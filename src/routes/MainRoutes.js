@@ -15,6 +15,8 @@ import ViewOperatorEntry from 'views/pages/master/operator/operatorEntry/ViewOpe
 import ViewSeason from 'views/pages/master/season/ViewSeason';
 import ViewHotelBasis from 'views/pages/master/hotelMaster/hotelBasis/ViewHotelBasis';
 import ViewRoomCategory from 'views/pages/master/hotelMaster/roomCategory/ViewRoomCategory';
+import ViewHotelCategory from 'views/pages/master/hotelMaster/hotel_category/ViewHotelCategory';
+import ViewHotelFacility from 'views/pages/master/hotelMaster/hotel_facility/ViewHotelacility';
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
 
@@ -148,6 +150,14 @@ const MainRoutes = {
                 {
                     path: 'roomcategory',
                     element: <ViewRoomCategory />
+                },
+                {
+                    path: 'hotelcategoryview',
+                    element: <ViewHotelCategory />
+                },
+                {
+                    path: 'hotelFacilityview',
+                    element: <ViewHotelFacility />
                 }
             ]
         }

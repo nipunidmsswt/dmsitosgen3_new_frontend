@@ -141,14 +141,23 @@ import {
 //     checkLatestLocationModifiedDateSaga
 // } from './masterSaga/LocationSaga';
 
-// import {
-//     SAVE_HOTEL_CATEGORY_DATA,
-//     GET_HOTEL_CATEGORY_DATA_BY_ID,
-//     GET_ALL_HOTEL_CATEGORY_DATA,
-//     UPDATE_HOTEL_CATEGORY_DATA,
-//     CHECK_HOTEL_CATEGORY_DUPLICATE,
-//     GET_LAST_MODIFIED_DATE_TIME_HOTEL_CATEGORY
-// } from 'store/constant/master/HotelCategoryConstant';
+import {
+    SAVE_HOTEL_CATEGORY_DATA,
+    GET_HOTEL_CATEGORY_DATA_BY_ID,
+    GET_ALL_HOTEL_CATEGORY_DATA,
+    UPDATE_HOTEL_CATEGORY_DATA,
+    CHECK_HOTEL_CATEGORY_DUPLICATE,
+    GET_LAST_MODIFIED_DATE_TIME_HOTEL_CATEGORY
+} from 'store/constant/master/HotelCategoryConstant';
+
+import {
+    checkDupicateHotelCateogryCodeSaga,
+    checkLatestHotelCateogryModifiedDateSaga,
+    getAllHotelCateogrySaga,
+    getHotelCateogryByIdSaga,
+    saveHotelCateogrySaga,
+    updateHotelCateogrySaga
+} from './mastersaga/HotelCategorySaga';
 
 // import {
 //     SAVE_ROOM_RECREATION_DATA,
@@ -254,14 +263,6 @@ import { checkDuplicateTourTypeCode } from 'store/actions/masterActions/TourType
 //     saveOwner,
 //     updateOwnerSaga
 // } from './masterSaga/OwnerSaga';
-// import {
-//     checkDupicateHotelCateogryCodeSaga,
-//     checkLatestHotelCateogryModifiedDateSaga,
-//     getAllHotelCateogrySaga,
-//     getHotelCateogryByIdSaga,
-//     saveHotelCateogrySaga,
-//     updateHotelCateogrySaga
-// } from './masterSaga/HotelCategorySaga';
 
 import {
     CHECK_SEASON_DUPLICATE,
@@ -281,14 +282,24 @@ import {
     checkDupicateSeasonSaga
 } from './mastersaga/SeasonSaga';
 
-// import {
-//     GET_ALL_HOTEL_FACILITY_DATA,
-//     GET_HOTEL_FACILITY_DATA_BY_ID,
-//     GET_LAST_MODIFIED_DATE_TIME_HOTEL_FACILITY,
-//     SAVE_HOTEL_FACILITY_DATA,
-//     UPDATE_HOTEL_FACILITY_DATA,
-//     GET_ALL_HOTEL_FACILITY_TYPES_DATA
-// } from 'store/constant/master/HotelFacilityConstant';
+import {
+    GET_ALL_HOTEL_FACILITY_DATA,
+    GET_HOTEL_FACILITY_DATA_BY_ID,
+    GET_LAST_MODIFIED_DATE_TIME_HOTEL_FACILITY,
+    SAVE_HOTEL_FACILITY_DATA,
+    UPDATE_HOTEL_FACILITY_DATA,
+    GET_ALL_HOTEL_FACILITY_TYPES_DATA
+} from 'store/constant/master/HotelFacilityConstant';
+
+import {
+    saveHotelFacilitySaga,
+    checkDupicateHotelFacilitySaga,
+    getAllHotelFacilitySaga,
+    getFacilityByIdSaga,
+    updateHotelFacilitySaga,
+    checkLatestHotelFacilityModifiedDateSaga,
+    getAllHotelFacilityTypesSaga
+} from './mastersaga/HotelFacilitySaga';
 
 import {
     CHECK_MARKET_GROUP_CODE_DUPLICATE,
@@ -342,15 +353,6 @@ import {
     UPDATE_ROOM_CATEGORY
 } from 'store/constant/master/RoomCategoryConstant';
 
-// import {
-//     saveHotelFacilitySaga,
-//     checkDupicateHotelFacilitySaga,
-//     getAllHotelFacilitySaga,
-//     getFacilityByIdSaga,
-//     updateHotelFacilitySaga,
-//     checkLatestHotelFacilityModifiedDateSaga,
-//     getAllHotelFacilityTypesSaga
-// } from './masterSaga/HotelFacilitySaga';
 export function* wacherSaga() {
     // tax setup
     yield takeLatest(SAVE_TAX_DATA, saveTaxSaga);
@@ -418,24 +420,24 @@ export function* wacherSaga() {
     // yield takeLatest(CHECK_CODE_TYPE_DUPLICATE, checkDupicateCodeTypeSaga);
     // yield takeLatest(GET_CODE_LAST_MODIFIED_DATE_TIME, checkCodeLatestModifiedDateSaga);
 
-    // //hotel category
-    // // yield takeLatest(SAVE_TAX_DATA, saveTaxSaga);
-    // // yield takeLatest(GET_TAX_DATA_BY_ID, getTaxByIdSaga);
-    // // yield takeLatest(GET_ALL_TAX_DATA, getAllTaxSaga);
-    // // yield takeLatest(UPDATE_TAX_DATA, updateTaxSaga);
-    // // yield takeLatest(CHECK_TAX_DUPLICATE, checkDupicateTaxCodeSaga);
-    // // yield takeLatest(
-    // //   GET_LAST_MODIFIED_DATE_TIME_TAX,
-    // //   checkLatestTaxModifiedDateSaga
-    // // );
+    //hotel category
+    // yield takeLatest(SAVE_TAX_DATA, saveTaxSaga);
+    // yield takeLatest(GET_TAX_DATA_BY_ID, getTaxByIdSaga);
+    // yield takeLatest(GET_ALL_TAX_DATA, getAllTaxSaga);
+    // yield takeLatest(UPDATE_TAX_DATA, updateTaxSaga);
+    // yield takeLatest(CHECK_TAX_DUPLICATE, checkDupicateTaxCodeSaga);
+    // yield takeLatest(
+    //   GET_LAST_MODIFIED_DATE_TIME_TAX,
+    //   checkLatestTaxModifiedDateSaga
+    // );
 
-    // //hotel category
-    // yield takeLatest(SAVE_HOTEL_CATEGORY_DATA, saveHotelCateogrySaga);
-    // yield takeLatest(GET_HOTEL_CATEGORY_DATA_BY_ID, getHotelCateogryByIdSaga);
-    // yield takeLatest(GET_ALL_HOTEL_CATEGORY_DATA, getAllHotelCateogrySaga);
-    // yield takeLatest(UPDATE_HOTEL_CATEGORY_DATA, updateHotelCateogrySaga);
-    // yield takeLatest(CHECK_HOTEL_CATEGORY_DUPLICATE, checkDupicateHotelCateogryCodeSaga);
-    // yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_HOTEL_CATEGORY, checkLatestHotelCateogryModifiedDateSaga);
+    //hotel category
+    yield takeLatest(SAVE_HOTEL_CATEGORY_DATA, saveHotelCateogrySaga);
+    yield takeLatest(GET_HOTEL_CATEGORY_DATA_BY_ID, getHotelCateogryByIdSaga);
+    yield takeLatest(GET_ALL_HOTEL_CATEGORY_DATA, getAllHotelCateogrySaga);
+    yield takeLatest(UPDATE_HOTEL_CATEGORY_DATA, updateHotelCateogrySaga);
+    yield takeLatest(CHECK_HOTEL_CATEGORY_DUPLICATE, checkDupicateHotelCateogryCodeSaga);
+    yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_HOTEL_CATEGORY, checkLatestHotelCateogryModifiedDateSaga);
 
     // //room recreation
     // yield takeLatest(SAVE_ROOM_RECREATION_DATA, saveRoomRecreationSaga);
@@ -516,16 +518,16 @@ export function* wacherSaga() {
     yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_SEASON, checkLatestSeasonModifiedDateSaga);
 
     // //hotel facility data
-    // yield takeLatest(SAVE_HOTEL_FACILITY_DATA, saveHotelFacilitySaga);
-    // yield takeLatest(GET_HOTEL_FACILITY_DATA_BY_ID, getFacilityByIdSaga);
-    // yield takeLatest(GET_ALL_HOTEL_FACILITY_DATA, getAllHotelFacilitySaga);
-    // yield takeLatest(UPDATE_HOTEL_FACILITY_DATA, updateHotelFacilitySaga);
-    // yield takeLatest(CHECK_HOTEL_CATEGORY_DUPLICATE, checkDupicateHotelFacilitySaga);
+    yield takeLatest(SAVE_HOTEL_FACILITY_DATA, saveHotelFacilitySaga);
+    yield takeLatest(GET_HOTEL_FACILITY_DATA_BY_ID, getFacilityByIdSaga);
+    yield takeLatest(GET_ALL_HOTEL_FACILITY_DATA, getAllHotelFacilitySaga);
+    yield takeLatest(UPDATE_HOTEL_FACILITY_DATA, updateHotelFacilitySaga);
+    yield takeLatest(CHECK_HOTEL_CATEGORY_DUPLICATE, checkDupicateHotelFacilitySaga);
 
-    // yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_HOTEL_FACILITY, checkLatestHotelFacilityModifiedDateSaga);
+    yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_HOTEL_FACILITY, checkLatestHotelFacilityModifiedDateSaga);
 
-    // //hotel facility types
-    // yield takeLatest(GET_ALL_HOTEL_FACILITY_TYPES_DATA, getAllHotelFacilityTypesSaga);
+    //hotel facility types
+    yield takeLatest(GET_ALL_HOTEL_FACILITY_TYPES_DATA, getAllHotelFacilityTypesSaga);
 
     // //Hotel Basis
 
