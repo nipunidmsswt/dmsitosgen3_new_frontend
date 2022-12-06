@@ -4,7 +4,7 @@ import { lazy } from 'react';
 import MainLayout from 'layout/MainLayout';
 import Loadable from 'ui-component/Loadable';
 import ViewTax from 'views/pages/master/tax/ViewTax';
-
+import ViewTaxGroup from 'views/pages/master/tax_group/ViewTaxGroup';
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
 
@@ -94,6 +94,10 @@ const MainRoutes = {
                 {
                     path: 'taxview',
                     element: <ViewTax />
+                },
+                {
+                    path: 'taxgroupview',
+                    element: <ViewTaxGroup />
                 }
             ]
         }

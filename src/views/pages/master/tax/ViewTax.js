@@ -206,9 +206,9 @@ const ViewTax = () => {
                                             maxHeight: 30,
                                             padding: 2,
                                             fontSize: '14px',
-                                            background: '#0288d1',
-                                            background: '-ms-linear-gradient(top, #0790E8, #3180e6)',
-                                            background: '-webkit-linear-gradient(top, #0790E8, #3180e6)',
+                                            backgroundColor: '#2196F3',
+                                            // background: '-ms-linear-gradient(top, #0790E8, #3180e6)',
+                                            // background: '-webkit-linear-gradient(top, #0790E8, #3180e6)',
                                             textAlign: 'center',
                                             color: '#FFF'
                                         },

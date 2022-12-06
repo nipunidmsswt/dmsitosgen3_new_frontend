@@ -59,7 +59,7 @@ const utilities = {
                     id: 'material-icons',
                     title: 'Tax Group',
                     type: 'item',
-                    url: '/utils/util-color',
+                    url: '/master/taxgroupview',
                     breadcrumbs: false
                 },
                 {
