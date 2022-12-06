@@ -47,7 +47,7 @@ const utilities = {
             icon: icons.IconWindmill,
             children: [
                 {
-                    id: 'tabler-icons',
+                    id: 'tax-id',
                     title: 'Tax',
                     // icon: icons.IconTypography,
                     // type: 'collapse',
@@ -56,10 +56,10 @@ const utilities = {
                     breadcrumbs: false
                 },
                 {
-                    id: 'material-icons',
+                    id: 'tax-group-id',
                     title: 'Tax Group',
                     type: 'item',
-                    url: '/utils/util-color',
+                    url: '/master/taxgroupview',
                     breadcrumbs: false
                 },
                 {
@@ -111,6 +111,14 @@ const utilities = {
                         //     path: "/master/marketGroup",
                         //   },
                     ]
+                },
+
+                {
+                    id: 'tour-category-id',
+                    title: 'Tour Category',
+                    type: 'item',
+                    url: '/master/tourcategoryview',
+                    breadcrumbs: false
                 }
             ]
         }

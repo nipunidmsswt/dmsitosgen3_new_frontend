@@ -10,7 +10,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import { getAllTaxData, getLatestModifiedTaxDetails } from 'store/actions/masterActions/TaxActions/TaxAction';
 import SuccessMsg from 'messages/SuccessMsg';
 import ErrorMsg from 'messages/ErrorMsg';
-import SubCard from 'ui-component/cards/SubCard';
 
 const ViewTax = () => {
     const columns = [
@@ -117,7 +116,7 @@ const ViewTax = () => {
         setLastModifiedTimeDate(
             lastModifiedDate === null
                 ? ''
-                : new Date(lastModifiedDate).toLocaleString('en-US', {
+                : new Date(lastModifiedDate).toLocaleString('en-GB', {
                       year: 'numeric',
                       month: 'long',
                       day: '2-digit',
@@ -151,9 +150,10 @@ const ViewTax = () => {
     return (
         <div>
             <MainCard title="Tax Setup">
+                <div style={{ textAlign: 'right' }}> Last Modified Date : {lastModifiedTimeDate}</div>
+                <br />
                 <Grid container spacing={gridSpacing}>
                     <Grid item xs={12}>
-                        {/* <SubCard title={'Last Modified Date :' + { lastModifiedTimeDate }}> */}
                         <Grid container spacing={gridSpacing}>
                             <Grid item xs={12}>
                                 <MaterialTable
@@ -206,7 +206,7 @@ const ViewTax = () => {
                                             maxHeight: 30,
                                             padding: 2,
                                             fontSize: '14px',
-                                            background: '#0288d1',
+                                            backgroundColor: '#2196F3',
                                             background: '-ms-linear-gradient(top, #0790E8, #3180e6)',
                                             background: '-webkit-linear-gradient(top, #0790E8, #3180e6)',
                                             textAlign: 'center',

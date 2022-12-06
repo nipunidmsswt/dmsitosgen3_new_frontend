@@ -4,7 +4,7 @@ const config = {
     // basename: '/free',
     defaultPath: '/dashboard/default',
     fontFamily: `'Lexend', sans-serif`,
-    borderRadius: 18
+    borderRadius: 12
 };
 
 export default config;
