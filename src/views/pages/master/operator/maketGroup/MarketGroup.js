@@ -37,6 +37,7 @@ import {
     updateMarketGroupData
 } from 'store/actions/masterActions/operatorActions/MarketGroupAction';
 import { getAllActiveMarketData } from 'store/actions/masterActions/operatorActions/MarketAction';
+import CreatedUpdatedUserDetailsWithTableFormat from '../../userTimeDetails/CreatedUpdatedUserDetailsWithTableFormat';
 
 const MarketGroup = ({ open, handleClose, mode, marketGroupCode }) => {
     const initialValues1 = {

@@ -208,7 +208,7 @@ function ViewCodeAndName() {
                                             background: '-moz-linear-gradient(top, #0790E8, #3180e6)',
                                             background: '-ms-linear-gradient(top, #0790E8, #3180e6)',
                                             background: '-webkit-linear-gradient(top, #0790E8, #3180e6)',
-                                            textAlign: 'center',
+                                            // textAlign: 'center',
                                             color: '#FFF'
                                         },
                                         rowStyle: {

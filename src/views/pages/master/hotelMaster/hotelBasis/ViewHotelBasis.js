@@ -1,101 +1,51 @@
-import { useEffect, useState, forwardRef } from 'react';
+import React from 'react';
 import MaterialTable from 'material-table';
-import SuccessMsg from 'messages/SuccessMsg';
-import ErrorMsg from 'messages/ErrorMsg';
+import { useEffect, useState } from 'react';
+import { styled } from '@mui/material/styles';
+import { Typography, TextField } from '@mui/material';
+import Box from '@mui/material/Box';
+import Paper from '@mui/material/Paper';
+import Grid from '@mui/material/Grid';
+import { useDispatch, useSelector } from 'react-redux';
 import tableIcons from 'utils/MaterialTableIcons';
 import { gridSpacing } from 'store/constant';
-import { useSelector, useDispatch } from 'react-redux';
-import Manager from './Manager';
-import { Grid } from '@mui/material';
-import { getAllManagerData, getLatestModifiedDetails } from 'store/actions/masterActions/operatorActions/ManagerAction';
+import SuccessMsg from 'messages/SuccessMsg';
+import ErrorMsg from 'messages/ErrorMsg';
+import HotelBasis from './HotelBasis';
+import { getAllHotelBasisData, getHotelBasisLatestModifiedDetails } from 'store/actions/masterActions/operatorActions/HotelBasisAction';
 import MainCard from 'ui-component/cards/MainCard';
 
-function ViewManager() {
+function ViewHotelBasis() {
     const [open, setOpen] = useState(false);
-    const [managerCode, setManagerCode] = useState('');
+    const [rowHotelBasisCode, setHotelBasisCode] = useState('');
     const [mode, setMode] = useState('INSERT');
     const [openToast, setHandleToast] = useState(false);
     const [openErrorToast, setOpenErrorToast] = useState(false);
-    const [tableData, setTableData] = useState([]);
-    const columns = [
-        {
-            title: 'Code',
-            field: 'code',
-            filterPlaceholder: 'filter',
-            align: 'center'
-        },
-        {
-            title: 'Initial',
-            field: 'initials',
-            filterPlaceholder: 'filter',
-            align: 'center'
-        },
-        {
-            title: 'Surname',
-            field: 'surName',
-            align: 'center',
-            grouping: false,
-            filterPlaceholder: 'filter'
-        },
-        {
-            title: 'Mobile Number',
-            field: 'mobileNumber',
-            align: 'center',
-            grouping: false,
-            filterPlaceholder: 'filter'
-        },
-        {
-            title: 'Fax',
-            field: 'fax',
-            align: 'center',
-            grouping: false,
-            filterPlaceholder: 'filter'
-        },
-        {
-            title: 'Cluster',
-            field: 'codeAndNameDetail',
-            align: 'center',
-            grouping: false,
-            filterPlaceholder: 'filter'
-        },
-        {
-            title: 'Active',
-            field: 'status',
-            filterPlaceholder: 'True || False',
-            align: 'center',
-            emptyValue: () => <em>null</em>,
-            render: (rowData) => (
-                <div
-                    style={{
-                        color: rowData.status === true ? '#008000aa' : '#f90000aa',
-                        fontWeight: 'bold',
-                        // background: rowData.status === true ? "#008000aa" : "#f90000aa",
-                        borderRadius: '4px',
-                        paddingLeft: 5,
-                        paddingRight: 5
-                    }}
-                >
-                    {rowData.status === true ? 'Active' : 'Inactive'}
-                </div>
-            )
-        }
-    ];
-    const error = useSelector((state) => state.managerReducer.errorMsg);
-    const dispatch = useDispatch();
-    const managerData = useSelector((state) => state.managerReducer.manager);
-    const managerListData = useSelector((state) => state.managerReducer.managerList);
-    const lastModifiedDate = useSelector((state) => state.managerReducer.lastModifiedDateTime);
-
-    useEffect(() => {
-        if (managerData) {
-            setHandleToast(true);
-            dispatch(getAllManagerData());
-            dispatch(getLatestModifiedDetails());
-        } else {
-        }
-    }, [managerData]);
-
     const [lastModifiedTimeDate, setLastModifiedTimeDate] = useState(null);
+    const error = useSelector((state) => state.productDataReducer.errorMsg);
+    const hotelBasisListData = useSelector((state) => state.hotelBasisReducer.hotelBasisList);
+    const [tableData, setTableData] = useState([]);
+    const lastModifiedDate = useSelector((state) => state.hotelBasisReducer.lastModifiedDateTime);
+
+    const hotelBasisData = useSelector((state) => state.hotelBasisReducer.hotelBasis);
+    const dispatch = useDispatch();
+
+    const handleClickOpen = (type, data) => {
+        if (type === 'VIEW_UPDATE' || type === 'VIEW') {
+            setMode(type);
+            setHotelBasisCode(data.code);
+        } else {
+            setHotelBasisCode('');
+            setMode(type);
+        }
+
+        setOpen(true);
+    };
+
+    //   useEffect(() => {
+    //     setLastModifiedTimeDate(dateFormator(lastModifiedDate));
+    //     setLastModifiedTimeDate(lastModifiedDate);
+    // }, [lastModifiedDate]);
 
     useEffect(() => {
         setLastModifiedTimeDate(
@@ -113,26 +63,15 @@ function ViewManager() {
     }, [lastModifiedDate]);
 
     useEffect(() => {
-        const dataArray = [];
-        if (managerListData?.payload?.length > 0) {
-            {
-                managerListData?.payload.length != 0 &&
-                    managerListData?.payload[0].map((item) => {
-                        const initialValues = {
-                            code: item.code,
-                            initials: item.initials,
-                            surName: item.surName,
-                            mobileNumber: item.managerAdditionalDetails[0].officeTelNumber,
-                            codeAndNameDetail: item.codeAndNameDetail.name,
-                            fax: item.managerAdditionalDetails[0].fax1,
-                            status: item.status
-                        };
-                        dataArray.push(initialValues);
-                    });
-            }
+        dispatch(getAllHotelBasisData());
+        dispatch(getHotelBasisLatestModifiedDetails());
+    }, []);
+
+    useEffect(() => {
+        if (hotelBasisListData?.payload?.length > 0) {
+            setTableData(hotelBasisListData?.payload[0]);
         }
-        setTableData(dataArray);
-    }, [managerListData]);
+    }, [hotelBasisListData]);
 
     useEffect(() => {
         console.log(error);
@@ -143,25 +82,12 @@ function ViewManager() {
     }, [error]);
 
     useEffect(() => {
-        dispatch(getAllManagerData());
-        dispatch(getLatestModifiedDetails());
-    }, []);
-
-    const handleClickOpen = (type, data) => {
-        console.log(type);
-        console.log(data);
-        if (type === 'VIEW_UPDATE') {
-            setMode(type);
-            setManagerCode(data.code);
-        } else if (type === 'INSERT') {
-            setManagerCode('');
-            setMode(type);
-        } else {
-            setMode(type);
-            setManagerCode(data.code);
+        if (hotelBasisData) {
+            setHandleToast(true);
+            dispatch(getAllHotelBasisData());
+            dispatch(getHotelBasisLatestModifiedDetails());
         }
-        setOpen(true);
-    };
+    }, [hotelBasisData]);
 
     const handleClose = () => {
         setOpen(false);
@@ -170,12 +96,52 @@ function ViewManager() {
     const handleToast = () => {
         setHandleToast(false);
     };
-    const handleErrorToast = () => {
-        setOpenErrorToast(false);
-    };
+
+    const columns = [
+        {
+            title: 'Basis Code',
+            field: 'code',
+            headerStyle: { textAlign: 'center' },
+            align: 'center',
+            filterPlaceholder: 'filter'
+            // cellStyle: {
+            //     minWidth: 200,
+            //     maxWidth: 200,
+            //     align: 'center'
+            // },
+        },
+        {
+            title: 'Basis Description',
+            field: 'basisDesc',
+            filterPlaceholder: 'filter',
+            align: 'center'
+        },
+
+        {
+            title: 'Status',
+            field: 'status',
+            filterPlaceholder: 'True || False',
+            align: 'center',
+            emptyValue: () => <em>null</em>,
+            render: (rowData) => (
+                <div
+                    style={{
+                        color: rowData.status === true ? '#008000aa' : '#f90000aa',
+                        fontWeight: 'bold',
+                        // background: rowData.status === true ? "#008000aa" : "#f90000aa",
+                        borderRadius: '4px',
+                        paddingLeft: 5,
+                        paddingRight: 5
+                    }}
+                >
+                    {rowData.status === true ? 'ACTIVE' : 'INACTIVE'}
+                </div>
+            )
+        }
+    ];
     return (
         <div>
-            <MainCard title="Manager">
+            <MainCard title="Hotel Basis">
                 <div style={{ textAlign: 'right' }}> Last Modified Date : {lastModifiedTimeDate}</div>
                 <br />
                 <Grid container spacing={gridSpacing}>
@@ -188,22 +154,26 @@ function ViewManager() {
                                     actions={[
                                         {
                                             icon: tableIcons.Add,
-                                            tooltip: 'Add Manager',
+                                            tooltip: 'Add Hotel Basis',
                                             isFreeAction: true,
                                             onClick: () => handleClickOpen('INSERT', null)
                                         },
                                         (rowData) => ({
                                             icon: tableIcons.Edit,
-                                            tooltip: 'Edit Manager',
+                                            filtering: true,
+                                            tooltip: 'Edit Hotel Basis',
+                                            // iconProps: { color: "primary" },
                                             onClick: () => handleClickOpen('VIEW_UPDATE', rowData)
                                         }),
                                         (rowData) => ({
                                             icon: tableIcons.VisibilityIcon,
-                                            tooltip: 'View Manager',
+                                            tooltip: 'View Hotel Basis',
+                                            // iconProps: { color: "action" },
                                             onClick: () => handleClickOpen('VIEW', rowData)
                                         })
                                     ]}
                                     options={{
+                                        // title:<ModifiedElement/>,
                                         padding: 'dense',
                                         showTitle: false,
                                         sorting: true,
@@ -217,10 +187,13 @@ function ViewManager() {
                                         pageSize: 5,
                                         paginationType: 'stepped',
                                         showFirstLastPageButtons: false,
+                                        // paginationPosition: "both",
                                         exportButton: true,
                                         exportAllData: true,
-                                        exportFileName: 'ManagerData',
+                                        exportFileName: 'Tour Category Table Data',
                                         actionsColumnIndex: -1,
+
+                                        // grouping: true,
                                         columnsButton: true,
 
                                         headerStyle: {
@@ -232,8 +205,7 @@ function ViewManager() {
                                             background: '-moz-linear-gradient(top, #0790E8, #3180e6)',
                                             background: '-ms-linear-gradient(top, #0790E8, #3180e6)',
                                             background: '-webkit-linear-gradient(top, #0790E8, #3180e6)',
-                                            textAlign: 'center',
-                                            alignItems: 'center',
+                                            // textAlign: 'center',
                                             color: '#FFF'
                                         },
                                         rowStyle: {
@@ -245,7 +217,11 @@ function ViewManager() {
                                     }}
                                 />
 
-                                {open ? <Manager open={open} handleClose={handleClose} managerCode={managerCode} mode={mode} /> : ''}
+                                {open ? (
+                                    <HotelBasis open={open} handleClose={handleClose} mode={mode} rowHotelBasisCode={rowHotelBasisCode} />
+                                ) : (
+                                    ''
+                                )}
                                 {openToast ? <SuccessMsg openToast={openToast} handleToast={handleToast} mode={mode} /> : null}
                                 {openErrorToast ? (
                                     <ErrorMsg openToast={openErrorToast} handleToast={setOpenErrorToast} mode={mode} />
@@ -260,4 +236,4 @@ function ViewManager() {
     );
 }
 
-export default ViewManager;
+export default ViewHotelBasis;
