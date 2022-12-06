@@ -90,47 +90,47 @@ import {
 //     GET_LAST_MODIFIED_DATE_TIME_LOCATION
 // } from 'store/constant/master/LocationConstant';
 
-// import {
-//     CHECK_CODE_DUPLICATE,
-//     CHECK_CODE_TYPE_DUPLICATE,
-//     GET_ALL_CLUSTER_DATA,
-//     GET_ALL_CODE_AND_NAME_DATA,
-//     GET_CODE_LAST_MODIFIED_DATE_TIME,
-//     GET_CODE_NAME_DATA_BY_CODE,
-//     SAVE_CODE_AND_NAME_DATA,
-//     UPDATE_CODE_AND_NAME_DATA
-// } from 'store/constant/master/CodeAndNameConstant';
+import {
+    CHECK_CODE_DUPLICATE,
+    CHECK_CODE_TYPE_DUPLICATE,
+    GET_ALL_CLUSTER_DATA,
+    GET_ALL_CODE_AND_NAME_DATA,
+    GET_CODE_LAST_MODIFIED_DATE_TIME,
+    GET_CODE_NAME_DATA_BY_CODE,
+    SAVE_CODE_AND_NAME_DATA,
+    UPDATE_CODE_AND_NAME_DATA
+} from 'store/constant/master/CodeAndNameConstant';
 
-// import {
-//     saveCodeAndNameDataHandler,
-//     getAllCodeAndNameSaga,
-//     getCodeAndNameByCodeSaga,
-//     updateCodeAndNameDataSaga,
-//     checkDupicateCodeSaga,
-//     checkDupicateCodeTypeSaga,
-//     checkCodeLatestModifiedDateSaga,
-//     getAllClusterTypeData
-// } from './masterSaga/CodeAndNameSaga';
+import {
+    saveCodeAndNameDataHandler,
+    getAllCodeAndNameSaga,
+    getCodeAndNameByCodeSaga,
+    updateCodeAndNameDataSaga,
+    checkDupicateCodeSaga,
+    checkDupicateCodeTypeSaga,
+    checkCodeLatestModifiedDateSaga,
+    getAllClusterTypeData
+} from './mastersaga/CodeAndNameSaga';
 
-// import {
-//     CHECK_MANAGER_CODE_DUPLICATE,
-//     GET_ALL_ACTIVE_MANAGER_DATA,
-//     GET_ALL_MANAGER_DATA,
-//     GET_MANAGER_DETAILS_BY_CODE,
-//     GET_MANAGER_LAST_MODIFIED_DATE_TIME,
-//     SAVE_MANAGER_DATA,
-//     UPDATE_MANAGER_DATA
-// } from 'store/constant/master/ManagerConstant';
+import {
+    CHECK_MANAGER_CODE_DUPLICATE,
+    GET_ALL_ACTIVE_MANAGER_DATA,
+    GET_ALL_MANAGER_DATA,
+    GET_MANAGER_DETAILS_BY_CODE,
+    GET_MANAGER_LAST_MODIFIED_DATE_TIME,
+    SAVE_MANAGER_DATA,
+    UPDATE_MANAGER_DATA
+} from 'store/constant/master/ManagerConstant';
 
-// import {
-//     saveManagerDataHandler,
-//     getAllManagerDataSaga,
-//     getManagerDetailsByCodeSaga,
-//     getManagerLatestModifiedDateSaga,
-//     checkManagerDupicateCodeSaga,
-//     updateManagerDataSaga,
-//     getAllActiveManagerDataSaga
-// } from './masterSaga/ManagerSaga';
+import {
+    saveManagerDataHandler,
+    getAllManagerDataSaga,
+    getManagerDetailsByCodeSaga,
+    getManagerLatestModifiedDateSaga,
+    checkManagerDupicateCodeSaga,
+    updateManagerDataSaga,
+    getAllActiveManagerDataSaga
+} from './mastersaga/ManagerSaga';
 
 // import {
 //     saveLocationSaga,
@@ -186,24 +186,24 @@ import {
 //     UPDATE_MANAGING_COMAPANY_DATA
 // } from 'store/constant/master/ManagingCompanyConstant';
 
-// import {
-//     saveMarketDataHandler,
-//     getMarketLatestModifiedDateSaga,
-//     getAllMarketDataSaga,
-//     getMarketDetailsByCodeSaga,
-//     updateMarketDataSaga,
-//     checkMarketDupicateCodeSaga,
-//     getAllActiveMarketDataSaga
-// } from './masterSaga/MarketSaga';
-// import {
-//     CHECK_MARKET_CODE_DUPLICATE,
-//     GET_ALL_ACTIVE_MARKET_DATA,
-//     GET_ALL_MARKET_DATA,
-//     GET_MARKET_DETAILS_BY_CODE,
-//     GET_MARKET_LAST_MODIFIED_DATE_TIME,
-//     SAVE_MARKET_DATA,
-//     UPDATE_MARKET_DATA
-// } from 'store/constant/master/MarketConstant';
+import {
+    saveMarketDataHandler,
+    getMarketLatestModifiedDateSaga,
+    getAllMarketDataSaga,
+    getMarketDetailsByCodeSaga,
+    updateMarketDataSaga,
+    checkMarketDupicateCodeSaga,
+    getAllActiveMarketDataSaga
+} from './mastersaga/MarketSaga';
+import {
+    CHECK_MARKET_CODE_DUPLICATE,
+    GET_ALL_ACTIVE_MARKET_DATA,
+    GET_ALL_MARKET_DATA,
+    GET_MARKET_DETAILS_BY_CODE,
+    GET_MARKET_LAST_MODIFIED_DATE_TIME,
+    SAVE_MARKET_DATA,
+    UPDATE_MARKET_DATA
+} from 'store/constant/master/MarketConstant';
 
 // import {
 //     CHECK_SERVICEOFFERED_CODE_DUPLICATE,
@@ -221,15 +221,22 @@ import {
 //     saveServiceOffered,
 //     updateServiceOfferedSaga
 // } from './masterSaga/ServiceOfferedSaga';
-// import {
-//     CHECK_TOURTYPE_CODE_DUPLICATE,
-//     GET_ALL_TOURTYPE_DATA,
-//     GET_TOURTYPE_DATA_BY_ID,
-//     GET_TOURTYPE_LAST_MODIFIED_DATE_TIME,
-//     SAVE_TOURTYPE_DATA,
-//     UPDATE_TOURTYPE_DATA
-// } from 'store/constant/master/TourTypeConstant';
-// import { checkTourTypeLatestModifiedDateSaga, getAllTourTypeSaga, getTourTypeByIdSaga, saveTourType } from './masterSaga/TourTypeSaga';
+import {
+    CHECK_TOURTYPE_CODE_DUPLICATE,
+    GET_ALL_TOURTYPE_DATA,
+    GET_TOURTYPE_DATA_BY_ID,
+    GET_TOURTYPE_LAST_MODIFIED_DATE_TIME,
+    SAVE_TOURTYPE_DATA,
+    UPDATE_TOURTYPE_DATA
+} from 'store/constant/master/TourTypeConstant';
+import {
+    checkTourTypeLatestModifiedDateSaga,
+    getAllTourTypeSaga,
+    getTourTypeByIdSaga,
+    saveTourType,
+    updateTourTypeSaga
+} from './mastersaga/TourTypeSaga';
+import { checkDuplicateTourTypeCode } from 'store/actions/masterActions/TourTypeAction';
 // import { checkDuplicateTourTypeCode, getAllTourTypeData } from '../actions/masterActions/TourTypeAction';
 // import {
 //     CHECK_OWNER_CODE_DUPLICATE,
@@ -283,24 +290,24 @@ import {
 //     GET_ALL_HOTEL_FACILITY_TYPES_DATA
 // } from 'store/constant/master/HotelFacilityConstant';
 
-// import {
-//     CHECK_MARKET_GROUP_CODE_DUPLICATE,
-//     GET_ALL_ACTIVE_MARKET_GROUP_DATA,
-//     GET_ALL_MARKET_GROUP_DATA,
-//     GET_ALL_MARKET_GROUP_GROUP_DATA,
-//     GET_MARKET_GROUP_DETAILS_BY_CODE,
-//     GET_MARKET_GROUP_LAST_MODIFIED_DATE_TIME,
-//     SAVE_MARKET_GROUP_DATA,
-//     UPDATE_MARKET_GROUP_DATA
-// } from 'store/constant/master/MarketGroupConstant';
-// import {
-//     checkMarketGroupDupicateCodeSaga,
-//     getAllMarketGroupDataSaga,
-//     getMarketGroupDetailsByCodeSaga,
-//     getMarketGroupLatestModifiedDateSaga,
-//     saveMarketGroupDataHandler,
-//     updateMarketGroupDataSaga
-// } from './masterSaga/MarketGroupSaga';
+import {
+    CHECK_MARKET_GROUP_CODE_DUPLICATE,
+    GET_ALL_ACTIVE_MARKET_GROUP_DATA,
+    GET_ALL_MARKET_GROUP_DATA,
+    GET_ALL_MARKET_GROUP_GROUP_DATA,
+    GET_MARKET_GROUP_DETAILS_BY_CODE,
+    GET_MARKET_GROUP_LAST_MODIFIED_DATE_TIME,
+    SAVE_MARKET_GROUP_DATA,
+    UPDATE_MARKET_GROUP_DATA
+} from 'store/constant/master/MarketGroupConstant';
+import {
+    checkMarketGroupDupicateCodeSaga,
+    getAllMarketGroupDataSaga,
+    getMarketGroupDetailsByCodeSaga,
+    getMarketGroupLatestModifiedDateSaga,
+    saveMarketGroupDataHandler,
+    updateMarketGroupDataSaga
+} from './mastersaga/MarketGroupSaga';
 // import {
 //     CHECK_HOTEL_BASIS_CODE_DUPLICATE,
 //     GET_ALL_HOTEL_BASIS,
@@ -390,9 +397,13 @@ export function* wacherSaga() {
 
     // //code&Name setup
 
-    // yield takeLatest(SAVE_CODE_AND_NAME_DATA, saveCodeAndNameDataHandler);
-    // yield takeLatest(GET_ALL_CODE_AND_NAME_DATA, getAllCodeAndNameSaga);
-    // yield takeLatest(GET_CODE_NAME_DATA_BY_CODE, getCodeAndNameByCodeSaga);
+    yield takeLatest(SAVE_CODE_AND_NAME_DATA, saveCodeAndNameDataHandler);
+    yield takeLatest(GET_ALL_CODE_AND_NAME_DATA, getAllCodeAndNameSaga);
+    yield takeLatest(GET_CODE_NAME_DATA_BY_CODE, getCodeAndNameByCodeSaga);
+    yield takeLatest(UPDATE_CODE_AND_NAME_DATA, updateCodeAndNameDataSaga);
+    yield takeLatest(CHECK_CODE_DUPLICATE, checkDupicateCodeSaga);
+    yield takeLatest(CHECK_CODE_TYPE_DUPLICATE, checkDupicateCodeTypeSaga);
+    yield takeLatest(GET_CODE_LAST_MODIFIED_DATE_TIME, checkCodeLatestModifiedDateSaga);
 
     // //location data
     // yield takeLatest(SAVE_LOCATION_DATA, saveLocationSaga);
@@ -437,23 +448,23 @@ export function* wacherSaga() {
 
     // //Manager
 
-    // yield takeLatest(SAVE_MANAGER_DATA, saveManagerDataHandler);
-    // yield takeLatest(GET_ALL_MANAGER_DATA, getAllManagerDataSaga);
-    // yield takeLatest(GET_MANAGER_DETAILS_BY_CODE, getManagerDetailsByCodeSaga);
-    // yield takeLatest(GET_MANAGER_LAST_MODIFIED_DATE_TIME, getManagerLatestModifiedDateSaga);
-    // yield takeLatest(CHECK_MANAGER_CODE_DUPLICATE, checkManagerDupicateCodeSaga);
-    // yield takeLatest(UPDATE_MANAGER_DATA, updateManagerDataSaga);
-    // yield takeLatest(GET_ALL_ACTIVE_MANAGER_DATA, getAllActiveManagerDataSaga);
+    yield takeLatest(SAVE_MANAGER_DATA, saveManagerDataHandler);
+    yield takeLatest(GET_ALL_MANAGER_DATA, getAllManagerDataSaga);
+    yield takeLatest(GET_MANAGER_DETAILS_BY_CODE, getManagerDetailsByCodeSaga);
+    yield takeLatest(GET_MANAGER_LAST_MODIFIED_DATE_TIME, getManagerLatestModifiedDateSaga);
+    yield takeLatest(CHECK_MANAGER_CODE_DUPLICATE, checkManagerDupicateCodeSaga);
+    yield takeLatest(UPDATE_MANAGER_DATA, updateManagerDataSaga);
+    yield takeLatest(GET_ALL_ACTIVE_MANAGER_DATA, getAllActiveManagerDataSaga);
 
     // //Market
 
-    // yield takeLatest(SAVE_MARKET_DATA, saveMarketDataHandler);
-    // yield takeLatest(GET_ALL_MARKET_DATA, getAllMarketDataSaga);
-    // yield takeLatest(GET_MARKET_DETAILS_BY_CODE, getMarketDetailsByCodeSaga);
-    // yield takeLatest(GET_MARKET_LAST_MODIFIED_DATE_TIME, getMarketLatestModifiedDateSaga);
-    // yield takeLatest(CHECK_MARKET_CODE_DUPLICATE, checkMarketDupicateCodeSaga);
-    // yield takeLatest(UPDATE_MARKET_DATA, updateMarketDataSaga);
-    // yield takeLatest(GET_ALL_ACTIVE_MARKET_DATA, getAllActiveMarketDataSaga);
+    yield takeLatest(SAVE_MARKET_DATA, saveMarketDataHandler);
+    yield takeLatest(GET_ALL_MARKET_DATA, getAllMarketDataSaga);
+    yield takeLatest(GET_MARKET_DETAILS_BY_CODE, getMarketDetailsByCodeSaga);
+    yield takeLatest(GET_MARKET_LAST_MODIFIED_DATE_TIME, getMarketLatestModifiedDateSaga);
+    yield takeLatest(CHECK_MARKET_CODE_DUPLICATE, checkMarketDupicateCodeSaga);
+    yield takeLatest(UPDATE_MARKET_DATA, updateMarketDataSaga);
+    yield takeLatest(GET_ALL_ACTIVE_MARKET_DATA, getAllActiveMarketDataSaga);
 
     // //hotel service offered setup
     // yield takeLatest(SAVE_SERVICEOFFERED_DATA, saveServiceOffered);
@@ -463,22 +474,23 @@ export function* wacherSaga() {
     // yield takeLatest(GET_SERVICEOFFERED_LAST_MODIFIED_DATE_TIME, checkServiceOfferedLatestModifiedDateSaga);
     // yield takeLatest(CHECK_SERVICEOFFERED_CODE_DUPLICATE, checkDupicateServiceOfferedCodeSaga);
 
-    // //tour type setup
-    // yield takeLatest(SAVE_TOURTYPE_DATA, saveTourType);
-    // yield takeLatest(GET_ALL_TOURTYPE_DATA, getAllTourTypeSaga);
-    // yield takeLatest(GET_TOURTYPE_DATA_BY_ID, getTourTypeByIdSaga);
-    // yield takeLatest(UPDATE_TOURTYPE_DATA, updateServiceOfferedSaga);
-    // yield takeLatest(GET_TOURTYPE_LAST_MODIFIED_DATE_TIME, checkTourTypeLatestModifiedDateSaga);
-    // yield takeLatest(CHECK_TOURTYPE_CODE_DUPLICATE, checkDuplicateTourTypeCode);
+    //tour type setup
+    yield takeLatest(SAVE_TOURTYPE_DATA, saveTourType);
+    yield takeLatest(GET_ALL_TOURTYPE_DATA, getAllTourTypeSaga);
+    yield takeLatest(GET_TOURTYPE_DATA_BY_ID, getTourTypeByIdSaga);
+    yield takeLatest(UPDATE_TOURTYPE_DATA, updateTourTypeSaga);
+    yield takeLatest(GET_TOURTYPE_LAST_MODIFIED_DATE_TIME, checkTourTypeLatestModifiedDateSaga);
+    yield takeLatest(CHECK_TOURTYPE_CODE_DUPLICATE, checkDuplicateTourTypeCode);
+
     // // Market Group
 
-    // yield takeLatest(SAVE_MARKET_GROUP_DATA, saveMarketGroupDataHandler);
-    // yield takeLatest(GET_ALL_MARKET_GROUP_DATA, getAllMarketGroupDataSaga);
-    // yield takeLatest(GET_MARKET_GROUP_DETAILS_BY_CODE, getMarketGroupDetailsByCodeSaga);
-    // yield takeLatest(GET_MARKET_GROUP_LAST_MODIFIED_DATE_TIME, getMarketGroupLatestModifiedDateSaga);
-    // yield takeLatest(CHECK_MARKET_GROUP_CODE_DUPLICATE, checkMarketGroupDupicateCodeSaga);
-    // yield takeLatest(UPDATE_MARKET_GROUP_DATA, updateMarketGroupDataSaga);
-    // yield takeLatest(GET_ALL_ACTIVE_MARKET_GROUP_DATA, getAllMarketGroupDataSaga);
+    yield takeLatest(SAVE_MARKET_GROUP_DATA, saveMarketGroupDataHandler);
+    yield takeLatest(GET_ALL_MARKET_GROUP_DATA, getAllMarketGroupDataSaga);
+    yield takeLatest(GET_MARKET_GROUP_DETAILS_BY_CODE, getMarketGroupDetailsByCodeSaga);
+    yield takeLatest(GET_MARKET_GROUP_LAST_MODIFIED_DATE_TIME, getMarketGroupLatestModifiedDateSaga);
+    yield takeLatest(CHECK_MARKET_GROUP_CODE_DUPLICATE, checkMarketGroupDupicateCodeSaga);
+    yield takeLatest(UPDATE_MARKET_GROUP_DATA, updateMarketGroupDataSaga);
+    yield takeLatest(GET_ALL_ACTIVE_MARKET_GROUP_DATA, getAllMarketGroupDataSaga);
 
     // //managing company
     // yield takeLatest(SAVE_MANAGING_COMAPANY_DATA, saveManagingCompanySaga);

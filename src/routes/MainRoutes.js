@@ -6,6 +6,12 @@ import Loadable from 'ui-component/Loadable';
 import ViewTax from 'views/pages/master/tax/ViewTax';
 import ViewTaxGroup from 'views/pages/master/tax_group/ViewTaxGroup';
 import ViewTourCategory from 'views/pages/master/tour_category/ViewTourCategory';
+import ViewTourType from 'views/pages/master/tour_type/ViewTourType';
+import ViewCodeAndName from 'views/pages/master/code_name/ViewCodeAndName';
+import ViewManager from 'views/pages/master/operator/manager/ViewManager';
+import ViewMarket from 'views/pages/master/operator/market/ViewMarket';
+import ViewMarketGroup from 'views/pages/master/operator/maketGroup/ViewMarketGroup';
+import ViewOperatorEntry from 'views/pages/master/operator/operatorEntry/ViewOperatorEntry';
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
 
@@ -101,8 +107,32 @@ const MainRoutes = {
                     element: <ViewTaxGroup />
                 },
                 {
+                    path: 'tourtypeview',
+                    element: <ViewTourType />
+                },
+                {
                     path: 'tourcategoryview',
                     element: <ViewTourCategory />
+                },
+                {
+                    path: 'codeandnameview',
+                    element: <ViewCodeAndName />
+                },
+                {
+                    path: 'managerview',
+                    element: <ViewManager />
+                },
+                {
+                    path: 'marketview',
+                    element: <ViewMarket />
+                },
+                {
+                    path: 'marketgroupview',
+                    element: <ViewMarketGroup />
+                },
+                {
+                    path: 'viewoperatorentry',
+                    element: <ViewOperatorEntry />
                 }
             ]
         }

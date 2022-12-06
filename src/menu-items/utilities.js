@@ -71,7 +71,7 @@ const utilities = {
                             id: 'codename',
                             title: 'CodeAndName',
                             type: 'item',
-                            url: '/utils/util-color',
+                            url: '/master/codeandnameview',
                             breadcrumbs: false
                             // icon: "bi bi-journal-code",
                             // path: "/master/codeAndName",
@@ -80,7 +80,7 @@ const utilities = {
                             id: 'manager',
                             title: 'Manager',
                             type: 'item',
-                            url: '/utils/util-color',
+                            url: '/master/managerview',
                             breadcrumbs: false
                             // icon: "bi bi-journal-code",
                             // path: "/master/codeAndName",
@@ -89,6 +89,33 @@ const utilities = {
                         {
                             id: 'market',
                             title: 'Market',
+                            type: 'item',
+                            url: '/master/marketview',
+                            breadcrumbs: false
+                            // icon: "bi bi-journal-code",
+                            // path: "/master/codeAndName",
+                        },
+                        {
+                            id: 'market-group',
+                            title: 'Market Group',
+                            type: 'item',
+                            url: '/master/marketgroupview',
+                            breadcrumbs: false
+                            // icon: "bi bi-journal-code",
+                            // path: "/master/codeAndName",
+                        },
+                        {
+                            id: 'operator-entry',
+                            title: 'Operator Entry',
+                            type: 'item',
+                            url: '/master/viewoperatorentry',
+                            breadcrumbs: false
+                            // icon: "bi bi-journal-code",
+                            // path: "/master/codeAndName",
+                        },
+                        {
+                            id: 'Color',
+                            title: 'Color',
                             type: 'item',
                             url: '/utils/util-color',
                             breadcrumbs: false
@@ -111,6 +138,14 @@ const utilities = {
                         //     path: "/master/marketGroup",
                         //   },
                     ]
+                },
+
+                {
+                    id: 'tour-type-id',
+                    title: 'Tour Type',
+                    type: 'item',
+                    url: '/master/tourtypeview',
+                    breadcrumbs: false
                 },
 
                 {
