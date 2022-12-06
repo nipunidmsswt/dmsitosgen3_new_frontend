@@ -169,6 +169,15 @@ const utilities = {
                     title: 'Hotel Masters',
                     children: [
                         {
+                            id: 'hotel-category',
+                            title: 'Hotel Category',
+                            type: 'item',
+                            url: '/master/hotelcategoryview',
+                            breadcrumbs: false
+                            // icon: "bi bi-journal-code",
+                            // path: "/master/codeAndName",
+                        },
+                        {
                             id: 'hotelbasis',
                             title: 'Hotel Basis',
                             type: 'item',
@@ -188,19 +197,10 @@ const utilities = {
                         },
 
                         {
-                            id: 'market',
-                            title: 'Market',
+                            id: 'hotel-facility',
+                            title: 'Hotel Facility',
                             type: 'item',
-                            url: '/master/marketview',
-                            breadcrumbs: false
-                            // icon: "bi bi-journal-code",
-                            // path: "/master/codeAndName",
-                        },
-                        {
-                            id: 'market-group',
-                            title: 'Market Group',
-                            type: 'item',
-                            url: '/master/marketgroupview',
+                            url: '/master/hotelFacilityview',
                             breadcrumbs: false
                             // icon: "bi bi-journal-code",
                             // path: "/master/codeAndName",
