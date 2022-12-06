@@ -20,7 +20,7 @@ export const getAllTourCategoryData = () => {
     };
 };
 
-export const getLatestModifiedDetails = () => {
+export const getTourCategoryLatestModifiedDetails = () => {
     return {
         type: GET_LAST_MODIFIED_DATE_TIME
     };

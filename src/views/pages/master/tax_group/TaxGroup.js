@@ -38,7 +38,6 @@ import Autocomplete from '@mui/material/Autocomplete';
 import Paper from '@mui/material/Paper';
 import * as yup from 'yup';
 import { getAllTaxData } from '../../../../store/actions/masterActions/TaxActions/TaxAction';
-// import CreatedUpdatedUserDetailsWithTableFormat from '../../../components/CreatedUpdatedUserDetailsWithTableFormat';
 
 function TaxGroup({ open, handleClose, mode, taxGroupCode }) {
     const initialValues1 = {
@@ -200,8 +199,8 @@ function TaxGroup({ open, handleClose, mode, taxGroupCode }) {
         <div>
             <Dialog maxWidth="220px" open={open} keepMounted onClose={handleClose} aria-describedby="alert-dialog-slide-description">
                 <DialogTitle>
-                    <Box display="flex" alignItems="center">
-                        <Box flexGrow={1} className="dialog-title">
+                    <Box display="flex" className="dialog-title">
+                        <Box flexGrow={1}>
                             {mode === 'INSERT' ? 'Add' : ''} {mode === 'VIEW_UPDATE' ? 'Update' : ''} {mode === 'VIEW' ? 'View' : ''}Tax
                             Group
                         </Box>
@@ -621,28 +620,22 @@ function TaxGroup({ open, handleClose, mode, taxGroupCode }) {
                                                             <Box display="flex" flexDirection="row-reverse" style={{ marginTop: '20px' }}>
                                                                 {mode != 'VIEW' ? (
                                                                     <Button
-                                                                        variant="contained"
+                                                                        variant="outlined"
                                                                         type="button"
                                                                         style={{
-                                                                            backgroundColor: '#B22222',
+                                                                            // backgroundColor: '#B22222',
                                                                             marginLeft: '10px'
                                                                         }}
                                                                         onClick={handleCancel}
                                                                     >
-                                                                        Cancel
+                                                                        CLEAR
                                                                     </Button>
                                                                 ) : (
                                                                     ''
                                                                 )}
 
                                                                 {mode != 'VIEW' ? (
-                                                                    <Button
-                                                                        variant="contained"
-                                                                        type="submit"
-                                                                        style={{
-                                                                            backgroundColor: '#00AB55'
-                                                                        }}
-                                                                    >
+                                                                    <Button className="btnSave" variant="contained" type="submit">
                                                                         {mode === 'INSERT' ? 'SAVE' : 'UPDATE'}
                                                                     </Button>
                                                                 ) : (

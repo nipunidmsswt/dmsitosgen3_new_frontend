@@ -19,16 +19,8 @@ import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import 'assets/scss/style.scss';
 import { useDispatch, useSelector } from 'react-redux';
-import { saveTaxData } from 'store/actions/masterActions/TaxActions/TaxAction';
-// import {
-//     getTaxDataById,
-//     saveTaxData,
-//     updateTaxData,
-//     checkDuplicateTaxCode,
-//     taxDuplicateError
-// } from '../../../redux/actions/masterActions/TaxActions/TaxAction';
-// import CreatedUpdatedUserDetailsWithTableFormat from "../../../components/CreatedUpdatedUserDetailsWithTableFormat";
-// import CreatedUpdatedUserDetails from "../../../components/CreatedUpdatedUserDetails";
+import { checkDuplicateTaxCode, getTaxDataById, saveTaxData, updateTaxData } from 'store/actions/masterActions/TaxActions/TaxAction';
+import CreatedUpdatedUserDetails from '../userTimeDetails/CreatedUpdatedUserDetails';
 
 const Transition = forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -58,6 +50,9 @@ function Tax({ open, handleClose, mode, rowTaxCode }) {
         </p>
     );
     const [formValues, setFormValues] = useState(initialValues);
+
+    const taxToUpdate = useSelector((state) => state.taxReducer.taxToUpdate);
+    const duplicateTax = useSelector((state) => state.taxReducer.duplicateTax);
     const handleSubmitForm = (e) => {
         e.preventDefault();
         if (formValues.taxCode.length == 0 || formValues.taxDescription.length == 0 || formValues.percentage.length == 0) {
@@ -67,12 +62,37 @@ function Tax({ open, handleClose, mode, rowTaxCode }) {
                 dispatch(saveTaxData(formValues));
             } else if (mode === 'VIEW_UPDATE') {
                 console.log('yes click');
-                // dispatch(updateTaxData(formValues));
+                dispatch(updateTaxData(formValues));
             }
 
             handleClose();
         }
     };
+
+    useEffect(() => {
+        if (duplicateTax != null && duplicateTax.length != 0) {
+            if (duplicateTax?.errorMessages?.length != 0) {
+                setDuplicateError(true);
+            } else {
+                setDuplicateError(false);
+            }
+        } else {
+            setDuplicateError(false);
+        }
+    }, [duplicateTax]);
+
+    useEffect(() => {
+        if (mode === 'VIEW_UPDATE' || mode === 'VIEW') {
+            dispatch(getTaxDataById(rowTaxCode));
+        }
+    }, [mode]);
+
+    useEffect(() => {
+        if ((mode === 'VIEW_UPDATE' && taxToUpdate != null) || (mode === 'VIEW' && taxToUpdate != null)) {
+            console.log(taxToUpdate);
+            setFormValues(taxToUpdate);
+        }
+    }, [taxToUpdate]);
     const handleCancle = () => {
         if (mode === 'INSERT') {
             setFormValues(initialValues);
@@ -89,6 +109,11 @@ function Tax({ open, handleClose, mode, rowTaxCode }) {
             [name]: value
         });
     };
+
+    const checkDuplicateTaxes = () => {
+        dispatch(checkDuplicateTaxCode(formValues.taxCode));
+    };
+
     const [error, setError] = useState(false);
     const dispatch = useDispatch();
     const [duplicateError, setDuplicateError] = useState(false);
@@ -124,6 +149,9 @@ function Tax({ open, handleClose, mode, rowTaxCode }) {
                                     <TextField
                                         disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
                                         label={taxCode}
+                                        InputLabelProps={{
+                                            shrink: true
+                                        }}
                                         sx={{
                                             width: { sm: 200, md: 300 },
                                             '& .MuiInputBase-root': {
@@ -132,23 +160,20 @@ function Tax({ open, handleClose, mode, rowTaxCode }) {
                                         }}
                                         type="text"
                                         variant="outlined"
-                                        InputLabelProps={{
-                                            shrink: true
-                                        }}
                                         // className="txt"
                                         id="taxCode"
                                         name="taxCode"
                                         onChange={handleInputChange}
-                                        // error={(error && formValues.taxCode.length === 0) || duplicateError}
-                                        // helperText={
-                                        //     error && formValues.taxCode.length === 0
-                                        //         ? 'Required Field'
-                                        //         : '' || duplicateError
-                                        //         ? 'Tax Code already exists'
-                                        //         : ''
-                                        // }
+                                        error={(error && formValues.taxCode.length === 0) || duplicateError}
+                                        helperText={
+                                            error && formValues.taxCode.length === 0
+                                                ? 'Required Field'
+                                                : '' || duplicateError
+                                                ? 'Tax Code already exists'
+                                                : ''
+                                        }
                                         value={formValues.taxCode}
-                                        // onBlur={checkDuplicateTaxes}
+                                        onBlur={checkDuplicateTaxes}
                                     />
                                 </Grid>
                                 <Grid item>
@@ -200,27 +225,12 @@ function Tax({ open, handleClose, mode, rowTaxCode }) {
                                 </Grid>
 
                                 <Grid item>
-                                    {/* <Typography variant="subtitle1" component="h2">
-                  Active
-                </Typography> */}
-                                    {/* <FormGroup>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        name="status"
-                        onChange={handleInputChange}
-                        value={formValues.status}
-                        checked={formValues.status}
-                      />
-                    }
-                  />
-                </FormGroup> */}
                                     <FormGroup>
                                         <FormControlLabel
                                             name="status"
                                             onChange={handleInputChange}
                                             value={formValues.status}
-                                            control={<Switch />}
+                                            control={<Switch color="success" />}
                                             label="Status"
                                             checked={formValues.status}
                                             disabled={mode == 'VIEW'}
@@ -230,7 +240,7 @@ function Tax({ open, handleClose, mode, rowTaxCode }) {
                             </Grid>
 
                             <br></br>
-                            {/* <Grid>{mode === 'VIEW' ? <CreatedUpdatedUserDetails formValues={formValues} /> : null}</Grid> */}
+                            <Grid>{mode === 'VIEW' ? <CreatedUpdatedUserDetails formValues={formValues} /> : null}</Grid>
                         </div>
                     </DialogContent>
                     <DialogActions>
@@ -242,7 +252,7 @@ function Tax({ open, handleClose, mode, rowTaxCode }) {
                             ''
                         )}
                         {mode != 'VIEW' ? (
-                            <Button className="btnClear" variant="contained" type="button" onClick={handleCancle}>
+                            <Button variant="outlined" type="button" onClick={handleCancle}>
                                 CLEAR
                             </Button>
                         ) : (

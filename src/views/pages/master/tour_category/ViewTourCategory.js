@@ -1,48 +1,61 @@
-import { useEffect, useState } from 'react';
+import React from 'react';
 import MaterialTable from 'material-table';
-import tableIcons from 'utils/MaterialTableIcons';
-import TaxGroup from './TaxGroup';
-import SuccessMsg from '../../../../messages/SuccessMsg';
-import ErrorMsg from '../../../../messages/ErrorMsg';
-import { useSelector, useDispatch } from 'react-redux';
-import { getAllTaxData } from '../../../../store/actions/masterActions/TaxActions/TaxAction';
-import { getAllTaxGroupDetails, getLatestModifiedTaxGroupDetails } from '../../../../store/actions/masterActions/TaxActions/TaxGroupAction';
-import Grid from '@mui/material/Grid';
-import MainCard from 'ui-component/cards/MainCard';
-import { gridSpacing } from 'store/constant';
-import { FormControlLabel, FormGroup, Switch } from '@mui/material';
 
-function ViewTaxGroup() {
+import { useEffect, useState, forwardRef } from 'react';
+
+import { useSelector, useDispatch } from 'react-redux';
+import TourCategory from './TourCategory';
+import { styled } from '@mui/material/styles';
+import { Typography, TextField } from '@mui/material';
+import Box from '@mui/material/Box';
+import Paper from '@mui/material/Paper';
+import Grid from '@mui/material/Grid';
+import { gridSpacing } from 'store/constant';
+import './tourCategory.scss';
+import { getAllTourCategoryData, getTourCategoryLatestModifiedDetails } from 'store/actions/masterActions/TourCategoryActions';
+import SuccessMsg from 'messages/SuccessMsg';
+import ErrorMsg from 'messages/ErrorMsg';
+import tableIcons from 'utils/MaterialTableIcons';
+import MainCard from 'ui-component/cards/MainCard';
+
+function ViewTourCategory() {
     const [open, setOpen] = useState(false);
-    const [taxGroupCode, setTaxGroupCode] = useState('');
+    const [rowTourCategoryCode, setTourCategoryCode] = useState('');
     const [mode, setMode] = useState('INSERT');
+    const [lastModifiedTimeDate, setLastModifiedTimeDate] = useState(null);
+    const [tableData, setTableData] = useState([]);
     const [openToast, setHandleToast] = useState(false);
     const [openErrorToast, setOpenErrorToast] = useState(false);
-    const [tableData, setTableData] = useState([]);
-    const [lastModifiedTimeDate, setLastModifiedTimeDate] = useState(null);
+    const dispatch = useDispatch();
+    const tourCategoryListData = useSelector((state) => state.tourCategoryReducer.tourCategories);
+    const error = useSelector((state) => state.tourCategoryReducer.errorMsg);
+    const lastModifiedDate = useSelector((state) => state.tourCategoryReducer.lastModifiedDateTime);
+    // const updateErrorMsg = useSelector((state) => state.taxReducer.updateErrorMsg);
+
+    const tourCategoryData = useSelector((state) => state.tourCategoryReducer.tourCategory);
 
     const columns = [
         {
-            title: 'Tax Group Type',
-            field: 'taxGroupType',
-            filterPlaceholder: 'Tax Group Type',
-            align: 'center'
+            title: 'Category Code',
+            field: 'tourCategoryCode',
+            headerStyle: { textAlign: 'center' },
+            cellStyle: {
+                minWidth: 200,
+                maxWidth: 200,
+                align: 'left'
+            },
+            filterPlaceholder: 'filter'
         },
         {
-            title: 'Tax Group Code',
-            field: 'taxGroupCode',
-            filterPlaceholder: 'Tax Group Code',
-            align: 'center'
+            title: 'Category Description',
+            field: 'name',
+            filterPlaceholder: 'filter',
+            headerStyle: { textAlign: 'center' },
+            align: 'left'
         },
+
         {
-            title: 'Description',
-            field: 'description',
-            align: 'center',
-            grouping: false,
-            filterPlaceholder: 'Description'
-        },
-        {
-            title: 'Status',
+            title: 'Active',
             field: 'status',
             filterPlaceholder: 'True || False',
             align: 'center',
@@ -50,40 +63,21 @@ function ViewTaxGroup() {
             render: (rowData) => (
                 <div
                     style={{
-                        alignItems: 'center',
-                        align: 'center',
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center'
+                        color: rowData.status === true ? '#008000aa' : '#f90000aa',
+                        fontWeight: 'bold',
+                        // background: rowData.status === true ? "#008000aa" : "#f90000aa",
+                        borderRadius: '4px',
+                        paddingLeft: 5,
+                        paddingRight: 5
                     }}
                 >
-                    {rowData.status === true ? (
-                        <FormGroup>
-                            <FormControlLabel control={<Switch color="success" size="small" />} checked={true} />
-                        </FormGroup>
-                    ) : (
-                        <FormGroup>
-                            <FormControlLabel control={<Switch color="error" size="small" />} checked={false} />
-                        </FormGroup>
-                    )}
+                    {rowData.status === true ? 'Active' : 'Inactive'}
                 </div>
             )
+            // searchable: false,
+            // export: false,
         }
     ];
-
-    const dispatch = useDispatch();
-    const error = useSelector((state) => state.taxReducer.errorMsg);
-
-    const taxGroupListData = useSelector((state) => state.taxGroupReducer.taxgroups);
-    const taxGroupData = useSelector((state) => state.taxGroupReducer.taxgroup);
-    console.log(taxGroupListData);
-    const lastModifiedDate = useSelector((state) => state.taxGroupReducer.lastModifiedDateTime);
-
-    useEffect(() => {
-        if (taxGroupListData?.payload?.length > 0) {
-            setTableData(taxGroupListData?.payload[0]);
-        }
-    }, [taxGroupListData]);
 
     useEffect(() => {
         console.log(error);
@@ -94,49 +88,53 @@ function ViewTaxGroup() {
     }, [error]);
 
     useEffect(() => {
-        console.log(taxGroupData);
-        if (taxGroupData) {
-            console.log('sucessToast');
+        if (tourCategoryData) {
             setHandleToast(true);
-            dispatch(getAllTaxGroupDetails());
-            dispatch(getLatestModifiedTaxGroupDetails());
+            dispatch(getAllTourCategoryData());
+            dispatch(getTourCategoryLatestModifiedDetails());
         }
-    }, [taxGroupData]);
+    }, [tourCategoryData]);
 
     useEffect(() => {
-        dispatch(getAllTaxGroupDetails());
-        dispatch(getAllTaxData());
-        dispatch(getLatestModifiedTaxGroupDetails());
+        dispatch(getAllTourCategoryData());
+        dispatch(getTourCategoryLatestModifiedDetails());
     }, []);
 
     useEffect(() => {
-        setLastModifiedTimeDate(
-            lastModifiedDate === null
-                ? ''
-                : new Date(lastModifiedDate).toLocaleString('en-GB', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: '2-digit',
-                      hour: 'numeric',
-                      minute: 'numeric',
-                      hour12: true
-                  })
-        );
+        if (tourCategoryListData?.payload?.length > 0) {
+            setTableData(tourCategoryListData?.payload[0]);
+        }
+    }, [tourCategoryListData]);
+
+    useEffect(() => {
+        // setLastModifiedTimeDate(dateFormator(lastModifiedDate));
+        setLastModifiedTimeDate(lastModifiedDate);
     }, [lastModifiedDate]);
 
+    function dateFormator(date) {
+        var d = new Date(date),
+            month = '' + (d.getMonth() + 1),
+            day = '' + d.getDate(),
+            year = d.getFullYear();
+
+        if (month.length < 2) month = '0' + month;
+        if (day.length < 2) day = '0' + day;
+
+        return [day, month, year].join('/');
+    }
+
     const handleClickOpen = (type, data) => {
-        console.log(type);
-        console.log(data);
-        if (type === 'VIEW_UPDATE') {
+        if (type === 'VIEW_UPDATE' || type === 'VIEW') {
+            // console.log(type)
+            console.log('data:' + data);
             setMode(type);
-            setTaxGroupCode(data.taxGroupCode);
-        } else if (type === 'INSERT') {
-            setTaxGroupCode('');
-            setMode(type);
+            setTourCategoryCode(data.tourCategoryCode);
+            // setTaxCode(data.tou);
         } else {
+            setTourCategoryCode('');
             setMode(type);
-            setTaxGroupCode(data.taxGroupCode);
         }
+
         setOpen(true);
     };
 
@@ -150,9 +148,10 @@ function ViewTaxGroup() {
     const handleErrorToast = () => {
         setOpenErrorToast(false);
     };
+
     return (
         <div>
-            <MainCard title="Tax Group Setup">
+            <MainCard title="Tour Category">
                 <div style={{ textAlign: 'right' }}> Last Modified Date : {lastModifiedTimeDate}</div>
                 <br />
                 <Grid container spacing={gridSpacing}>
@@ -160,18 +159,20 @@ function ViewTaxGroup() {
                         <Grid container spacing={gridSpacing}>
                             <Grid item xs={12}>
                                 <MaterialTable
+                                    title={lastModifiedTimeDate}
                                     columns={columns}
                                     data={tableData}
                                     actions={[
                                         {
                                             icon: tableIcons.Add,
-                                            tooltip: 'Add',
+                                            tooltip: 'Add New',
                                             isFreeAction: true,
                                             onClick: () => handleClickOpen('INSERT', null)
                                         },
                                         (rowData) => ({
+                                            // <-- ***NOW A FUNCTION***
                                             icon: tableIcons.Edit,
-                                            tooltip: 'Edit',
+                                            tooltip: 'Edit ',
                                             onClick: () => handleClickOpen('VIEW_UPDATE', rowData)
                                         }),
                                         (rowData) => ({
@@ -190,15 +191,16 @@ function ViewTaxGroup() {
                                         searchFieldVariant: 'standard',
                                         filtering: true,
                                         paging: true,
-                                        pageSizeOptions: [2, 5, 10, 20, 25, 50, 100],
+                                        pageSizeOptions: [5, 10, 20, 50, 100],
                                         pageSize: 5,
                                         paginationType: 'stepped',
                                         showFirstLastPageButtons: false,
                                         exportButton: true,
                                         exportAllData: true,
-                                        exportFileName: 'TableData',
+                                        exportFileName: 'Tax Data',
                                         actionsColumnIndex: -1,
                                         columnsButton: true,
+                                        color: 'primary',
 
                                         headerStyle: {
                                             whiteSpace: 'nowrap',
@@ -223,7 +225,16 @@ function ViewTaxGroup() {
                                     }}
                                 />
 
-                                {open ? <TaxGroup open={open} handleClose={handleClose} taxGroupCode={taxGroupCode} mode={mode} /> : ''}
+                                {open ? (
+                                    <TourCategory
+                                        open={open}
+                                        handleClose={handleClose}
+                                        mode={mode}
+                                        rowTourCategoryCode={rowTourCategoryCode}
+                                    />
+                                ) : (
+                                    ''
+                                )}
                                 {openToast ? <SuccessMsg openToast={openToast} handleToast={handleToast} mode={mode} /> : null}
                                 {openErrorToast ? (
                                     <ErrorMsg openToast={openErrorToast} handleToast={setOpenErrorToast} mode={mode} />
@@ -238,4 +249,4 @@ function ViewTaxGroup() {
     );
 }
 
-export default ViewTaxGroup;
+export default ViewTourCategory;

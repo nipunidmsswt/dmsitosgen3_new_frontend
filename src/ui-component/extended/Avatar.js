@@ -65,7 +65,6 @@ Avatar.propTypes = {
     className: PropTypes.string,
     color: PropTypes.string,
     outline: PropTypes.bool,
-    size: PropTypes.string,
     sx: PropTypes.object
 };
 

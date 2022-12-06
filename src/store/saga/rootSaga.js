@@ -29,23 +29,23 @@ import {
     GET_LAST_MODIFIED_DATE_TIME_TAX_GROUP
 } from 'store/constant/master/TaxMasterConstant';
 
-// import {
-//     saveTourCategoryHandler,
-//     getAllTourCategorySaga,
-//     getTourCategoryByIdSaga,
-//     updateTourCategorySaga,
-//     checkDupicateTourCategotyCodeSaga,
-//     checkLeatestModifiedDateSaga
-// } from './masterSaga/TourCategorySaga';
+import {
+    saveTourCategoryHandler,
+    getAllTourCategorySaga,
+    getTourCategoryByIdSaga,
+    updateTourCategorySaga,
+    checkDupicateTourCategotyCodeSaga,
+    checkLeatestModifiedDateSaga
+} from './mastersaga/TourCategorySaga';
 
-// import {
-//     CHECK_TOUR_CATEGORY_CODE_DUPLICATE,
-//     GET_ALL_TOUR_CATEGORY_DATA,
-//     GET_TOUR_CATEGORY_DATA_BY_ID,
-//     SAVE_TOUR_CATEGORY_DATA,
-//     UPDATE_TOUR_CATEGORY_DATA,
-//     GET_LAST_MODIFIED_DATE_TIME
-// } from 'store/constant/master/TourCategoryMasterConstant';
+import {
+    CHECK_TOUR_CATEGORY_CODE_DUPLICATE,
+    GET_ALL_TOUR_CATEGORY_DATA,
+    GET_TOUR_CATEGORY_DATA_BY_ID,
+    SAVE_TOUR_CATEGORY_DATA,
+    UPDATE_TOUR_CATEGORY_DATA,
+    GET_LAST_MODIFIED_DATE_TIME
+} from 'store/constant/master/TourCategoryMasterConstant';
 
 // import { getAllCurrenciesSaga } from '../saga/ApiServiceSaga/ApiServiceSaga';
 // import { GET_ALL_CURRENCIES } from 'store/constant/apiServiceConstant/ApiServiceConstant';
@@ -88,7 +88,7 @@ import {
 //     UPDATE_LOCATION_DATA,
 //     CHECK_LOCATION_DUPLICATE,
 //     GET_LAST_MODIFIED_DATE_TIME_LOCATION
-// } from '../constant/master/LocationConstant';
+// } from 'store/constant/master/LocationConstant';
 
 // import {
 //     CHECK_CODE_DUPLICATE,
@@ -99,7 +99,7 @@ import {
 //     GET_CODE_NAME_DATA_BY_CODE,
 //     SAVE_CODE_AND_NAME_DATA,
 //     UPDATE_CODE_AND_NAME_DATA
-// } from '../constant/master/CodeAndNameConstant';
+// } from 'store/constant/master/CodeAndNameConstant';
 
 // import {
 //     saveCodeAndNameDataHandler,
@@ -120,7 +120,7 @@ import {
 //     GET_MANAGER_LAST_MODIFIED_DATE_TIME,
 //     SAVE_MANAGER_DATA,
 //     UPDATE_MANAGER_DATA
-// } from '../constant/master/ManagerConstant';
+// } from 'store/constant/master/ManagerConstant';
 
 // import {
 //     saveManagerDataHandler,
@@ -148,7 +148,7 @@ import {
 //     UPDATE_HOTEL_CATEGORY_DATA,
 //     CHECK_HOTEL_CATEGORY_DUPLICATE,
 //     GET_LAST_MODIFIED_DATE_TIME_HOTEL_CATEGORY
-// } from '../constant/master/HotelCategoryConstant';
+// } from 'store/constant/master/HotelCategoryConstant';
 
 // import {
 //     SAVE_ROOM_RECREATION_DATA,
@@ -157,7 +157,7 @@ import {
 //     UPDATE_ROOM_RECREATION_DATA,
 //     CHECK_ROOM_RECREATION_DUPLICATE,
 //     GET_LAST_MODIFIED_DATE_TIME_ROOM_RECREATION
-// } from '../constant/master/RoomRecreationConstant';
+// } from 'store/constant/master/RoomRecreationConstant';
 
 // import {
 //     saveRoomRecreationSaga,
@@ -184,7 +184,7 @@ import {
 //     GET_MANAGING_COMAPANY_DATA_BY_ID,
 //     SAVE_MANAGING_COMAPANY_DATA,
 //     UPDATE_MANAGING_COMAPANY_DATA
-// } from '../constant/master/ManagingCompanyConstant';
+// } from 'store/constant/master/ManagingCompanyConstant';
 
 // import {
 //     saveMarketDataHandler,
@@ -203,7 +203,7 @@ import {
 //     GET_MARKET_LAST_MODIFIED_DATE_TIME,
 //     SAVE_MARKET_DATA,
 //     UPDATE_MARKET_DATA
-// } from '../constant/master/MarketConstant';
+// } from 'store/constant/master/MarketConstant';
 
 // import {
 //     CHECK_SERVICEOFFERED_CODE_DUPLICATE,
@@ -212,7 +212,7 @@ import {
 //     GET_SERVICEOFFERED_LAST_MODIFIED_DATE_TIME,
 //     SAVE_SERVICEOFFERED_DATA,
 //     UPDATE_SERVICEOFFERED_DATA
-// } from '../constant/master/ServiceOfferedConstant';
+// } from 'store/constant/master/ServiceOfferedConstant';
 // import {
 //     checkDupicateServiceOfferedCodeSaga,
 //     checkServiceOfferedLatestModifiedDateSaga,
@@ -228,7 +228,7 @@ import {
 //     GET_TOURTYPE_LAST_MODIFIED_DATE_TIME,
 //     SAVE_TOURTYPE_DATA,
 //     UPDATE_TOURTYPE_DATA
-// } from '../constant/master/TourTypeConstant';
+// } from 'store/constant/master/TourTypeConstant';
 // import { checkTourTypeLatestModifiedDateSaga, getAllTourTypeSaga, getTourTypeByIdSaga, saveTourType } from './masterSaga/TourTypeSaga';
 // import { checkDuplicateTourTypeCode, getAllTourTypeData } from '../actions/masterActions/TourTypeAction';
 // import {
@@ -238,7 +238,7 @@ import {
 //     GET_OWNER_LAST_MODIFIED_DATE_TIME,
 //     SAVE_OWNER_DATA,
 //     UPDATE_OWNER_DATA
-// } from '../constant/master/OwnerConstant';
+// } from 'store/constant/master/OwnerConstant';
 // import {
 //     checkDupicateOwnerCodeSaga,
 //     checkOwnerLatestModifiedDateSaga,
@@ -263,7 +263,7 @@ import {
 //     GET_LAST_MODIFIED_DATE_TIME_SEASON,
 //     SAVE_SEASON_DATA,
 //     UPDATE_SEASON_DATA
-// } from '../constant/master/SeasonConstant';
+// } from 'store/constant/master/SeasonConstant';
 
 // import {
 //     saveSeasonSaga,
@@ -281,7 +281,7 @@ import {
 //     SAVE_HOTEL_FACILITY_DATA,
 //     UPDATE_HOTEL_FACILITY_DATA,
 //     GET_ALL_HOTEL_FACILITY_TYPES_DATA
-// } from '../constant/master/HotelFacilityConstant';
+// } from 'store/constant/master/HotelFacilityConstant';
 
 // import {
 //     CHECK_MARKET_GROUP_CODE_DUPLICATE,
@@ -292,7 +292,7 @@ import {
 //     GET_MARKET_GROUP_LAST_MODIFIED_DATE_TIME,
 //     SAVE_MARKET_GROUP_DATA,
 //     UPDATE_MARKET_GROUP_DATA
-// } from '../constant/master/MarketGroupConstant';
+// } from 'store/constant/master/MarketGroupConstant';
 // import {
 //     checkMarketGroupDupicateCodeSaga,
 //     getAllMarketGroupDataSaga,
@@ -308,7 +308,7 @@ import {
 //     GET_HOTEL_BASIS_LAST_MODIFIED_DATE_TIME,
 //     SAVE_HOTEL_BASIS,
 //     UPDATE_HOTEL_BASIS
-// } from '../constant/master/HotelBasisConstant';
+// } from 'store/constant/master/HotelBasisConstant';
 // import {
 //     checkHotelBasisDupicateCodeSaga,
 //     getAllHotelBasisDataSaga,
@@ -333,7 +333,7 @@ import {
 //     GET_ROOM_CATEGORY_LAST_MODIFIED_DATE_TIME,
 //     SAVE_ROOM_CATEGORY,
 //     UPDATE_ROOM_CATEGORY
-// } from '../constant/master/RoomCategoryConstant';
+// } from 'store/constant/master/RoomCategoryConstant';
 
 // import {
 //     saveHotelFacilitySaga,
@@ -360,13 +360,14 @@ export function* wacherSaga() {
     yield takeLatest(UPDATE_TAX_GROUP_DATA, updateTaxGroupSaga);
     yield takeLatest(CHECK_TAX_GROUP_DUPLICATE, checkDupicateTaxGroupCodeSaga);
     yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_TAX_GROUP, checkLatestTaxGrupModifiedDateSaga);
+
     // //tour category setup
-    // yield takeLatest(SAVE_TOUR_CATEGORY_DATA, saveTourCategoryHandler);
-    // yield takeLatest(GET_ALL_TOUR_CATEGORY_DATA, getAllTourCategorySaga);
-    // yield takeLatest(GET_TOUR_CATEGORY_DATA_BY_ID, getTourCategoryByIdSaga);
-    // yield takeLatest(UPDATE_TOUR_CATEGORY_DATA, updateTourCategorySaga);
-    // yield takeLatest(CHECK_TOUR_CATEGORY_CODE_DUPLICATE, checkDupicateTourCategotyCodeSaga);
-    // yield takeLatest(GET_LAST_MODIFIED_DATE_TIME, checkLeatestModifiedDateSaga);
+    yield takeLatest(SAVE_TOUR_CATEGORY_DATA, saveTourCategoryHandler);
+    yield takeLatest(GET_ALL_TOUR_CATEGORY_DATA, getAllTourCategorySaga);
+    yield takeLatest(GET_TOUR_CATEGORY_DATA_BY_ID, getTourCategoryByIdSaga);
+    yield takeLatest(UPDATE_TOUR_CATEGORY_DATA, updateTourCategorySaga);
+    yield takeLatest(CHECK_TOUR_CATEGORY_CODE_DUPLICATE, checkDupicateTourCategotyCodeSaga);
+    yield takeLatest(GET_LAST_MODIFIED_DATE_TIME, checkLeatestModifiedDateSaga);
 
     // //currency
     // yield takeLatest(GET_ALL_CURRENCIES, getAllCurrenciesSaga);

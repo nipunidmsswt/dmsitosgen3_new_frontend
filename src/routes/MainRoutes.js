@@ -5,6 +5,7 @@ import MainLayout from 'layout/MainLayout';
 import Loadable from 'ui-component/Loadable';
 import ViewTax from 'views/pages/master/tax/ViewTax';
 import ViewTaxGroup from 'views/pages/master/tax_group/ViewTaxGroup';
+import ViewTourCategory from 'views/pages/master/tour_category/ViewTourCategory';
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
 
@@ -98,6 +99,10 @@ const MainRoutes = {
                 {
                     path: 'taxgroupview',
                     element: <ViewTaxGroup />
+                },
+                {
+                    path: 'tourcategoryview',
+                    element: <ViewTourCategory />
                 }
             ]
         }

@@ -1,5 +1,5 @@
+import { create, get, getById, update } from 'apis/Apis';
 import { put, takeEvery, call } from 'redux-saga/effects';
-import { create, getById, update, get } from '../../../apis/Apis';
 import {
     ADD_SUCCESS_TOUR_CATEGORY_DATA,
     ADD_FAILED_TOUR_CATEGORY_DATA,
@@ -12,7 +12,7 @@ import {
     TOUR_CATEGORY_DUPLICATE,
     SUCCESS_LAST_MODIFIED_DATE,
     FAILED_LAST_MODIFIED_DATE
-} from '../../constant/master/TourCategoryMasterConstant';
+} from 'store/constant/master/TourCategoryMasterConstant';
 
 export function* saveTourCategoryHandler(action) {
     action.data.path = `${process.env.REACT_APP_TOUR_URL}/tourCategory`;
