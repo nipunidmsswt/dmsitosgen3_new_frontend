@@ -263,23 +263,23 @@ import { checkDuplicateTourTypeCode } from 'store/actions/masterActions/TourType
 //     updateHotelCateogrySaga
 // } from './masterSaga/HotelCategorySaga';
 
-// import {
-//     CHECK_SEASON_DUPLICATE,
-//     GET_ALL_SEASON_DATA,
-//     GET_SEASON_DATA_BY_ID,
-//     GET_LAST_MODIFIED_DATE_TIME_SEASON,
-//     SAVE_SEASON_DATA,
-//     UPDATE_SEASON_DATA
-// } from 'store/constant/master/SeasonConstant';
+import {
+    CHECK_SEASON_DUPLICATE,
+    GET_ALL_SEASON_DATA,
+    GET_SEASON_DATA_BY_ID,
+    GET_LAST_MODIFIED_DATE_TIME_SEASON,
+    SAVE_SEASON_DATA,
+    UPDATE_SEASON_DATA
+} from 'store/constant/master/SeasonConstant';
 
-// import {
-//     saveSeasonSaga,
-//     checkLatestSeasonModifiedDateSaga,
-//     getSeasonByIdSaga,
-//     getAllSeasonSaga,
-//     updateSeasonSaga,
-//     checkDupicateSeasonSaga
-// } from './masterSaga/SeasonSaga';
+import {
+    saveSeasonSaga,
+    checkLatestSeasonModifiedDateSaga,
+    getSeasonByIdSaga,
+    getAllSeasonSaga,
+    updateSeasonSaga,
+    checkDupicateSeasonSaga
+} from './mastersaga/SeasonSaga';
 
 // import {
 //     GET_ALL_HOTEL_FACILITY_DATA,
@@ -308,39 +308,39 @@ import {
     saveMarketGroupDataHandler,
     updateMarketGroupDataSaga
 } from './mastersaga/MarketGroupSaga';
-// import {
-//     CHECK_HOTEL_BASIS_CODE_DUPLICATE,
-//     GET_ALL_HOTEL_BASIS,
-//     GET_HOTEL_BASIS_BY_ID,
-//     GET_HOTEL_BASIS_LAST_MODIFIED_DATE_TIME,
-//     SAVE_HOTEL_BASIS,
-//     UPDATE_HOTEL_BASIS
-// } from 'store/constant/master/HotelBasisConstant';
-// import {
-//     checkHotelBasisDupicateCodeSaga,
-//     getAllHotelBasisDataSaga,
-//     getHotelBasisByCodeSaga,
-//     getHotelBasisLatestModifiedDateSaga,
-//     saveHotelBasisDataHandler,
-//     updateHotelBasisDataSaga
-// } from './masterSaga/HotelBasisSaga';
+import {
+    CHECK_HOTEL_BASIS_CODE_DUPLICATE,
+    GET_ALL_HOTEL_BASIS,
+    GET_HOTEL_BASIS_BY_ID,
+    GET_HOTEL_BASIS_LAST_MODIFIED_DATE_TIME,
+    SAVE_HOTEL_BASIS,
+    UPDATE_HOTEL_BASIS
+} from 'store/constant/master/HotelBasisConstant';
+import {
+    checkHotelBasisDupicateCodeSaga,
+    getAllHotelBasisDataSaga,
+    getHotelBasisByCodeSaga,
+    getHotelBasisLatestModifiedDateSaga,
+    saveHotelBasisDataHandler,
+    updateHotelBasisDataSaga
+} from './mastersaga/HotelBasisSaga';
 
-// import {
-//     checkRoomCategoryDupicateCodeSaga,
-//     getAllRoomCategoryDataSaga,
-//     getRoomCategoryByCodeSaga,
-//     getRoomCategoryLatestModifiedDateSaga,
-//     saveRoomCategoryDataHandler,
-//     updateRoomCategoryDataSaga
-// } from './masterSaga/RoomCategorySaga';
-// import {
-//     CHECK_ROOM_CATEGORY_CODE_DUPLICATE,
-//     GET_ALL_ROOM_CATEGORY,
-//     GET_ROOM_CATEGORY_BY_ID,
-//     GET_ROOM_CATEGORY_LAST_MODIFIED_DATE_TIME,
-//     SAVE_ROOM_CATEGORY,
-//     UPDATE_ROOM_CATEGORY
-// } from 'store/constant/master/RoomCategoryConstant';
+import {
+    checkRoomCategoryDupicateCodeSaga,
+    getAllRoomCategoryDataSaga,
+    getRoomCategoryByCodeSaga,
+    getRoomCategoryLatestModifiedDateSaga,
+    saveRoomCategoryDataHandler,
+    updateRoomCategoryDataSaga
+} from './mastersaga/RoomCategorySaga';
+import {
+    CHECK_ROOM_CATEGORY_CODE_DUPLICATE,
+    GET_ALL_ROOM_CATEGORY,
+    GET_ROOM_CATEGORY_BY_ID,
+    GET_ROOM_CATEGORY_LAST_MODIFIED_DATE_TIME,
+    SAVE_ROOM_CATEGORY,
+    UPDATE_ROOM_CATEGORY
+} from 'store/constant/master/RoomCategoryConstant';
 
 // import {
 //     saveHotelFacilitySaga,
@@ -508,12 +508,12 @@ export function* wacherSaga() {
     // yield takeLatest(GET_OWNER_LAST_MODIFIED_DATE_TIME, checkOwnerLatestModifiedDateSaga);
     // yield takeLatest(CHECK_OWNER_CODE_DUPLICATE, checkDupicateOwnerCodeSaga);
     // //season data
-    // yield takeLatest(SAVE_SEASON_DATA, saveSeasonSaga);
-    // yield takeLatest(GET_SEASON_DATA_BY_ID, getSeasonByIdSaga);
-    // yield takeLatest(GET_ALL_SEASON_DATA, getAllSeasonSaga);
-    // yield takeLatest(UPDATE_SEASON_DATA, updateSeasonSaga);
-    // yield takeLatest(CHECK_SEASON_DUPLICATE, checkDupicateSeasonSaga);
-    // yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_SEASON, checkLatestSeasonModifiedDateSaga);
+    yield takeLatest(SAVE_SEASON_DATA, saveSeasonSaga);
+    yield takeLatest(GET_SEASON_DATA_BY_ID, getSeasonByIdSaga);
+    yield takeLatest(GET_ALL_SEASON_DATA, getAllSeasonSaga);
+    yield takeLatest(UPDATE_SEASON_DATA, updateSeasonSaga);
+    yield takeLatest(CHECK_SEASON_DUPLICATE, checkDupicateSeasonSaga);
+    yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_SEASON, checkLatestSeasonModifiedDateSaga);
 
     // //hotel facility data
     // yield takeLatest(SAVE_HOTEL_FACILITY_DATA, saveHotelFacilitySaga);
@@ -526,23 +526,24 @@ export function* wacherSaga() {
 
     // //hotel facility types
     // yield takeLatest(GET_ALL_HOTEL_FACILITY_TYPES_DATA, getAllHotelFacilityTypesSaga);
+
     // //Hotel Basis
 
-    // yield takeLatest(SAVE_HOTEL_BASIS, saveHotelBasisDataHandler);
-    // yield takeLatest(GET_ALL_HOTEL_BASIS, getAllHotelBasisDataSaga);
-    // yield takeLatest(GET_HOTEL_BASIS_BY_ID, getHotelBasisByCodeSaga);
+    yield takeLatest(SAVE_HOTEL_BASIS, saveHotelBasisDataHandler);
+    yield takeLatest(GET_ALL_HOTEL_BASIS, getAllHotelBasisDataSaga);
+    yield takeLatest(GET_HOTEL_BASIS_BY_ID, getHotelBasisByCodeSaga);
 
-    // yield takeLatest(GET_HOTEL_BASIS_LAST_MODIFIED_DATE_TIME, getHotelBasisLatestModifiedDateSaga);
-    // yield takeLatest(CHECK_HOTEL_BASIS_CODE_DUPLICATE, checkHotelBasisDupicateCodeSaga);
-    // yield takeLatest(UPDATE_HOTEL_BASIS, updateHotelBasisDataSaga);
+    yield takeLatest(GET_HOTEL_BASIS_LAST_MODIFIED_DATE_TIME, getHotelBasisLatestModifiedDateSaga);
+    yield takeLatest(CHECK_HOTEL_BASIS_CODE_DUPLICATE, checkHotelBasisDupicateCodeSaga);
+    yield takeLatest(UPDATE_HOTEL_BASIS, updateHotelBasisDataSaga);
 
     // //Room Category
 
-    // yield takeLatest(SAVE_ROOM_CATEGORY, saveRoomCategoryDataHandler);
-    // yield takeLatest(GET_ALL_ROOM_CATEGORY, getAllRoomCategoryDataSaga);
-    // yield takeLatest(GET_ROOM_CATEGORY_BY_ID, getRoomCategoryByCodeSaga);
+    yield takeLatest(SAVE_ROOM_CATEGORY, saveRoomCategoryDataHandler);
+    yield takeLatest(GET_ALL_ROOM_CATEGORY, getAllRoomCategoryDataSaga);
+    yield takeLatest(GET_ROOM_CATEGORY_BY_ID, getRoomCategoryByCodeSaga);
 
-    // yield takeLatest(GET_ROOM_CATEGORY_LAST_MODIFIED_DATE_TIME, getRoomCategoryLatestModifiedDateSaga);
-    // yield takeLatest(CHECK_ROOM_CATEGORY_CODE_DUPLICATE, checkRoomCategoryDupicateCodeSaga);
-    // yield takeLatest(UPDATE_ROOM_CATEGORY, updateRoomCategoryDataSaga);
+    yield takeLatest(GET_ROOM_CATEGORY_LAST_MODIFIED_DATE_TIME, getRoomCategoryLatestModifiedDateSaga);
+    yield takeLatest(CHECK_ROOM_CATEGORY_CODE_DUPLICATE, checkRoomCategoryDupicateCodeSaga);
+    yield takeLatest(UPDATE_ROOM_CATEGORY, updateRoomCategoryDataSaga);
 }

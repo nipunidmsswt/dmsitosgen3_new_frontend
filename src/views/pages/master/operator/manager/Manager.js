@@ -38,6 +38,7 @@ import {
     updateManagerData
 } from 'store/actions/masterActions/operatorActions/ManagerAction';
 import { getAllClusterData } from 'store/actions/masterActions/CodeAndNameAction';
+import CreatedUpdatedUserDetailsWithTableFormat from '../../userTimeDetails/CreatedUpdatedUserDetailsWithTableFormat';
 
 const Manager = ({ open, handleClose, mode, managerCode }) => {
     const initialValues1 = {

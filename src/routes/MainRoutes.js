@@ -12,6 +12,9 @@ import ViewManager from 'views/pages/master/operator/manager/ViewManager';
 import ViewMarket from 'views/pages/master/operator/market/ViewMarket';
 import ViewMarketGroup from 'views/pages/master/operator/maketGroup/ViewMarketGroup';
 import ViewOperatorEntry from 'views/pages/master/operator/operatorEntry/ViewOperatorEntry';
+import ViewSeason from 'views/pages/master/season/ViewSeason';
+import ViewHotelBasis from 'views/pages/master/hotelMaster/hotelBasis/ViewHotelBasis';
+import ViewRoomCategory from 'views/pages/master/hotelMaster/roomCategory/ViewRoomCategory';
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
 
@@ -131,8 +134,20 @@ const MainRoutes = {
                     element: <ViewMarketGroup />
                 },
                 {
-                    path: 'viewoperatorentry',
+                    path: 'operatorentryview',
                     element: <ViewOperatorEntry />
+                },
+                {
+                    path: 'seasonview',
+                    element: <ViewSeason />
+                },
+                {
+                    path: 'hotelbasis',
+                    element: <ViewHotelBasis />
+                },
+                {
+                    path: 'roomcategory',
+                    element: <ViewRoomCategory />
                 }
             ]
         }

@@ -108,7 +108,7 @@ const utilities = {
                             id: 'operator-entry',
                             title: 'Operator Entry',
                             type: 'item',
-                            url: '/master/viewoperatorentry',
+                            url: '/master/operatorentryview',
                             breadcrumbs: false
                             // icon: "bi bi-journal-code",
                             // path: "/master/codeAndName",
@@ -154,6 +154,91 @@ const utilities = {
                     type: 'item',
                     url: '/master/tourcategoryview',
                     breadcrumbs: false
+                },
+                {
+                    id: 'season-id',
+                    title: 'Season',
+                    type: 'item',
+                    url: '/master/seasonview',
+                    breadcrumbs: false
+                },
+
+                {
+                    id: 'Hotel-master',
+                    type: 'collapse',
+                    title: 'Hotel Masters',
+                    children: [
+                        {
+                            id: 'hotelbasis',
+                            title: 'Hotel Basis',
+                            type: 'item',
+                            url: '/master/hotelbasis',
+                            breadcrumbs: false
+                            // icon: "bi bi-journal-code",
+                            // path: "/master/codeAndName",
+                        },
+                        {
+                            id: 'room-category',
+                            title: 'Room Category',
+                            type: 'item',
+                            url: '/master/roomcategory',
+                            breadcrumbs: false
+                            // icon: "bi bi-journal-code",
+                            // path: "/master/codeAndName",
+                        },
+
+                        {
+                            id: 'market',
+                            title: 'Market',
+                            type: 'item',
+                            url: '/master/marketview',
+                            breadcrumbs: false
+                            // icon: "bi bi-journal-code",
+                            // path: "/master/codeAndName",
+                        },
+                        {
+                            id: 'market-group',
+                            title: 'Market Group',
+                            type: 'item',
+                            url: '/master/marketgroupview',
+                            breadcrumbs: false
+                            // icon: "bi bi-journal-code",
+                            // path: "/master/codeAndName",
+                        },
+                        {
+                            id: 'operator-entry',
+                            title: 'Operator Entry',
+                            type: 'item',
+                            url: '/master/operatorentryview',
+                            breadcrumbs: false
+                            // icon: "bi bi-journal-code",
+                            // path: "/master/codeAndName",
+                        },
+                        {
+                            id: 'Color',
+                            title: 'Color',
+                            type: 'item',
+                            url: '/utils/util-color',
+                            breadcrumbs: false
+                            // icon: "bi bi-journal-code",
+                            // path: "/master/codeAndName",
+                        }
+                        //   {
+                        //     title: "Manager",
+                        //     icon: "bi bi-file-earmark-person",
+                        //     path: "/master/manager",
+                        //   },
+                        //   {
+                        //     title: "Market",
+                        //     icon: "bi bi-shop-window",
+                        //     path: "/master/market",
+                        //   },
+                        //   {
+                        //     title: "Operator/Market Group",
+                        //     icon: "bi bi-terminal-dash",
+                        //     path: "/master/marketGroup",
+                        //   },
+                    ]
                 }
             ]
         }

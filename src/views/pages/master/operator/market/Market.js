@@ -37,6 +37,7 @@ import {
     updateMarketData
 } from 'store/actions/masterActions/operatorActions/MarketAction';
 import { getAllActiveManagerData } from 'store/actions/masterActions/operatorActions/ManagerAction';
+import CreatedUpdatedUserDetailsWithTableFormat from '../../userTimeDetails/CreatedUpdatedUserDetailsWithTableFormat';
 
 const Market = ({ open, handleClose, mode, marketCode }) => {
     const initialValues1 = {

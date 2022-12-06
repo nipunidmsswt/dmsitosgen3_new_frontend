@@ -1,63 +1,33 @@
-import { useEffect, useState, forwardRef } from 'react';
+import { useEffect, useState } from 'react';
 import MaterialTable from 'material-table';
+
+import Season from './Season';
+
+import { useSelector, useDispatch } from 'react-redux';
 import SuccessMsg from 'messages/SuccessMsg';
 import ErrorMsg from 'messages/ErrorMsg';
 import tableIcons from 'utils/MaterialTableIcons';
 import { gridSpacing } from 'store/constant';
-import { useSelector, useDispatch } from 'react-redux';
-import Manager from './Manager';
-import { Grid } from '@mui/material';
-import { getAllManagerData, getLatestModifiedDetails } from 'store/actions/masterActions/operatorActions/ManagerAction';
+import Grid from '@mui/material/Grid';
+import { getAllSeasonData, getLatestModifiedDetails } from 'store/actions/masterActions/SeasonAction';
 import MainCard from 'ui-component/cards/MainCard';
 
-function ViewManager() {
+function ViewSeason() {
     const [open, setOpen] = useState(false);
-    const [managerCode, setManagerCode] = useState('');
+    const [code, setCode] = useState('');
     const [mode, setMode] = useState('INSERT');
     const [openToast, setHandleToast] = useState(false);
     const [openErrorToast, setOpenErrorToast] = useState(false);
     const [tableData, setTableData] = useState([]);
+    const [lastModifiedTimeDate, setLastModifiedTimeDate] = useState(null);
     const columns = [
         {
-            title: 'Code',
-            field: 'code',
+            title: 'Main Season',
+            field: 'mainSeason',
             filterPlaceholder: 'filter',
             align: 'center'
         },
-        {
-            title: 'Initial',
-            field: 'initials',
-            filterPlaceholder: 'filter',
-            align: 'center'
-        },
-        {
-            title: 'Surname',
-            field: 'surName',
-            align: 'center',
-            grouping: false,
-            filterPlaceholder: 'filter'
-        },
-        {
-            title: 'Mobile Number',
-            field: 'mobileNumber',
-            align: 'center',
-            grouping: false,
-            filterPlaceholder: 'filter'
-        },
-        {
-            title: 'Fax',
-            field: 'fax',
-            align: 'center',
-            grouping: false,
-            filterPlaceholder: 'filter'
-        },
-        {
-            title: 'Cluster',
-            field: 'codeAndNameDetail',
-            align: 'center',
-            grouping: false,
-            filterPlaceholder: 'filter'
-        },
+
         {
             title: 'Active',
             field: 'status',
@@ -80,22 +50,38 @@ function ViewManager() {
             )
         }
     ];
-    const error = useSelector((state) => state.managerReducer.errorMsg);
+
     const dispatch = useDispatch();
-    const managerData = useSelector((state) => state.managerReducer.manager);
-    const managerListData = useSelector((state) => state.managerReducer.managerList);
-    const lastModifiedDate = useSelector((state) => state.managerReducer.lastModifiedDateTime);
+    const error = useSelector((state) => state.seasonReducer.errorMsg);
+
+    const seasonListData = useSelector((state) => state.seasonReducer.seasons);
+    const seasonData = useSelector((state) => state.seasonReducer.season);
+    const lastModifiedDate = useSelector((state) => state.seasonReducer.lastModifiedDateTime);
+    console.log(seasonData);
 
     useEffect(() => {
-        if (managerData) {
-            setHandleToast(true);
-            dispatch(getAllManagerData());
-            dispatch(getLatestModifiedDetails());
-        } else {
+        if (seasonListData?.payload?.length > 0) {
+            setTableData(seasonListData?.payload[0]);
         }
-    }, [managerData]);
+    }, [seasonListData]);
 
-    const [lastModifiedTimeDate, setLastModifiedTimeDate] = useState(null);
+    useEffect(() => {
+        console.log(error);
+        if (error != null) {
+            console.log('failed Toast');
+            setOpenErrorToast(true);
+        }
+    }, [error]);
+
+    useEffect(() => {
+        console.log(seasonData);
+        if (seasonData) {
+            console.log('sucessToast');
+            setHandleToast(true);
+            dispatch(getAllSeasonData());
+            dispatch(getLatestModifiedDetails());
+        }
+    }, [seasonData]);
 
     useEffect(() => {
         setLastModifiedTimeDate(
@@ -113,37 +99,7 @@ function ViewManager() {
     }, [lastModifiedDate]);
 
     useEffect(() => {
-        const dataArray = [];
-        if (managerListData?.payload?.length > 0) {
-            {
-                managerListData?.payload.length != 0 &&
-                    managerListData?.payload[0].map((item) => {
-                        const initialValues = {
-                            code: item.code,
-                            initials: item.initials,
-                            surName: item.surName,
-                            mobileNumber: item.managerAdditionalDetails[0].officeTelNumber,
-                            codeAndNameDetail: item.codeAndNameDetail.name,
-                            fax: item.managerAdditionalDetails[0].fax1,
-                            status: item.status
-                        };
-                        dataArray.push(initialValues);
-                    });
-            }
-        }
-        setTableData(dataArray);
-    }, [managerListData]);
-
-    useEffect(() => {
-        console.log(error);
-        if (error != null) {
-            console.log('failed Toast');
-            setOpenErrorToast(true);
-        }
-    }, [error]);
-
-    useEffect(() => {
-        dispatch(getAllManagerData());
+        dispatch(getAllSeasonData());
         dispatch(getLatestModifiedDetails());
     }, []);
 
@@ -152,13 +108,13 @@ function ViewManager() {
         console.log(data);
         if (type === 'VIEW_UPDATE') {
             setMode(type);
-            setManagerCode(data.code);
+            setCode(data.mainSeason);
         } else if (type === 'INSERT') {
-            setManagerCode('');
+            setCode('');
             setMode(type);
         } else {
             setMode(type);
-            setManagerCode(data.code);
+            setCode(data.mainSeason);
         }
         setOpen(true);
     };
@@ -175,7 +131,7 @@ function ViewManager() {
     };
     return (
         <div>
-            <MainCard title="Manager">
+            <MainCard title="Season">
                 <div style={{ textAlign: 'right' }}> Last Modified Date : {lastModifiedTimeDate}</div>
                 <br />
                 <Grid container spacing={gridSpacing}>
@@ -188,18 +144,18 @@ function ViewManager() {
                                     actions={[
                                         {
                                             icon: tableIcons.Add,
-                                            tooltip: 'Add Manager',
+                                            tooltip: 'Add Season',
                                             isFreeAction: true,
                                             onClick: () => handleClickOpen('INSERT', null)
                                         },
                                         (rowData) => ({
                                             icon: tableIcons.Edit,
-                                            tooltip: 'Edit Manager',
+                                            tooltip: 'Edit Season',
                                             onClick: () => handleClickOpen('VIEW_UPDATE', rowData)
                                         }),
                                         (rowData) => ({
                                             icon: tableIcons.VisibilityIcon,
-                                            tooltip: 'View Manager',
+                                            tooltip: 'View Season',
                                             onClick: () => handleClickOpen('VIEW', rowData)
                                         })
                                     ]}
@@ -219,7 +175,7 @@ function ViewManager() {
                                         showFirstLastPageButtons: false,
                                         exportButton: true,
                                         exportAllData: true,
-                                        exportFileName: 'ManagerData',
+                                        exportFileName: 'TableData',
                                         actionsColumnIndex: -1,
                                         columnsButton: true,
 
@@ -233,7 +189,6 @@ function ViewManager() {
                                             background: '-ms-linear-gradient(top, #0790E8, #3180e6)',
                                             background: '-webkit-linear-gradient(top, #0790E8, #3180e6)',
                                             textAlign: 'center',
-                                            alignItems: 'center',
                                             color: '#FFF'
                                         },
                                         rowStyle: {
@@ -245,7 +200,7 @@ function ViewManager() {
                                     }}
                                 />
 
-                                {open ? <Manager open={open} handleClose={handleClose} managerCode={managerCode} mode={mode} /> : ''}
+                                {open ? <Season open={open} handleClose={handleClose} code={code} mode={mode} /> : ''}
                                 {openToast ? <SuccessMsg openToast={openToast} handleToast={handleToast} mode={mode} /> : null}
                                 {openErrorToast ? (
                                     <ErrorMsg openToast={openErrorToast} handleToast={setOpenErrorToast} mode={mode} />
@@ -260,4 +215,4 @@ function ViewManager() {
     );
 }
 
-export default ViewManager;
+export default ViewSeason;
