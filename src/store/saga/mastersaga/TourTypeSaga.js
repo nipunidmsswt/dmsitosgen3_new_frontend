@@ -1,5 +1,5 @@
 import { put, takeEvery, call } from 'redux-saga/effects';
-import { create, getById, update, get } from '../../../apis/Apis';
+import { create, get, getById, update } from 'apis/Apis';
 
 import {
     ADD_FAILED_TOURTYPE_DATA,
@@ -13,7 +13,7 @@ import {
     SUCCESS_TOURTYPE_LIST_DATA,
     UPDATE_FAILED_TOURTYPE_DATA,
     UPDATE_SUCCESS_TOURTYPE_DATA
-} from '../../constant/master/TourTypeConstant';
+} from 'store/constant/master/TourTypeConstant';
 
 export function* saveTourType(action) {
     action.data.path = `${process.env.REACT_APP_TOUR_URL}/tourType/`;
