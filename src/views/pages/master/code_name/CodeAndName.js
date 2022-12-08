@@ -400,28 +400,22 @@ function CodeAndName({ open, handleClose, mode, ccode }) {
                                                             <Box display="flex" flexDirection="row-reverse" style={{ marginTop: '20px' }}>
                                                                 {mode != 'VIEW' ? (
                                                                     <Button
-                                                                        variant="contained"
+                                                                        variant="outlined"
                                                                         type="button"
+                                                                        onClick={handleClose}
                                                                         style={{
-                                                                            backgroundColor: '#B22222',
+                                                                            // backgroundColor: '#B22222',
                                                                             marginLeft: '10px'
                                                                         }}
-                                                                        onClick={handleClose}
                                                                     >
-                                                                        Cancel
+                                                                        CLEAR
                                                                     </Button>
                                                                 ) : (
                                                                     ''
                                                                 )}
 
                                                                 {mode != 'VIEW' ? (
-                                                                    <Button
-                                                                        variant="contained"
-                                                                        type="submit"
-                                                                        style={{
-                                                                            backgroundColor: '#00AB55'
-                                                                        }}
-                                                                    >
+                                                                    <Button className="btnSave" variant="contained" type="submit">
                                                                         {mode === 'INSERT' ? 'SAVE' : 'UPDATE'}
                                                                     </Button>
                                                                 ) : (
