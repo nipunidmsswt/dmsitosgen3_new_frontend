@@ -152,8 +152,8 @@ function TourType({ open, mode, handleClose, tourTypeCode }) {
         <div>
             <Dialog open={open} TransitionComponent={Transition} keepMounted aria-describedby="alert-dialog-slide-description">
                 <DialogTitle>
-                    <Box display="flex" alignItems="center">
-                        <Box flexGrow={1} className="dialog-title">
+                    <Box display="flex" alignItems="center" className="dialog-title">
+                        <Box flexGrow={1}>
                             {(() => {
                                 if (mode === 'INSERT') {
                                     return 'Add Tour Type';
@@ -266,17 +266,17 @@ function TourType({ open, mode, handleClose, tourTypeCode }) {
                                     variant="contained"
                                     type="submit"
                                     style={{
-                                        backgroundColor: '#00AB55',
                                         display: mode == 'VIEW' ? 'none' : 'block'
                                     }}
+                                    className="btnSave"
                                 >
                                     {mode === 'INSERT' ? 'SAVE' : 'UPDATE'}
                                 </Button>
                                 <Button
-                                    variant="contained"
+                                    variant="outlined"
                                     type="button"
                                     style={{
-                                        backgroundColor: '#B22222',
+                                        //   backgroundColor: '#B22222',
                                         display: mode == 'VIEW' ? 'none' : 'block'
                                     }}
                                     // onClick={clearForm}
