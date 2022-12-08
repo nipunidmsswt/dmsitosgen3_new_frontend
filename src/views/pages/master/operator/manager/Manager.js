@@ -80,7 +80,7 @@ const Manager = ({ open, handleClose, mode, managerCode }) => {
     useEffect(() => {
         console.log('data:' + clusterListData);
         if (clusterListData != null) {
-            console.log('data 678:' + clusterListData.codeAndNameDetails);
+            console.log('data 678:' + clusterListData.codeAndNameDetail);
             setClusterListOptions(clusterListData);
         }
     }, [clusterListData]);
@@ -152,8 +152,8 @@ const Manager = ({ open, handleClose, mode, managerCode }) => {
                 aria-describedby="alert-dialog-slide-description"
             >
                 <DialogTitle>
-                    <Box display="flex" alignItems="center">
-                        <Box flexGrow={1} className="dialog-title">
+                    <Box display="flex" className="dialog-title">
+                        <Box flexGrow={1}>
                             {mode === 'INSERT' ? 'Add' : ''} {mode === 'VIEW_UPDATE' ? 'Update' : ''} {mode === 'VIEW' ? 'View' : ''}Manager
                         </Box>
                         <Box>
