@@ -63,13 +63,20 @@ const utilities = {
                     breadcrumbs: false
                 },
                 {
+                    id: 'exchange-rate-id',
+                    title: 'Exchange Rate Types',
+                    type: 'item',
+                    url: '/master/exchangeratetypeview',
+                    breadcrumbs: false
+                },
+                {
                     id: 'operators',
                     type: 'collapse',
                     title: 'Operators',
                     children: [
                         {
                             id: 'codename',
-                            title: 'CodeAndName',
+                            title: 'Code And Name',
                             type: 'item',
                             url: '/master/codeandnameview',
                             breadcrumbs: false
@@ -156,17 +163,31 @@ const utilities = {
                     breadcrumbs: false
                 },
                 {
+                    id: 'product-id',
+                    title: 'Product',
+                    type: 'item',
+                    url: '/master/productview',
+                    breadcrumbs: false
+                },
+                {
                     id: 'season-id',
                     title: 'Season',
                     type: 'item',
                     url: '/master/seasonview',
                     breadcrumbs: false
                 },
+                {
+                    id: 'owner-id',
+                    title: 'Owner',
+                    type: 'item',
+                    url: '/master/ownerview',
+                    breadcrumbs: false
+                },
 
                 {
                     id: 'Hotel-master',
                     type: 'collapse',
-                    title: 'Hotel Masters',
+                    title: 'Hotel Master',
                     children: [
                         {
                             id: 'hotel-category',
@@ -195,6 +216,15 @@ const utilities = {
                             // icon: "bi bi-journal-code",
                             // path: "/master/codeAndName",
                         },
+                        {
+                            id: 'facility-count',
+                            title: 'Facility Count',
+                            type: 'item',
+                            url: '/master/facilitycountview',
+                            breadcrumbs: false
+                            // icon: "bi bi-journal-code",
+                            // path: "/master/codeAndName",
+                        },
 
                         {
                             id: 'hotel-facility',
@@ -205,15 +235,7 @@ const utilities = {
                             // icon: "bi bi-journal-code",
                             // path: "/master/codeAndName",
                         },
-                        {
-                            id: 'operator-entry',
-                            title: 'Operator Entry',
-                            type: 'item',
-                            url: '/master/operatorentryview',
-                            breadcrumbs: false
-                            // icon: "bi bi-journal-code",
-                            // path: "/master/codeAndName",
-                        },
+
                         {
                             id: 'Color',
                             title: 'Color',
@@ -238,6 +260,40 @@ const utilities = {
                         //     icon: "bi bi-terminal-dash",
                         //     path: "/master/marketGroup",
                         //   },
+                    ]
+                },
+
+                {
+                    id: 'transport-master',
+                    type: 'collapse',
+                    title: 'Transport Master',
+                    children: [
+                        {
+                            id: 'location',
+                            title: 'Location',
+                            type: 'item',
+                            url: '/master/locationview',
+                            breadcrumbs: false
+                            // icon: "bi bi-journal-code",
+                            // path: "/master/codeAndName",
+                        }
+                    ]
+                },
+
+                {
+                    id: 'guide-master',
+                    type: 'collapse',
+                    title: 'Guide Master',
+                    children: [
+                        {
+                            id: 'guide-class',
+                            title: 'Guide Class',
+                            type: 'item',
+                            url: '/master/guideclassview',
+                            breadcrumbs: false
+                            // icon: "bi bi-journal-code",
+                            // path: "/master/codeAndName",
+                        }
                     ]
                 }
             ]

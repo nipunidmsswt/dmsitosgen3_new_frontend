@@ -247,22 +247,22 @@ import {
 } from './mastersaga/TourTypeSaga';
 import { checkDuplicateTourTypeCode } from 'store/actions/masterActions/TourTypeAction';
 // import { checkDuplicateTourTypeCode, getAllTourTypeData } from '../actions/masterActions/TourTypeAction';
-// import {
-//     CHECK_OWNER_CODE_DUPLICATE,
-//     GET_ALL_OWNER_DATA,
-//     GET_OWNER_DATA_BY_ID,
-//     GET_OWNER_LAST_MODIFIED_DATE_TIME,
-//     SAVE_OWNER_DATA,
-//     UPDATE_OWNER_DATA
-// } from 'store/constant/master/OwnerConstant';
-// import {
-//     checkDupicateOwnerCodeSaga,
-//     checkOwnerLatestModifiedDateSaga,
-//     getAllOwnerSaga,
-//     getOwnerByIdSaga,
-//     saveOwner,
-//     updateOwnerSaga
-// } from './masterSaga/OwnerSaga';
+import {
+    CHECK_OWNER_CODE_DUPLICATE,
+    GET_ALL_OWNER_DATA,
+    GET_OWNER_DATA_BY_ID,
+    GET_OWNER_LAST_MODIFIED_DATE_TIME,
+    SAVE_OWNER_DATA,
+    UPDATE_OWNER_DATA
+} from 'store/constant/master/OwnerConstant';
+import {
+    checkDupicateOwnerCodeSaga,
+    checkOwnerLatestModifiedDateSaga,
+    getAllOwnerSaga,
+    getOwnerByIdSaga,
+    saveOwner,
+    updateOwnerSaga
+} from './mastersaga/OwnerSaga';
 
 import {
     CHECK_SEASON_DUPLICATE,
@@ -421,17 +421,6 @@ export function* wacherSaga() {
     // yield takeLatest(GET_CODE_LAST_MODIFIED_DATE_TIME, checkCodeLatestModifiedDateSaga);
 
     //hotel category
-    // yield takeLatest(SAVE_TAX_DATA, saveTaxSaga);
-    // yield takeLatest(GET_TAX_DATA_BY_ID, getTaxByIdSaga);
-    // yield takeLatest(GET_ALL_TAX_DATA, getAllTaxSaga);
-    // yield takeLatest(UPDATE_TAX_DATA, updateTaxSaga);
-    // yield takeLatest(CHECK_TAX_DUPLICATE, checkDupicateTaxCodeSaga);
-    // yield takeLatest(
-    //   GET_LAST_MODIFIED_DATE_TIME_TAX,
-    //   checkLatestTaxModifiedDateSaga
-    // );
-
-    //hotel category
     yield takeLatest(SAVE_HOTEL_CATEGORY_DATA, saveHotelCateogrySaga);
     yield takeLatest(GET_HOTEL_CATEGORY_DATA_BY_ID, getHotelCateogryByIdSaga);
     yield takeLatest(GET_ALL_HOTEL_CATEGORY_DATA, getAllHotelCateogrySaga);
@@ -503,12 +492,12 @@ export function* wacherSaga() {
     // yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_MANAGING_COMAPANY, checkLatestManagingCompanyModifiedDateSaga);
 
     // //owner setup
-    // yield takeLatest(SAVE_OWNER_DATA, saveOwner);
-    // yield takeLatest(GET_ALL_OWNER_DATA, getAllOwnerSaga);
-    // yield takeLatest(GET_OWNER_DATA_BY_ID, getOwnerByIdSaga);
-    // yield takeLatest(UPDATE_OWNER_DATA, updateOwnerSaga);
-    // yield takeLatest(GET_OWNER_LAST_MODIFIED_DATE_TIME, checkOwnerLatestModifiedDateSaga);
-    // yield takeLatest(CHECK_OWNER_CODE_DUPLICATE, checkDupicateOwnerCodeSaga);
+    yield takeLatest(SAVE_OWNER_DATA, saveOwner);
+    yield takeLatest(GET_ALL_OWNER_DATA, getAllOwnerSaga);
+    yield takeLatest(GET_OWNER_DATA_BY_ID, getOwnerByIdSaga);
+    yield takeLatest(UPDATE_OWNER_DATA, updateOwnerSaga);
+    yield takeLatest(GET_OWNER_LAST_MODIFIED_DATE_TIME, checkOwnerLatestModifiedDateSaga);
+    yield takeLatest(CHECK_OWNER_CODE_DUPLICATE, checkDupicateOwnerCodeSaga);
     // //season data
     yield takeLatest(SAVE_SEASON_DATA, saveSeasonSaga);
     yield takeLatest(GET_SEASON_DATA_BY_ID, getSeasonByIdSaga);
