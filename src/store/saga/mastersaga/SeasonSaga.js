@@ -1,5 +1,5 @@
 import { put, call } from 'redux-saga/effects';
-import { create, getById, get, update } from '../../../apis/Apis';
+import { create, get, getById, update } from 'apis/Apis';
 import {
     ADD_SUCCESS_SEASON_DATA,
     ADD_FAILED_SEASON_DATA,
@@ -12,7 +12,7 @@ import {
     CHECK_SEASON_DUPLICATE,
     SUCCESS_LAST_MODIFIED_DATE_SEASON,
     FAILED_LAST_MODIFIED_DATE_SEASON
-} from '../../constant/master/SeasonConstant';
+} from 'store/constant/master/SeasonConstant';
 
 //Season saga
 

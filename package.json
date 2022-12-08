@@ -37,6 +37,7 @@
         "react-scripts": "^5.0.1",
         "redux": "^4.2.0",
         "redux-saga": "^1.2.1",
+        "srilankan-provinces-districts": "^1.0.8",
         "yup": "^0.32.11"
     },
     "scripts": {

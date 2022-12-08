@@ -9046,6 +9046,11 @@
   "resolved" "https://registry.npmjs.org/sprintf-js/-/sprintf-js-1.0.3.tgz"
   "version" "1.0.3"
 
+"srilankan-provinces-districts@^1.0.8":
+  "integrity" "sha512-VAnGCAUGVvsENt6I5lXztDtpbPiDZSrdr1ppTeV0T5BmcIyw83n03PE0DUztKagTSVySLxib9Xmi4jtvSArldg=="
+  "resolved" "https://registry.npmjs.org/srilankan-provinces-districts/-/srilankan-provinces-districts-1.0.8.tgz"
+  "version" "1.0.8"
+
 "stable@^0.1.8":
   "integrity" "sha512-ji9qxRnOVfcuLDySj9qzhGSEFVobyt1kIOSkj1qZzYLzq7Tos/oUUWvotUPQLlrsidqsK6tBH89Bc9kL5zHA6w=="
   "resolved" "https://registry.npmjs.org/stable/-/stable-0.1.8.tgz"

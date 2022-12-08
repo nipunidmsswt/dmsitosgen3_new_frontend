@@ -13,9 +13,9 @@ import {
     SUCCESS_GET_CODE_NAME_DATA_BY_CODE,
     UPDATE_FAILED_CODE_AND_NAME_DATA,
     UPDATE_SUCCESS_CODE_AND_NAME_DATA
-} from '../../constant/master/CodeAndNameConstant';
+} from 'store/constant/master/CodeAndNameConstant';
 import { put, takeEvery, call } from 'redux-saga/effects';
-import { create, getById, update, get } from '../../../apis/Apis';
+import { create, get, getById, update } from 'apis/Apis';
 
 export function* saveCodeAndNameDataHandler(action) {
     action.data.path = `${process.env.REACT_APP_OPERATOR_URL}/codeAndName/`;
