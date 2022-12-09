@@ -6,10 +6,12 @@ import {
     FAILED_ALL_CLUSTER_TYPE_DATA,
     FAILED_ALL_CODE_AND_NAME_DATA,
     FAILED_CODE_LAST_MODIFIED_DATE,
+    FAILED_GET_ALL_OPERATOR_DATA,
     FAILED_GET_CODE_NAME_DATA_BY_CODE,
     SUCCESS_ALL_CLUSTER_TYPE_DATA,
     SUCCESS_ALL_CODE_AND_NAME_DATA,
     SUCCESS_CODE_LAST_MODIFIED_DATE,
+    SUCCESS_GET_ALL_OPERATOR_DATA,
     SUCCESS_GET_CODE_NAME_DATA_BY_CODE,
     UPDATE_FAILED_CODE_AND_NAME_DATA,
     UPDATE_SUCCESS_CODE_AND_NAME_DATA
@@ -45,10 +47,19 @@ export function* getAllClusterTypeData() {
     let responseData = [];
     try {
         responseData = yield call(get, `${process.env.REACT_APP_OPERATOR_URL}/codeAndName/clusterTypes/`);
-        // console.log("response data:"+responseData);
         yield put({ type: SUCCESS_ALL_CLUSTER_TYPE_DATA, data: responseData.data });
     } catch (e) {
         yield put({ type: FAILED_ALL_CLUSTER_TYPE_DATA, data: responseData.data });
+    }
+}
+
+export function* getAllActiveOperatorSaga() {
+    let responseData = [];
+    try {
+        responseData = yield call(get, `${process.env.REACT_APP_OPERATOR_URL}/codeAndName/operatorTypes/`);
+        yield put({ type: SUCCESS_GET_ALL_OPERATOR_DATA, data: responseData.data });
+    } catch (e) {
+        yield put({ type: FAILED_GET_ALL_OPERATOR_DATA, data: responseData.data });
     }
 }
 

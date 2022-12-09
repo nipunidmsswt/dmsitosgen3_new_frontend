@@ -203,32 +203,6 @@ const Market = ({ open, handleClose, mode, marketCode }) => {
                                                                             helperText={touched.name && errors.name ? errors.name : ''}
                                                                         />
                                                                     </Grid>
-
-                                                                    {/* <Grid item>
-                                    <TextField
-                                      sx={{
-                                        width: { sm: 200, md: 300 },
-                                        "& .MuiInputBase-root": {
-                                          height: 40,
-                                        },
-                                      }}
-                                      id="outlined-required"
-                                      label="Sur Name"
-                                      name="surName"
-                                      onChange={handleChange}
-                                      onBlur={handleBlur}
-                                      disabled={mode == "VIEW"}
-                                      value={values.surName}
-                                      error={Boolean(
-                                        touched.surName && errors.surName
-                                      )}
-                                      helperText={
-                                        touched.surName && errors.surName
-                                          ? errors.surName
-                                          : ""
-                                      }
-                                    />
-                                  </Grid> */}
                                                                 </Grid>
                                                                 <br />
 

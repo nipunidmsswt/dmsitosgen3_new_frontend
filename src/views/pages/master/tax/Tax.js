@@ -224,18 +224,20 @@ function Tax({ open, handleClose, mode, rowTaxCode }) {
                                     />
                                 </Grid>
 
-                                <Grid item>
-                                    <FormGroup>
-                                        <FormControlLabel
-                                            name="status"
-                                            onChange={handleInputChange}
-                                            value={formValues.status}
-                                            control={<Switch color="success" />}
-                                            label="Status"
-                                            checked={formValues.status}
-                                            disabled={mode == 'VIEW'}
-                                        />
-                                    </FormGroup>
+                                <Grid containers>
+                                    <Grid item xs={2}>
+                                        <FormGroup>
+                                            <FormControlLabel
+                                                name="status"
+                                                onChange={handleInputChange}
+                                                value={formValues.status}
+                                                control={<Switch color="success" />}
+                                                label="Status"
+                                                checked={formValues.status}
+                                                disabled={mode == 'VIEW'}
+                                            />
+                                        </FormGroup>
+                                    </Grid>
                                 </Grid>
                             </Grid>
 

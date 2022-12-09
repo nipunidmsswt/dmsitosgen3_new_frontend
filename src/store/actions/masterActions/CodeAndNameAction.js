@@ -3,6 +3,7 @@ import {
     CHECK_CODE_TYPE_DUPLICATE,
     GET_ALL_CLUSTER_DATA,
     GET_ALL_CODE_AND_NAME_DATA,
+    GET_ALL_OPERATOR_DATA,
     GET_CODE_LAST_MODIFIED_DATE_TIME,
     GET_CODE_NAME_DATA_BY_CODE,
     SAVE_CODE_AND_NAME_DATA,
@@ -62,3 +63,11 @@ export const getAllClusterData = () => {
         type: GET_ALL_CLUSTER_DATA
     };
 };
+
+export const getAllActiveOperatorData = () => {
+    return {
+        type: GET_ALL_OPERATOR_DATA
+    };
+};
+
+

@@ -95,6 +95,7 @@ import {
     CHECK_CODE_TYPE_DUPLICATE,
     GET_ALL_CLUSTER_DATA,
     GET_ALL_CODE_AND_NAME_DATA,
+    GET_ALL_OPERATOR_DATA,
     GET_CODE_LAST_MODIFIED_DATE_TIME,
     GET_CODE_NAME_DATA_BY_CODE,
     SAVE_CODE_AND_NAME_DATA,
@@ -109,7 +110,8 @@ import {
     checkDupicateCodeSaga,
     checkDupicateCodeTypeSaga,
     checkCodeLatestModifiedDateSaga,
-    getAllClusterTypeData
+    getAllClusterTypeData,
+    getAllActiveOperatorSaga
 } from './mastersaga/CodeAndNameSaga';
 
 import {
@@ -407,6 +409,7 @@ export function* wacherSaga() {
     yield takeLatest(CHECK_CODE_TYPE_DUPLICATE, checkDupicateCodeTypeSaga);
     yield takeLatest(GET_CODE_LAST_MODIFIED_DATE_TIME, checkCodeLatestModifiedDateSaga);
     yield takeLatest(GET_ALL_CLUSTER_DATA, getAllClusterTypeData);
+    yield takeLatest(GET_ALL_OPERATOR_DATA, getAllActiveOperatorSaga);
 
     // //location data
     yield takeLatest(SAVE_LOCATION_DATA, saveLocationSaga);

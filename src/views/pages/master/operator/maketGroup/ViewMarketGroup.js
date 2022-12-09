@@ -163,7 +163,7 @@ function ViewMarketGroup() {
     };
     return (
         <div>
-            <MainCard title="Market Group">
+            <MainCard title="Operator / Market Group">
                 <div style={{ textAlign: 'right' }}> Last Modified Date : {lastModifiedTimeDate}</div>
                 <br />
                 <Grid container spacing={gridSpacing}>

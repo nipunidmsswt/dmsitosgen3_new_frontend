@@ -104,7 +104,7 @@ const utilities = {
                         },
                         {
                             id: 'market-group',
-                            title: 'Market Group',
+                            title: 'Operator / Market Group',
                             type: 'item',
                             url: '/master/marketgroupview',
                             breadcrumbs: false
