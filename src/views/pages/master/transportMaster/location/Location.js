@@ -229,8 +229,8 @@ function Location({ open, handleClose, mode, locationCode }) {
         <div>
             <Dialog maxWidth="220px" open={open} keepMounted onClose={handleClose} aria-describedby="alert-dialog-slide-description">
                 <DialogTitle>
-                    <Box display="flex" alignItems="center">
-                        <Box flexGrow={1} className="dialog-title">
+                    <Box display="flex" alignItems="center" className="dialog-title">
+                        <Box flexGrow={1}>
                             {mode === 'INSERT' ? 'Add' : ''} {mode === 'VIEW_UPDATE' ? 'Update' : ''} {mode === 'VIEW' ? 'View' : ''}
                             Location
                         </Box>
@@ -588,28 +588,21 @@ function Location({ open, handleClose, mode, locationCode }) {
                                                             <Box display="flex" flexDirection="row-reverse" style={{ marginTop: '20px' }}>
                                                                 {mode != 'VIEW' ? (
                                                                     <Button
-                                                                        variant="contained"
+                                                                        variant="outlined"
                                                                         type="button"
                                                                         style={{
-                                                                            backgroundColor: '#B22222',
                                                                             marginLeft: '10px'
                                                                         }}
                                                                         // onClick={handleCancel}
                                                                     >
-                                                                        Cancel
+                                                                        CLEAR
                                                                     </Button>
                                                                 ) : (
                                                                     ''
                                                                 )}
 
                                                                 {mode != 'VIEW' ? (
-                                                                    <Button
-                                                                        variant="contained"
-                                                                        type="submit"
-                                                                        style={{
-                                                                            backgroundColor: '#00AB55'
-                                                                        }}
-                                                                    >
+                                                                    <Button variant="contained" type="submit" className="btnSave">
                                                                         {mode === 'INSERT' ? 'SAVE' : 'UPDATE'}
                                                                     </Button>
                                                                 ) : (

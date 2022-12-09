@@ -136,16 +136,16 @@ function FacilityCounter({ open, mode, handleClose, ownerCode }) {
         <div>
             <Dialog open={open} TransitionComponent={Transition} keepMounted aria-describedby="alert-dialog-slide-description">
                 <DialogTitle>
-                    <Box display="flex" alignItems="center">
-                        <Box flexGrow={1} className="dialog-title">
+                    <Box display="flex" alignItems="center" className="dialog-title">
+                        <Box flexGrow={1}>
                             {(() => {
                                 if (mode === 'INSERT') {
-                                    return 'Add Owner';
+                                    return 'Add Facility Count';
                                     // <Text>Add</Text>
                                 } else if (mode === 'VIEW') {
-                                    return 'View Owner';
+                                    return 'View Facility Count';
                                 } else {
-                                    return 'Edit Owner';
+                                    return 'Edit Facility Count';
                                 }
 
                                 return null;
@@ -247,24 +247,23 @@ function FacilityCounter({ open, mode, handleClose, ownerCode }) {
                                 <Button
                                     variant="contained"
                                     type="submit"
+                                    className="btnSave"
                                     style={{
-                                        backgroundColor: '#00AB55',
                                         display: mode == 'VIEW' ? 'none' : 'block'
                                     }}
                                 >
                                     {mode === 'INSERT' ? 'SAVE' : 'UPDATE'}
                                 </Button>
                                 <Button
-                                    variant="contained"
+                                    variant="outlined"
                                     type="button"
                                     style={{
-                                        backgroundColor: '#B22222',
                                         display: mode == 'VIEW' ? 'none' : 'block'
                                     }}
                                     // onClick={clearForm}
                                     onClick={handleReset.bind(null, props.resetForm)}
                                 >
-                                    Cancel
+                                    CLEAR
                                 </Button>
                             </DialogActions>
                         </Form>

@@ -38,7 +38,7 @@ import Autocomplete from '@mui/material/Autocomplete';
 import Paper from '@mui/material/Paper';
 import * as yup from 'yup';
 import { getAllTaxData } from '../../../../store/actions/masterActions/TaxActions/TaxAction';
-
+import CreatedUpdatedUserDetailsWithTableFormat from '../userTimeDetails/CreatedUpdatedUserDetailsWithTableFormat';
 function TaxGroup({ open, handleClose, mode, taxGroupCode }) {
     const initialValues1 = {
         taxGroupType: '',
@@ -644,9 +644,9 @@ function TaxGroup({ open, handleClose, mode, taxGroupCode }) {
                                                             </Box>
                                                             <Box>
                                                                 <Grid item>
-                                                                    {/* {mode === 'VIEW' ? (
+                                                                    {mode === 'VIEW' ? (
                                                                         <CreatedUpdatedUserDetailsWithTableFormat formValues={values} />
-                                                                    ) : null} */}
+                                                                    ) : null}
                                                                 </Grid>
                                                             </Box>
                                                         </Form>
