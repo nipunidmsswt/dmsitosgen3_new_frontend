@@ -276,6 +276,15 @@ const utilities = {
                             breadcrumbs: false
                             // icon: "bi bi-journal-code",
                             // path: "/master/codeAndName",
+                        },
+                        {
+                            id: 'transport-rate',
+                            title: 'Transport Rate',
+                            type: 'item',
+                            url: '/master/trasportrateview',
+                            breadcrumbs: false
+                            // icon: "bi bi-journal-code",
+                            // path: "/master/codeAndName",
                         }
                     ]
                 },
