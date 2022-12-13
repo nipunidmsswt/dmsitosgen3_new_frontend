@@ -461,7 +461,7 @@ function TaxGroup({ open, handleClose, mode, taxGroupCode }) {
                                                                                                                             height: 40
                                                                                                                         }
                                                                                                                 }}
-                                                                                                                placeholder="--Select a service --"
+                                                                                                                placeholder="--Select a Tax Code --"
                                                                                                                 variant="outlined"
                                                                                                                 name={`taxGroupDetails.${idx}.tax`}
                                                                                                                 onBlur={handleBlur}

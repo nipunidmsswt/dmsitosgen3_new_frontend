@@ -5,7 +5,7 @@ import SuccessMsg from 'messages/SuccessMsg';
 import ErrorMsg from 'messages/ErrorMsg';
 import tableIcons from 'utils/MaterialTableIcons';
 import { useSelector, useDispatch } from 'react-redux';
-import { getAllExChangeRateData } from 'store/actions/masterActions/exchangeRateActions/ExchangeRateActions';
+import { getAllExChangeRateData, getLatestModifiedDetails } from 'store/actions/masterActions/exchangeRateActions/ExchangeRateActions';
 import MainCard from 'ui-component/cards/MainCard';
 import { Grid } from '@mui/material';
 import { gridSpacing } from 'store/constant';
@@ -66,6 +66,7 @@ function ViewExchangeRateTypes() {
 
     const exchangeRateTypeList = useSelector((state) => state.exchangeRateTypesReducer.exchangeRateTypeList);
     const exchangeRateType = useSelector((state) => state.exchangeRateTypesReducer.exchangeRateType);
+    const lastModifiedDate = useSelector((state) => state.exchangeRateTypesReducer.lastModifiedDateTime);
     console.log(exchangeRateType);
 
     useEffect(() => {
@@ -92,9 +93,24 @@ function ViewExchangeRateTypes() {
     }, [exchangeRateType]);
 
     useEffect(() => {
+        dispatch(getLatestModifiedDetails());
         dispatch(getAllExChangeRateData());
     }, []);
 
+    useEffect(() => {
+        setLastModifiedTimeDate(
+            lastModifiedDate === null
+                ? ''
+                : new Date(lastModifiedDate).toLocaleString('en-GB', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: '2-digit',
+                      hour: 'numeric',
+                      minute: 'numeric',
+                      hour12: true
+                  })
+        );
+    }, [lastModifiedDate]);
     const handleClickOpen = (type, data) => {
         console.log(type);
         console.log(data);
@@ -136,18 +152,18 @@ function ViewExchangeRateTypes() {
                                     actions={[
                                         {
                                             icon: tableIcons.Add,
-                                            tooltip: 'Add Exchange Rate',
+                                            tooltip: 'Add New',
                                             isFreeAction: true,
                                             onClick: () => handleClickOpen('INSERT', null)
                                         },
                                         (rowData) => ({
                                             icon: tableIcons.Edit,
-                                            tooltip: 'Edit Exchange Rate',
+                                            tooltip: 'Edit',
                                             onClick: () => handleClickOpen('VIEW_UPDATE', rowData)
                                         }),
                                         (rowData) => ({
                                             icon: tableIcons.VisibilityIcon,
-                                            tooltip: 'View Exchange Rate',
+                                            tooltip: 'View',
                                             onClick: () => handleClickOpen('VIEW', rowData)
                                         })
                                     ]}

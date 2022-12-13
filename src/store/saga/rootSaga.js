@@ -54,14 +54,16 @@ import {
     SAVE_EXCHNAGE_RATE_TYPE_DATA,
     UPDATE_EXCHNAGE_RATE_TYPE_DATA,
     GET_ALL_EXCHNAGE_RATE_TYPE_DATA,
-    GET_EXCHNAGE_RATE_TYPE_BY_ID
+    GET_EXCHNAGE_RATE_TYPE_BY_ID,
+    GET_LAST_MODIFIED_DATE_TIME_EXCHNAGE_RATE_TYPE
 } from 'store/constant/master/ExchangeRateConstant';
 
 import {
     saveExchangeRateTypeSaga,
     updateExchangeRateTypeSaga,
     getAllExchnageRateTypeDataSaga,
-    getExchangeRateTypeByIdSaga
+    getExchangeRateTypeByIdSaga,
+    checkLatestCurrencyModifiedDateSaga
 } from './mastersaga/ExchangeRateTypeSaga';
 
 import {
@@ -179,23 +181,23 @@ import {
 //     checkLatestRoomCreationModifiedDateSaga
 // } from './masterSaga/RoomRecreationSaga';
 
-// import {
-//     saveManagingCompanySaga,
-//     getAllManagingCompanySaga,
-//     getManagingCompanyByIdSaga,
-//     updateManagingCompanySaga,
-//     checkDupicateManagingCompanyCodeSaga,
-//     checkLatestManagingCompanyModifiedDateSaga
-// } from './masterSaga/ManagingCompanySaga';
+import {
+    saveManagingCompanySaga,
+    getAllManagingCompanySaga,
+    getManagingCompanyByIdSaga,
+    updateManagingCompanySaga,
+    checkDupicateManagingCompanyCodeSaga,
+    checkLatestManagingCompanyModifiedDateSaga
+} from './mastersaga/ManagingCompanySaga';
 
-// import {
-//     CHECK_MANAGING_COMAPANY_DUPLICATE,
-//     GET_ALL_MANAGING_COMAPANY_DATA,
-//     GET_LAST_MODIFIED_DATE_TIME_MANAGING_COMAPANY,
-//     GET_MANAGING_COMAPANY_DATA_BY_ID,
-//     SAVE_MANAGING_COMAPANY_DATA,
-//     UPDATE_MANAGING_COMAPANY_DATA
-// } from 'store/constant/master/ManagingCompanyConstant';
+import {
+    CHECK_MANAGING_COMAPANY_DUPLICATE,
+    GET_ALL_MANAGING_COMAPANY_DATA,
+    GET_LAST_MODIFIED_DATE_TIME_MANAGING_COMAPANY,
+    GET_MANAGING_COMAPANY_DATA_BY_ID,
+    SAVE_MANAGING_COMAPANY_DATA,
+    UPDATE_MANAGING_COMAPANY_DATA
+} from 'store/constant/master/ManagingCompanyConstant';
 
 import {
     saveMarketDataHandler,
@@ -313,6 +315,7 @@ import {
     SAVE_MARKET_GROUP_DATA,
     UPDATE_MARKET_GROUP_DATA
 } from 'store/constant/master/MarketGroupConstant';
+
 import {
     checkMarketGroupDupicateCodeSaga,
     getAllMarketGroupDataSaga,
@@ -346,6 +349,7 @@ import {
     saveRoomCategoryDataHandler,
     updateRoomCategoryDataSaga
 } from './mastersaga/RoomCategorySaga';
+
 import {
     CHECK_ROOM_CATEGORY_CODE_DUPLICATE,
     GET_ALL_ROOM_CATEGORY,
@@ -383,12 +387,12 @@ export function* wacherSaga() {
     // //currency
     yield takeLatest(GET_ALL_CURRENCIES, getAllCurrenciesSaga);
 
-    // //exchange rate type
+    //exchange rate type
     yield takeLatest(SAVE_EXCHNAGE_RATE_TYPE_DATA, saveExchangeRateTypeSaga);
     yield takeLatest(GET_EXCHNAGE_RATE_TYPE_BY_ID, getExchangeRateTypeByIdSaga);
     yield takeLatest(GET_ALL_EXCHNAGE_RATE_TYPE_DATA, getAllExchnageRateTypeDataSaga);
     yield takeLatest(UPDATE_EXCHNAGE_RATE_TYPE_DATA, updateExchangeRateTypeSaga);
-    // yield takeLatest(CHECK_TAX_DUPLICATE, checkDupicateTaxCodeSaga);
+    yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_EXCHNAGE_RATE_TYPE, checkLatestCurrencyModifiedDateSaga);
 
     // //product  setup
 
@@ -486,13 +490,13 @@ export function* wacherSaga() {
     yield takeLatest(UPDATE_MARKET_GROUP_DATA, updateMarketGroupDataSaga);
     yield takeLatest(GET_ALL_ACTIVE_MARKET_GROUP_DATA, getAllMarketGroupDataSaga);
 
-    // //managing company
-    // yield takeLatest(SAVE_MANAGING_COMAPANY_DATA, saveManagingCompanySaga);
-    // yield takeLatest(GET_MANAGING_COMAPANY_DATA_BY_ID, getManagingCompanyByIdSaga);
-    // yield takeLatest(GET_ALL_MANAGING_COMAPANY_DATA, getAllManagingCompanySaga);
-    // yield takeLatest(UPDATE_MANAGING_COMAPANY_DATA, updateManagingCompanySaga);
-    // yield takeLatest(CHECK_MANAGING_COMAPANY_DUPLICATE, checkDupicateManagingCompanyCodeSaga);
-    // yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_MANAGING_COMAPANY, checkLatestManagingCompanyModifiedDateSaga);
+    //managing company
+    yield takeLatest(SAVE_MANAGING_COMAPANY_DATA, saveManagingCompanySaga);
+    yield takeLatest(GET_MANAGING_COMAPANY_DATA_BY_ID, getManagingCompanyByIdSaga);
+    yield takeLatest(GET_ALL_MANAGING_COMAPANY_DATA, getAllManagingCompanySaga);
+    yield takeLatest(UPDATE_MANAGING_COMAPANY_DATA, updateManagingCompanySaga);
+    yield takeLatest(CHECK_MANAGING_COMAPANY_DUPLICATE, checkDupicateManagingCompanyCodeSaga);
+    yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_MANAGING_COMAPANY, checkLatestManagingCompanyModifiedDateSaga);
 
     // //owner setup
     yield takeLatest(SAVE_OWNER_DATA, saveOwner);
