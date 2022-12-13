@@ -8,7 +8,9 @@ import {
     ADD_SUCCESS_EXCHNAGE_RATE_TYPE_DATA,
     ADD_FAILED_EXCHNAGE_RATE_TYPE_DATA,
     SUCCESS_GET_EXCHNAGE_RATE_TYPE_DATA_BY_ID,
-    FAILED_GET_EXCHNAGE_RATE_TYPE_DATA_BY_ID
+    FAILED_GET_EXCHNAGE_RATE_TYPE_DATA_BY_ID,
+    SUCCESS_LAST_MODIFIED_DATE_EXCHNAGE_RATE_TYPE,
+    FAILED_LAST_MODIFIED_DATE_EXCHNAGE_RATE_TYPE
 } from '../../constant/master/ExchangeRateConstant';
 
 //exchange rate type saga
@@ -93,3 +95,18 @@ export function* getAllExchnageRateTypeDataSaga() {
 //     yield put({ type: TAX_DUPLICATE, data:  responseData});
 //   }
 // }
+
+export function* checkLatestCurrencyModifiedDateSaga() {
+    let responseData = [];
+    try {
+        responseData = yield call(get, `${process.env.REACT_APP_FINANCE_URL}/currency/lastModifiedTime`);
+        console.log('response data last:' + responseData);
+        yield put({
+            type: SUCCESS_LAST_MODIFIED_DATE_EXCHNAGE_RATE_TYPE,
+            data: responseData.data
+        });
+    } catch (e) {
+        console.log('Error:' + e);
+        yield put({ type: FAILED_LAST_MODIFIED_DATE_EXCHNAGE_RATE_TYPE, data: '' });
+    }
+}
