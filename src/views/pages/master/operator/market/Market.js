@@ -121,6 +121,10 @@ const Market = ({ open, handleClose, mode, marketCode }) => {
         name: yup.string().required('Required field')
     });
 
+    var handleReset = (values, formProps) => {
+        // return window.confirm('Reset?'); // still resets after you Cancel :(
+    };
+
     return (
         <div>
             <Dialog
@@ -157,6 +161,7 @@ const Market = ({ open, handleClose, mode, marketCode }) => {
                                                 onSubmit={(values) => {
                                                     handleSubmitForm(values);
                                                 }}
+                                                onReset={handleReset}
                                                 validationSchema={validationSchema}
                                             >
                                                 {({ values, handleChange, setFieldValue, errors, handleBlur, touched }) => {
@@ -298,7 +303,7 @@ const Market = ({ open, handleClose, mode, marketCode }) => {
                                                                 {mode != 'VIEW' ? (
                                                                     <Button
                                                                         variant="outlined"
-                                                                        type="button"
+                                                                        type="reset"
                                                                         style={{
                                                                             // backgroundColor: '#B22222',
                                                                             marginLeft: '10px'
