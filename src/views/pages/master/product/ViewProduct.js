@@ -140,20 +140,20 @@ function ViewProduct() {
                                     actions={[
                                         {
                                             icon: tableIcons.Add,
-                                            tooltip: 'Add Tour Category',
+                                            tooltip: 'Add New',
                                             isFreeAction: true,
                                             onClick: () => handleClickOpen('INSERT', null)
                                         },
                                         (rowData) => ({
                                             icon: tableIcons.Edit,
                                             filtering: true,
-                                            tooltip: 'Edit Tour Category',
+                                            tooltip: 'Edit',
                                             // iconProps: { color: "primary" },
                                             onClick: () => handleClickOpen('VIEW_UPDATE', rowData)
                                         }),
                                         (rowData) => ({
                                             icon: tableIcons.VisibilityIcon,
-                                            tooltip: 'View Tour Category',
+                                            tooltip: 'View',
                                             // iconProps: { color: "action" },
                                             onClick: () => handleClickOpen('VIEW', rowData)
                                         })
