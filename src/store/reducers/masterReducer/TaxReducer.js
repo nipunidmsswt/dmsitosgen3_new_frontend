@@ -71,8 +71,8 @@ export const taxReducer = (state = initialState, action) => {
         case SUCCESS_TAX_LIST_DATA:
             console.warn('SUCCESS_TAX_LIST_DATA', action);
 
-            console.log(data);
-            return { ...state, taxes: data };
+            console.log(data.payload[0]);
+            return { ...state, taxes: data.payload[0] };
 
         case FAILED_TAX_LIST_DATA:
             console.warn('FAILED_TAX_LIST_DATA', action);

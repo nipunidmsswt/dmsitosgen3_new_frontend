@@ -358,6 +358,8 @@ import {
     SAVE_ROOM_CATEGORY,
     UPDATE_ROOM_CATEGORY
 } from 'store/constant/master/RoomCategoryConstant';
+import { GET_ALL_CURRENCY_LIST } from 'store/constant/master/ExpenseTypesConstant';
+import { getAllCurrencyListData } from './mastersaga/ExpenseTypesSaga';
 
 export function* wacherSaga() {
     // tax setup
@@ -544,4 +546,7 @@ export function* wacherSaga() {
     yield takeLatest(GET_ROOM_CATEGORY_LAST_MODIFIED_DATE_TIME, getRoomCategoryLatestModifiedDateSaga);
     yield takeLatest(CHECK_ROOM_CATEGORY_CODE_DUPLICATE, checkRoomCategoryDupicateCodeSaga);
     yield takeLatest(UPDATE_ROOM_CATEGORY, updateRoomCategoryDataSaga);
+
+    //EXPENSE TYPES
+    yield takeLatest(GET_ALL_CURRENCY_LIST, getAllCurrencyListData);
 }

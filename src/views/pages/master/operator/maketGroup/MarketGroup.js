@@ -169,9 +169,7 @@ const MarketGroup = ({ open, handleClose, mode, marketGroupCode }) => {
     });
 
     function handleClick(e) {
-        console.log('handle click');
-        console.log(e.target.dataset.value);
-        var selectedValue = e.target.dataset.value;
+        let selectedValue = e.target.dataset.value;
         selectedValue === 'Market Group' ? setListOptions(marketListData) : setListOptions(operatorListData.codeAndNameDetails);
     }
 

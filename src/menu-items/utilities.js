@@ -276,6 +276,16 @@ const utilities = {
                             breadcrumbs: false
                             // icon: "bi bi-journal-code",
                             // path: "/master/codeAndName",
+                        },
+
+                        {
+                            id: 'expensetypes',
+                            title: 'Expense Types',
+                            type: 'item',
+                            url: '/master/expensetypesview',
+                            breadcrumbs: false
+                            // icon: "bi bi-journal-code",
+                            // path: "/master/codeAndName",
                         }
                     ]
                 },
