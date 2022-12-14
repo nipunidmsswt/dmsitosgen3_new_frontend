@@ -357,6 +357,10 @@ import {
     UPDATE_ROOM_CATEGORY
 } from 'store/constant/master/RoomCategoryConstant';
 
+import { getAllChargeMethods, getAllModeOfTransort } from './mastersaga/TransportRateSaga';
+
+import { GET_ALL_CHARGE_METHOD_DATA, GET_ALL_MODE_OF_TRANSPORT_DATA } from 'store/constant/master/TransportRateConstant';
+
 export function* wacherSaga() {
     // tax setup
     yield takeLatest(SAVE_TAX_DATA, saveTaxSaga);
@@ -541,4 +545,10 @@ export function* wacherSaga() {
     yield takeLatest(GET_ROOM_CATEGORY_LAST_MODIFIED_DATE_TIME, getRoomCategoryLatestModifiedDateSaga);
     yield takeLatest(CHECK_ROOM_CATEGORY_CODE_DUPLICATE, checkRoomCategoryDupicateCodeSaga);
     yield takeLatest(UPDATE_ROOM_CATEGORY, updateRoomCategoryDataSaga);
+
+    //charge method
+    yield takeLatest(GET_ALL_CHARGE_METHOD_DATA, getAllChargeMethods);
+
+    //mode of transport
+    yield takeLatest(GET_ALL_MODE_OF_TRANSPORT_DATA, getAllModeOfTransort);
 }
