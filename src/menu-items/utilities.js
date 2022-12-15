@@ -104,7 +104,7 @@ const utilities = {
                         },
                         {
                             id: 'market-group',
-                            title: 'Market Group',
+                            title: 'Operator / Market Group',
                             type: 'item',
                             url: '/master/marketgroupview',
                             breadcrumbs: false
@@ -276,6 +276,13 @@ const utilities = {
                             breadcrumbs: false
                             // icon: "bi bi-journal-code",
                             // path: "/master/codeAndName",
+                        },
+
+                        {
+                            id: 'expensetypes',
+                            title: 'Expense Types',
+                            type: 'item',
+                            url: '/master/expensetypesview',
                         },
                         {
                             id: 'transport-rate',

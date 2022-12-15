@@ -47,8 +47,8 @@ import {
     GET_LAST_MODIFIED_DATE_TIME
 } from 'store/constant/master/TourCategoryMasterConstant';
 
-// import { getAllCurrenciesSaga } from '../saga/ApiServiceSaga/ApiServiceSaga';
-// import { GET_ALL_CURRENCIES } from 'store/constant/apiServiceConstant/ApiServiceConstant';
+import { getAllCurrenciesSaga } from '../saga/ApiServiceSaga/ApiServiceSaga';
+import { GET_ALL_CURRENCIES } from 'store/constant/apiServiceConstant/ApiServiceConstant';
 
 import {
     SAVE_EXCHNAGE_RATE_TYPE_DATA,
@@ -66,22 +66,22 @@ import {
     checkLatestCurrencyModifiedDateSaga
 } from './mastersaga/ExchangeRateTypeSaga';
 
-// import {
-//     saveProductDataHandler,
-//     getAllProductSaga,
-//     getProductByIdSaga,
-//     updateProductDataSaga,
-//     checkProductLatestModifiedDateSaga,
-//     checkDupicateProductCodeSaga
-// } from './masterSaga/ProductDataSaga';
-// import {
-//     CHECK_PRODUCT_CODE_DUPLICATE,
-//     GET_ALL_PRODUCT_DATA,
-//     GET_PRODUCT_DATA_BY_ID,
-//     GET_PRODUCT_LAST_MODIFIED_DATE_TIME,
-//     SAVE_PRODUCT_DATA,
-//     UPDATE_PRODUCT_DATA
-// } from 'store/constant/master/ProductDataMasterConstant';
+import {
+    saveProductDataHandler,
+    getAllProductSaga,
+    getProductByIdSaga,
+    updateProductDataSaga,
+    checkProductLatestModifiedDateSaga,
+    checkDupicateProductCodeSaga
+} from './mastersaga/ProductDataSaga';
+import {
+    CHECK_PRODUCT_CODE_DUPLICATE,
+    GET_ALL_PRODUCT_DATA,
+    GET_PRODUCT_DATA_BY_ID,
+    GET_PRODUCT_LAST_MODIFIED_DATE_TIME,
+    SAVE_PRODUCT_DATA,
+    UPDATE_PRODUCT_DATA
+} from 'store/constant/master/ProductDataMasterConstant';
 
 import {
     SAVE_LOCATION_DATA,
@@ -97,6 +97,7 @@ import {
     CHECK_CODE_TYPE_DUPLICATE,
     GET_ALL_CLUSTER_DATA,
     GET_ALL_CODE_AND_NAME_DATA,
+    GET_ALL_OPERATOR_DATA,
     GET_CODE_LAST_MODIFIED_DATE_TIME,
     GET_CODE_NAME_DATA_BY_CODE,
     SAVE_CODE_AND_NAME_DATA,
@@ -111,7 +112,8 @@ import {
     checkDupicateCodeSaga,
     checkDupicateCodeTypeSaga,
     checkCodeLatestModifiedDateSaga,
-    getAllClusterTypeData
+    getAllClusterTypeData,
+    getAllActiveOperatorSaga
 } from './mastersaga/CodeAndNameSaga';
 
 import {
@@ -356,6 +358,8 @@ import {
     SAVE_ROOM_CATEGORY,
     UPDATE_ROOM_CATEGORY
 } from 'store/constant/master/RoomCategoryConstant';
+import { GET_ALL_CURRENCY_LIST } from 'store/constant/master/ExpenseTypesConstant';
+import { getAllCurrencyListData } from './mastersaga/ExpenseTypesSaga';
 
 import { getAllChargeMethods, getAllModeOfTransort } from './mastersaga/TransportRateSaga';
 
@@ -387,7 +391,7 @@ export function* wacherSaga() {
     yield takeLatest(GET_LAST_MODIFIED_DATE_TIME, checkLeatestModifiedDateSaga);
 
     // //currency
-    // yield takeLatest(GET_ALL_CURRENCIES, getAllCurrenciesSaga);
+    yield takeLatest(GET_ALL_CURRENCIES, getAllCurrenciesSaga);
 
     //exchange rate type
     yield takeLatest(SAVE_EXCHNAGE_RATE_TYPE_DATA, saveExchangeRateTypeSaga);
@@ -398,12 +402,12 @@ export function* wacherSaga() {
 
     // //product  setup
 
-    // yield takeLatest(SAVE_PRODUCT_DATA, saveProductDataHandler);
-    // yield takeLatest(GET_ALL_PRODUCT_DATA, getAllProductSaga);
-    // yield takeLatest(GET_PRODUCT_DATA_BY_ID, getProductByIdSaga);
-    // yield takeLatest(UPDATE_PRODUCT_DATA, updateProductDataSaga);
-    // yield takeLatest(GET_PRODUCT_LAST_MODIFIED_DATE_TIME, checkProductLatestModifiedDateSaga);
-    // yield takeLatest(CHECK_PRODUCT_CODE_DUPLICATE, checkDupicateProductCodeSaga);
+    yield takeLatest(SAVE_PRODUCT_DATA, saveProductDataHandler);
+    yield takeLatest(GET_ALL_PRODUCT_DATA, getAllProductSaga);
+    yield takeLatest(GET_PRODUCT_DATA_BY_ID, getProductByIdSaga);
+    yield takeLatest(UPDATE_PRODUCT_DATA, updateProductDataSaga);
+    yield takeLatest(GET_PRODUCT_LAST_MODIFIED_DATE_TIME, checkProductLatestModifiedDateSaga);
+    yield takeLatest(CHECK_PRODUCT_CODE_DUPLICATE, checkDupicateProductCodeSaga);
 
     // //code&Name setup
 
@@ -414,6 +418,8 @@ export function* wacherSaga() {
     yield takeLatest(CHECK_CODE_DUPLICATE, checkDupicateCodeSaga);
     yield takeLatest(CHECK_CODE_TYPE_DUPLICATE, checkDupicateCodeTypeSaga);
     yield takeLatest(GET_CODE_LAST_MODIFIED_DATE_TIME, checkCodeLatestModifiedDateSaga);
+    yield takeLatest(GET_ALL_CLUSTER_DATA, getAllClusterTypeData);
+    yield takeLatest(GET_ALL_OPERATOR_DATA, getAllActiveOperatorSaga);
 
     // //location data
     yield takeLatest(SAVE_LOCATION_DATA, saveLocationSaga);
@@ -423,10 +429,10 @@ export function* wacherSaga() {
     yield takeLatest(CHECK_LOCATION_DUPLICATE, checkDupicateLocationSaga);
     yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_LOCATION, checkLatestLocationModifiedDateSaga);
 
-    // yield takeLatest(UPDATE_CODE_AND_NAME_DATA, updateCodeAndNameDataSaga);
-    // yield takeLatest(CHECK_CODE_DUPLICATE, checkDupicateCodeSaga);
-    // yield takeLatest(CHECK_CODE_TYPE_DUPLICATE, checkDupicateCodeTypeSaga);
-    // yield takeLatest(GET_CODE_LAST_MODIFIED_DATE_TIME, checkCodeLatestModifiedDateSaga);
+    yield takeLatest(UPDATE_CODE_AND_NAME_DATA, updateCodeAndNameDataSaga);
+    yield takeLatest(CHECK_CODE_DUPLICATE, checkDupicateCodeSaga);
+    yield takeLatest(CHECK_CODE_TYPE_DUPLICATE, checkDupicateCodeTypeSaga);
+    yield takeLatest(GET_CODE_LAST_MODIFIED_DATE_TIME, checkCodeLatestModifiedDateSaga);
 
     //hotel category
     yield takeLatest(SAVE_HOTEL_CATEGORY_DATA, saveHotelCateogrySaga);
@@ -443,7 +449,6 @@ export function* wacherSaga() {
     // yield takeLatest(UPDATE_ROOM_RECREATION_DATA, updateRoomRecreationSaga);
     // yield takeLatest(CHECK_ROOM_RECREATION_DUPLICATE, checkDupicateRoomRecreationCodeSaga);
     // yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_ROOM_RECREATION, checkLatestRoomCreationModifiedDateSaga);
-    // yield takeLatest(GET_ALL_CLUSTER_DATA, getAllClusterTypeData);
 
     // //Manager
 
@@ -546,6 +551,9 @@ export function* wacherSaga() {
     yield takeLatest(CHECK_ROOM_CATEGORY_CODE_DUPLICATE, checkRoomCategoryDupicateCodeSaga);
     yield takeLatest(UPDATE_ROOM_CATEGORY, updateRoomCategoryDataSaga);
 
+    //EXPENSE TYPES
+    yield takeLatest(GET_ALL_CURRENCY_LIST, getAllCurrencyListData);
+    yield takeLatest(GET_ALL_CURRENCY_LIST, getAllCurrencyListData);
     //charge method
     yield takeLatest(GET_ALL_CHARGE_METHOD_DATA, getAllChargeMethods);
 

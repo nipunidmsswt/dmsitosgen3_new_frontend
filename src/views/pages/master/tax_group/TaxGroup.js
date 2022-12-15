@@ -151,7 +151,7 @@ function TaxGroup({ open, handleClose, mode, taxGroupCode }) {
 
     useEffect(() => {
         if (taxListData != null) {
-            setTaxListOptions(taxListData.payload[0]);
+            setTaxListOptions(taxListData);
         }
     }, [taxListData]);
 

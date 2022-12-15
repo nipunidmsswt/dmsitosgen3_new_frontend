@@ -1,60 +1,50 @@
-import { FormControlLabel, FormGroup, Grid, Switch } from '@mui/material';
+import { useEffect, useState } from 'react';
 import MaterialTable from 'material-table';
-import React from 'react';
-import MainCard from 'ui-component/cards/MainCard';
-import tableIcons from 'utils/MaterialTableIcons';
-import { gridSpacing } from 'store/constant';
-import { useEffect, useState, forwardRef } from 'react';
-import Tax from './Tax';
-import { useSelector, useDispatch } from 'react-redux';
-import { getAllTaxData, getLatestModifiedTaxDetails } from 'store/actions/masterActions/TaxActions/TaxAction';
+
 import SuccessMsg from 'messages/SuccessMsg';
 import ErrorMsg from 'messages/ErrorMsg';
+import tableIcons from 'utils/MaterialTableIcons';
+import { useSelector, useDispatch } from 'react-redux';
+import { getAllExChangeRateData, getLatestModifiedDetails } from 'store/actions/masterActions/exchangeRateActions/ExchangeRateActions';
+import MainCard from 'ui-component/cards/MainCard';
+import { FormControlLabel, FormGroup, Grid, Switch } from '@mui/material';
+import { gridSpacing } from 'store/constant';
+import ExpenseTypes from './ExpenseTypes';
 
-const ViewTax = () => {
+function ViewExpenseTypes() {
+    const [open, setOpen] = useState(false);
+    const [Code, setCode] = useState('');
+    const [mode, setMode] = useState('INSERT');
+    const [openToast, setHandleToast] = useState(false);
+    const [openErrorToast, setOpenErrorToast] = useState(false);
+    const [tableData, setTableData] = useState([]);
+    const [lastModifiedTimeDate, setLastModifiedTimeDate] = useState(null);
     const columns = [
         {
-            title: 'Tax Code',
-            field: 'taxCode',
-            filterPlaceholder: 'Tax Code',
+            title: 'Expense Code',
+            field: 'expenseCode',
+            filterPlaceholder: 'filter',
             align: 'center'
         },
         {
-            title: 'Tax Description',
-            field: 'taxDescription',
-            filterPlaceholder: 'Tax Description',
+            title: 'Description',
+            field: 'description',
+            filterPlaceholder: 'filter',
             align: 'center'
         },
         {
-            title: 'Percentage %',
-            field: 'percentage',
-            align: 'center',
-            grouping: false,
-            filterPlaceholder: 'Percentage'
-        },
-        {
-            title: 'Status',
+            title: 'Sttaus',
             field: 'status',
-            // filterPlaceholder: "True || False",
+            filterPlaceholder: 'True || False',
             align: 'center',
-            lookup: {
-                true: 'Active',
-                false: 'Inactive'
-            },
-
-            // emptyValue: () => <em>null</em>,
+            emptyValue: () => <em>null</em>,
             render: (rowData) => (
                 <div
                     style={{
                         alignItems: 'center',
                         align: 'center',
                         display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center'
-                        // background: rowData.status === true ? "#008000aa" : "#f90000aa",
-                        // borderRadius: "4px",
-                        // paddingLeft: 5,
-                        // paddingRight: 5,
+                        justifyContent: 'center'
                     }}
                 >
                     {rowData.status === true ? (
@@ -70,22 +60,20 @@ const ViewTax = () => {
             )
         }
     ];
-    const [open, setOpen] = useState(false);
-    const [rowTaxCode, setTaxCode] = useState('');
-    const [mode, setMode] = useState('INSERT');
-    const [tableData, setTableData] = useState([]);
-    const [openToast, setHandleToast] = useState(false);
-    const [openErrorToast, setOpenErrorToast] = useState(false);
-    const [lastModifiedTimeDate, setLastModifiedTimeDate] = useState(null);
-    const dispatch = useDispatch();
-    const error = useSelector((state) => state.taxReducer.errorMsg);
-    const taxListData = useSelector((state) => state.taxReducer.taxes);
-    const taxData = useSelector((state) => state.taxReducer.tax);
-    const lastModifiedDate = useSelector((state) => state.taxReducer.lastModifiedDateTime);
 
-    const handleClose = () => {
-        setOpen(false);
-    };
+    const dispatch = useDispatch();
+    const error = useSelector((state) => state.exchangeRateTypesReducer.errorMsg);
+
+    const exchangeRateTypeList = useSelector((state) => state.exchangeRateTypesReducer.exchangeRateTypeList);
+    const exchangeRateType = useSelector((state) => state.exchangeRateTypesReducer.exchangeRateType);
+    const lastModifiedDate = useSelector((state) => state.exchangeRateTypesReducer.lastModifiedDateTime);
+    const expenseType = useSelector((state) => state.expenseTypesReducer.expenseType);
+    // useEffect(() => {
+    //     if (exchangeRateTypeList?.payload?.length > 0) {
+    //         setTableData(exchangeRateTypeList?.payload[0]);
+    //     }
+    // }, [exchangeRateTypeList]);
+
     useEffect(() => {
         if (error != null) {
             setOpenErrorToast(true);
@@ -93,24 +81,18 @@ const ViewTax = () => {
     }, [error]);
 
     useEffect(() => {
-        if (taxData) {
+        console.log(expenseType);
+        if (expenseType) {
+            console.log('sucessToast');
             setHandleToast(true);
-
-            dispatch(getAllTaxData());
-            dispatch(getLatestModifiedTaxDetails());
+            // dispatch(getAllExChangeRateData());
         }
-    }, [taxData]);
+    }, [expenseType]);
 
-    useEffect(() => {
-        dispatch(getAllTaxData());
-        dispatch(getLatestModifiedTaxDetails());
-    }, []);
-
-    useEffect(() => {
-        if (taxListData?.payload?.length > 0) {
-            setTableData(taxListData?.payload[0]);
-        }
-    }, [taxListData]);
+    // useEffect(() => {
+    //     dispatch(getLatestModifiedDetails());
+    //     dispatch(getAllExChangeRateData());
+    // }, []);
 
     useEffect(() => {
         setLastModifiedTimeDate(
@@ -126,19 +108,24 @@ const ViewTax = () => {
                   })
         );
     }, [lastModifiedDate]);
-
     const handleClickOpen = (type, data) => {
+        console.log(type);
+        console.log(data);
         if (type === 'VIEW_UPDATE') {
             setMode(type);
-            setTaxCode(data.taxCode);
+            setCode(data.baseCurrencyCode);
         } else if (type === 'INSERT') {
-            setTaxCode('');
+            setCode('');
             setMode(type);
         } else {
             setMode(type);
-            setTaxCode(data.taxCode);
+            setCode(data.baseCurrencyCode);
         }
         setOpen(true);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
     };
 
     const handleToast = () => {
@@ -149,7 +136,7 @@ const ViewTax = () => {
     };
     return (
         <div>
-            <MainCard title="Tax Setup">
+            <MainCard title="Expense Types">
                 <div style={{ textAlign: 'right' }}> Last Modified Date : {lastModifiedTimeDate}</div>
                 <br />
                 <Grid container spacing={gridSpacing}>
@@ -157,7 +144,6 @@ const ViewTax = () => {
                         <Grid container spacing={gridSpacing}>
                             <Grid item xs={12}>
                                 <MaterialTable
-                                    title={lastModifiedTimeDate}
                                     columns={columns}
                                     data={tableData}
                                     actions={[
@@ -168,9 +154,8 @@ const ViewTax = () => {
                                             onClick: () => handleClickOpen('INSERT', null)
                                         },
                                         (rowData) => ({
-                                            // <-- ***NOW A FUNCTION***
                                             icon: tableIcons.Edit,
-                                            tooltip: 'Edit ',
+                                            tooltip: 'Edit',
                                             onClick: () => handleClickOpen('VIEW_UPDATE', rowData)
                                         }),
                                         (rowData) => ({
@@ -189,41 +174,38 @@ const ViewTax = () => {
                                         searchFieldVariant: 'standard',
                                         filtering: true,
                                         paging: true,
-                                        pageSizeOptions: [5, 10, 20, 50, 100],
+                                        pageSizeOptions: [2, 5, 10, 20, 25, 50, 100],
                                         pageSize: 5,
                                         paginationType: 'stepped',
                                         showFirstLastPageButtons: false,
                                         exportButton: true,
                                         exportAllData: true,
-                                        exportFileName: 'Tax Data',
+                                        exportFileName: 'TableData',
                                         actionsColumnIndex: -1,
                                         columnsButton: true,
-                                        color: 'primary',
 
                                         headerStyle: {
                                             whiteSpace: 'nowrap',
-                                            height: 30,
-                                            maxHeight: 30,
+                                            height: 20,
+                                            maxHeight: 20,
                                             padding: 2,
                                             fontSize: '14px',
-                                            backgroundColor: '#2196F3',
+                                            background: '-moz-linear-gradient(top, #0790E8, #3180e6)',
                                             background: '-ms-linear-gradient(top, #0790E8, #3180e6)',
                                             background: '-webkit-linear-gradient(top, #0790E8, #3180e6)',
-                                            textAlign: 'center',
+                                            // textAlign: 'center',
                                             color: '#FFF'
                                         },
                                         rowStyle: {
                                             whiteSpace: 'nowrap',
                                             height: 20,
-                                            align: 'left',
-                                            // maxHeight: 20,
                                             fontSize: '13px',
                                             padding: 0
                                         }
                                     }}
                                 />
 
-                                {open ? <Tax open={open} handleClose={handleClose} rowTaxCode={rowTaxCode} mode={mode} /> : ''}
+                                {open ? <ExpenseTypes open={open} handleClose={handleClose} code={Code} mode={mode} /> : ''}
                                 {openToast ? <SuccessMsg openToast={openToast} handleToast={handleToast} mode={mode} /> : null}
                                 {openErrorToast ? (
                                     <ErrorMsg openToast={openErrorToast} handleToast={setOpenErrorToast} mode={mode} />
@@ -236,6 +218,6 @@ const ViewTax = () => {
             </MainCard>
         </div>
     );
-};
+}
 
-export default ViewTax;
+export default ViewExpenseTypes;

@@ -38,6 +38,7 @@ import {
 } from 'store/actions/masterActions/operatorActions/MarketGroupAction';
 import { getAllActiveMarketData } from 'store/actions/masterActions/operatorActions/MarketAction';
 import CreatedUpdatedUserDetailsWithTableFormat from '../../userTimeDetails/CreatedUpdatedUserDetailsWithTableFormat';
+import { getAllActiveOperatorData } from 'store/actions/masterActions/CodeAndNameAction';
 
 const MarketGroup = ({ open, handleClose, mode, marketGroupCode }) => {
     const initialValues1 = {
@@ -69,21 +70,36 @@ const MarketGroup = ({ open, handleClose, mode, marketGroupCode }) => {
 
     const [loadValues, setLoadValues] = useState(null);
     const ref = useRef(null);
-    const [marketListOptions, setMarketListOptions] = useState([]);
+    const [listOptions, setListOptions] = useState([]);
+    const [operatorListOptions, setOperatorListOptions] = useState([]);
     const dispatch = useDispatch();
     const marketToUpdate = useSelector((state) => state.marketGroupReducer.marketToUpdate);
 
     const marketListData = useSelector((state) => state.marketReducer.marketActiveList);
-    useEffect(() => {
-        if (marketListData != null) {
-            setMarketListOptions(marketListData);
-        }
-    }, [marketListData]);
+    const operatorListData = useSelector((state) => state.codeAndNameReducer.operatorTypesDetails);
+
+    // useEffect(() => {
+    //     // console.log('group type:' + initialValues1.groupType);
+    //     // if (initialValues1.groupType == 'Operator Group') {
+    //     // }
+    //     if (marketListData != null) {
+    //         // console.log(marketListData);
+    //         setMarketListOptions(marketListData);
+    //     }
+    // }, [marketListData]);
+
+    // useEffect(() => {
+    //     if (operatorListData != null) {
+    //         console.log(operatorListData.codeAndNameDetails);
+    //         setMarketListOptions(operatorListData.codeAndNameDetails);
+    //     }
+    // }, [operatorListData]);
 
     const duplicateCode = useSelector((state) => state.marketGroupReducer.duplicateCode);
 
     useEffect(() => {
         dispatch(getAllActiveMarketData());
+        dispatch(getAllActiveOperatorData());
     }, []);
 
     useEffect(() => {
@@ -152,6 +168,11 @@ const MarketGroup = ({ open, handleClose, mode, marketGroupCode }) => {
             .uniqueCode('Must be unique')
     });
 
+    function handleClick(e) {
+        let selectedValue = e.target.dataset.value;
+        selectedValue === 'Market Group' ? setListOptions(marketListData) : setListOptions(operatorListData.codeAndNameDetails);
+    }
+
     return (
         <div>
             <Dialog
@@ -212,6 +233,10 @@ const MarketGroup = ({ open, handleClose, mode, marketGroupCode }) => {
                                                                             onChange={handleChange}
                                                                             onBlur={handleBlur}
                                                                             value={values.groupType}
+                                                                            // onClick={handleClick}
+                                                                            onClick={(values) => {
+                                                                                handleClick(values);
+                                                                            }}
                                                                             error={Boolean(touched.groupType && errors.groupType)}
                                                                             helperText={
                                                                                 touched.groupType && errors.groupType
@@ -372,7 +397,7 @@ const MarketGroup = ({ open, handleClose, mode, marketGroupCode }) => {
                                                                                                                 value
                                                                                                             );
                                                                                                         }}
-                                                                                                        options={marketListOptions}
+                                                                                                        options={listOptions}
                                                                                                         getOptionLabel={(option) =>
                                                                                                             `${option.code} - ${option.name}`
                                                                                                         }
