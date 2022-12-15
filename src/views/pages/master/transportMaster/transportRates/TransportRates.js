@@ -18,9 +18,11 @@ import {
     TableCell,
     TableHead,
     TableRow,
-    Switch
+    Switch,
+    Paper,
+    TableContainer
 } from '@mui/material';
-
+import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
@@ -476,13 +478,525 @@ function TransportRates({ open, handleClose, mode, code }) {
                                                                     </FormGroup>
                                                                 </Grid>
                                                             </Grid>
-
+                                                            <Grid display="flex" style={{ marginBottom: '10px', marginTop: '10px' }}>
+                                                                <Grid item>
+                                                                    <Typography variant="h4">Distances</Typography>
+                                                                </Grid>
+                                                            </Grid>
                                                             <Grid
                                                                 display={enableblock1 ? 'flex' : 'none'}
                                                                 gap="10px"
                                                                 style={{ marginBottom: '10px', marginTop: '10px' }}
                                                             >
-                                                                <Grid item>grid 1 Distances</Grid>
+                                                                <Grid item>
+                                                                    <FieldArray name="seasonDetails">
+                                                                        {({ insert, remove, push }) => (
+                                                                            <Paper>
+                                                                                {mode != 'VIEW' ? (
+                                                                                    <Box display="flex" flexDirection="row-reverse">
+                                                                                        <IconButton
+                                                                                            aria-label="delete"
+                                                                                            onClick={() => {
+                                                                                                // setFieldValue(
+                                                                                                //   `seasonDetails.${ref.current.values.seasonDetails.length}.taxOrder`,
+                                                                                                //   ref.current.values.seasonDetails.length+1
+                                                                                                // );
+                                                                                                push({
+                                                                                                    subSeason: '',
+                                                                                                    specialOfferSeason: '',
+                                                                                                    toDate: '',
+                                                                                                    status: true,
+                                                                                                    fromDate: ''
+                                                                                                });
+                                                                                            }}
+                                                                                        >
+                                                                                            <AddBoxIcon />
+                                                                                        </IconButton>
+                                                                                    </Box>
+                                                                                ) : (
+                                                                                    ''
+                                                                                )}
+
+                                                                                <TableContainer>
+                                                                                    <Table stickyHeader size="small">
+                                                                                        <TableHead>
+                                                                                            <TableRow>
+                                                                                                <TableCell>From Location</TableCell>
+                                                                                                <TableCell>Description</TableCell>
+                                                                                                {/* <TableCell>Free</TableCell> */}
+                                                                                                <TableCell>To Location</TableCell>
+                                                                                                <TableCell>Description</TableCell>
+                                                                                                <TableCell>Distances(KM)</TableCell>
+                                                                                                <TableCell>Duration(Hours)</TableCell>
+                                                                                                <TableCell>Status</TableCell>
+                                                                                                <TableCell>Action</TableCell>
+                                                                                            </TableRow>
+                                                                                        </TableHead>
+                                                                                        <TableBody>
+                                                                                            {values.seasonDetails.map((record, idx) => {
+                                                                                                return (
+                                                                                                    <TableRow key={idx} hover>
+                                                                                                        <TableCell>
+                                                                                                            <TextField
+                                                                                                                // label="taxOrder"
+                                                                                                                sx={{
+                                                                                                                    width: { sm: 200 },
+                                                                                                                    '& .MuiInputBase-root':
+                                                                                                                        {
+                                                                                                                            height: 40
+                                                                                                                        }
+                                                                                                                }}
+                                                                                                                type="text"
+                                                                                                                variant="outlined"
+                                                                                                                name={`seasonDetails.${idx}.subSeason`}
+                                                                                                                disabled={
+                                                                                                                    mode == 'VIEW_UPDATE'
+                                                                                                                }
+                                                                                                                value={
+                                                                                                                    values.seasonDetails[
+                                                                                                                        idx
+                                                                                                                    ] &&
+                                                                                                                    values.seasonDetails[
+                                                                                                                        idx
+                                                                                                                    ].subSeason
+                                                                                                                }
+                                                                                                                onChange={handleChange}
+                                                                                                                onBlur={handleBlur}
+                                                                                                                error={Boolean(
+                                                                                                                    touched.seasonDetails &&
+                                                                                                                        touched
+                                                                                                                            .seasonDetails[
+                                                                                                                            idx
+                                                                                                                        ] &&
+                                                                                                                        touched
+                                                                                                                            .seasonDetails[
+                                                                                                                            idx
+                                                                                                                        ].subSeason &&
+                                                                                                                        errors.seasonDetails &&
+                                                                                                                        errors
+                                                                                                                            .seasonDetails[
+                                                                                                                            idx
+                                                                                                                        ] &&
+                                                                                                                        errors
+                                                                                                                            .seasonDetails[
+                                                                                                                            idx
+                                                                                                                        ].subSeason
+                                                                                                                )}
+                                                                                                                helperText={
+                                                                                                                    touched.seasonDetails &&
+                                                                                                                    touched.seasonDetails[
+                                                                                                                        idx
+                                                                                                                    ] &&
+                                                                                                                    touched.seasonDetails[
+                                                                                                                        idx
+                                                                                                                    ].subSeason &&
+                                                                                                                    errors.seasonDetails &&
+                                                                                                                    errors.seasonDetails[
+                                                                                                                        idx
+                                                                                                                    ] &&
+                                                                                                                    errors.seasonDetails[
+                                                                                                                        idx
+                                                                                                                    ].subSeason
+                                                                                                                        ? errors
+                                                                                                                              .seasonDetails[
+                                                                                                                              idx
+                                                                                                                          ].subSeason
+                                                                                                                        : ''
+                                                                                                                }
+                                                                                                            />
+                                                                                                        </TableCell>
+                                                                                                        <TableCell>
+                                                                                                            <TextField
+                                                                                                                // label="taxOrder"
+                                                                                                                sx={{
+                                                                                                                    width: { sm: 200 },
+                                                                                                                    '& .MuiInputBase-root':
+                                                                                                                        {
+                                                                                                                            height: 40
+                                                                                                                        }
+                                                                                                                }}
+                                                                                                                type="text"
+                                                                                                                variant="outlined"
+                                                                                                                name={`seasonDetails.${idx}.specialOfferSeason`}
+                                                                                                                value={
+                                                                                                                    values.seasonDetails[
+                                                                                                                        idx
+                                                                                                                    ] &&
+                                                                                                                    values.seasonDetails[
+                                                                                                                        idx
+                                                                                                                    ].specialOfferSeason
+                                                                                                                }
+                                                                                                                onChange={handleChange}
+                                                                                                                onBlur={handleBlur}
+                                                                                                                error={Boolean(
+                                                                                                                    touched.seasonDetails &&
+                                                                                                                        touched
+                                                                                                                            .seasonDetails[
+                                                                                                                            idx
+                                                                                                                        ] &&
+                                                                                                                        touched
+                                                                                                                            .seasonDetails[
+                                                                                                                            idx
+                                                                                                                        ]
+                                                                                                                            .specialOfferSeason &&
+                                                                                                                        errors.seasonDetails &&
+                                                                                                                        errors
+                                                                                                                            .seasonDetails[
+                                                                                                                            idx
+                                                                                                                        ] &&
+                                                                                                                        errors
+                                                                                                                            .seasonDetails[
+                                                                                                                            idx
+                                                                                                                        ].specialOfferSeason
+                                                                                                                )}
+                                                                                                                helperText={
+                                                                                                                    touched.seasonDetails &&
+                                                                                                                    touched.seasonDetails[
+                                                                                                                        idx
+                                                                                                                    ] &&
+                                                                                                                    touched.seasonDetails[
+                                                                                                                        idx
+                                                                                                                    ].specialOfferSeason &&
+                                                                                                                    errors.seasonDetails &&
+                                                                                                                    errors.seasonDetails[
+                                                                                                                        idx
+                                                                                                                    ] &&
+                                                                                                                    errors.seasonDetails[
+                                                                                                                        idx
+                                                                                                                    ].specialOfferSeason
+                                                                                                                        ? errors
+                                                                                                                              .seasonDetails[
+                                                                                                                              idx
+                                                                                                                          ]
+                                                                                                                              .specialOfferSeason
+                                                                                                                        : ''
+                                                                                                                }
+                                                                                                            />
+                                                                                                        </TableCell>
+
+                                                                                                        <TableCell>
+                                                                                                            <TextField
+                                                                                                                // label="taxOrder"
+                                                                                                                sx={{
+                                                                                                                    width: { sm: 200 },
+                                                                                                                    '& .MuiInputBase-root':
+                                                                                                                        {
+                                                                                                                            height: 40
+                                                                                                                        }
+                                                                                                                }}
+                                                                                                                type="text"
+                                                                                                                variant="outlined"
+                                                                                                                name={`seasonDetails.${idx}.specialOfferSeason`}
+                                                                                                                value={
+                                                                                                                    values.seasonDetails[
+                                                                                                                        idx
+                                                                                                                    ] &&
+                                                                                                                    values.seasonDetails[
+                                                                                                                        idx
+                                                                                                                    ].specialOfferSeason
+                                                                                                                }
+                                                                                                                onChange={handleChange}
+                                                                                                                onBlur={handleBlur}
+                                                                                                                error={Boolean(
+                                                                                                                    touched.seasonDetails &&
+                                                                                                                        touched
+                                                                                                                            .seasonDetails[
+                                                                                                                            idx
+                                                                                                                        ] &&
+                                                                                                                        touched
+                                                                                                                            .seasonDetails[
+                                                                                                                            idx
+                                                                                                                        ]
+                                                                                                                            .specialOfferSeason &&
+                                                                                                                        errors.seasonDetails &&
+                                                                                                                        errors
+                                                                                                                            .seasonDetails[
+                                                                                                                            idx
+                                                                                                                        ] &&
+                                                                                                                        errors
+                                                                                                                            .seasonDetails[
+                                                                                                                            idx
+                                                                                                                        ].specialOfferSeason
+                                                                                                                )}
+                                                                                                                helperText={
+                                                                                                                    touched.seasonDetails &&
+                                                                                                                    touched.seasonDetails[
+                                                                                                                        idx
+                                                                                                                    ] &&
+                                                                                                                    touched.seasonDetails[
+                                                                                                                        idx
+                                                                                                                    ].specialOfferSeason &&
+                                                                                                                    errors.seasonDetails &&
+                                                                                                                    errors.seasonDetails[
+                                                                                                                        idx
+                                                                                                                    ] &&
+                                                                                                                    errors.seasonDetails[
+                                                                                                                        idx
+                                                                                                                    ].specialOfferSeason
+                                                                                                                        ? errors
+                                                                                                                              .seasonDetails[
+                                                                                                                              idx
+                                                                                                                          ]
+                                                                                                                              .specialOfferSeason
+                                                                                                                        : ''
+                                                                                                                }
+                                                                                                            />
+                                                                                                        </TableCell>
+
+                                                                                                        <TableCell>
+                                                                                                            <TextField
+                                                                                                                // label="taxOrder"
+                                                                                                                sx={{
+                                                                                                                    width: { sm: 200 },
+                                                                                                                    '& .MuiInputBase-root':
+                                                                                                                        {
+                                                                                                                            height: 40
+                                                                                                                        }
+                                                                                                                }}
+                                                                                                                type="text"
+                                                                                                                variant="outlined"
+                                                                                                                name={`seasonDetails.${idx}.specialOfferSeason`}
+                                                                                                                value={
+                                                                                                                    values.seasonDetails[
+                                                                                                                        idx
+                                                                                                                    ] &&
+                                                                                                                    values.seasonDetails[
+                                                                                                                        idx
+                                                                                                                    ].specialOfferSeason
+                                                                                                                }
+                                                                                                                onChange={handleChange}
+                                                                                                                onBlur={handleBlur}
+                                                                                                                error={Boolean(
+                                                                                                                    touched.seasonDetails &&
+                                                                                                                        touched
+                                                                                                                            .seasonDetails[
+                                                                                                                            idx
+                                                                                                                        ] &&
+                                                                                                                        touched
+                                                                                                                            .seasonDetails[
+                                                                                                                            idx
+                                                                                                                        ]
+                                                                                                                            .specialOfferSeason &&
+                                                                                                                        errors.seasonDetails &&
+                                                                                                                        errors
+                                                                                                                            .seasonDetails[
+                                                                                                                            idx
+                                                                                                                        ] &&
+                                                                                                                        errors
+                                                                                                                            .seasonDetails[
+                                                                                                                            idx
+                                                                                                                        ].specialOfferSeason
+                                                                                                                )}
+                                                                                                                helperText={
+                                                                                                                    touched.seasonDetails &&
+                                                                                                                    touched.seasonDetails[
+                                                                                                                        idx
+                                                                                                                    ] &&
+                                                                                                                    touched.seasonDetails[
+                                                                                                                        idx
+                                                                                                                    ].specialOfferSeason &&
+                                                                                                                    errors.seasonDetails &&
+                                                                                                                    errors.seasonDetails[
+                                                                                                                        idx
+                                                                                                                    ] &&
+                                                                                                                    errors.seasonDetails[
+                                                                                                                        idx
+                                                                                                                    ].specialOfferSeason
+                                                                                                                        ? errors
+                                                                                                                              .seasonDetails[
+                                                                                                                              idx
+                                                                                                                          ]
+                                                                                                                              .specialOfferSeason
+                                                                                                                        : ''
+                                                                                                                }
+                                                                                                            />
+                                                                                                        </TableCell>
+                                                                                                        <TableCell>
+                                                                                                            <TextField
+                                                                                                                // label="taxOrder"
+                                                                                                                sx={{
+                                                                                                                    width: { sm: 200 },
+                                                                                                                    '& .MuiInputBase-root':
+                                                                                                                        {
+                                                                                                                            height: 40
+                                                                                                                        }
+                                                                                                                }}
+                                                                                                                type="text"
+                                                                                                                variant="outlined"
+                                                                                                                name={`seasonDetails.${idx}.specialOfferSeason`}
+                                                                                                                value={
+                                                                                                                    values.seasonDetails[
+                                                                                                                        idx
+                                                                                                                    ] &&
+                                                                                                                    values.seasonDetails[
+                                                                                                                        idx
+                                                                                                                    ].specialOfferSeason
+                                                                                                                }
+                                                                                                                onChange={handleChange}
+                                                                                                                onBlur={handleBlur}
+                                                                                                                error={Boolean(
+                                                                                                                    touched.seasonDetails &&
+                                                                                                                        touched
+                                                                                                                            .seasonDetails[
+                                                                                                                            idx
+                                                                                                                        ] &&
+                                                                                                                        touched
+                                                                                                                            .seasonDetails[
+                                                                                                                            idx
+                                                                                                                        ]
+                                                                                                                            .specialOfferSeason &&
+                                                                                                                        errors.seasonDetails &&
+                                                                                                                        errors
+                                                                                                                            .seasonDetails[
+                                                                                                                            idx
+                                                                                                                        ] &&
+                                                                                                                        errors
+                                                                                                                            .seasonDetails[
+                                                                                                                            idx
+                                                                                                                        ].specialOfferSeason
+                                                                                                                )}
+                                                                                                                helperText={
+                                                                                                                    touched.seasonDetails &&
+                                                                                                                    touched.seasonDetails[
+                                                                                                                        idx
+                                                                                                                    ] &&
+                                                                                                                    touched.seasonDetails[
+                                                                                                                        idx
+                                                                                                                    ].specialOfferSeason &&
+                                                                                                                    errors.seasonDetails &&
+                                                                                                                    errors.seasonDetails[
+                                                                                                                        idx
+                                                                                                                    ] &&
+                                                                                                                    errors.seasonDetails[
+                                                                                                                        idx
+                                                                                                                    ].specialOfferSeason
+                                                                                                                        ? errors
+                                                                                                                              .seasonDetails[
+                                                                                                                              idx
+                                                                                                                          ]
+                                                                                                                              .specialOfferSeason
+                                                                                                                        : ''
+                                                                                                                }
+                                                                                                            />
+                                                                                                        </TableCell>
+                                                                                                        <TableCell>
+                                                                                                            <TextField
+                                                                                                                // label="taxOrder"
+                                                                                                                sx={{
+                                                                                                                    width: { sm: 200 },
+                                                                                                                    '& .MuiInputBase-root':
+                                                                                                                        {
+                                                                                                                            height: 40
+                                                                                                                        }
+                                                                                                                }}
+                                                                                                                type="text"
+                                                                                                                variant="outlined"
+                                                                                                                name={`seasonDetails.${idx}.specialOfferSeason`}
+                                                                                                                value={
+                                                                                                                    values.seasonDetails[
+                                                                                                                        idx
+                                                                                                                    ] &&
+                                                                                                                    values.seasonDetails[
+                                                                                                                        idx
+                                                                                                                    ].specialOfferSeason
+                                                                                                                }
+                                                                                                                onChange={handleChange}
+                                                                                                                onBlur={handleBlur}
+                                                                                                                error={Boolean(
+                                                                                                                    touched.seasonDetails &&
+                                                                                                                        touched
+                                                                                                                            .seasonDetails[
+                                                                                                                            idx
+                                                                                                                        ] &&
+                                                                                                                        touched
+                                                                                                                            .seasonDetails[
+                                                                                                                            idx
+                                                                                                                        ]
+                                                                                                                            .specialOfferSeason &&
+                                                                                                                        errors.seasonDetails &&
+                                                                                                                        errors
+                                                                                                                            .seasonDetails[
+                                                                                                                            idx
+                                                                                                                        ] &&
+                                                                                                                        errors
+                                                                                                                            .seasonDetails[
+                                                                                                                            idx
+                                                                                                                        ].specialOfferSeason
+                                                                                                                )}
+                                                                                                                helperText={
+                                                                                                                    touched.seasonDetails &&
+                                                                                                                    touched.seasonDetails[
+                                                                                                                        idx
+                                                                                                                    ] &&
+                                                                                                                    touched.seasonDetails[
+                                                                                                                        idx
+                                                                                                                    ].specialOfferSeason &&
+                                                                                                                    errors.seasonDetails &&
+                                                                                                                    errors.seasonDetails[
+                                                                                                                        idx
+                                                                                                                    ] &&
+                                                                                                                    errors.seasonDetails[
+                                                                                                                        idx
+                                                                                                                    ].specialOfferSeason
+                                                                                                                        ? errors
+                                                                                                                              .seasonDetails[
+                                                                                                                              idx
+                                                                                                                          ]
+                                                                                                                              .specialOfferSeason
+                                                                                                                        : ''
+                                                                                                                }
+                                                                                                            />
+                                                                                                        </TableCell>
+                                                                                                        <TableCell>
+                                                                                                            <FormGroup>
+                                                                                                                <FormControlLabel
+                                                                                                                    control={
+                                                                                                                        <Checkbox
+                                                                                                                            name={`seasonDetails.${idx}.status`}
+                                                                                                                            onChange={
+                                                                                                                                handleChange
+                                                                                                                            }
+                                                                                                                            checked={
+                                                                                                                                values
+                                                                                                                                    .seasonDetails[
+                                                                                                                                    idx
+                                                                                                                                ].status
+                                                                                                                            }
+                                                                                                                            value={
+                                                                                                                                values
+                                                                                                                                    .seasonDetails[
+                                                                                                                                    idx
+                                                                                                                                ] &&
+                                                                                                                                values
+                                                                                                                                    .seasonDetails[
+                                                                                                                                    idx
+                                                                                                                                ].status
+                                                                                                                            }
+                                                                                                                        />
+                                                                                                                    }
+                                                                                                                />
+                                                                                                            </FormGroup>
+                                                                                                        </TableCell>
+                                                                                                        <TableCell>
+                                                                                                            <IconButton
+                                                                                                                aria-label="delete"
+                                                                                                                onClick={() => {
+                                                                                                                    remove(idx);
+                                                                                                                }}
+                                                                                                            >
+                                                                                                                <HighlightOffIcon />
+                                                                                                            </IconButton>
+                                                                                                        </TableCell>
+                                                                                                    </TableRow>
+                                                                                                );
+                                                                                            })}
+                                                                                        </TableBody>
+                                                                                    </Table>
+                                                                                </TableContainer>
+                                                                            </Paper>
+                                                                        )}
+                                                                    </FieldArray>
+                                                                </Grid>
                                                             </Grid>
                                                             <Grid
                                                                 gap="10px"
