@@ -37,7 +37,7 @@ import CreatedUpdatedUserDetailsWithTableFormat from '../../userTimeDetails/Crea
 
 function TransportRates({ open, handleClose, mode, code }) {
     const initialValues = {
-        mainSeason: '',
+        changeMethod: '',
         status: true,
         seasonDetails: [
             {
@@ -54,6 +54,44 @@ function TransportRates({ open, handleClose, mode, code }) {
     const [loadValues, setLoadValues] = useState(null);
     const [chargeMethodArrayList, setChargeMethodArrayList] = useState([]);
     const [modeofTransportArrayList, setModeofTransportArrayList] = useState([]);
+
+    const [enableFeature, setEnableFeature] = useState('');
+
+    //Distances
+    const [enableblock1, setEnableblock1] = useState(false);
+    //Pax/Baggage Vs Vehicle
+    const [enableblock2, setEnableblock2] = useState(false);
+    //Location wise Expenses
+    const [enableblock3, setEnableblock3] = useState(false);
+    //Per Km Rate
+    const [enableblock4, setEnableblock4] = useState(false);
+    //Per Hr Rate
+    const [enableblock5, setEnableblock5] = useState(false);
+    //Per Vehicle  Rate
+    const [enableblock6, setEnableblock6] = useState(false);
+    //Per Pax  Rate
+    const [enableblock7, setEnableblock7] = useState(false);
+
+    const featureList = [];
+    useEffect(() => {
+        if (enableFeature === 'BY_DISTANCE') {
+            setEnableblock1(true);
+            setEnableblock2(true);
+            setEnableblock3(true);
+            setEnableblock4(true);
+        } else if (enableFeature === 'BY_TIME') {
+            setEnableblock1(true);
+            setEnableblock2(true);
+            setEnableblock3(true);
+            setEnableblock5(true);
+        } else if (enableFeature === 'PER_VEHICLE') {
+            setEnableblock1(true);
+            setEnableblock6(true);
+        } else if (enableFeature === 'PER_PAX') {
+            setEnableblock1(true);
+            setEnableblock7(true);
+        }
+    }, [enableFeature]);
 
     //   yup.addMethod(yup.array, "uniqueTaxOrder", function (message) {
     //     return this.test("uniqueTaxOrder", message, function (list) {
@@ -246,7 +284,35 @@ function TransportRates({ open, handleClose, mode, code }) {
                                                             </Grid>
                                                             <Grid display="flex" style={{ marginBottom: '10px', marginTop: '10px' }}>
                                                                 <Grid item>
-                                                                    <Typography variant="h5">Type of Transport</Typography>
+                                                                    <Typography variant="h4">Type of Transport</Typography>
+                                                                </Grid>
+                                                            </Grid>
+                                                            <Grid gap="10px" display="flex">
+                                                                <Grid
+                                                                    item
+                                                                    display="flex"
+                                                                    style={{
+                                                                        alignItems: 'center',
+                                                                        //   marginTop: "10px",
+                                                                        marginBottom: '10px'
+                                                                    }}
+                                                                >
+                                                                    <Typography variant="" component="p" style={{ marginRight: '10px' }}>
+                                                                        Create New Type of Transport
+                                                                    </Typography>
+
+                                                                    <FormGroup>
+                                                                        <FormControlLabel
+                                                                            control={
+                                                                                <Checkbox
+                                                                                    name="status"
+                                                                                    onChange={handleChange}
+                                                                                    checked={values.status}
+                                                                                    value={values.status}
+                                                                                />
+                                                                            }
+                                                                        />
+                                                                    </FormGroup>
                                                                 </Grid>
                                                             </Grid>
                                                             <Grid gap="10px" display="flex" style={{ marginBottom: '10px' }}>
@@ -313,9 +379,12 @@ function TransportRates({ open, handleClose, mode, code }) {
                                                                             }
                                                                         }}
                                                                         select
-                                                                        label="Mode of Transport"
-                                                                        name="transportCode"
-                                                                        onChange={handleChange}
+                                                                        label="Change Method"
+                                                                        name="changeMethod"
+                                                                        onChange={(value) => {
+                                                                            handleChange;
+                                                                            setEnableFeature(value.target.value);
+                                                                        }}
                                                                         onBlur={handleBlur}
                                                                         value={values.taxGroupType}
                                                                         error={Boolean(touched.taxGroupType && errors.taxGroupType)}
@@ -408,6 +477,20 @@ function TransportRates({ open, handleClose, mode, code }) {
                                                                 </Grid>
                                                             </Grid>
 
+                                                            <Grid
+                                                                display={enableblock1 ? 'flex' : 'none'}
+                                                                gap="10px"
+                                                                style={{ marginBottom: '10px', marginTop: '10px' }}
+                                                            >
+                                                                <Grid item>grid 1 Distances</Grid>
+                                                            </Grid>
+                                                            <Grid
+                                                                gap="10px"
+                                                                display="flex"
+                                                                style={{ marginBottom: '10px', marginTop: '10px' }}
+                                                            >
+                                                                <Grid item>grid 2 Per Hr Rate</Grid>
+                                                            </Grid>
                                                             <Box display="flex" flexDirection="row-reverse" style={{ marginTop: '20px' }}>
                                                                 {mode != 'VIEW' ? (
                                                                     <Button
