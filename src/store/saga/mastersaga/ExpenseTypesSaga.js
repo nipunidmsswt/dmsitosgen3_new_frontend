@@ -1,4 +1,9 @@
-import { ADD_FAILED_EXPENSE_TYPES, ADD_SUCCESS_EXPENSE_TYPES, FAILED_GET_ALL_CURRENCY_LIST, SUCESS_GET_ALL_CURRENCY_LIST } from 'store/constant/master/ExpenseTypesConstant';
+import {
+    ADD_FAILED_EXPENSE_TYPES,
+    ADD_SUCCESS_EXPENSE_TYPES,
+    FAILED_GET_ALL_CURRENCY_LIST,
+    SUCESS_GET_ALL_CURRENCY_LIST
+} from 'store/constant/master/ExpenseTypesConstant';
 import { put, takeEvery, call } from 'redux-saga/effects';
 import { create, getById, update, get } from '../../../apis/Apis';
 
@@ -13,7 +18,7 @@ export function* getAllCurrencyListData() {
 }
 
 export function* saveExpenseTypesDataHandler(action) {
-    action.data.path = `${process.env.REACT_APP_ACCOMODATION_URL}/expenseTypes/`;
+    action.data.path = `${process.env.REACT_APP_TRANSPORT_URL}/expenseTypes/`;
     let responseData = [];
     try {
         responseData = yield call(create, action.data);

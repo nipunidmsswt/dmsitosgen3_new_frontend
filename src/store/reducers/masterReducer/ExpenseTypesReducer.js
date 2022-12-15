@@ -1,4 +1,9 @@
-import { ADD_FAILED_EXPENSE_TYPES, ADD_SUCCESS_EXPENSE_TYPES, FAILED_GET_ALL_CURRENCY_LIST, SUCESS_GET_ALL_CURRENCY_LIST } from 'store/constant/master/ExpenseTypesConstant';
+import {
+    ADD_FAILED_EXPENSE_TYPES,
+    ADD_SUCCESS_EXPENSE_TYPES,
+    FAILED_GET_ALL_CURRENCY_LIST,
+    SUCESS_GET_ALL_CURRENCY_LIST
+} from 'store/constant/master/ExpenseTypesConstant';
 
 const initialState = {
     expenseType: null,

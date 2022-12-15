@@ -549,4 +549,5 @@ export function* wacherSaga() {
 
     //EXPENSE TYPES
     yield takeLatest(GET_ALL_CURRENCY_LIST, getAllCurrencyListData);
+    yield takeLatest(GET_ALL_CURRENCY_LIST, getAllCurrencyListData);
 }

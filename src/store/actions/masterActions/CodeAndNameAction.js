@@ -69,5 +69,3 @@ export const getAllActiveOperatorData = () => {
         type: GET_ALL_OPERATOR_DATA
     };
 };
-
-

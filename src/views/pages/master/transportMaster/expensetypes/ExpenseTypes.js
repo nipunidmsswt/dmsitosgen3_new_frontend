@@ -30,12 +30,6 @@ import Grid from '@mui/material/Grid';
 import TableContainer from '@mui/material/TableContainer';
 import Paper from '@mui/material/Paper';
 import * as yup from 'yup';
-import {
-    saveExChangeRateData,
-    updateExChangeRateData,
-    getExChangeRateDataById
-} from 'store/actions/masterActions/exchangeRateActions/ExchangeRateActions';
-import { currencies } from './Currency';
 import { gridSpacing } from 'store/constant';
 import { getAllTaxData } from 'store/actions/masterActions/TaxActions/TaxAction';
 import { getAllCurrencyListData } from 'store/actions/masterActions/ExpenseTypeAction';
@@ -154,8 +148,8 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
         expenseTypeDetails: yup.array().of(
             yup.object().shape({
                 // tax: yup.object().typeError("Required field"),
-                fromDate: yup.date().required('Required field'),
-                rate: yup.string().required('Required field')
+                fromDate: yup.date().required('Required field')
+                // rate: yup.string().required('Required field')
             })
         )
     });
@@ -197,6 +191,7 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
         }
         handleClose();
     };
+
     useEffect(() => {
         console.log(ref.current);
     }, [ref]);

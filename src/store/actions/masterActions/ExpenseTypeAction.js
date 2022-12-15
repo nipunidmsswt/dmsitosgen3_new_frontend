@@ -8,6 +8,7 @@ export const getAllCurrencyListData = (data) => {
 };
 
 export const saveExpenseTypesData = (data) => {
+    console.log(data);
     return {
         type: SAVE_EXPENSE_TYPES,
         data
