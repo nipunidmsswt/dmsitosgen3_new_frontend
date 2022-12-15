@@ -193,8 +193,9 @@ const MainRoutes = {
                 },
                 {
                     path: 'expensetypesview',
-                    element: <ViewExpenseTypes />},
-{
+                    element: <ViewExpenseTypes />
+                },
+                {
                     path: 'trasportrateview',
                     element: <ViewTransportRates />
                 }
