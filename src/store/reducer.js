@@ -23,6 +23,7 @@ import { hotelFacilityReducer } from './reducers/masterReducer/HotelFacilityRedu
 import { hotelBasisReducer } from './reducers/masterReducer/HotelBasisReducer';
 import { roomCategoryReducer } from './reducers/masterReducer/RoomCategoryReducer';
 import { expenseTypesReducer } from './reducers/masterReducer/ExpenseTypesReducer';
+import { chargeMethodReducer, modeOfTransortReducer } from './reducers/masterReducer/TransportRateReducer';
 // ==============================|| COMBINE REDUCER ||============================== //
 
 const reducer = combineReducers({
@@ -48,7 +49,10 @@ const reducer = combineReducers({
     marketGroupReducer,
     hotelBasisReducer,
     roomCategoryReducer,
-    expenseTypesReducer
+    expenseTypesReducer,
+    // transportRateReducer,
+    chargeMethodReducer,
+    modeOfTransortReducer
 });
 
 export default reducer;

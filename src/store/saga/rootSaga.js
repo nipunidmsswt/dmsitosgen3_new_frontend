@@ -361,6 +361,10 @@ import {
 import { GET_ALL_CURRENCY_LIST } from 'store/constant/master/ExpenseTypesConstant';
 import { getAllCurrencyListData } from './mastersaga/ExpenseTypesSaga';
 
+import { getAllChargeMethods, getAllModeOfTransort } from './mastersaga/TransportRateSaga';
+
+import { GET_ALL_CHARGE_METHOD_DATA, GET_ALL_MODE_OF_TRANSPORT_DATA } from 'store/constant/master/TransportRateConstant';
+
 export function* wacherSaga() {
     // tax setup
     yield takeLatest(SAVE_TAX_DATA, saveTaxSaga);
@@ -550,4 +554,9 @@ export function* wacherSaga() {
     //EXPENSE TYPES
     yield takeLatest(GET_ALL_CURRENCY_LIST, getAllCurrencyListData);
     yield takeLatest(GET_ALL_CURRENCY_LIST, getAllCurrencyListData);
+    //charge method
+    yield takeLatest(GET_ALL_CHARGE_METHOD_DATA, getAllChargeMethods);
+
+    //mode of transport
+    yield takeLatest(GET_ALL_MODE_OF_TRANSPORT_DATA, getAllModeOfTransort);
 }

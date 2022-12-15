@@ -24,6 +24,7 @@ import ViewLocation from 'views/pages/master/transportMaster/location/ViewLocati
 import ViewFacilityCounter from 'views/pages/master/hotelMaster/facility_count/ViewFacilityCount';
 import ViewGuideClass from 'views/pages/master/guideMaster/guide_class/ViewGuideClass';
 import ViewExpenseTypes from 'views/pages/master/transportMaster/expensetypes/ViewExpenseTypes';
+import ViewTransportRates from 'views/pages/master/transportMaster/transportRates/ViewTransportRates';
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
 
@@ -192,7 +193,10 @@ const MainRoutes = {
                 },
                 {
                     path: 'expensetypesview',
-                    element: <ViewExpenseTypes />
+                    element: <ViewExpenseTypes />},
+{
+                    path: 'trasportrateview',
+                    element: <ViewTransportRates />
                 }
             ]
         }
