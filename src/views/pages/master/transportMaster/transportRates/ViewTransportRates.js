@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import MaterialTable from 'material-table';
 
-// import TransportRates from './TransportRates';
+import TransportRates from './TransportRates';
 
 import { useSelector, useDispatch } from 'react-redux';
 import SuccessMsg from 'messages/SuccessMsg';
@@ -254,7 +254,7 @@ function ViewTransportRates() {
                                     }}
                                 />
 
-                                {/* {open ? <TransportRates open={open} handleClose={handleClose} code={code} mode={mode} /> : ''} */}
+                                {open ? <TransportRates open={open} handleClose={handleClose} code={code} mode={mode} /> : ''}
                                 {openToast ? <SuccessMsg openToast={openToast} handleToast={handleToast} mode={mode} /> : null}
                                 {openErrorToast ? (
                                     <ErrorMsg openToast={openErrorToast} handleToast={setOpenErrorToast} mode={mode} />
