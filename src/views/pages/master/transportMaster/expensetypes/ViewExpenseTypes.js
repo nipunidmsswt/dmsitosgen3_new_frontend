@@ -10,6 +10,7 @@ import MainCard from 'ui-component/cards/MainCard';
 import { FormControlLabel, FormGroup, Grid, Switch } from '@mui/material';
 import { gridSpacing } from 'store/constant';
 import ExpenseTypes from './ExpenseTypes';
+import { getAllExpenseTypesData } from 'store/actions/masterActions/ExpenseTypeAction';
 
 function ViewExpenseTypes() {
     const [open, setOpen] = useState(false);
@@ -63,16 +64,16 @@ function ViewExpenseTypes() {
 
     const dispatch = useDispatch();
     const error = useSelector((state) => state.exchangeRateTypesReducer.errorMsg);
-
-    const exchangeRateTypeList = useSelector((state) => state.exchangeRateTypesReducer.exchangeRateTypeList);
-    const exchangeRateType = useSelector((state) => state.exchangeRateTypesReducer.exchangeRateType);
     const lastModifiedDate = useSelector((state) => state.exchangeRateTypesReducer.lastModifiedDateTime);
     const expenseType = useSelector((state) => state.expenseTypesReducer.expenseType);
-    // useEffect(() => {
-    //     if (exchangeRateTypeList?.payload?.length > 0) {
-    //         setTableData(exchangeRateTypeList?.payload[0]);
-    //     }
-    // }, [exchangeRateTypeList]);
+    const expenseTypesList = useSelector((state) => state.expenseTypesReducer.expenseTypes);
+
+    useEffect(() => {
+        console.log(expenseTypesList);
+        if (expenseTypesList?.length > 0) {
+            setTableData(expenseTypesList);
+        }
+    }, [expenseTypesList]);
 
     useEffect(() => {
         if (error != null) {
@@ -85,14 +86,14 @@ function ViewExpenseTypes() {
         if (expenseType) {
             console.log('sucessToast');
             setHandleToast(true);
-            // dispatch(getAllExChangeRateData());
+            dispatch(getAllExpenseTypesData());
         }
     }, [expenseType]);
 
-    // useEffect(() => {
-    //     dispatch(getLatestModifiedDetails());
-    //     dispatch(getAllExChangeRateData());
-    // }, []);
+    useEffect(() => {
+        // dispatch(getLatestModifiedDetails());
+        dispatch(getAllExpenseTypesData());
+    }, []);
 
     useEffect(() => {
         setLastModifiedTimeDate(
@@ -108,18 +109,18 @@ function ViewExpenseTypes() {
                   })
         );
     }, [lastModifiedDate]);
+
     const handleClickOpen = (type, data) => {
-        console.log(type);
-        console.log(data);
         if (type === 'VIEW_UPDATE') {
+            console.log('expenseCode:' + data.expenseCode);
             setMode(type);
-            setCode(data.baseCurrencyCode);
+            setCode(data.expenseCode);
         } else if (type === 'INSERT') {
             setCode('');
             setMode(type);
         } else {
             setMode(type);
-            setCode(data.baseCurrencyCode);
+            setCode(data.expenseCode);
         }
         setOpen(true);
     };
@@ -136,7 +137,7 @@ function ViewExpenseTypes() {
     };
     return (
         <div>
-            <MainCard title="Expense Types">
+            <MainCard>
                 <div style={{ textAlign: 'right' }}> Last Modified Date : {lastModifiedTimeDate}</div>
                 <br />
                 <Grid container spacing={gridSpacing}>

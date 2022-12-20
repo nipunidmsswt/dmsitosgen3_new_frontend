@@ -1,4 +1,9 @@
-import { GET_ALL_CURRENCY_LIST, SAVE_EXPENSE_TYPES } from 'store/constant/master/ExpenseTypesConstant';
+import {
+    GET_ALL_CURRENCY_LIST,
+    GET_ALL_EXPENSE_TYPES,
+    GET_EXPENSE_TYPES_BY_ID,
+    SAVE_EXPENSE_TYPES
+} from 'store/constant/master/ExpenseTypesConstant';
 
 export const getAllCurrencyListData = (data) => {
     return {
@@ -15,18 +20,18 @@ export const saveExpenseTypesData = (data) => {
     };
 };
 
-// export const getAllFacilityCounterData = () => {
-//     return {
-//         type: GET_ALL_FACILITYCOUNTER_DATA
-//     };
-// };
+export const getAllExpenseTypesData = () => {
+    return {
+        type: GET_ALL_EXPENSE_TYPES
+    };
+};
 
-// export const getFacilityCounterDataById = (id) => {
-//     return {
-//         type: GET_FACILITYCOUNTER_DATA_BY_ID,
-//         data: { id }
-//     };
-// };
+export const getExpenseTypesById = (id) => {
+    return {
+        type: GET_EXPENSE_TYPES_BY_ID,
+        data: { id }
+    };
+};
 
 // export const updateFacilityCounterData = (data) => {
 //     return {
