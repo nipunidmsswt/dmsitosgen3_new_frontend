@@ -185,7 +185,7 @@ function ViewTransportRates() {
     };
     return (
         <div>
-            <MainCard title="Season">
+            <MainCard title="Transport Rates">
                 <div style={{ textAlign: 'right' }}> Last Modified Date : {lastModifiedTimeDate}</div>
                 <br />
                 <Grid container spacing={gridSpacing}>
