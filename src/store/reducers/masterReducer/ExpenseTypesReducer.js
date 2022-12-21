@@ -1,7 +1,11 @@
 import {
     ADD_FAILED_EXPENSE_TYPES,
     ADD_SUCCESS_EXPENSE_TYPES,
+    FAILED_EXPENSE_TYPES_LIST_DATA,
     FAILED_GET_ALL_CURRENCY_LIST,
+    FAILED_GET_EXPENSE_TYPES_BY_ID,
+    SUCCESS_EXPENSE_TYPES_LIST_DATA,
+    SUCCESS_GET_EXPENSE_TYPES_BY_ID,
     SUCESS_GET_ALL_CURRENCY_LIST
 } from 'store/constant/master/ExpenseTypesConstant';
 
@@ -28,19 +32,24 @@ export const expenseTypesReducer = (state = initialState, action) => {
                 errorMsg: data ? data.errorMessages : 'netwok error'
             };
 
-        // case SUCCESS_GET_TAX_DATA_BY_ID:
-        //     console.warn('SUCCESS_GET_TAX_DATA_BY_ID', action.payload);
-        //     console.log(data.payload[0]);
-        //     return { ...state, taxToUpdate: data.payload[0] };
+        case SUCCESS_EXPENSE_TYPES_LIST_DATA:
+            return { ...state, expenseTypes: data.payload[0] };
 
-        // case FAILED_GET_TAX_DATA_BY_ID:
-        //     console.warn('FAILED_GET_TAX_DATA_BY_ID', action);
-        //     console.log(data);
-        //     return {
-        //         ...state,
-        //         taxToUpdate: null,
-        //         errorMsg: data ? data.errorMessages : 'netwok error'
-        //     };
+        case FAILED_EXPENSE_TYPES_LIST_DATA:
+            return { ...state, expenseTypes: data };
+
+        case SUCCESS_GET_EXPENSE_TYPES_BY_ID:
+            console.log(data.payload[0]);
+            return { ...state, expenseTypeToUpdate: data.payload[0] };
+
+        case FAILED_GET_EXPENSE_TYPES_BY_ID:
+            console.warn('FAILED_GET_TAX_DATA_BY_ID', action);
+            console.log(data);
+            return {
+                ...state,
+                expenseTypeToUpdate: null,
+                errorMsg: data ? data.errorMessages : 'netwok error'
+            };
 
         // case UPDATE_SUCCESS_TAX_DATA:
         //     console.log(data.payload[0]);

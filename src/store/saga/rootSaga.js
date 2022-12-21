@@ -12,7 +12,8 @@ import {
     updateTaxGroupSaga,
     checkDupicateTaxGroupCodeSaga,
     checkLatestTaxModifiedDateSaga,
-    checkLatestTaxGrupModifiedDateSaga
+    checkLatestTaxGrupModifiedDateSaga,
+    getTaxByUniqueIdSaga
 } from './mastersaga/TaxSaga';
 import {
     SAVE_TAX_DATA,
@@ -26,7 +27,8 @@ import {
     UPDATE_TAX_GROUP_DATA,
     CHECK_TAX_GROUP_DUPLICATE,
     GET_LAST_MODIFIED_DATE_TIME_TAX,
-    GET_LAST_MODIFIED_DATE_TIME_TAX_GROUP
+    GET_LAST_MODIFIED_DATE_TIME_TAX_GROUP,
+    GET_TAX_DATA_BY_UNIQUE_ID
 } from 'store/constant/master/TaxMasterConstant';
 
 import {
@@ -358,8 +360,18 @@ import {
     SAVE_ROOM_CATEGORY,
     UPDATE_ROOM_CATEGORY
 } from 'store/constant/master/RoomCategoryConstant';
-import { GET_ALL_CURRENCY_LIST } from 'store/constant/master/ExpenseTypesConstant';
-import { getAllCurrencyListData } from './mastersaga/ExpenseTypesSaga';
+import {
+    GET_ALL_CURRENCY_LIST,
+    GET_ALL_EXPENSE_TYPES,
+    GET_EXPENSE_TYPES_BY_ID,
+    SAVE_EXPENSE_TYPES
+} from 'store/constant/master/ExpenseTypesConstant';
+import {
+    getAllCurrencyListData,
+    getAllExpenseTypesDataSaga,
+    getExpenseTypesByCodeSaga,
+    saveExpenseTypesDataHandler
+} from './mastersaga/ExpenseTypesSaga';
 
 import { getAllChargeMethods, getAllModeOfTransort } from './mastersaga/TransportRateSaga';
 
@@ -373,6 +385,7 @@ export function* wacherSaga() {
     yield takeLatest(UPDATE_TAX_DATA, updateTaxSaga);
     yield takeLatest(CHECK_TAX_DUPLICATE, checkDupicateTaxCodeSaga);
     yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_TAX, checkLatestTaxModifiedDateSaga);
+    yield takeLatest(GET_TAX_DATA_BY_UNIQUE_ID, getTaxByUniqueIdSaga);
 
     //tax group setup
     yield takeLatest(SAVE_TAX_GROUP_DATA, saveTaxGroupSaga);
@@ -553,7 +566,9 @@ export function* wacherSaga() {
 
     //EXPENSE TYPES
     yield takeLatest(GET_ALL_CURRENCY_LIST, getAllCurrencyListData);
-    yield takeLatest(GET_ALL_CURRENCY_LIST, getAllCurrencyListData);
+    yield takeLatest(SAVE_EXPENSE_TYPES, saveExpenseTypesDataHandler);
+    yield takeLatest(GET_ALL_EXPENSE_TYPES, getAllExpenseTypesDataSaga);
+    yield takeLatest(GET_EXPENSE_TYPES_BY_ID, getExpenseTypesByCodeSaga);
     //charge method
     yield takeLatest(GET_ALL_CHARGE_METHOD_DATA, getAllChargeMethods);
 

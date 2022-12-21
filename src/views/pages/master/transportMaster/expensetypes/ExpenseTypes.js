@@ -31,10 +31,10 @@ import TableContainer from '@mui/material/TableContainer';
 import Paper from '@mui/material/Paper';
 import * as yup from 'yup';
 import { gridSpacing } from 'store/constant';
-import { getAllTaxData } from 'store/actions/masterActions/TaxActions/TaxAction';
-import { getAllCurrencyListData } from 'store/actions/masterActions/ExpenseTypeAction';
+import { getAllTaxData, getTaxDataById, getTaxDataByUniqueId } from 'store/actions/masterActions/TaxActions/TaxAction';
+import { getAllCurrencyListData, getExpenseTypesById, saveExpenseTypesData } from 'store/actions/masterActions/ExpenseTypeAction';
 import CreatedUpdatedUserDetailsWithTableFormat from '../../userTimeDetails/CreatedUpdatedUserDetailsWithTableFormat';
-
+import axios from 'axios';
 const Transition = forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
@@ -60,6 +60,23 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
 
     const [loadValues, setLoadValues] = useState(null);
     const [currencyListArray, setCurrecyListArray] = useState([]);
+    // const [Data, setData] = useState({
+    //     expenseCode: '',
+    //     description: '',
+    //     status: true,
+    //     expenseTypeDetails: [
+    //         {
+    //             fromDate: '',
+    //             toDate: '',
+    //             currencyList: '',
+    //             tax: '',
+    //             expenseRate: '',
+    //             rateWithoutTax: '',
+    //             rateWithTax: '',
+    //             status: true
+    //         }
+    //     ]
+    // });
 
     const ref = useRef(null);
 
@@ -154,10 +171,11 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
         )
     });
 
-    // const exchnageRateTypeToUpdate = useSelector((state) => state.exchangeRateTypesReducer.exchnageRateTypeToUpdate);
-    // console.log(exchnageRateTypeToUpdate);
+    const expenseTypeToUpdate = useSelector((state) => state.expenseTypesReducer.expenseTypeToUpdate);
 
     const dispatch = useDispatch();
+    const [taxIdValues, setTaxIdValues] = useState(null);
+    const [taxValues, setTaxValues] = useState(null);
 
     // useEffect(() => {
     //     if (currencies.length != 0) {
@@ -170,22 +188,309 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
     //         setCurrecyListArray(array);
     //     }
     // }, [currencies]);
-    // useEffect(() => {
-    //     if (mode === 'VIEW_UPDATE' || mode === 'VIEW') {
-    //         dispatch(getExChangeRateDataById(code));
-    //     }
-    // }, [mode]);
+    useEffect(() => {
+        console.log('192');
+        if (mode === 'VIEW_UPDATE' || mode === 'VIEW') {
+            dispatch(getExpenseTypesById(code));
+        }
+    }, [mode]);
+
+    const taxToUpdate = useSelector((state) => state.taxReducer.taxToUpdate);
+    const taxToEdit = useSelector((state) => state.taxReducer.taxToEdit);
+
+    useEffect(() => {
+        if ((mode === 'VIEW_UPDATE' && taxToEdit != null) || (mode === 'VIEW' && taxToEdit != null)) {
+            console.log('tax to edit:' + taxToEdit.taxCode);
+            setTaxValues(taxToEdit);
+        }
+    }, [taxToEdit != null]);
 
     // useEffect(() => {
-    //     if ((mode === 'VIEW_UPDATE' && exchnageRateTypeToUpdate != null) || (mode === 'VIEW' && exchnageRateTypeToUpdate != null)) {
-    //         setLoadValues(exchnageRateTypeToUpdate);
+    //     (async () => {
+    //         if ((mode === 'VIEW_UPDATE' && taxToEdit != null) || (mode === 'VIEW' && taxToEdit != null)) {
+    //             console.log('taxToEdit:' + taxToEdit);
+    //             setTaxValues(taxToEdit);
+    //         }
+    //     })();
+    // }, [taxToEdit]);
+
+    // useEffect(() => {
+    //     async function fetchData() {
+    //         try {
+    //             const response = await fetch(`https://www.reddit.com/r/${subreddit}.json`);
+    //             const json = await response.json();
+    //             setPosts(json.data.children.map((it) => it.data));
+    //         } catch (e) {
+    //             console.error(e);
+    //         }
     //     }
-    // }, [exchnageRateTypeToUpdate]);
+    //     fetchData();
+    // }, [expenseTypeToUpdate]);
+
+    const [taxData, setData] = useState(null);
+    async function getData(userId) {
+        console.log(userId);
+        const realData1 = null;
+        const data = await axios
+            .get(`${process.env.REACT_APP_FINANCE_URL}/taxDetails/${userId}`)
+            .then((promise) => {
+                console.log(promise);
+                console.log(promise.data.payload[0]);
+                const realData1 = promise.data.payload[0];
+                return realData1;
+            })
+            .catch((e) => {
+                console.error(e);
+            });
+        console.log(data);
+        // const realData = data.data.payload[0];
+        // setData(realData);
+        return data;
+    }
+
+    // useEffect(() => {
+    //     console.log(taxData);
+
+    //     //   return () => {
+    //     //     second
+    //     //   }
+    // }, [taxData]);
+
+    useEffect(() => {
+        console.log('yyyy');
+        console.log(expenseTypeToUpdate);
+        // fetchData();
+        // declare the data fetching function
+        // const fetchData = () => {
+        if (expenseTypeToUpdate != null) {
+            const dataArray = [];
+            if ((mode === 'VIEW_UPDATE' && expenseTypeToUpdate != null) || (mode === 'VIEW' && expenseTypeToUpdate != null)) {
+                console.log(expenseTypeToUpdate.expenseTypeDetails.length);
+                if (expenseTypeToUpdate.expenseTypeDetails.length > 0) {
+                    expenseTypeToUpdate.expenseTypeDetails.map((item) => {
+                        console.log(item.tax);
+                        // setTaxIdValues(item.Tax);
+                        // console.log('inside');
+                        // dispatch(getTaxDataByUniqueId(item.tax));
+
+                        // dispatch(addUser(values))
+                        // .then(data=>{
+                        //     console.log(data)
+                        // })
+                        // const getList = async () => {
+                        //     console.log('fetch:' + item.tax);
+                        //     //await has no effect
+                        //     await dispatch(getTaxDataByUniqueId(item.tax));
+                        //     console.log(taxValues);
+                        // };
+                        // const fetchData = async () => {
+                        //     try {
+                        //         const list = await dispatch(getTaxDataByUniqueId(item.tax));
+                        //         // if (list) {
+                        //         console.log('data567:' + list); //
+                        //         console.log('return90:' + taxToEdit.taxCode);
+                        //         const expenseTypeDetails = {
+                        //             fromDate: item.fromDate,
+                        //             toDate: item.toDate,
+                        //             // currencyList: item.currencyList,
+
+                        //             // tax: taxToEdit,
+                        //             expenseRate: item.expenseRate,
+                        //             rateWithoutTax: '',
+                        //             rateWithTax: '',
+                        //             status: item.status
+                        //         };
+                        //         dataArray.push(expenseTypeDetails);
+                        //         console.log(expenseTypeDetails);
+                        //         // }
+
+                        //         //
+                        //         // });
+
+                        //         // const json = await response.json();
+                        //         // setPosts(json.data.children.map((it) => it.data));
+                        //     } catch (e) {
+                        //         console.error(e);
+                        //     }
+                        // };
+                        // fetchData();
+                        const data = getData(item.tax);
+                        // setData(getData(item.tax));
+                        console.log(data);
+                        // async () => {
+                        //     const value = dispatch(getTaxDataByUniqueId(item.tax)).then;
+                        //     if (value) {
+                        //         // setTaxIdValues(...taxToEdit);
+                        //         console.log('dfdfdfdf');
+                        //     }
+                        // };
+                        // axios.get(`${process.env.REACT_APP_FINANCE_URL}/taxDetails/${item.tax}`).then(() => {
+                        //     // dispatch(functionToDispatch())
+                        //     console.log('dfdfdfdf' + taxToEdit);
+                        // });
+
+                        // here i'm using the location from the first function
+                        // await getInfo(location);
+                        // })();
+                        // const fetchData = async () => {
+                        //     const data = await fetch('https://yourapi.com');
+                        //   }
+                        console.log(taxData);
+
+                        const expenseTypeDetails = {
+                            fromDate: item.fromDate,
+                            toDate: item.toDate,
+                            // currencyList: item.currencyList,
+
+                            tax: data,
+                            expenseRate: item.expenseRate,
+                            rateWithoutTax: '',
+                            rateWithTax: '',
+                            status: item.status
+                        };
+                        dataArray.push(expenseTypeDetails);
+                    });
+
+                    const saveValues = {
+                        expenseCode: expenseTypeToUpdate.expenseCode,
+                        description: expenseTypeToUpdate.description,
+                        status: expenseTypeToUpdate.status,
+                        expenseTypeDetails: dataArray
+
+                        // expenseTypeDetails: [
+                        //     {
+                        //         fromDate: item.fromDate,
+                        //         toDate: item.toDate,
+                        //         currencyList: item.currencyList.currencyListId,
+                        //         tax: item.tax.taxId,
+                        //         expenseRate: item.expenseRate,
+                        //         rateWithoutTax: '',
+                        //         rateWithTax: '',
+                        //         status:item.status,
+                        //     }
+                        // ]
+                    };
+                    console.log(saveValues);
+                    setLoadValues(saveValues);
+                }
+                // dispatch(saveExpenseTypesData(saveValues));
+            }
+        }
+        // };
+
+        // call the function
+        // getList()
+        // make sure to catch any error
+        // .catch(console.error);
+    }, [expenseTypeToUpdate]);
+
+    // useEffect(() => {
+    //     console.log(taxIdValues);
+    //     const value = dispatch(getTaxDataByUniqueId(taxIdValues));
+
+    //     return () => {
+    //         console.log(taxToEdit);
+    //     };
+    // }, [taxIdValues]);
+
+    // useEffect(() => {
+    //     console.log(expenseTypeToUpdate);
+    //     const dataArray = [];
+    //     if ((mode === 'VIEW_UPDATE' && expenseTypeToUpdate != null) || (mode === 'VIEW' && expenseTypeToUpdate != null)) {
+    //         if (expenseTypeToUpdate.expenseTypeDetails.length > 0) {
+    //             expenseTypeToUpdate.expenseTypeDetails.map((item) => {
+    //                 dispatch(await getTaxDataByUniqueId(item.tax));
+    //                 const fetchData = async () => {
+    //                     const data = await fetch('https://yourapi.com');
+    //                   }
+    //                 console.log(taxToEdit);
+    //                 const expenseTypeDetails = {
+    //                     fromDate: item.fromDate,
+    //                     toDate: item.toDate,
+    //                     currencyList: item.currencyList,
+
+    //                     tax: taxToEdit,
+    //                     expenseRate: item.expenseRate,
+    //                     rateWithoutTax: '',
+    //                     rateWithTax: '',
+    //                     status: item.status
+    //                 };
+    //                 dataArray.push(expenseTypeDetails);
+    //             });
+
+    //             const saveValues = {
+    //                 expenseCode: expenseTypeToUpdate.expenseCode,
+    //                 description: expenseTypeToUpdate.description,
+    //                 status: expenseTypeToUpdate.status,
+    //                 expenseTypeDetails: dataArray
+
+    //                 // expenseTypeDetails: [
+    //                 //     {
+    //                 //         fromDate: item.fromDate,
+    //                 //         toDate: item.toDate,
+    //                 //         currencyList: item.currencyList.currencyListId,
+    //                 //         tax: item.tax.taxId,
+    //                 //         expenseRate: item.expenseRate,
+    //                 //         rateWithoutTax: '',
+    //                 //         rateWithTax: '',
+    //                 //         status:item.status,
+    //                 //     }
+    //                 // ]
+    //             };
+    //             console.log(saveValues);
+    //             setLoadValues(saveValues);
+    //         }
+    //         // dispatch(saveExpenseTypesData(saveValues));
+    //     }
+    //     // di
+    // }, [expenseTypeToUpdate]);
 
     const handleSubmitForm = (data) => {
         console.log(data);
         if (mode === 'INSERT') {
-            dispatch(saveExpenseTypesData(data));
+            const dataArray = [];
+
+            console.log(data.expenseTypeDetails.length);
+            console.log(data.expenseTypeDetails.size);
+            if (data.expenseTypeDetails.length > 0) {
+                data.expenseTypeDetails.map((item) => {
+                    const expenseTypeDetails = {
+                        fromDate: item.fromDate,
+                        toDate: item.toDate,
+                        currencyList: item.currencyList.currencyListId,
+                        tax: item.tax.taxId,
+                        expenseRate: item.expenseRate,
+                        rateWithoutTax: '',
+                        rateWithTax: '',
+                        status: item.status
+                    };
+                    dataArray.push(expenseTypeDetails);
+                });
+
+                const saveValues = {
+                    expenseCode: data.expenseCode,
+                    description: data.description,
+                    status: data.status,
+                    expenseTypeDetails: dataArray
+
+                    // expenseTypeDetails: [
+                    //     {
+                    //         fromDate: item.fromDate,
+                    //         toDate: item.toDate,
+                    //         currencyList: item.currencyList.currencyListId,
+                    //         tax: item.tax.taxId,
+                    //         expenseRate: item.expenseRate,
+                    //         rateWithoutTax: '',
+                    //         rateWithTax: '',
+                    //         status:item.status,
+                    //     }
+                    // ]
+                };
+                console.log(saveValues);
+                dispatch(saveExpenseTypesData(saveValues));
+            }
+            // dispatch(saveExpenseTypesData(data));
+            // setTableData(dataArray);
         } else if (mode === 'VIEW_UPDATE') {
             // dispatch(updateExChangeRateData(data));
         }
@@ -215,7 +520,6 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
     }, [currencyListData]);
 
     useEffect(() => {
-        console.log(taxListData);
         if (taxListData != null) {
             setTaxListOptions(taxListData);
         }
@@ -554,15 +858,19 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
 
                                                                                             <TableCell>
                                                                                                 <Autocomplete
-                                                                                                    value={
-                                                                                                        values.expenseTypeDetails[idx]
-                                                                                                            ? values.expenseTypeDetails[idx]
-                                                                                                                  .currencyList
-                                                                                                            : null
-                                                                                                    }
+                                                                                                    // value={
+                                                                                                    //     values.expenseTypeDetails[idx]
+                                                                                                    //         ? values.expenseTypeDetails[idx]
+                                                                                                    //               .currencyList
+                                                                                                    //         : null
+                                                                                                    // }
                                                                                                     name={`expenseTypeDetails.${idx}.currencyList`}
                                                                                                     onChange={(_, value) => {
-                                                                                                        console.log(value);
+                                                                                                        console.log(value.currencyListId);
+                                                                                                        setFieldValue(
+                                                                                                            `expenseTypeDetails.${idx}.currencyList`,
+                                                                                                            value
+                                                                                                        );
                                                                                                         setFieldValue(
                                                                                                             `expenseTypeDetails.${idx}.currencyList`,
                                                                                                             value
@@ -570,7 +878,7 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                                                                                                     }}
                                                                                                     options={currencyListOptions}
                                                                                                     getOptionLabel={(option) =>
-                                                                                                        `${option.currencyCode} - (${option.currencyDescription})`
+                                                                                                        `${option.currencyCode} - ${option.currencyDescription}`
                                                                                                     }
                                                                                                     isOptionEqualToValue={(option, value) =>
                                                                                                         option.currencyListId ===
@@ -718,11 +1026,11 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                                                                                                 />
                                                                                             </TableCell>
                                                                                             <TableCell>
-                                                                                                {values.expenseTypeDetails[idx] &&
+                                                                                                {/* {values.expenseTypeDetails[idx] &&
                                                                                                 values.expenseTypeDetails[idx].tax
                                                                                                     ? values.expenseTypeDetails[idx].tax
                                                                                                           .percentage
-                                                                                                    : 0}
+                                                                                                    : 0} */}
                                                                                             </TableCell>
                                                                                             <TableCell>
                                                                                                 <TextField
@@ -783,7 +1091,7 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                                                                                                     : 0}
                                                                                             </TableCell>
                                                                                             <TableCell>
-                                                                                                {values.expenseTypeDetails[idx] &&
+                                                                                                {/* {values.expenseTypeDetails[idx] &&
                                                                                                 values.expenseTypeDetails[idx].expenseRate
                                                                                                     ? values.expenseTypeDetails[idx]
                                                                                                           .expenseRate *
@@ -792,7 +1100,7 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                                                                                                               100) +
                                                                                                       values.expenseTypeDetails[idx]
                                                                                                           .expenseRate
-                                                                                                    : 0}
+                                                                                                    : 0} */}
                                                                                                 {/* <TextField
                                                                                                     sx={{
                                                                                                         width: { sm: 200 },
