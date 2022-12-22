@@ -21,7 +21,8 @@ import {
     Switch,
     Paper,
     TableContainer,
-    Collapse
+    Collapse,
+    Autocomplete
 } from '@mui/material';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import AddBoxIcon from '@mui/icons-material/AddBox';
@@ -33,6 +34,7 @@ import Grid from '@mui/material/Grid';
 import * as yup from 'yup';
 
 import { checkDuplicateSeasonCode, getSeasonDataById, saveSeasonData, updateSeasonData } from 'store/actions/masterActions/SeasonAction';
+import { getActiveLocations } from 'store/actions/masterActions/LocationAction';
 import { getAllChargeMethods, getAllModeofTransports } from 'store/actions/masterActions/TransportRateAction';
 import CreatedUpdatedUserDetailsWithTableFormat from '../../userTimeDetails/CreatedUpdatedUserDetailsWithTableFormat';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -40,10 +42,13 @@ import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-
+import { getAllCurrencyListData } from 'store/actions/masterActions/ExpenseTypeAction';
+import { getAllTaxData } from 'store/actions/masterActions/TaxActions/TaxAction';
+import { getAllActiveMarketData } from 'store/actions/masterActions/operatorActions/MarketAction';
 function TransportRates({ open, handleClose, mode, code }) {
     const initialValues = {
-        chargeMethod: '',
+        chargeMethod2: 'BY_DISTANCE',
+        chargeMethod1: '',
         transportMode: '',
         code: '',
         description: '',
@@ -53,8 +58,8 @@ function TransportRates({ open, handleClose, mode, code }) {
         newTransport: true,
         distances: [
             {
-                fromLocation: '',
-                toLocation: '',
+                fromLocation: null,
+                toLocation: null,
                 fromDescription: '',
                 toDescription: '',
                 distance: '',
@@ -70,24 +75,62 @@ function TransportRates({ open, handleClose, mode, code }) {
                 maxPax: '',
                 defaultGuide: '',
                 status: '',
-                noOfAssistant: ''
+                noOfAssistant: '',
+                fromDate: '',
+                toDate: '',
+                currencyCode: null,
+                rateType: '',
+                taxCodeKmRate: null,
+                taxKmRate: '',
+                rateKmRate: '',
+                rateWithoutTaxKmRate: '',
+                rateWithTaxKmRate: '',
+                taxCodeDriverRate: null,
+                taxDriverRate: '',
+                rateDriverRate: '',
+                rateWithoutTaxDriverRate: '',
+                rateWithTaxDriverRate: '',
+                taxCodeAssistantRate: null,
+                taxAssistantRate: '',
+                rateAssistantRate: '',
+                rateWithoutTaxAssistantRatee: '',
+                rateWithTaxAssistantRate: ''
             }
         ],
         locationWiseExpenses: [
             {
-                location: '',
+                location: null,
                 locationDescription: '',
                 expenseCode: '',
                 expenseDescription: '',
                 status: ''
             }
+        ],
+        vehiclePaxRates: [
+            {
+                fromDate: '',
+                toDate: '',
+                marketCode: null,
+                operatorCode: null,
+                operatorGroupCode: null,
+                currency: null,
+                taxCode: null,
+                tax: '',
+                charterRate: '',
+                charterRatewithTax: '',
+                charterRatewithoutTax: ''
+            }
         ]
     };
 
     const [taxListOptions, setTaxListOptions] = useState([]);
+    const [getchargeMethod, setchargeMethod] = useState('');
     const [loadValues, setLoadValues] = useState(null);
     const [chargeMethodArrayList, setChargeMethodArrayList] = useState([]);
     const [modeofTransportArrayList, setModeofTransportArrayList] = useState([]);
+    const [activeLocationList, setActiveocationList] = useState([]);
+    const [currencyListOptions, setCurrencyListOptions] = useState([]);
+    const [activeMarketList, setActiveMarketList] = useState([]);
 
     const [enableFeature, setEnableFeature] = useState('');
     const [openRow, setOpenRow] = useState(-1);
@@ -102,10 +145,8 @@ function TransportRates({ open, handleClose, mode, code }) {
     const [enableblock4, setEnableblock4] = useState(false);
     //Per Hr Rate
     const [enableblock5, setEnableblock5] = useState(false);
-    //Per Vehicle  Rate
+    //Per Vehicle  Rate or  Per Pax  Rate
     const [enableblock6, setEnableblock6] = useState(false);
-    //Per Pax  Rate
-    const [enableblock7, setEnableblock7] = useState(false);
 
     const featureList = [];
     useEffect(() => {
@@ -114,73 +155,31 @@ function TransportRates({ open, handleClose, mode, code }) {
             setEnableblock2(true);
             setEnableblock3(true);
             setEnableblock4(true);
+            setEnableblock6(false);
         } else if (enableFeature === 'BY_TIME') {
             setEnableblock1(true);
             setEnableblock2(true);
             setEnableblock3(true);
             setEnableblock5(true);
+            setEnableblock4(false);
         } else if (enableFeature === 'PER_VEHICLE') {
+            setchargeMethod('PER_VEHICLE');
             setEnableblock1(true);
             setEnableblock6(true);
+            setEnableblock2(false);
+            setEnableblock3(false);
+            setEnableblock4(false);
+            setEnableblock5(false);
         } else if (enableFeature === 'PER_PAX') {
+            setchargeMethod('PER_PAX');
             setEnableblock1(true);
-            setEnableblock7(true);
+            setEnableblock6(true);
+            setEnableblock2(false);
+            setEnableblock3(false);
+            setEnableblock4(false);
+            setEnableblock5(false);
         }
     }, [enableFeature]);
-
-    //   yup.addMethod(yup.array, "uniqueTaxOrder", function (message) {
-    //     return this.test("uniqueTaxOrder", message, function (list) {
-    //       const mapper = (x) => {
-    //         return x.taxOrder;
-    //       };
-    //       const set = [...new Set(list.map(mapper))];
-    //       const isUnique = list.length === set.length;
-    //       if (isUnique) {
-    //         return true;
-    //       }
-
-    //       const idx = list.findIndex((l, i) => mapper(l) !== set[i]);
-    //       return this.createError({
-    //         path: `distances[${idx}].taxOrder`,
-    //         message: message,
-    //       });
-    //     });
-    //   });
-
-    //   yup.addMethod(yup.array, "uniqueTaxCode", function (message) {
-    //     return this.test("uniqueTaxCode", message, function (list) {
-    //       const mapper = (x) => {
-    //         return x.tax?.taxCode;
-    //       };
-    //       const set = [...new Set(list.map(mapper))];
-    //       const isUnique = list.length === set.length;
-    //       if (isUnique) {
-    //         return true;
-    //       }
-
-    //       const idx = list.findIndex((l, i) => mapper(l) !== set[i]);
-    //       return this.createError({
-    //         path: `distances[${idx}].tax`,
-    //         message: message,
-    //       });
-    //     });
-    //   });
-
-    yup.addMethod(yup.string, 'checkDuplicateSeason', function (message) {
-        return this.test('checkDuplicateSeason', message, async function validateValue(value) {
-            if (mode === 'INSERT') {
-                try {
-                    await dispatch(checkDuplicateSeasonCode(value));
-                    if (duplicateSeason != null && duplicateSeason.errorMessages.length != 0) {
-                        return false;
-                    } else {
-                        return true;
-                    }
-                } catch (error) {}
-            }
-            return true;
-        });
-    });
 
     const validationSchema = yup.object().shape({
         mainSeason: yup.string().required('Required field'),
@@ -202,7 +201,11 @@ function TransportRates({ open, handleClose, mode, code }) {
     const duplicateSeason = useSelector((state) => state.seasonReducer.duplicateSeason);
     const modeofTransportList = useSelector((state) => state.modeOfTransortReducer.modeofTransports);
     const chargeMethodList = useSelector((state) => state.chargeMethodReducer.chargeofMethods);
-    console.log(chargeMethodList);
+    const activeLocations = useSelector((state) => state.locationReducer.activeLocations);
+    const taxListData = useSelector((state) => state.taxReducer.taxes);
+    const currencyListData = useSelector((state) => state.expenseTypesReducer.currencyList);
+    const marketActiveListData = useSelector((state) => state.marketReducer.marketActiveList);
+
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -214,6 +217,23 @@ function TransportRates({ open, handleClose, mode, code }) {
     }, [mode]);
 
     useEffect(() => {
+        if (taxListData != null) {
+            setTaxListOptions(taxListData);
+        }
+    }, [taxListData]);
+
+    useEffect(() => {
+        if (marketActiveListData != null) {
+            setActiveMarketList(marketActiveListData);
+        }
+    }, [marketActiveListData]);
+
+    useEffect(() => {
+        console.log(activeLocations);
+        setActiveocationList(activeLocations);
+    }, [activeLocations]);
+
+    useEffect(() => {
         setModeofTransportArrayList(modeofTransportList);
         console.log(modeofTransportList);
     }, [modeofTransportList]);
@@ -221,6 +241,13 @@ function TransportRates({ open, handleClose, mode, code }) {
     useEffect(() => {
         setChargeMethodArrayList(chargeMethodList);
     }, [chargeMethodList]);
+
+    useEffect(() => {
+        console.log(currencyListData);
+        if (currencyListData != null) {
+            setCurrencyListOptions(currencyListData);
+        }
+    }, [currencyListData]);
 
     useEffect(() => {
         console.log(seasonToUpdate);
@@ -233,10 +260,10 @@ function TransportRates({ open, handleClose, mode, code }) {
     const handleSubmitForm = (data) => {
         console.log(data);
         if (mode === 'INSERT') {
-            dispatch(saveSeasonData(data));
+            // dispatch(saveSeasonData(data));
         } else if (mode === 'VIEW_UPDATE') {
             console.log('yes click');
-            dispatch(updateSeasonData(data));
+            // dispatch(updateSeasonData(data));
         }
         handleClose();
     };
@@ -244,6 +271,13 @@ function TransportRates({ open, handleClose, mode, code }) {
     useEffect(() => {
         dispatch(getAllChargeMethods());
         dispatch(getAllModeofTransports());
+        dispatch(getActiveLocations());
+        dispatch(getAllCurrencyListData());
+        dispatch(getAllTaxData());
+        dispatch(getAllActiveMarketData());
+        setEnableblock1(true);
+        setEnableblock2(true);
+        setEnableblock3(true);
     }, []);
 
     const handleCancel = () => {
@@ -352,33 +386,6 @@ function TransportRates({ open, handleClose, mode, code }) {
                                                             </Grid>
                                                             <Grid gap="10px" display="flex" style={{ marginBottom: '10px' }}>
                                                                 <Grid item>
-                                                                    {/* <TextField
-                                                                        sx={{
-                                                                            width: { sm: 200, md: 300 },
-                                                                            '& .MuiInputBase-root': {
-                                                                                height: 40
-                                                                            }
-                                                                        }}
-                                                                        select
-                                                                        label="Code"
-                                                                        name="transportCode"
-                                                                        onChange={handleChange}
-                                                                        onBlur={handleBlur}
-                                                                        value={values.taxGroupType}
-                                                                        error={Boolean(touched.taxGroupType && errors.taxGroupType)}
-                                                                        helperText={
-                                                                            touched.taxGroupType && errors.taxGroupType
-                                                                                ? errors.taxGroupType
-                                                                                : ''
-                                                                        }
-                                                                    >
-                                                                        <MenuItem dense={true} value={'Sell'}>
-                                                                            Sell
-                                                                        </MenuItem>
-                                                                        <MenuItem dense={true} value={'Buy'}>
-                                                                            Buy
-                                                                        </MenuItem>
-                                                                    </TextField> */}
                                                                     <TextField
                                                                         label="Code"
                                                                         sx={{
@@ -423,7 +430,7 @@ function TransportRates({ open, handleClose, mode, code }) {
                                                                     />
                                                                 </Grid>
                                                                 <Grid>
-                                                                    <TextField
+                                                                    {/* <TextField
                                                                         sx={{
                                                                             width: { sm: 200, md: 300 },
                                                                             '& .MuiInputBase-root': {
@@ -432,17 +439,85 @@ function TransportRates({ open, handleClose, mode, code }) {
                                                                         }}
                                                                         select
                                                                         label="Change Method"
-                                                                        name="chargeMethod"
+                                                                        name="chargeMethod1"
+                                                                        onChange={(value) => {
+                                                                            handleChange;
+                                                                            // setEnableFeature(value.target.value);
+                                                                        }}
+                                                                        onBlur={handleBlur}
+                                                                        value={values.chargeMethod1}
+                                                                        // error={Boolean(touched.chargeMethod1 && errors.chargeMethod1)}
+                                                                        // helperText={
+                                                                        //     touched.chargeMethod && errors.chargeMethod
+                                                                        //         ? errors.chargeMethod
+                                                                        //         : ''
+                                                                        // }
+                                                                    >
+                                                                        {chargeMethodArrayList.length != 0
+                                                                            ? chargeMethodArrayList.map((data, key) => {
+                                                                                  return (
+                                                                                      <MenuItem key={key} value={data}>
+                                                                                          {data}
+                                                                                      </MenuItem>
+                                                                                  );
+                                                                              })
+                                                                            : null}
+                                                                    </TextField> */}
+                                                                    {/* <TextField
+                                                                        sx={{
+                                                                            width: { sm: 200, md: 300 },
+                                                                            '& .MuiInputBase-root': {
+                                                                                height: 40
+                                                                            }
+                                                                        }}
+                                                                        select
+                                                                        label="Charge Method"
+                                                                        name="chargeMethod1"
                                                                         onChange={(value) => {
                                                                             handleChange;
                                                                             setEnableFeature(value.target.value);
                                                                         }}
                                                                         onBlur={handleBlur}
-                                                                        value={values.chargeMethod}
-                                                                        error={Boolean(touched.chargeMethod && errors.chargeMethod)}
+                                                                        value={values.chargeMethod1}
+                                                                        error={Boolean(touched.chargeMethod1 && errors.chargeMethod1)}
                                                                         helperText={
-                                                                            touched.chargeMethod && errors.chargeMethod
-                                                                                ? errors.chargeMethod
+                                                                            touched.chargeMethod1 && errors.chargeMethod1
+                                                                                ? errors.chargeMethod1
+                                                                                : ''
+                                                                        }
+                                                                    >
+                                                                        {chargeMethodArrayList.length != 0
+                                                                            ? chargeMethodArrayList.map((data, key) => {
+                                                                                  return (
+                                                                                      <MenuItem key={key} value={data}>
+                                                                                          {data}
+                                                                                      </MenuItem>
+                                                                                  );
+                                                                              })
+                                                                            : null}
+                                                                    </TextField> */}
+                                                                    <TextField
+                                                                        sx={{
+                                                                            width: { sm: 200, md: 300 },
+                                                                            '& .MuiInputBase-root': {
+                                                                                height: 40
+                                                                            }
+                                                                        }}
+                                                                        select
+                                                                        label="Charge Method"
+                                                                        name="chargeMethod2"
+                                                                        // onChange={handleChange}
+                                                                        onChange={(e) => {
+                                                                            // console.log("field value change");
+                                                                            handleChange(e);
+                                                                            setEnableFeature(e.target.value);
+                                                                        }}
+                                                                        onBlur={handleBlur}
+                                                                        value={values.chargeMethod2}
+                                                                        error={Boolean(touched.chargeMethod2 && errors.chargeMethod2)}
+                                                                        helperText={
+                                                                            touched.chargeMethod2 && errors.chargeMethod2
+                                                                                ? errors.chargeMethod2
                                                                                 : ''
                                                                         }
                                                                     >
@@ -521,7 +596,10 @@ function TransportRates({ open, handleClose, mode, code }) {
                                                                     </FormGroup>
                                                                 </Grid>
                                                             </Grid>
-                                                            <Grid display="flex" style={{ marginBottom: '10px', marginTop: '10px' }}>
+                                                            <Grid
+                                                                display={enableblock1 ? 'flex' : 'none'}
+                                                                style={{ marginBottom: '10px', marginTop: '10px' }}
+                                                            >
                                                                 <Grid item>
                                                                     <Typography variant="h4">Distances</Typography>
                                                                 </Grid>
@@ -541,8 +619,8 @@ function TransportRates({ open, handleClose, mode, code }) {
                                                                                             aria-label="delete"
                                                                                             onClick={() => {
                                                                                                 push({
-                                                                                                    fromLocation: '',
-                                                                                                    toLocation: '',
+                                                                                                    fromLocation: null,
+                                                                                                    toLocation: null,
                                                                                                     fromDescription: '',
                                                                                                     toDescription: true,
                                                                                                     distance: '',
@@ -563,7 +641,6 @@ function TransportRates({ open, handleClose, mode, code }) {
                                                                                             <TableRow>
                                                                                                 <TableCell>From Location</TableCell>
                                                                                                 <TableCell>Description</TableCell>
-                                                                                                {/* <TableCell>Free</TableCell> */}
                                                                                                 <TableCell>To Location</TableCell>
                                                                                                 <TableCell>Description</TableCell>
                                                                                                 <TableCell>Distances(KM)</TableCell>
@@ -578,74 +655,113 @@ function TransportRates({ open, handleClose, mode, code }) {
                                                                                                     <>
                                                                                                         <TableRow key={idx} hover>
                                                                                                             <TableCell>
-                                                                                                                <TextField
-                                                                                                                    // label="taxOrder"
-                                                                                                                    sx={{
-                                                                                                                        width: { sm: 200 },
-                                                                                                                        '& .MuiInputBase-root':
-                                                                                                                            {
-                                                                                                                                height: 40
-                                                                                                                            }
-                                                                                                                    }}
-                                                                                                                    type="text"
-                                                                                                                    variant="outlined"
-                                                                                                                    name={`distances.${idx}.fromLocation`}
-                                                                                                                    disabled={
-                                                                                                                        mode ==
-                                                                                                                        'VIEW_UPDATE'
-                                                                                                                    }
+                                                                                                                <Autocomplete
                                                                                                                     value={
                                                                                                                         values.distances[
                                                                                                                             idx
-                                                                                                                        ] &&
-                                                                                                                        values.distances[
-                                                                                                                            idx
-                                                                                                                        ].fromLocation
-                                                                                                                    }
-                                                                                                                    onChange={handleChange}
-                                                                                                                    onBlur={handleBlur}
-                                                                                                                    error={Boolean(
-                                                                                                                        touched.distances &&
-                                                                                                                            touched
-                                                                                                                                .distances[
-                                                                                                                                idx
-                                                                                                                            ] &&
-                                                                                                                            touched
-                                                                                                                                .distances[
-                                                                                                                                idx
-                                                                                                                            ]
-                                                                                                                                .fromLocation &&
-                                                                                                                            errors.distances &&
-                                                                                                                            errors
-                                                                                                                                .distances[
-                                                                                                                                idx
-                                                                                                                            ] &&
-                                                                                                                            errors
-                                                                                                                                .distances[
-                                                                                                                                idx
-                                                                                                                            ].fromLocation
-                                                                                                                    )}
-                                                                                                                    helperText={
-                                                                                                                        touched.distances &&
-                                                                                                                        touched.distances[
-                                                                                                                            idx
-                                                                                                                        ] &&
-                                                                                                                        touched.distances[
-                                                                                                                            idx
-                                                                                                                        ].fromLocation &&
-                                                                                                                        errors.distances &&
-                                                                                                                        errors.distances[
-                                                                                                                            idx
-                                                                                                                        ] &&
-                                                                                                                        errors.distances[
-                                                                                                                            idx
-                                                                                                                        ].fromLocation
-                                                                                                                            ? errors
+                                                                                                                        ]
+                                                                                                                            ? values
                                                                                                                                   .distances[
                                                                                                                                   idx
                                                                                                                               ].fromLocation
-                                                                                                                            : ''
+                                                                                                                            : null
                                                                                                                     }
+                                                                                                                    name={`distances.${idx}.fromLocation`}
+                                                                                                                    onChange={(
+                                                                                                                        _,
+                                                                                                                        value
+                                                                                                                    ) => {
+                                                                                                                        setFieldValue(
+                                                                                                                            `distances.${idx}.fromLocation`,
+                                                                                                                            value
+                                                                                                                        );
+                                                                                                                    }}
+                                                                                                                    options={
+                                                                                                                        activeLocationList
+                                                                                                                    }
+                                                                                                                    getOptionLabel={(
+                                                                                                                        option
+                                                                                                                    ) => `${option.code}`}
+                                                                                                                    isOptionEqualToValue={(
+                                                                                                                        option,
+                                                                                                                        value
+                                                                                                                    ) =>
+                                                                                                                        option.location_id ===
+                                                                                                                        value.location_id
+                                                                                                                    }
+                                                                                                                    renderInput={(
+                                                                                                                        params
+                                                                                                                    ) => (
+                                                                                                                        <TextField
+                                                                                                                            {...params}
+                                                                                                                            // label="tax"
+                                                                                                                            sx={{
+                                                                                                                                width: {
+                                                                                                                                    sm: 200
+                                                                                                                                },
+                                                                                                                                '& .MuiInputBase-root':
+                                                                                                                                    {
+                                                                                                                                        height: 40
+                                                                                                                                    }
+                                                                                                                            }}
+                                                                                                                            placeholder="--Select a Location --"
+                                                                                                                            variant="outlined"
+                                                                                                                            name={`distances.${idx}.fromLocation`}
+                                                                                                                            onBlur={
+                                                                                                                                handleBlur
+                                                                                                                            }
+                                                                                                                            helperText={
+                                                                                                                                touched.distances &&
+                                                                                                                                touched
+                                                                                                                                    .distances[
+                                                                                                                                    idx
+                                                                                                                                ] &&
+                                                                                                                                touched
+                                                                                                                                    .distances[
+                                                                                                                                    idx
+                                                                                                                                ]
+                                                                                                                                    .fromLocation &&
+                                                                                                                                errors.distances &&
+                                                                                                                                errors
+                                                                                                                                    .distances[
+                                                                                                                                    idx
+                                                                                                                                ] &&
+                                                                                                                                errors
+                                                                                                                                    .distances[
+                                                                                                                                    idx
+                                                                                                                                ]
+                                                                                                                                    .fromLocation
+                                                                                                                                    ? errors
+                                                                                                                                          .distances[
+                                                                                                                                          idx
+                                                                                                                                      ]
+                                                                                                                                          .fromLocation
+                                                                                                                                    : ''
+                                                                                                                            }
+                                                                                                                            error={Boolean(
+                                                                                                                                touched.distances &&
+                                                                                                                                    touched
+                                                                                                                                        .distances[
+                                                                                                                                        idx
+                                                                                                                                    ] &&
+                                                                                                                                    touched
+                                                                                                                                        .distances[
+                                                                                                                                        idx
+                                                                                                                                    ]
+                                                                                                                                        .fromLocation &&
+                                                                                                                                    errors.distances &&
+                                                                                                                                    errors
+                                                                                                                                        .distances[
+                                                                                                                                        idx
+                                                                                                                                    ] &&
+                                                                                                                                    errors
+                                                                                                                                        .distances[
+                                                                                                                                        idx
+                                                                                                                                    ]
+                                                                                                                                        .fromLocation
+                                                                                                                            )}
+                                                                                                                        />
+                                                                                                                    )}
                                                                                                                 />
                                                                                                             </TableCell>
                                                                                                             <TableCell>
@@ -717,71 +833,113 @@ function TransportRates({ open, handleClose, mode, code }) {
                                                                                                                     }
                                                                                                                 />
                                                                                                             </TableCell>
-
                                                                                                             <TableCell>
-                                                                                                                <TextField
-                                                                                                                    // label="taxOrder"
-                                                                                                                    sx={{
-                                                                                                                        width: { sm: 200 },
-                                                                                                                        '& .MuiInputBase-root':
-                                                                                                                            {
-                                                                                                                                height: 40
-                                                                                                                            }
-                                                                                                                    }}
-                                                                                                                    type="text"
-                                                                                                                    variant="outlined"
-                                                                                                                    name={`distances.${idx}.toLocation`}
+                                                                                                                <Autocomplete
                                                                                                                     value={
                                                                                                                         values.distances[
                                                                                                                             idx
-                                                                                                                        ] &&
-                                                                                                                        values.distances[
-                                                                                                                            idx
-                                                                                                                        ].toLocation
-                                                                                                                    }
-                                                                                                                    onChange={handleChange}
-                                                                                                                    onBlur={handleBlur}
-                                                                                                                    error={Boolean(
-                                                                                                                        touched.distances &&
-                                                                                                                            touched
-                                                                                                                                .distances[
-                                                                                                                                idx
-                                                                                                                            ] &&
-                                                                                                                            touched
-                                                                                                                                .distances[
-                                                                                                                                idx
-                                                                                                                            ].toLocation &&
-                                                                                                                            errors.distances &&
-                                                                                                                            errors
-                                                                                                                                .distances[
-                                                                                                                                idx
-                                                                                                                            ] &&
-                                                                                                                            errors
-                                                                                                                                .distances[
-                                                                                                                                idx
-                                                                                                                            ].toLocation
-                                                                                                                    )}
-                                                                                                                    helperText={
-                                                                                                                        touched.distances &&
-                                                                                                                        touched.distances[
-                                                                                                                            idx
-                                                                                                                        ] &&
-                                                                                                                        touched.distances[
-                                                                                                                            idx
-                                                                                                                        ].toLocation &&
-                                                                                                                        errors.distances &&
-                                                                                                                        errors.distances[
-                                                                                                                            idx
-                                                                                                                        ] &&
-                                                                                                                        errors.distances[
-                                                                                                                            idx
-                                                                                                                        ].toLocation
-                                                                                                                            ? errors
+                                                                                                                        ]
+                                                                                                                            ? values
                                                                                                                                   .distances[
                                                                                                                                   idx
                                                                                                                               ].toLocation
-                                                                                                                            : ''
+                                                                                                                            : null
                                                                                                                     }
+                                                                                                                    name={`distances.${idx}.toLocation`}
+                                                                                                                    onChange={(
+                                                                                                                        _,
+                                                                                                                        value
+                                                                                                                    ) => {
+                                                                                                                        setFieldValue(
+                                                                                                                            `distances.${idx}.toLocation`,
+                                                                                                                            value
+                                                                                                                        );
+                                                                                                                    }}
+                                                                                                                    options={
+                                                                                                                        activeLocationList
+                                                                                                                    }
+                                                                                                                    getOptionLabel={(
+                                                                                                                        option
+                                                                                                                    ) => `${option.code}`}
+                                                                                                                    isOptionEqualToValue={(
+                                                                                                                        option,
+                                                                                                                        value
+                                                                                                                    ) =>
+                                                                                                                        option.location_id ===
+                                                                                                                        value.location_id
+                                                                                                                    }
+                                                                                                                    renderInput={(
+                                                                                                                        params
+                                                                                                                    ) => (
+                                                                                                                        <TextField
+                                                                                                                            {...params}
+                                                                                                                            // label="tax"
+                                                                                                                            sx={{
+                                                                                                                                width: {
+                                                                                                                                    sm: 200
+                                                                                                                                },
+                                                                                                                                '& .MuiInputBase-root':
+                                                                                                                                    {
+                                                                                                                                        height: 40
+                                                                                                                                    }
+                                                                                                                            }}
+                                                                                                                            placeholder="--Select a Location --"
+                                                                                                                            variant="outlined"
+                                                                                                                            name={`distances.${idx}.fromLocation`}
+                                                                                                                            onBlur={
+                                                                                                                                handleBlur
+                                                                                                                            }
+                                                                                                                            helperText={
+                                                                                                                                touched.distances &&
+                                                                                                                                touched
+                                                                                                                                    .distances[
+                                                                                                                                    idx
+                                                                                                                                ] &&
+                                                                                                                                touched
+                                                                                                                                    .distances[
+                                                                                                                                    idx
+                                                                                                                                ]
+                                                                                                                                    .toLocation &&
+                                                                                                                                errors.distances &&
+                                                                                                                                errors
+                                                                                                                                    .distances[
+                                                                                                                                    idx
+                                                                                                                                ] &&
+                                                                                                                                errors
+                                                                                                                                    .distances[
+                                                                                                                                    idx
+                                                                                                                                ].toLocation
+                                                                                                                                    ? errors
+                                                                                                                                          .distances[
+                                                                                                                                          idx
+                                                                                                                                      ]
+                                                                                                                                          .toLocation
+                                                                                                                                    : ''
+                                                                                                                            }
+                                                                                                                            error={Boolean(
+                                                                                                                                touched.distances &&
+                                                                                                                                    touched
+                                                                                                                                        .distances[
+                                                                                                                                        idx
+                                                                                                                                    ] &&
+                                                                                                                                    touched
+                                                                                                                                        .distances[
+                                                                                                                                        idx
+                                                                                                                                    ]
+                                                                                                                                        .toLocation &&
+                                                                                                                                    errors.distances &&
+                                                                                                                                    errors
+                                                                                                                                        .distances[
+                                                                                                                                        idx
+                                                                                                                                    ] &&
+                                                                                                                                    errors
+                                                                                                                                        .distances[
+                                                                                                                                        idx
+                                                                                                                                    ]
+                                                                                                                                        .toLocation
+                                                                                                                            )}
+                                                                                                                        />
+                                                                                                                    )}
                                                                                                                 />
                                                                                                             </TableCell>
 
@@ -1037,13 +1195,16 @@ function TransportRates({ open, handleClose, mode, code }) {
                                                                     </FieldArray>
                                                                 </Grid>
                                                             </Grid>
-                                                            <Grid display="flex" style={{ marginBottom: '10px', marginTop: '10px' }}>
+                                                            <Grid
+                                                                display={enableblock2 ? 'flex' : 'none'}
+                                                                style={{ marginBottom: '10px', marginTop: '10px' }}
+                                                            >
                                                                 <Grid item>
                                                                     <Typography variant="h4">Pax/Baggage Vs Vehicle</Typography>
                                                                 </Grid>
                                                             </Grid>
                                                             <Grid
-                                                                display={enableblock1 ? 'flex' : 'none'}
+                                                                display={enableblock2 ? 'flex' : 'none'}
                                                                 gap="10px"
                                                                 style={{ marginBottom: '10px', marginTop: '10px' }}
                                                             >
@@ -1064,7 +1225,23 @@ function TransportRates({ open, handleClose, mode, code }) {
                                                                                                     maxPax: '',
                                                                                                     defaultGuide: '',
                                                                                                     status: '',
-                                                                                                    noOfAssistant: ''
+                                                                                                    noOfAssistant: '',
+                                                                                                    rateType: '',
+                                                                                                    taxCodeKmRate: null,
+                                                                                                    taxKmRate: '',
+                                                                                                    rateKmRate: '',
+                                                                                                    rateWithoutTaxKmRate: '',
+                                                                                                    rateWithTaxKmRate: '',
+                                                                                                    taxCodeDriverRate: null,
+                                                                                                    taxDriverRate: '',
+                                                                                                    rateDriverRate: '',
+                                                                                                    rateWithoutTaxDriverRate: '',
+                                                                                                    rateWithTaxDriverRate: '',
+                                                                                                    taxCodeAssistantRate: null,
+                                                                                                    taxAssistantRate: '',
+                                                                                                    rateAssistantRate: '',
+                                                                                                    rateWithoutTaxAssistantRatee: '',
+                                                                                                    rateWithTaxAssistantRate: ''
                                                                                                 });
                                                                                             }}
                                                                                         >
@@ -1228,7 +1405,7 @@ function TransportRates({ open, handleClose, mode, code }) {
                                                                                                                     error={Boolean(
                                                                                                                         touched.paxBaggages &&
                                                                                                                             touched
-                                                                                                                                .distances[
+                                                                                                                                .paxBaggages[
                                                                                                                                 idx
                                                                                                                             ] &&
                                                                                                                             touched
@@ -1674,8 +1851,6 @@ function TransportRates({ open, handleClose, mode, code }) {
                                                                                                                             marginBottom: 1
                                                                                                                         }}
                                                                                                                     >
-                                                                                                                        {/* It's me! Index:{' '}
-                                                                                                                        {idx}. */}
                                                                                                                         <Grid
                                                                                                                             gap="10px"
                                                                                                                             display="flex"
@@ -1702,18 +1877,18 @@ function TransportRates({ open, handleClose, mode, code }) {
                                                                                                                                                 ref.current
                                                                                                                                             );
                                                                                                                                             setFieldValue(
-                                                                                                                                                `distances.${idx}.fromDate`,
+                                                                                                                                                `paxBaggages.${idx}.fromDate`,
                                                                                                                                                 value
                                                                                                                                             );
                                                                                                                                         }}
                                                                                                                                         inputFormat="DD/MM/YYYY"
                                                                                                                                         value={
                                                                                                                                             values
-                                                                                                                                                .distances[
+                                                                                                                                                .paxBaggages[
                                                                                                                                                 idx
                                                                                                                                             ] &&
                                                                                                                                             values
-                                                                                                                                                .distances[
+                                                                                                                                                .paxBaggages[
                                                                                                                                                 idx
                                                                                                                                             ]
                                                                                                                                                 .fromDate
@@ -1733,55 +1908,55 @@ function TransportRates({ open, handleClose, mode, code }) {
                                                                                                                                                         }
                                                                                                                                                 }}
                                                                                                                                                 variant="outlined"
-                                                                                                                                                name={`distances.${idx}.fromDate`}
+                                                                                                                                                name={`paxBaggages.${idx}.fromDate`}
                                                                                                                                                 onBlur={
                                                                                                                                                     handleBlur
                                                                                                                                                 }
                                                                                                                                                 error={Boolean(
-                                                                                                                                                    touched.distances &&
+                                                                                                                                                    touched.paxBaggages &&
                                                                                                                                                         touched
-                                                                                                                                                            .distances[
+                                                                                                                                                            .paxBaggages[
                                                                                                                                                             idx
                                                                                                                                                         ] &&
                                                                                                                                                         touched
-                                                                                                                                                            .distances[
+                                                                                                                                                            .paxBaggages[
                                                                                                                                                             idx
                                                                                                                                                         ]
                                                                                                                                                             .fromDate &&
-                                                                                                                                                        errors.distances &&
+                                                                                                                                                        errors.paxBaggages &&
                                                                                                                                                         errors
-                                                                                                                                                            .distances[
+                                                                                                                                                            .paxBaggages[
                                                                                                                                                             idx
                                                                                                                                                         ] &&
                                                                                                                                                         errors
-                                                                                                                                                            .distances[
+                                                                                                                                                            .paxBaggages[
                                                                                                                                                             idx
                                                                                                                                                         ]
                                                                                                                                                             .fromDate
                                                                                                                                                 )}
                                                                                                                                                 helperText={
-                                                                                                                                                    touched.distances &&
+                                                                                                                                                    touched.paxBaggages &&
                                                                                                                                                     touched
-                                                                                                                                                        .distances[
+                                                                                                                                                        .paxBaggages[
                                                                                                                                                         idx
                                                                                                                                                     ] &&
                                                                                                                                                     touched
-                                                                                                                                                        .distances[
+                                                                                                                                                        .paxBaggages[
                                                                                                                                                         idx
                                                                                                                                                     ]
                                                                                                                                                         .fromDate &&
-                                                                                                                                                    errors.distances &&
+                                                                                                                                                    errors.paxBaggages &&
                                                                                                                                                     errors
-                                                                                                                                                        .distances[
+                                                                                                                                                        .paxBaggages[
                                                                                                                                                         idx
                                                                                                                                                     ] &&
                                                                                                                                                     errors
-                                                                                                                                                        .distances[
+                                                                                                                                                        .paxBaggages[
                                                                                                                                                         idx
                                                                                                                                                     ]
                                                                                                                                                         .fromDate
                                                                                                                                                         ? errors
-                                                                                                                                                              .distances[
+                                                                                                                                                              .paxBaggages[
                                                                                                                                                               idx
                                                                                                                                                           ]
                                                                                                                                                               .fromDate
@@ -1807,28 +1982,22 @@ function TransportRates({ open, handleClose, mode, code }) {
                                                                                                                                         onChange={(
                                                                                                                                             value
                                                                                                                                         ) => {
-                                                                                                                                            console.log(
-                                                                                                                                                value
-                                                                                                                                            );
-                                                                                                                                            console.log(
-                                                                                                                                                ref.current
-                                                                                                                                            );
                                                                                                                                             setFieldValue(
-                                                                                                                                                `distances.${idx}.fromDate`,
+                                                                                                                                                `paxBaggages.${idx}.toDate`,
                                                                                                                                                 value
                                                                                                                                             );
                                                                                                                                         }}
                                                                                                                                         inputFormat="DD/MM/YYYY"
                                                                                                                                         value={
                                                                                                                                             values
-                                                                                                                                                .distances[
+                                                                                                                                                .paxBaggages[
                                                                                                                                                 idx
                                                                                                                                             ] &&
                                                                                                                                             values
-                                                                                                                                                .distances[
+                                                                                                                                                .paxBaggages[
                                                                                                                                                 idx
                                                                                                                                             ]
-                                                                                                                                                .fromDate
+                                                                                                                                                .toDate
                                                                                                                                         }
                                                                                                                                         renderInput={(
                                                                                                                                             params
@@ -1845,58 +2014,58 @@ function TransportRates({ open, handleClose, mode, code }) {
                                                                                                                                                         }
                                                                                                                                                 }}
                                                                                                                                                 variant="outlined"
-                                                                                                                                                name={`distances.${idx}.fromDate`}
+                                                                                                                                                name={`paxBaggages.${idx}.toDate`}
                                                                                                                                                 onBlur={
                                                                                                                                                     handleBlur
                                                                                                                                                 }
                                                                                                                                                 error={Boolean(
-                                                                                                                                                    touched.distances &&
+                                                                                                                                                    touched.paxBaggages &&
                                                                                                                                                         touched
-                                                                                                                                                            .distances[
+                                                                                                                                                            .paxBaggages[
                                                                                                                                                             idx
                                                                                                                                                         ] &&
                                                                                                                                                         touched
-                                                                                                                                                            .distances[
+                                                                                                                                                            .paxBaggages[
                                                                                                                                                             idx
                                                                                                                                                         ]
-                                                                                                                                                            .fromDate &&
-                                                                                                                                                        errors.distances &&
+                                                                                                                                                            .toDate &&
+                                                                                                                                                        errors.paxBaggages &&
                                                                                                                                                         errors
-                                                                                                                                                            .distances[
+                                                                                                                                                            .paxBaggages[
                                                                                                                                                             idx
                                                                                                                                                         ] &&
                                                                                                                                                         errors
-                                                                                                                                                            .distances[
+                                                                                                                                                            .paxBaggages[
                                                                                                                                                             idx
                                                                                                                                                         ]
-                                                                                                                                                            .fromDate
+                                                                                                                                                            .toDate
                                                                                                                                                 )}
                                                                                                                                                 helperText={
-                                                                                                                                                    touched.distances &&
+                                                                                                                                                    touched.paxBaggages &&
                                                                                                                                                     touched
-                                                                                                                                                        .distances[
+                                                                                                                                                        .paxBaggages[
                                                                                                                                                         idx
                                                                                                                                                     ] &&
                                                                                                                                                     touched
-                                                                                                                                                        .distances[
+                                                                                                                                                        .paxBaggages[
                                                                                                                                                         idx
                                                                                                                                                     ]
-                                                                                                                                                        .fromDate &&
-                                                                                                                                                    errors.distances &&
+                                                                                                                                                        .toDate &&
+                                                                                                                                                    errors.paxBaggages &&
                                                                                                                                                     errors
-                                                                                                                                                        .distances[
+                                                                                                                                                        .paxBaggages[
                                                                                                                                                         idx
                                                                                                                                                     ] &&
                                                                                                                                                     errors
-                                                                                                                                                        .distances[
+                                                                                                                                                        .paxBaggages[
                                                                                                                                                         idx
                                                                                                                                                     ]
-                                                                                                                                                        .fromDate
+                                                                                                                                                        .toDate
                                                                                                                                                         ? errors
-                                                                                                                                                              .distances[
+                                                                                                                                                              .paxBaggages[
                                                                                                                                                               idx
                                                                                                                                                           ]
-                                                                                                                                                              .fromDate
+                                                                                                                                                              .toDate
                                                                                                                                                         : ''
                                                                                                                                                 }
                                                                                                                                             />
@@ -1905,63 +2074,121 @@ function TransportRates({ open, handleClose, mode, code }) {
                                                                                                                                 </LocalizationProvider>
                                                                                                                             </Grid>
                                                                                                                             <Grid>
-                                                                                                                                <TextField
-                                                                                                                                    sx={{
-                                                                                                                                        width: {
-                                                                                                                                            sm: 200,
-                                                                                                                                            md: 300
-                                                                                                                                        },
-                                                                                                                                        '& .MuiInputBase-root':
-                                                                                                                                            {
-                                                                                                                                                height: 40
-                                                                                                                                            }
-                                                                                                                                    }}
-                                                                                                                                    id="standard-select-currency"
-                                                                                                                                    select
-                                                                                                                                    label="Direction"
-                                                                                                                                    name="direction"
-                                                                                                                                    onChange={
-                                                                                                                                        handleChange
-                                                                                                                                    }
-                                                                                                                                    onBlur={
-                                                                                                                                        handleBlur
-                                                                                                                                    }
+                                                                                                                                <Autocomplete
                                                                                                                                     value={
-                                                                                                                                        values.taxGroupType
+                                                                                                                                        values
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ]
+                                                                                                                                            ? values
+                                                                                                                                                  .paxBaggages[
+                                                                                                                                                  idx
+                                                                                                                                              ]
+                                                                                                                                                  .currencyCode
+                                                                                                                                            : null
                                                                                                                                     }
-                                                                                                                                    error={Boolean(
-                                                                                                                                        touched.taxGroupType &&
-                                                                                                                                            errors.taxGroupType
+                                                                                                                                    name={`paxBaggages.${idx}.currencyCode`}
+                                                                                                                                    onChange={(
+                                                                                                                                        _,
+                                                                                                                                        value
+                                                                                                                                    ) => {
+                                                                                                                                        console.log(
+                                                                                                                                            value
+                                                                                                                                        );
+                                                                                                                                        setFieldValue(
+                                                                                                                                            `paxBaggages.${idx}.currencyCode`,
+                                                                                                                                            value
+                                                                                                                                        );
+                                                                                                                                    }}
+                                                                                                                                    options={
+                                                                                                                                        currencyListOptions
+                                                                                                                                    }
+                                                                                                                                    getOptionLabel={(
+                                                                                                                                        option
+                                                                                                                                    ) =>
+                                                                                                                                        `${option.currencyCode} - (${option.currencyDescription})`
+                                                                                                                                    }
+                                                                                                                                    isOptionEqualToValue={(
+                                                                                                                                        option,
+                                                                                                                                        value
+                                                                                                                                    ) =>
+                                                                                                                                        option.currencyListId ===
+                                                                                                                                        value.currencyListId
+                                                                                                                                    }
+                                                                                                                                    renderInput={(
+                                                                                                                                        params
+                                                                                                                                    ) => (
+                                                                                                                                        <TextField
+                                                                                                                                            {...params}
+                                                                                                                                            // label="tax"
+                                                                                                                                            sx={{
+                                                                                                                                                width: {
+                                                                                                                                                    sm: 200
+                                                                                                                                                },
+                                                                                                                                                '& .MuiInputBase-root':
+                                                                                                                                                    {
+                                                                                                                                                        height: 40
+                                                                                                                                                    }
+                                                                                                                                            }}
+                                                                                                                                            // placeholder="--Select a Tax Code --"
+                                                                                                                                            variant="outlined"
+                                                                                                                                            name={`paxBaggages.${idx}.currencyCode`}
+                                                                                                                                            onBlur={
+                                                                                                                                                handleBlur
+                                                                                                                                            }
+                                                                                                                                            helperText={
+                                                                                                                                                touched.paxBaggages &&
+                                                                                                                                                touched
+                                                                                                                                                    .paxBaggages[
+                                                                                                                                                    idx
+                                                                                                                                                ] &&
+                                                                                                                                                touched
+                                                                                                                                                    .paxBaggages[
+                                                                                                                                                    idx
+                                                                                                                                                ]
+                                                                                                                                                    .currencyCode &&
+                                                                                                                                                errors.paxBaggages &&
+                                                                                                                                                errors
+                                                                                                                                                    .paxBaggages[
+                                                                                                                                                    idx
+                                                                                                                                                ] &&
+                                                                                                                                                errors
+                                                                                                                                                    .paxBaggages[
+                                                                                                                                                    idx
+                                                                                                                                                ]
+                                                                                                                                                    .currencyCode
+                                                                                                                                                    ? errors
+                                                                                                                                                          .paxBaggages[
+                                                                                                                                                          idx
+                                                                                                                                                      ]
+                                                                                                                                                          .currencyCode
+                                                                                                                                                    : ''
+                                                                                                                                            }
+                                                                                                                                            error={Boolean(
+                                                                                                                                                touched.paxBaggages &&
+                                                                                                                                                    touched
+                                                                                                                                                        .paxBaggages[
+                                                                                                                                                        idx
+                                                                                                                                                    ] &&
+                                                                                                                                                    touched
+                                                                                                                                                        .paxBaggages[
+                                                                                                                                                        idx
+                                                                                                                                                    ]
+                                                                                                                                                        .currencyCode &&
+                                                                                                                                                    errors.paxBaggages &&
+                                                                                                                                                    errors
+                                                                                                                                                        .paxBaggages[
+                                                                                                                                                        idx
+                                                                                                                                                    ] &&
+                                                                                                                                                    errors
+                                                                                                                                                        .paxBaggages[
+                                                                                                                                                        idx
+                                                                                                                                                    ]
+                                                                                                                                                        .currencyCode
+                                                                                                                                            )}
+                                                                                                                                        />
                                                                                                                                     )}
-                                                                                                                                    helperText={
-                                                                                                                                        touched.taxGroupType &&
-                                                                                                                                        errors.taxGroupType
-                                                                                                                                            ? errors.taxGroupType
-                                                                                                                                            : ''
-                                                                                                                                    }
-                                                                                                                                >
-                                                                                                                                    <MenuItem
-                                                                                                                                        dense={
-                                                                                                                                            true
-                                                                                                                                        }
-                                                                                                                                        value={
-                                                                                                                                            'One Way'
-                                                                                                                                        }
-                                                                                                                                    >
-                                                                                                                                        One
-                                                                                                                                        Way
-                                                                                                                                    </MenuItem>
-                                                                                                                                    <MenuItem
-                                                                                                                                        dense={
-                                                                                                                                            true
-                                                                                                                                        }
-                                                                                                                                        value={
-                                                                                                                                            'Return'
-                                                                                                                                        }
-                                                                                                                                    >
-                                                                                                                                        Return
-                                                                                                                                    </MenuItem>
-                                                                                                                                </TextField>
+                                                                                                                                />
                                                                                                                             </Grid>
                                                                                                                         </Grid>
                                                                                                                     </Box>
@@ -2003,87 +2230,149 @@ function TransportRates({ open, handleClose, mode, code }) {
                                                                                                                             display="flex"
                                                                                                                         >
                                                                                                                             <Grid item>
-                                                                                                                                {' '}
-                                                                                                                                <TextField
-                                                                                                                                    sx={{
-                                                                                                                                        width: {
-                                                                                                                                            sm: 200,
-                                                                                                                                            md: 300
-                                                                                                                                        },
-                                                                                                                                        '& .MuiInputBase-root':
-                                                                                                                                            {
-                                                                                                                                                height: 40
-                                                                                                                                            }
-                                                                                                                                    }}
-                                                                                                                                    id="standard-select-currency"
-                                                                                                                                    select
-                                                                                                                                    label="Direction"
-                                                                                                                                    name="direction"
-                                                                                                                                    onChange={
-                                                                                                                                        handleChange
-                                                                                                                                    }
-                                                                                                                                    onBlur={
-                                                                                                                                        handleBlur
-                                                                                                                                    }
+                                                                                                                                <Autocomplete
                                                                                                                                     value={
-                                                                                                                                        values.taxGroupType
+                                                                                                                                        values
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ]
+                                                                                                                                            ? values
+                                                                                                                                                  .paxBaggages[
+                                                                                                                                                  idx
+                                                                                                                                              ]
+                                                                                                                                                  .taxCodeDriverRate
+                                                                                                                                            : null
                                                                                                                                     }
-                                                                                                                                    error={Boolean(
-                                                                                                                                        touched.taxGroupType &&
-                                                                                                                                            errors.taxGroupType
+                                                                                                                                    name={`paxBaggages.${idx}.taxCodeDriverRate`}
+                                                                                                                                    onChange={(
+                                                                                                                                        _,
+                                                                                                                                        value
+                                                                                                                                    ) => {
+                                                                                                                                        console.log(
+                                                                                                                                            value
+                                                                                                                                        );
+                                                                                                                                        setFieldValue(
+                                                                                                                                            `paxBaggages.${idx}.taxCodeDriverRate`,
+                                                                                                                                            value
+                                                                                                                                        );
+                                                                                                                                    }}
+                                                                                                                                    options={
+                                                                                                                                        taxListOptions
+                                                                                                                                    }
+                                                                                                                                    getOptionLabel={(
+                                                                                                                                        option
+                                                                                                                                    ) =>
+                                                                                                                                        `${option.taxCode} - (${option.taxDescription})`
+                                                                                                                                    }
+                                                                                                                                    isOptionEqualToValue={(
+                                                                                                                                        option,
+                                                                                                                                        value
+                                                                                                                                    ) =>
+                                                                                                                                        option.taxId ===
+                                                                                                                                        value.taxId
+                                                                                                                                    }
+                                                                                                                                    renderInput={(
+                                                                                                                                        params
+                                                                                                                                    ) => (
+                                                                                                                                        <TextField
+                                                                                                                                            {...params}
+                                                                                                                                            // label="tax"
+                                                                                                                                            sx={{
+                                                                                                                                                width: {
+                                                                                                                                                    sm: 200
+                                                                                                                                                },
+                                                                                                                                                '& .MuiInputBase-root':
+                                                                                                                                                    {
+                                                                                                                                                        height: 40
+                                                                                                                                                    }
+                                                                                                                                            }}
+                                                                                                                                            // placeholder="--Select a Tax Code --"
+                                                                                                                                            variant="outlined"
+                                                                                                                                            name={`paxBaggages.${idx}.taxCodeDriverRate`}
+                                                                                                                                            onBlur={
+                                                                                                                                                handleBlur
+                                                                                                                                            }
+                                                                                                                                            helperText={
+                                                                                                                                                touched.paxBaggages &&
+                                                                                                                                                touched
+                                                                                                                                                    .paxBaggages[
+                                                                                                                                                    idx
+                                                                                                                                                ] &&
+                                                                                                                                                touched
+                                                                                                                                                    .paxBaggages[
+                                                                                                                                                    idx
+                                                                                                                                                ]
+                                                                                                                                                    .taxCodeDriverRate &&
+                                                                                                                                                errors.paxBaggages &&
+                                                                                                                                                errors
+                                                                                                                                                    .paxBaggages[
+                                                                                                                                                    idx
+                                                                                                                                                ] &&
+                                                                                                                                                errors
+                                                                                                                                                    .paxBaggages[
+                                                                                                                                                    idx
+                                                                                                                                                ]
+                                                                                                                                                    .taxCodeDriverRate
+                                                                                                                                                    ? errors
+                                                                                                                                                          .paxBaggages[
+                                                                                                                                                          idx
+                                                                                                                                                      ]
+                                                                                                                                                          .taxCodeDriverRate
+                                                                                                                                                    : ''
+                                                                                                                                            }
+                                                                                                                                            error={Boolean(
+                                                                                                                                                touched.paxBaggages &&
+                                                                                                                                                    touched
+                                                                                                                                                        .paxBaggages[
+                                                                                                                                                        idx
+                                                                                                                                                    ] &&
+                                                                                                                                                    touched
+                                                                                                                                                        .paxBaggages[
+                                                                                                                                                        idx
+                                                                                                                                                    ]
+                                                                                                                                                        .taxCodeDriverRate &&
+                                                                                                                                                    errors.paxBaggages &&
+                                                                                                                                                    errors
+                                                                                                                                                        .paxBaggages[
+                                                                                                                                                        idx
+                                                                                                                                                    ] &&
+                                                                                                                                                    errors
+                                                                                                                                                        .paxBaggages[
+                                                                                                                                                        idx
+                                                                                                                                                    ]
+                                                                                                                                                        .taxCodeDriverRate
+                                                                                                                                            )}
+                                                                                                                                        />
                                                                                                                                     )}
-                                                                                                                                    helperText={
-                                                                                                                                        touched.taxGroupType &&
-                                                                                                                                        errors.taxGroupType
-                                                                                                                                            ? errors.taxGroupType
-                                                                                                                                            : ''
-                                                                                                                                    }
-                                                                                                                                >
-                                                                                                                                    <MenuItem
-                                                                                                                                        dense={
-                                                                                                                                            true
-                                                                                                                                        }
-                                                                                                                                        value={
-                                                                                                                                            'One Way'
-                                                                                                                                        }
-                                                                                                                                    >
-                                                                                                                                        One
-                                                                                                                                        Way
-                                                                                                                                    </MenuItem>
-                                                                                                                                    <MenuItem
-                                                                                                                                        dense={
-                                                                                                                                            true
-                                                                                                                                        }
-                                                                                                                                        value={
-                                                                                                                                            'Return'
-                                                                                                                                        }
-                                                                                                                                    >
-                                                                                                                                        Return
-                                                                                                                                    </MenuItem>
-                                                                                                                                </TextField>
+                                                                                                                                />
                                                                                                                             </Grid>
+
                                                                                                                             <Grid item>
                                                                                                                                 <TextField
-                                                                                                                                    label="Max Pax"
                                                                                                                                     sx={{
                                                                                                                                         width: {
-                                                                                                                                            sm: 200,
-                                                                                                                                            md: 300
+                                                                                                                                            sm: 200
                                                                                                                                         },
                                                                                                                                         '& .MuiInputBase-root':
                                                                                                                                             {
                                                                                                                                                 height: 40
                                                                                                                                             }
                                                                                                                                     }}
-                                                                                                                                    disabled={
-                                                                                                                                        mode ==
-                                                                                                                                        'VIEW_UPDATE'
-                                                                                                                                    }
-                                                                                                                                    type="text"
+                                                                                                                                    // label="Additional Price"
+                                                                                                                                    type="number"
                                                                                                                                     variant="outlined"
-                                                                                                                                    name="maxPax"
+                                                                                                                                    placeholder="0"
+                                                                                                                                    name={`paxBaggages.${idx}.onOriginal`}
                                                                                                                                     value={
-                                                                                                                                        values.taxGroupCode
+                                                                                                                                        values
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ] &&
+                                                                                                                                        values
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ]
+                                                                                                                                            .onOriginal
                                                                                                                                     }
                                                                                                                                     onChange={
                                                                                                                                         handleChange
@@ -2092,38 +2381,312 @@ function TransportRates({ open, handleClose, mode, code }) {
                                                                                                                                         handleBlur
                                                                                                                                     }
                                                                                                                                     error={Boolean(
-                                                                                                                                        touched.taxGroupCode &&
-                                                                                                                                            errors.taxGroupCode
+                                                                                                                                        touched.paxBaggages &&
+                                                                                                                                            touched
+                                                                                                                                                .paxBaggages[
+                                                                                                                                                idx
+                                                                                                                                            ] &&
+                                                                                                                                            touched
+                                                                                                                                                .paxBaggages[
+                                                                                                                                                idx
+                                                                                                                                            ]
+                                                                                                                                                .onOriginal &&
+                                                                                                                                            errors.paxBaggages &&
+                                                                                                                                            errors
+                                                                                                                                                .paxBaggages[
+                                                                                                                                                idx
+                                                                                                                                            ] &&
+                                                                                                                                            errors
+                                                                                                                                                .paxBaggages[
+                                                                                                                                                idx
+                                                                                                                                            ]
+                                                                                                                                                .onOriginal
                                                                                                                                     )}
                                                                                                                                     helperText={
-                                                                                                                                        touched.taxGroupCode &&
-                                                                                                                                        errors.taxGroupCode
-                                                                                                                                            ? errors.taxGroupCode
+                                                                                                                                        touched.paxBaggages &&
+                                                                                                                                        touched
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ] &&
+                                                                                                                                        touched
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ]
+                                                                                                                                            .onOriginal &&
+                                                                                                                                        errors.paxBaggages &&
+                                                                                                                                        errors
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ] &&
+                                                                                                                                        errors
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ]
+                                                                                                                                            .onOriginal
+                                                                                                                                            ? errors
+                                                                                                                                                  .paxBaggages[
+                                                                                                                                                  idx
+                                                                                                                                              ]
+                                                                                                                                                  .onOriginal
+                                                                                                                                            : ''
+                                                                                                                                    }
+                                                                                                                                />
+                                                                                                                            </Grid>
+
+                                                                                                                            <Grid>
+                                                                                                                                <TextField
+                                                                                                                                    sx={{
+                                                                                                                                        width: {
+                                                                                                                                            sm: 200
+                                                                                                                                        },
+                                                                                                                                        '& .MuiInputBase-root':
+                                                                                                                                            {
+                                                                                                                                                height: 40
+                                                                                                                                            }
+                                                                                                                                    }}
+                                                                                                                                    // label="Additional Price"
+                                                                                                                                    type="number"
+                                                                                                                                    variant="outlined"
+                                                                                                                                    placeholder="0"
+                                                                                                                                    name={`paxBaggages.${idx}.onOriginal`}
+                                                                                                                                    value={
+                                                                                                                                        values
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ] &&
+                                                                                                                                        values
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ]
+                                                                                                                                            .onOriginal
+                                                                                                                                    }
+                                                                                                                                    onChange={
+                                                                                                                                        handleChange
+                                                                                                                                    }
+                                                                                                                                    onBlur={
+                                                                                                                                        handleBlur
+                                                                                                                                    }
+                                                                                                                                    error={Boolean(
+                                                                                                                                        touched.paxBaggages &&
+                                                                                                                                            touched
+                                                                                                                                                .paxBaggages[
+                                                                                                                                                idx
+                                                                                                                                            ] &&
+                                                                                                                                            touched
+                                                                                                                                                .paxBaggages[
+                                                                                                                                                idx
+                                                                                                                                            ]
+                                                                                                                                                .onOriginal &&
+                                                                                                                                            errors.paxBaggages &&
+                                                                                                                                            errors
+                                                                                                                                                .paxBaggages[
+                                                                                                                                                idx
+                                                                                                                                            ] &&
+                                                                                                                                            errors
+                                                                                                                                                .paxBaggages[
+                                                                                                                                                idx
+                                                                                                                                            ]
+                                                                                                                                                .onOriginal
+                                                                                                                                    )}
+                                                                                                                                    helperText={
+                                                                                                                                        touched.paxBaggages &&
+                                                                                                                                        touched
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ] &&
+                                                                                                                                        touched
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ]
+                                                                                                                                            .onOriginal &&
+                                                                                                                                        errors.paxBaggages &&
+                                                                                                                                        errors
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ] &&
+                                                                                                                                        errors
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ]
+                                                                                                                                            .onOriginal
+                                                                                                                                            ? errors
+                                                                                                                                                  .paxBaggages[
+                                                                                                                                                  idx
+                                                                                                                                              ]
+                                                                                                                                                  .onOriginal
                                                                                                                                             : ''
                                                                                                                                     }
                                                                                                                                 />
                                                                                                                             </Grid>
                                                                                                                             <Grid>
-                                                                                                                                <FormGroup>
-                                                                                                                                    <FormControlLabel
-                                                                                                                                        name="status"
-                                                                                                                                        // onChange={handleInputChange}
-                                                                                                                                        value={
-                                                                                                                                            values.status
-                                                                                                                                        }
-                                                                                                                                        control={
-                                                                                                                                            <Switch color="success" />
-                                                                                                                                        }
-                                                                                                                                        label="Status"
-                                                                                                                                        checked={
-                                                                                                                                            values.status
-                                                                                                                                        }
-                                                                                                                                        disabled={
-                                                                                                                                            mode ==
-                                                                                                                                            'VIEW'
-                                                                                                                                        }
-                                                                                                                                    />
-                                                                                                                                </FormGroup>
+                                                                                                                                <TextField
+                                                                                                                                    sx={{
+                                                                                                                                        width: {
+                                                                                                                                            sm: 200
+                                                                                                                                        },
+                                                                                                                                        '& .MuiInputBase-root':
+                                                                                                                                            {
+                                                                                                                                                height: 40
+                                                                                                                                            }
+                                                                                                                                    }}
+                                                                                                                                    // label="Additional Price"
+                                                                                                                                    type="number"
+                                                                                                                                    variant="outlined"
+                                                                                                                                    placeholder="0"
+                                                                                                                                    name={`paxBaggages.${idx}.onOriginal`}
+                                                                                                                                    value={
+                                                                                                                                        values
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ] &&
+                                                                                                                                        values
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ]
+                                                                                                                                            .onOriginal
+                                                                                                                                    }
+                                                                                                                                    onChange={
+                                                                                                                                        handleChange
+                                                                                                                                    }
+                                                                                                                                    onBlur={
+                                                                                                                                        handleBlur
+                                                                                                                                    }
+                                                                                                                                    error={Boolean(
+                                                                                                                                        touched.paxBaggages &&
+                                                                                                                                            touched
+                                                                                                                                                .paxBaggages[
+                                                                                                                                                idx
+                                                                                                                                            ] &&
+                                                                                                                                            touched
+                                                                                                                                                .paxBaggages[
+                                                                                                                                                idx
+                                                                                                                                            ]
+                                                                                                                                                .onOriginal &&
+                                                                                                                                            errors.paxBaggages &&
+                                                                                                                                            errors
+                                                                                                                                                .paxBaggages[
+                                                                                                                                                idx
+                                                                                                                                            ] &&
+                                                                                                                                            errors
+                                                                                                                                                .paxBaggages[
+                                                                                                                                                idx
+                                                                                                                                            ]
+                                                                                                                                                .onOriginal
+                                                                                                                                    )}
+                                                                                                                                    helperText={
+                                                                                                                                        touched.paxBaggages &&
+                                                                                                                                        touched
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ] &&
+                                                                                                                                        touched
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ]
+                                                                                                                                            .onOriginal &&
+                                                                                                                                        errors.paxBaggages &&
+                                                                                                                                        errors
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ] &&
+                                                                                                                                        errors
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ]
+                                                                                                                                            .onOriginal
+                                                                                                                                            ? errors
+                                                                                                                                                  .paxBaggages[
+                                                                                                                                                  idx
+                                                                                                                                              ]
+                                                                                                                                                  .onOriginal
+                                                                                                                                            : ''
+                                                                                                                                    }
+                                                                                                                                />
+                                                                                                                            </Grid>
+                                                                                                                            <Grid>
+                                                                                                                                <TextField
+                                                                                                                                    sx={{
+                                                                                                                                        width: {
+                                                                                                                                            sm: 200
+                                                                                                                                        },
+                                                                                                                                        '& .MuiInputBase-root':
+                                                                                                                                            {
+                                                                                                                                                height: 40
+                                                                                                                                            }
+                                                                                                                                    }}
+                                                                                                                                    // label="Additional Price"
+                                                                                                                                    type="number"
+                                                                                                                                    variant="outlined"
+                                                                                                                                    placeholder="0"
+                                                                                                                                    name={`paxBaggages.${idx}.onOriginal`}
+                                                                                                                                    value={
+                                                                                                                                        values
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ] &&
+                                                                                                                                        values
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ]
+                                                                                                                                            .onOriginal
+                                                                                                                                    }
+                                                                                                                                    onChange={
+                                                                                                                                        handleChange
+                                                                                                                                    }
+                                                                                                                                    onBlur={
+                                                                                                                                        handleBlur
+                                                                                                                                    }
+                                                                                                                                    error={Boolean(
+                                                                                                                                        touched.paxBaggages &&
+                                                                                                                                            touched
+                                                                                                                                                .paxBaggages[
+                                                                                                                                                idx
+                                                                                                                                            ] &&
+                                                                                                                                            touched
+                                                                                                                                                .paxBaggages[
+                                                                                                                                                idx
+                                                                                                                                            ]
+                                                                                                                                                .onOriginal &&
+                                                                                                                                            errors.paxBaggages &&
+                                                                                                                                            errors
+                                                                                                                                                .paxBaggages[
+                                                                                                                                                idx
+                                                                                                                                            ] &&
+                                                                                                                                            errors
+                                                                                                                                                .paxBaggages[
+                                                                                                                                                idx
+                                                                                                                                            ]
+                                                                                                                                                .onOriginal
+                                                                                                                                    )}
+                                                                                                                                    helperText={
+                                                                                                                                        touched.paxBaggages &&
+                                                                                                                                        touched
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ] &&
+                                                                                                                                        touched
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ]
+                                                                                                                                            .onOriginal &&
+                                                                                                                                        errors.paxBaggages &&
+                                                                                                                                        errors
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ] &&
+                                                                                                                                        errors
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ]
+                                                                                                                                            .onOriginal
+                                                                                                                                            ? errors
+                                                                                                                                                  .paxBaggages[
+                                                                                                                                                  idx
+                                                                                                                                              ]
+                                                                                                                                                  .onOriginal
+                                                                                                                                            : ''
+                                                                                                                                    }
+                                                                                                                                />
                                                                                                                             </Grid>
                                                                                                                         </Grid>
                                                                                                                     </Box>
@@ -2165,87 +2728,148 @@ function TransportRates({ open, handleClose, mode, code }) {
                                                                                                                             display="flex"
                                                                                                                         >
                                                                                                                             <Grid item>
-                                                                                                                                {' '}
-                                                                                                                                <TextField
-                                                                                                                                    sx={{
-                                                                                                                                        width: {
-                                                                                                                                            sm: 200,
-                                                                                                                                            md: 300
-                                                                                                                                        },
-                                                                                                                                        '& .MuiInputBase-root':
-                                                                                                                                            {
-                                                                                                                                                height: 40
-                                                                                                                                            }
-                                                                                                                                    }}
-                                                                                                                                    id="standard-select-currency"
-                                                                                                                                    select
-                                                                                                                                    label="Direction"
-                                                                                                                                    name="direction"
-                                                                                                                                    onChange={
-                                                                                                                                        handleChange
-                                                                                                                                    }
-                                                                                                                                    onBlur={
-                                                                                                                                        handleBlur
-                                                                                                                                    }
+                                                                                                                                <Autocomplete
                                                                                                                                     value={
-                                                                                                                                        values.taxGroupType
+                                                                                                                                        values
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ]
+                                                                                                                                            ? values
+                                                                                                                                                  .paxBaggages[
+                                                                                                                                                  idx
+                                                                                                                                              ]
+                                                                                                                                                  .taxCodeAssistantRate
+                                                                                                                                            : null
                                                                                                                                     }
-                                                                                                                                    error={Boolean(
-                                                                                                                                        touched.taxGroupType &&
-                                                                                                                                            errors.taxGroupType
+                                                                                                                                    name={`paxBaggages.${idx}.taxCodeAssistantRate`}
+                                                                                                                                    onChange={(
+                                                                                                                                        _,
+                                                                                                                                        value
+                                                                                                                                    ) => {
+                                                                                                                                        console.log(
+                                                                                                                                            value
+                                                                                                                                        );
+                                                                                                                                        setFieldValue(
+                                                                                                                                            `paxBaggages.${idx}.taxCodeAssistantRate`,
+                                                                                                                                            value
+                                                                                                                                        );
+                                                                                                                                    }}
+                                                                                                                                    options={
+                                                                                                                                        taxListOptions
+                                                                                                                                    }
+                                                                                                                                    getOptionLabel={(
+                                                                                                                                        option
+                                                                                                                                    ) =>
+                                                                                                                                        `${option.taxCode} - (${option.taxDescription})`
+                                                                                                                                    }
+                                                                                                                                    isOptionEqualToValue={(
+                                                                                                                                        option,
+                                                                                                                                        value
+                                                                                                                                    ) =>
+                                                                                                                                        option.taxId ===
+                                                                                                                                        value.taxId
+                                                                                                                                    }
+                                                                                                                                    renderInput={(
+                                                                                                                                        params
+                                                                                                                                    ) => (
+                                                                                                                                        <TextField
+                                                                                                                                            {...params}
+                                                                                                                                            // label="tax"
+                                                                                                                                            sx={{
+                                                                                                                                                width: {
+                                                                                                                                                    sm: 200
+                                                                                                                                                },
+                                                                                                                                                '& .MuiInputBase-root':
+                                                                                                                                                    {
+                                                                                                                                                        height: 40
+                                                                                                                                                    }
+                                                                                                                                            }}
+                                                                                                                                            // placeholder="--Select a Tax Code --"
+                                                                                                                                            variant="outlined"
+                                                                                                                                            name={`paxBaggages.${idx}.taxCodeAssistantRate`}
+                                                                                                                                            onBlur={
+                                                                                                                                                handleBlur
+                                                                                                                                            }
+                                                                                                                                            helperText={
+                                                                                                                                                touched.paxBaggages &&
+                                                                                                                                                touched
+                                                                                                                                                    .paxBaggages[
+                                                                                                                                                    idx
+                                                                                                                                                ] &&
+                                                                                                                                                touched
+                                                                                                                                                    .paxBaggages[
+                                                                                                                                                    idx
+                                                                                                                                                ]
+                                                                                                                                                    .taxCodeAssistantRate &&
+                                                                                                                                                errors.paxBaggages &&
+                                                                                                                                                errors
+                                                                                                                                                    .paxBaggages[
+                                                                                                                                                    idx
+                                                                                                                                                ] &&
+                                                                                                                                                errors
+                                                                                                                                                    .paxBaggages[
+                                                                                                                                                    idx
+                                                                                                                                                ]
+                                                                                                                                                    .taxCodeAssistantRate
+                                                                                                                                                    ? errors
+                                                                                                                                                          .paxBaggages[
+                                                                                                                                                          idx
+                                                                                                                                                      ]
+                                                                                                                                                          .taxCodeAssistantRate
+                                                                                                                                                    : ''
+                                                                                                                                            }
+                                                                                                                                            error={Boolean(
+                                                                                                                                                touched.paxBaggages &&
+                                                                                                                                                    touched
+                                                                                                                                                        .paxBaggages[
+                                                                                                                                                        idx
+                                                                                                                                                    ] &&
+                                                                                                                                                    touched
+                                                                                                                                                        .paxBaggages[
+                                                                                                                                                        idx
+                                                                                                                                                    ]
+                                                                                                                                                        .taxCodeAssistantRate &&
+                                                                                                                                                    errors.paxBaggages &&
+                                                                                                                                                    errors
+                                                                                                                                                        .paxBaggages[
+                                                                                                                                                        idx
+                                                                                                                                                    ] &&
+                                                                                                                                                    errors
+                                                                                                                                                        .paxBaggages[
+                                                                                                                                                        idx
+                                                                                                                                                    ]
+                                                                                                                                                        .taxCodeAssistantRate
+                                                                                                                                            )}
+                                                                                                                                        />
                                                                                                                                     )}
-                                                                                                                                    helperText={
-                                                                                                                                        touched.taxGroupType &&
-                                                                                                                                        errors.taxGroupType
-                                                                                                                                            ? errors.taxGroupType
-                                                                                                                                            : ''
-                                                                                                                                    }
-                                                                                                                                >
-                                                                                                                                    <MenuItem
-                                                                                                                                        dense={
-                                                                                                                                            true
-                                                                                                                                        }
-                                                                                                                                        value={
-                                                                                                                                            'One Way'
-                                                                                                                                        }
-                                                                                                                                    >
-                                                                                                                                        One
-                                                                                                                                        Way
-                                                                                                                                    </MenuItem>
-                                                                                                                                    <MenuItem
-                                                                                                                                        dense={
-                                                                                                                                            true
-                                                                                                                                        }
-                                                                                                                                        value={
-                                                                                                                                            'Return'
-                                                                                                                                        }
-                                                                                                                                    >
-                                                                                                                                        Return
-                                                                                                                                    </MenuItem>
-                                                                                                                                </TextField>
+                                                                                                                                />
                                                                                                                             </Grid>
                                                                                                                             <Grid item>
                                                                                                                                 <TextField
-                                                                                                                                    label="Max Pax"
                                                                                                                                     sx={{
                                                                                                                                         width: {
-                                                                                                                                            sm: 200,
-                                                                                                                                            md: 300
+                                                                                                                                            sm: 200
                                                                                                                                         },
                                                                                                                                         '& .MuiInputBase-root':
                                                                                                                                             {
                                                                                                                                                 height: 40
                                                                                                                                             }
                                                                                                                                     }}
-                                                                                                                                    disabled={
-                                                                                                                                        mode ==
-                                                                                                                                        'VIEW_UPDATE'
-                                                                                                                                    }
-                                                                                                                                    type="text"
+                                                                                                                                    // label="Additional Price"
+                                                                                                                                    type="number"
                                                                                                                                     variant="outlined"
-                                                                                                                                    name="maxPax"
+                                                                                                                                    placeholder="0"
+                                                                                                                                    name={`paxBaggages.${idx}.onOriginal`}
                                                                                                                                     value={
-                                                                                                                                        values.taxGroupCode
+                                                                                                                                        values
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ] &&
+                                                                                                                                        values
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ]
+                                                                                                                                            .onOriginal
                                                                                                                                     }
                                                                                                                                     onChange={
                                                                                                                                         handleChange
@@ -2254,144 +2878,83 @@ function TransportRates({ open, handleClose, mode, code }) {
                                                                                                                                         handleBlur
                                                                                                                                     }
                                                                                                                                     error={Boolean(
-                                                                                                                                        touched.taxGroupCode &&
-                                                                                                                                            errors.taxGroupCode
+                                                                                                                                        touched.paxBaggages &&
+                                                                                                                                            touched
+                                                                                                                                                .paxBaggages[
+                                                                                                                                                idx
+                                                                                                                                            ] &&
+                                                                                                                                            touched
+                                                                                                                                                .paxBaggages[
+                                                                                                                                                idx
+                                                                                                                                            ]
+                                                                                                                                                .onOriginal &&
+                                                                                                                                            errors.paxBaggages &&
+                                                                                                                                            errors
+                                                                                                                                                .paxBaggages[
+                                                                                                                                                idx
+                                                                                                                                            ] &&
+                                                                                                                                            errors
+                                                                                                                                                .paxBaggages[
+                                                                                                                                                idx
+                                                                                                                                            ]
+                                                                                                                                                .onOriginal
                                                                                                                                     )}
                                                                                                                                     helperText={
-                                                                                                                                        touched.taxGroupCode &&
-                                                                                                                                        errors.taxGroupCode
-                                                                                                                                            ? errors.taxGroupCode
+                                                                                                                                        touched.paxBaggages &&
+                                                                                                                                        touched
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ] &&
+                                                                                                                                        touched
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ]
+                                                                                                                                            .onOriginal &&
+                                                                                                                                        errors.paxBaggages &&
+                                                                                                                                        errors
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ] &&
+                                                                                                                                        errors
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ]
+                                                                                                                                            .onOriginal
+                                                                                                                                            ? errors
+                                                                                                                                                  .paxBaggages[
+                                                                                                                                                  idx
+                                                                                                                                              ]
+                                                                                                                                                  .onOriginal
                                                                                                                                             : ''
                                                                                                                                     }
                                                                                                                                 />
                                                                                                                             </Grid>
-                                                                                                                            <Grid>
-                                                                                                                                <FormGroup>
-                                                                                                                                    <FormControlLabel
-                                                                                                                                        name="status"
-                                                                                                                                        // onChange={handleInputChange}
-                                                                                                                                        value={
-                                                                                                                                            values.status
-                                                                                                                                        }
-                                                                                                                                        control={
-                                                                                                                                            <Switch color="success" />
-                                                                                                                                        }
-                                                                                                                                        label="Status"
-                                                                                                                                        checked={
-                                                                                                                                            values.status
-                                                                                                                                        }
-                                                                                                                                        disabled={
-                                                                                                                                            mode ==
-                                                                                                                                            'VIEW'
-                                                                                                                                        }
-                                                                                                                                    />
-                                                                                                                                </FormGroup>
-                                                                                                                            </Grid>
-                                                                                                                        </Grid>
-                                                                                                                    </Box>
-                                                                                                                    <Box
-                                                                                                                        sx={{
-                                                                                                                            width: '100%',
-                                                                                                                            // backgroundColor:
-                                                                                                                            //     'rgba(50,50,50,0.4)',
-                                                                                                                            minHeight: 36,
-                                                                                                                            textAlign:
-                                                                                                                                'center',
-                                                                                                                            alignItems:
-                                                                                                                                'center',
-                                                                                                                            fontSize: 18,
-                                                                                                                            marginLeft: 10,
-                                                                                                                            marginTop: 1,
-                                                                                                                            marginBottom: 1
-                                                                                                                        }}
-                                                                                                                    >
-                                                                                                                        {/* It's me! Index:{' '}
-                                                                                                                        {idx}. */}
-                                                                                                                        <Grid
-                                                                                                                            gap="10px"
-                                                                                                                            display="flex"
-                                                                                                                        >
                                                                                                                             <Grid item>
                                                                                                                                 <TextField
                                                                                                                                     sx={{
                                                                                                                                         width: {
-                                                                                                                                            sm: 200,
-                                                                                                                                            md: 300
+                                                                                                                                            sm: 200
                                                                                                                                         },
                                                                                                                                         '& .MuiInputBase-root':
                                                                                                                                             {
                                                                                                                                                 height: 40
                                                                                                                                             }
                                                                                                                                     }}
-                                                                                                                                    id="standard-select-currency"
-                                                                                                                                    select
-                                                                                                                                    label="Direction"
-                                                                                                                                    name="direction"
-                                                                                                                                    onChange={
-                                                                                                                                        handleChange
-                                                                                                                                    }
-                                                                                                                                    onBlur={
-                                                                                                                                        handleBlur
-                                                                                                                                    }
-                                                                                                                                    value={
-                                                                                                                                        values.taxGroupType
-                                                                                                                                    }
-                                                                                                                                    error={Boolean(
-                                                                                                                                        touched.taxGroupType &&
-                                                                                                                                            errors.taxGroupType
-                                                                                                                                    )}
-                                                                                                                                    helperText={
-                                                                                                                                        touched.taxGroupType &&
-                                                                                                                                        errors.taxGroupType
-                                                                                                                                            ? errors.taxGroupType
-                                                                                                                                            : ''
-                                                                                                                                    }
-                                                                                                                                >
-                                                                                                                                    <MenuItem
-                                                                                                                                        dense={
-                                                                                                                                            true
-                                                                                                                                        }
-                                                                                                                                        value={
-                                                                                                                                            'One Way'
-                                                                                                                                        }
-                                                                                                                                    >
-                                                                                                                                        One
-                                                                                                                                        Way
-                                                                                                                                    </MenuItem>
-                                                                                                                                    <MenuItem
-                                                                                                                                        dense={
-                                                                                                                                            true
-                                                                                                                                        }
-                                                                                                                                        value={
-                                                                                                                                            'Return'
-                                                                                                                                        }
-                                                                                                                                    >
-                                                                                                                                        Return
-                                                                                                                                    </MenuItem>
-                                                                                                                                </TextField>
-                                                                                                                            </Grid>
-                                                                                                                            <Grid item>
-                                                                                                                                <TextField
-                                                                                                                                    label="Max Pax"
-                                                                                                                                    sx={{
-                                                                                                                                        width: {
-                                                                                                                                            sm: 200,
-                                                                                                                                            md: 300
-                                                                                                                                        },
-                                                                                                                                        '& .MuiInputBase-root':
-                                                                                                                                            {
-                                                                                                                                                height: 40
-                                                                                                                                            }
-                                                                                                                                    }}
-                                                                                                                                    disabled={
-                                                                                                                                        mode ==
-                                                                                                                                        'VIEW_UPDATE'
-                                                                                                                                    }
-                                                                                                                                    type="text"
+                                                                                                                                    // label="Additional Price"
+                                                                                                                                    type="number"
                                                                                                                                     variant="outlined"
-                                                                                                                                    name="maxPax"
+                                                                                                                                    placeholder="0"
+                                                                                                                                    name={`paxBaggages.${idx}.onOriginal`}
                                                                                                                                     value={
-                                                                                                                                        values.taxGroupCode
+                                                                                                                                        values
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ] &&
+                                                                                                                                        values
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ]
+                                                                                                                                            .onOriginal
                                                                                                                                     }
                                                                                                                                     onChange={
                                                                                                                                         handleChange
@@ -2400,63 +2963,230 @@ function TransportRates({ open, handleClose, mode, code }) {
                                                                                                                                         handleBlur
                                                                                                                                     }
                                                                                                                                     error={Boolean(
-                                                                                                                                        touched.taxGroupCode &&
-                                                                                                                                            errors.taxGroupCode
+                                                                                                                                        touched.paxBaggages &&
+                                                                                                                                            touched
+                                                                                                                                                .paxBaggages[
+                                                                                                                                                idx
+                                                                                                                                            ] &&
+                                                                                                                                            touched
+                                                                                                                                                .paxBaggages[
+                                                                                                                                                idx
+                                                                                                                                            ]
+                                                                                                                                                .onOriginal &&
+                                                                                                                                            errors.paxBaggages &&
+                                                                                                                                            errors
+                                                                                                                                                .paxBaggages[
+                                                                                                                                                idx
+                                                                                                                                            ] &&
+                                                                                                                                            errors
+                                                                                                                                                .paxBaggages[
+                                                                                                                                                idx
+                                                                                                                                            ]
+                                                                                                                                                .onOriginal
                                                                                                                                     )}
                                                                                                                                     helperText={
-                                                                                                                                        touched.taxGroupCode &&
-                                                                                                                                        errors.taxGroupCode
-                                                                                                                                            ? errors.taxGroupCode
+                                                                                                                                        touched.paxBaggages &&
+                                                                                                                                        touched
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ] &&
+                                                                                                                                        touched
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ]
+                                                                                                                                            .onOriginal &&
+                                                                                                                                        errors.paxBaggages &&
+                                                                                                                                        errors
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ] &&
+                                                                                                                                        errors
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ]
+                                                                                                                                            .onOriginal
+                                                                                                                                            ? errors
+                                                                                                                                                  .paxBaggages[
+                                                                                                                                                  idx
+                                                                                                                                              ]
+                                                                                                                                                  .onOriginal
                                                                                                                                             : ''
                                                                                                                                     }
                                                                                                                                 />
                                                                                                                             </Grid>
-                                                                                                                            <Grid>
-                                                                                                                                <FormGroup>
-                                                                                                                                    <FormControlLabel
-                                                                                                                                        name="status"
-                                                                                                                                        // onChange={handleInputChange}
-                                                                                                                                        value={
-                                                                                                                                            values.status
-                                                                                                                                        }
-                                                                                                                                        control={
-                                                                                                                                            <Switch color="success" />
-                                                                                                                                        }
-                                                                                                                                        label="Status"
-                                                                                                                                        checked={
-                                                                                                                                            values.status
-                                                                                                                                        }
-                                                                                                                                        disabled={
-                                                                                                                                            mode ==
-                                                                                                                                            'VIEW'
-                                                                                                                                        }
-                                                                                                                                    />
-                                                                                                                                </FormGroup>
+                                                                                                                            <Grid item>
+                                                                                                                                <TextField
+                                                                                                                                    sx={{
+                                                                                                                                        width: {
+                                                                                                                                            sm: 200
+                                                                                                                                        },
+                                                                                                                                        '& .MuiInputBase-root':
+                                                                                                                                            {
+                                                                                                                                                height: 40
+                                                                                                                                            }
+                                                                                                                                    }}
+                                                                                                                                    // label="Additional Price"
+                                                                                                                                    type="number"
+                                                                                                                                    variant="outlined"
+                                                                                                                                    placeholder="0"
+                                                                                                                                    name={`paxBaggages.${idx}.onOriginal`}
+                                                                                                                                    value={
+                                                                                                                                        values
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ] &&
+                                                                                                                                        values
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ]
+                                                                                                                                            .onOriginal
+                                                                                                                                    }
+                                                                                                                                    onChange={
+                                                                                                                                        handleChange
+                                                                                                                                    }
+                                                                                                                                    onBlur={
+                                                                                                                                        handleBlur
+                                                                                                                                    }
+                                                                                                                                    error={Boolean(
+                                                                                                                                        touched.paxBaggages &&
+                                                                                                                                            touched
+                                                                                                                                                .paxBaggages[
+                                                                                                                                                idx
+                                                                                                                                            ] &&
+                                                                                                                                            touched
+                                                                                                                                                .paxBaggages[
+                                                                                                                                                idx
+                                                                                                                                            ]
+                                                                                                                                                .onOriginal &&
+                                                                                                                                            errors.paxBaggages &&
+                                                                                                                                            errors
+                                                                                                                                                .paxBaggages[
+                                                                                                                                                idx
+                                                                                                                                            ] &&
+                                                                                                                                            errors
+                                                                                                                                                .paxBaggages[
+                                                                                                                                                idx
+                                                                                                                                            ]
+                                                                                                                                                .onOriginal
+                                                                                                                                    )}
+                                                                                                                                    helperText={
+                                                                                                                                        touched.paxBaggages &&
+                                                                                                                                        touched
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ] &&
+                                                                                                                                        touched
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ]
+                                                                                                                                            .onOriginal &&
+                                                                                                                                        errors.paxBaggages &&
+                                                                                                                                        errors
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ] &&
+                                                                                                                                        errors
+                                                                                                                                            .taxGroupDetails[
+                                                                                                                                            idx
+                                                                                                                                        ]
+                                                                                                                                            .onOriginal
+                                                                                                                                            ? errors
+                                                                                                                                                  .taxGroupDetails[
+                                                                                                                                                  idx
+                                                                                                                                              ]
+                                                                                                                                                  .onOriginal
+                                                                                                                                            : ''
+                                                                                                                                    }
+                                                                                                                                />
                                                                                                                             </Grid>
-                                                                                                                            <Grid>
-                                                                                                                                <FormGroup>
-                                                                                                                                    <FormControlLabel
-                                                                                                                                        name="status"
-                                                                                                                                        // onChange={handleInputChange}
-                                                                                                                                        value={
-                                                                                                                                            values.status
-                                                                                                                                        }
-                                                                                                                                        control={
-                                                                                                                                            <Switch color="success" />
-                                                                                                                                        }
-                                                                                                                                        label="Status"
-                                                                                                                                        checked={
-                                                                                                                                            values.status
-                                                                                                                                        }
-                                                                                                                                        disabled={
-                                                                                                                                            mode ==
-                                                                                                                                            'VIEW'
-                                                                                                                                        }
-                                                                                                                                    />
-                                                                                                                                </FormGroup>
+                                                                                                                            <Grid item>
+                                                                                                                                <TextField
+                                                                                                                                    sx={{
+                                                                                                                                        width: {
+                                                                                                                                            sm: 200
+                                                                                                                                        },
+                                                                                                                                        '& .MuiInputBase-root':
+                                                                                                                                            {
+                                                                                                                                                height: 40
+                                                                                                                                            }
+                                                                                                                                    }}
+                                                                                                                                    // label="Additional Price"
+                                                                                                                                    type="number"
+                                                                                                                                    variant="outlined"
+                                                                                                                                    placeholder="0"
+                                                                                                                                    name={`paxBaggages.${idx}.onOriginal`}
+                                                                                                                                    value={
+                                                                                                                                        values
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ] &&
+                                                                                                                                        values
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ]
+                                                                                                                                            .onOriginal
+                                                                                                                                    }
+                                                                                                                                    onChange={
+                                                                                                                                        handleChange
+                                                                                                                                    }
+                                                                                                                                    onBlur={
+                                                                                                                                        handleBlur
+                                                                                                                                    }
+                                                                                                                                    error={Boolean(
+                                                                                                                                        touched.paxBaggages &&
+                                                                                                                                            touched
+                                                                                                                                                .paxBaggages[
+                                                                                                                                                idx
+                                                                                                                                            ] &&
+                                                                                                                                            touched
+                                                                                                                                                .paxBaggages[
+                                                                                                                                                idx
+                                                                                                                                            ]
+                                                                                                                                                .onOriginal &&
+                                                                                                                                            errors.paxBaggages &&
+                                                                                                                                            errors
+                                                                                                                                                .paxBaggages[
+                                                                                                                                                idx
+                                                                                                                                            ] &&
+                                                                                                                                            errors
+                                                                                                                                                .paxBaggages[
+                                                                                                                                                idx
+                                                                                                                                            ]
+                                                                                                                                                .onOriginal
+                                                                                                                                    )}
+                                                                                                                                    helperText={
+                                                                                                                                        touched.paxBaggages &&
+                                                                                                                                        touched
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ] &&
+                                                                                                                                        touched
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ]
+                                                                                                                                            .onOriginal &&
+                                                                                                                                        errors.paxBaggages &&
+                                                                                                                                        errors
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ] &&
+                                                                                                                                        errors
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ]
+                                                                                                                                            .onOriginal
+                                                                                                                                            ? errors
+                                                                                                                                                  .paxBaggages[
+                                                                                                                                                  idx
+                                                                                                                                              ]
+                                                                                                                                                  .onOriginal
+                                                                                                                                            : ''
+                                                                                                                                    }
+                                                                                                                                />
                                                                                                                             </Grid>
                                                                                                                         </Grid>
                                                                                                                     </Box>
+
                                                                                                                     <Grid
                                                                                                                         display="flex"
                                                                                                                         style={{
@@ -2496,87 +3226,149 @@ function TransportRates({ open, handleClose, mode, code }) {
                                                                                                                             display="flex"
                                                                                                                         >
                                                                                                                             <Grid item>
-                                                                                                                                {' '}
-                                                                                                                                <TextField
-                                                                                                                                    sx={{
-                                                                                                                                        width: {
-                                                                                                                                            sm: 200,
-                                                                                                                                            md: 300
-                                                                                                                                        },
-                                                                                                                                        '& .MuiInputBase-root':
-                                                                                                                                            {
-                                                                                                                                                height: 40
-                                                                                                                                            }
-                                                                                                                                    }}
-                                                                                                                                    id="standard-select-currency"
-                                                                                                                                    select
-                                                                                                                                    label="Direction"
-                                                                                                                                    name="direction"
-                                                                                                                                    onChange={
-                                                                                                                                        handleChange
-                                                                                                                                    }
-                                                                                                                                    onBlur={
-                                                                                                                                        handleBlur
-                                                                                                                                    }
+                                                                                                                                <Autocomplete
                                                                                                                                     value={
-                                                                                                                                        values.taxGroupType
+                                                                                                                                        values
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ]
+                                                                                                                                            ? values
+                                                                                                                                                  .paxBaggages[
+                                                                                                                                                  idx
+                                                                                                                                              ]
+                                                                                                                                                  .taxCodeDriverRate
+                                                                                                                                            : null
                                                                                                                                     }
-                                                                                                                                    error={Boolean(
-                                                                                                                                        touched.taxGroupType &&
-                                                                                                                                            errors.taxGroupType
+                                                                                                                                    name={`paxBaggages.${idx}.taxCodeDriverRate`}
+                                                                                                                                    onChange={(
+                                                                                                                                        _,
+                                                                                                                                        value
+                                                                                                                                    ) => {
+                                                                                                                                        console.log(
+                                                                                                                                            value
+                                                                                                                                        );
+                                                                                                                                        setFieldValue(
+                                                                                                                                            `paxBaggages.${idx}.taxCodeDriverRate`,
+                                                                                                                                            value
+                                                                                                                                        );
+                                                                                                                                    }}
+                                                                                                                                    options={
+                                                                                                                                        taxListOptions
+                                                                                                                                    }
+                                                                                                                                    getOptionLabel={(
+                                                                                                                                        option
+                                                                                                                                    ) =>
+                                                                                                                                        `${option.taxCode} - (${option.taxDescription})`
+                                                                                                                                    }
+                                                                                                                                    isOptionEqualToValue={(
+                                                                                                                                        option,
+                                                                                                                                        value
+                                                                                                                                    ) =>
+                                                                                                                                        option.taxId ===
+                                                                                                                                        value.taxId
+                                                                                                                                    }
+                                                                                                                                    renderInput={(
+                                                                                                                                        params
+                                                                                                                                    ) => (
+                                                                                                                                        <TextField
+                                                                                                                                            {...params}
+                                                                                                                                            // label="tax"
+                                                                                                                                            sx={{
+                                                                                                                                                width: {
+                                                                                                                                                    sm: 200
+                                                                                                                                                },
+                                                                                                                                                '& .MuiInputBase-root':
+                                                                                                                                                    {
+                                                                                                                                                        height: 40
+                                                                                                                                                    }
+                                                                                                                                            }}
+                                                                                                                                            // placeholder="--Select a Tax Code --"
+                                                                                                                                            variant="outlined"
+                                                                                                                                            name={`paxBaggages.${idx}.taxCodeDriverRate`}
+                                                                                                                                            onBlur={
+                                                                                                                                                handleBlur
+                                                                                                                                            }
+                                                                                                                                            helperText={
+                                                                                                                                                touched.paxBaggages &&
+                                                                                                                                                touched
+                                                                                                                                                    .paxBaggages[
+                                                                                                                                                    idx
+                                                                                                                                                ] &&
+                                                                                                                                                touched
+                                                                                                                                                    .paxBaggages[
+                                                                                                                                                    idx
+                                                                                                                                                ]
+                                                                                                                                                    .taxCodeDriverRate &&
+                                                                                                                                                errors.paxBaggages &&
+                                                                                                                                                errors
+                                                                                                                                                    .paxBaggages[
+                                                                                                                                                    idx
+                                                                                                                                                ] &&
+                                                                                                                                                errors
+                                                                                                                                                    .paxBaggages[
+                                                                                                                                                    idx
+                                                                                                                                                ]
+                                                                                                                                                    .taxCodeDriverRate
+                                                                                                                                                    ? errors
+                                                                                                                                                          .paxBaggages[
+                                                                                                                                                          idx
+                                                                                                                                                      ]
+                                                                                                                                                          .taxCodeDriverRate
+                                                                                                                                                    : ''
+                                                                                                                                            }
+                                                                                                                                            error={Boolean(
+                                                                                                                                                touched.paxBaggages &&
+                                                                                                                                                    touched
+                                                                                                                                                        .paxBaggages[
+                                                                                                                                                        idx
+                                                                                                                                                    ] &&
+                                                                                                                                                    touched
+                                                                                                                                                        .paxBaggages[
+                                                                                                                                                        idx
+                                                                                                                                                    ]
+                                                                                                                                                        .taxCodeDriverRate &&
+                                                                                                                                                    errors.paxBaggages &&
+                                                                                                                                                    errors
+                                                                                                                                                        .paxBaggages[
+                                                                                                                                                        idx
+                                                                                                                                                    ] &&
+                                                                                                                                                    errors
+                                                                                                                                                        .paxBaggages[
+                                                                                                                                                        idx
+                                                                                                                                                    ]
+                                                                                                                                                        .taxCodeDriverRate
+                                                                                                                                            )}
+                                                                                                                                        />
                                                                                                                                     )}
-                                                                                                                                    helperText={
-                                                                                                                                        touched.taxGroupType &&
-                                                                                                                                        errors.taxGroupType
-                                                                                                                                            ? errors.taxGroupType
-                                                                                                                                            : ''
-                                                                                                                                    }
-                                                                                                                                >
-                                                                                                                                    <MenuItem
-                                                                                                                                        dense={
-                                                                                                                                            true
-                                                                                                                                        }
-                                                                                                                                        value={
-                                                                                                                                            'One Way'
-                                                                                                                                        }
-                                                                                                                                    >
-                                                                                                                                        One
-                                                                                                                                        Way
-                                                                                                                                    </MenuItem>
-                                                                                                                                    <MenuItem
-                                                                                                                                        dense={
-                                                                                                                                            true
-                                                                                                                                        }
-                                                                                                                                        value={
-                                                                                                                                            'Return'
-                                                                                                                                        }
-                                                                                                                                    >
-                                                                                                                                        Return
-                                                                                                                                    </MenuItem>
-                                                                                                                                </TextField>
+                                                                                                                                />
                                                                                                                             </Grid>
+
                                                                                                                             <Grid item>
                                                                                                                                 <TextField
-                                                                                                                                    label="Max Pax"
                                                                                                                                     sx={{
                                                                                                                                         width: {
-                                                                                                                                            sm: 200,
-                                                                                                                                            md: 300
+                                                                                                                                            sm: 200
                                                                                                                                         },
                                                                                                                                         '& .MuiInputBase-root':
                                                                                                                                             {
                                                                                                                                                 height: 40
                                                                                                                                             }
                                                                                                                                     }}
-                                                                                                                                    disabled={
-                                                                                                                                        mode ==
-                                                                                                                                        'VIEW_UPDATE'
-                                                                                                                                    }
-                                                                                                                                    type="text"
+                                                                                                                                    // label="Additional Price"
+                                                                                                                                    type="number"
                                                                                                                                     variant="outlined"
-                                                                                                                                    name="maxPax"
+                                                                                                                                    placeholder="0"
+                                                                                                                                    name={`paxBaggages.${idx}.onOriginal`}
                                                                                                                                     value={
-                                                                                                                                        values.taxGroupCode
+                                                                                                                                        values
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ] &&
+                                                                                                                                        values
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ]
+                                                                                                                                            .onOriginal
                                                                                                                                     }
                                                                                                                                     onChange={
                                                                                                                                         handleChange
@@ -2585,145 +3377,84 @@ function TransportRates({ open, handleClose, mode, code }) {
                                                                                                                                         handleBlur
                                                                                                                                     }
                                                                                                                                     error={Boolean(
-                                                                                                                                        touched.taxGroupCode &&
-                                                                                                                                            errors.taxGroupCode
+                                                                                                                                        touched.paxBaggages &&
+                                                                                                                                            touched
+                                                                                                                                                .paxBaggages[
+                                                                                                                                                idx
+                                                                                                                                            ] &&
+                                                                                                                                            touched
+                                                                                                                                                .paxBaggages[
+                                                                                                                                                idx
+                                                                                                                                            ]
+                                                                                                                                                .onOriginal &&
+                                                                                                                                            errors.paxBaggages &&
+                                                                                                                                            errors
+                                                                                                                                                .paxBaggages[
+                                                                                                                                                idx
+                                                                                                                                            ] &&
+                                                                                                                                            errors
+                                                                                                                                                .paxBaggages[
+                                                                                                                                                idx
+                                                                                                                                            ]
+                                                                                                                                                .onOriginal
                                                                                                                                     )}
                                                                                                                                     helperText={
-                                                                                                                                        touched.taxGroupCode &&
-                                                                                                                                        errors.taxGroupCode
-                                                                                                                                            ? errors.taxGroupCode
+                                                                                                                                        touched.paxBaggages &&
+                                                                                                                                        touched
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ] &&
+                                                                                                                                        touched
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ]
+                                                                                                                                            .onOriginal &&
+                                                                                                                                        errors.paxBaggages &&
+                                                                                                                                        errors
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ] &&
+                                                                                                                                        errors
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ]
+                                                                                                                                            .onOriginal
+                                                                                                                                            ? errors
+                                                                                                                                                  .paxBaggages[
+                                                                                                                                                  idx
+                                                                                                                                              ]
+                                                                                                                                                  .onOriginal
                                                                                                                                             : ''
                                                                                                                                     }
                                                                                                                                 />
                                                                                                                             </Grid>
-                                                                                                                            <Grid>
-                                                                                                                                <FormGroup>
-                                                                                                                                    <FormControlLabel
-                                                                                                                                        name="status"
-                                                                                                                                        // onChange={handleInputChange}
-                                                                                                                                        value={
-                                                                                                                                            values.status
-                                                                                                                                        }
-                                                                                                                                        control={
-                                                                                                                                            <Switch color="success" />
-                                                                                                                                        }
-                                                                                                                                        label="Status"
-                                                                                                                                        checked={
-                                                                                                                                            values.status
-                                                                                                                                        }
-                                                                                                                                        disabled={
-                                                                                                                                            mode ==
-                                                                                                                                            'VIEW'
-                                                                                                                                        }
-                                                                                                                                    />
-                                                                                                                                </FormGroup>
-                                                                                                                            </Grid>
-                                                                                                                        </Grid>
-                                                                                                                    </Box>
-                                                                                                                    <Box
-                                                                                                                        sx={{
-                                                                                                                            width: '100%',
-                                                                                                                            // backgroundColor:
-                                                                                                                            //     'rgba(50,50,50,0.4)',
-                                                                                                                            minHeight: 36,
-                                                                                                                            textAlign:
-                                                                                                                                'center',
-                                                                                                                            alignItems:
-                                                                                                                                'center',
-                                                                                                                            fontSize: 18,
-                                                                                                                            marginLeft: 10,
-                                                                                                                            marginTop: 1,
-                                                                                                                            marginBottom: 1
-                                                                                                                        }}
-                                                                                                                    >
-                                                                                                                        {/* It's me! Index:{' '}
-                                                                                                                        {idx}. */}
-                                                                                                                        <Grid
-                                                                                                                            gap="10px"
-                                                                                                                            display="flex"
-                                                                                                                        >
+
                                                                                                                             <Grid item>
-                                                                                                                                {' '}
                                                                                                                                 <TextField
                                                                                                                                     sx={{
                                                                                                                                         width: {
-                                                                                                                                            sm: 200,
-                                                                                                                                            md: 300
+                                                                                                                                            sm: 200
                                                                                                                                         },
                                                                                                                                         '& .MuiInputBase-root':
                                                                                                                                             {
                                                                                                                                                 height: 40
                                                                                                                                             }
                                                                                                                                     }}
-                                                                                                                                    id="standard-select-currency"
-                                                                                                                                    select
-                                                                                                                                    label="Direction"
-                                                                                                                                    name="direction"
-                                                                                                                                    onChange={
-                                                                                                                                        handleChange
-                                                                                                                                    }
-                                                                                                                                    onBlur={
-                                                                                                                                        handleBlur
-                                                                                                                                    }
-                                                                                                                                    value={
-                                                                                                                                        values.taxGroupType
-                                                                                                                                    }
-                                                                                                                                    error={Boolean(
-                                                                                                                                        touched.taxGroupType &&
-                                                                                                                                            errors.taxGroupType
-                                                                                                                                    )}
-                                                                                                                                    helperText={
-                                                                                                                                        touched.taxGroupType &&
-                                                                                                                                        errors.taxGroupType
-                                                                                                                                            ? errors.taxGroupType
-                                                                                                                                            : ''
-                                                                                                                                    }
-                                                                                                                                >
-                                                                                                                                    <MenuItem
-                                                                                                                                        dense={
-                                                                                                                                            true
-                                                                                                                                        }
-                                                                                                                                        value={
-                                                                                                                                            'One Way'
-                                                                                                                                        }
-                                                                                                                                    >
-                                                                                                                                        One
-                                                                                                                                        Way
-                                                                                                                                    </MenuItem>
-                                                                                                                                    <MenuItem
-                                                                                                                                        dense={
-                                                                                                                                            true
-                                                                                                                                        }
-                                                                                                                                        value={
-                                                                                                                                            'Return'
-                                                                                                                                        }
-                                                                                                                                    >
-                                                                                                                                        Return
-                                                                                                                                    </MenuItem>
-                                                                                                                                </TextField>
-                                                                                                                            </Grid>
-                                                                                                                            <Grid item>
-                                                                                                                                <TextField
-                                                                                                                                    label="Max Pax"
-                                                                                                                                    sx={{
-                                                                                                                                        width: {
-                                                                                                                                            sm: 200,
-                                                                                                                                            md: 300
-                                                                                                                                        },
-                                                                                                                                        '& .MuiInputBase-root':
-                                                                                                                                            {
-                                                                                                                                                height: 40
-                                                                                                                                            }
-                                                                                                                                    }}
-                                                                                                                                    disabled={
-                                                                                                                                        mode ==
-                                                                                                                                        'VIEW_UPDATE'
-                                                                                                                                    }
-                                                                                                                                    type="text"
+                                                                                                                                    // label="Additional Price"
+                                                                                                                                    type="number"
                                                                                                                                     variant="outlined"
-                                                                                                                                    name="maxPax"
+                                                                                                                                    placeholder="0"
+                                                                                                                                    name={`paxBaggages.${idx}.onOriginal`}
                                                                                                                                     value={
-                                                                                                                                        values.taxGroupCode
+                                                                                                                                        values
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ] &&
+                                                                                                                                        values
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ]
+                                                                                                                                            .onOriginal
                                                                                                                                     }
                                                                                                                                     onChange={
                                                                                                                                         handleChange
@@ -2732,39 +3463,83 @@ function TransportRates({ open, handleClose, mode, code }) {
                                                                                                                                         handleBlur
                                                                                                                                     }
                                                                                                                                     error={Boolean(
-                                                                                                                                        touched.taxGroupCode &&
-                                                                                                                                            errors.taxGroupCode
+                                                                                                                                        touched.paxBaggages &&
+                                                                                                                                            touched
+                                                                                                                                                .paxBaggages[
+                                                                                                                                                idx
+                                                                                                                                            ] &&
+                                                                                                                                            touched
+                                                                                                                                                .paxBaggages[
+                                                                                                                                                idx
+                                                                                                                                            ]
+                                                                                                                                                .onOriginal &&
+                                                                                                                                            errors.paxBaggages &&
+                                                                                                                                            errors
+                                                                                                                                                .paxBaggages[
+                                                                                                                                                idx
+                                                                                                                                            ] &&
+                                                                                                                                            errors
+                                                                                                                                                .paxBaggages[
+                                                                                                                                                idx
+                                                                                                                                            ]
+                                                                                                                                                .onOriginal
                                                                                                                                     )}
                                                                                                                                     helperText={
-                                                                                                                                        touched.taxGroupCode &&
-                                                                                                                                        errors.taxGroupCode
-                                                                                                                                            ? errors.taxGroupCode
+                                                                                                                                        touched.paxBaggages &&
+                                                                                                                                        touched
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ] &&
+                                                                                                                                        touched
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ]
+                                                                                                                                            .onOriginal &&
+                                                                                                                                        errors.paxBaggages &&
+                                                                                                                                        errors
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ] &&
+                                                                                                                                        errors
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ]
+                                                                                                                                            .onOriginal
+                                                                                                                                            ? errors
+                                                                                                                                                  .paxBaggages[
+                                                                                                                                                  idx
+                                                                                                                                              ]
+                                                                                                                                                  .onOriginal
                                                                                                                                             : ''
                                                                                                                                     }
                                                                                                                                 />
                                                                                                                             </Grid>
-                                                                                                                            <Grid>
+                                                                                                                            <Grid item>
                                                                                                                                 <TextField
-                                                                                                                                    label="Max Pax"
                                                                                                                                     sx={{
                                                                                                                                         width: {
-                                                                                                                                            sm: 200,
-                                                                                                                                            md: 300
+                                                                                                                                            sm: 200
                                                                                                                                         },
                                                                                                                                         '& .MuiInputBase-root':
                                                                                                                                             {
                                                                                                                                                 height: 40
                                                                                                                                             }
                                                                                                                                     }}
-                                                                                                                                    disabled={
-                                                                                                                                        mode ==
-                                                                                                                                        'VIEW_UPDATE'
-                                                                                                                                    }
-                                                                                                                                    type="text"
+                                                                                                                                    // label="Additional Price"
+                                                                                                                                    type="number"
                                                                                                                                     variant="outlined"
-                                                                                                                                    name="maxPax"
+                                                                                                                                    placeholder="0"
+                                                                                                                                    name={`paxBaggages.${idx}.onOriginal`}
                                                                                                                                     value={
-                                                                                                                                        values.taxGroupCode
+                                                                                                                                        values
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ] &&
+                                                                                                                                        values
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ]
+                                                                                                                                            .onOriginal
                                                                                                                                     }
                                                                                                                                     onChange={
                                                                                                                                         handleChange
@@ -2773,13 +3548,138 @@ function TransportRates({ open, handleClose, mode, code }) {
                                                                                                                                         handleBlur
                                                                                                                                     }
                                                                                                                                     error={Boolean(
-                                                                                                                                        touched.taxGroupCode &&
-                                                                                                                                            errors.taxGroupCode
+                                                                                                                                        touched.paxBaggages &&
+                                                                                                                                            touched
+                                                                                                                                                .paxBaggages[
+                                                                                                                                                idx
+                                                                                                                                            ] &&
+                                                                                                                                            touched
+                                                                                                                                                .paxBaggages[
+                                                                                                                                                idx
+                                                                                                                                            ]
+                                                                                                                                                .onOriginal &&
+                                                                                                                                            errors.paxBaggages &&
+                                                                                                                                            errors
+                                                                                                                                                .paxBaggages[
+                                                                                                                                                idx
+                                                                                                                                            ] &&
+                                                                                                                                            errors
+                                                                                                                                                .paxBaggages[
+                                                                                                                                                idx
+                                                                                                                                            ]
+                                                                                                                                                .onOriginal
                                                                                                                                     )}
                                                                                                                                     helperText={
-                                                                                                                                        touched.taxGroupCode &&
-                                                                                                                                        errors.taxGroupCode
-                                                                                                                                            ? errors.taxGroupCode
+                                                                                                                                        touched.paxBaggages &&
+                                                                                                                                        touched
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ] &&
+                                                                                                                                        touched
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ]
+                                                                                                                                            .onOriginal &&
+                                                                                                                                        errors.paxBaggages &&
+                                                                                                                                        errors
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ] &&
+                                                                                                                                        errors
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ]
+                                                                                                                                            .onOriginal
+                                                                                                                                            ? errors
+                                                                                                                                                  .paxBaggages[
+                                                                                                                                                  idx
+                                                                                                                                              ]
+                                                                                                                                                  .onOriginal
+                                                                                                                                            : ''
+                                                                                                                                    }
+                                                                                                                                />
+                                                                                                                            </Grid>
+                                                                                                                            <Grid item>
+                                                                                                                                <TextField
+                                                                                                                                    sx={{
+                                                                                                                                        width: {
+                                                                                                                                            sm: 200
+                                                                                                                                        },
+                                                                                                                                        '& .MuiInputBase-root':
+                                                                                                                                            {
+                                                                                                                                                height: 40
+                                                                                                                                            }
+                                                                                                                                    }}
+                                                                                                                                    // label="Additional Price"
+                                                                                                                                    type="number"
+                                                                                                                                    variant="outlined"
+                                                                                                                                    placeholder="0"
+                                                                                                                                    name={`paxBaggages.${idx}.onOriginal`}
+                                                                                                                                    value={
+                                                                                                                                        values
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ] &&
+                                                                                                                                        values
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ]
+                                                                                                                                            .onOriginal
+                                                                                                                                    }
+                                                                                                                                    onChange={
+                                                                                                                                        handleChange
+                                                                                                                                    }
+                                                                                                                                    onBlur={
+                                                                                                                                        handleBlur
+                                                                                                                                    }
+                                                                                                                                    error={Boolean(
+                                                                                                                                        touched.paxBaggages &&
+                                                                                                                                            touched
+                                                                                                                                                .paxBaggages[
+                                                                                                                                                idx
+                                                                                                                                            ] &&
+                                                                                                                                            touched
+                                                                                                                                                .paxBaggages[
+                                                                                                                                                idx
+                                                                                                                                            ]
+                                                                                                                                                .onOriginal &&
+                                                                                                                                            errors.paxBaggages &&
+                                                                                                                                            errors
+                                                                                                                                                .paxBaggages[
+                                                                                                                                                idx
+                                                                                                                                            ] &&
+                                                                                                                                            errors
+                                                                                                                                                .paxBaggages[
+                                                                                                                                                idx
+                                                                                                                                            ]
+                                                                                                                                                .onOriginal
+                                                                                                                                    )}
+                                                                                                                                    helperText={
+                                                                                                                                        touched.paxBaggages &&
+                                                                                                                                        touched
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ] &&
+                                                                                                                                        touched
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ]
+                                                                                                                                            .onOriginal &&
+                                                                                                                                        errors.paxBaggages &&
+                                                                                                                                        errors
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ] &&
+                                                                                                                                        errors
+                                                                                                                                            .paxBaggages[
+                                                                                                                                            idx
+                                                                                                                                        ]
+                                                                                                                                            .onOriginal
+                                                                                                                                            ? errors
+                                                                                                                                                  .paxBaggages[
+                                                                                                                                                  idx
+                                                                                                                                              ]
+                                                                                                                                                  .onOriginal
                                                                                                                                             : ''
                                                                                                                                     }
                                                                                                                                 />
@@ -2800,13 +3700,16 @@ function TransportRates({ open, handleClose, mode, code }) {
                                                                     </FieldArray>
                                                                 </Grid>
                                                             </Grid>
-                                                            <Grid display="flex" style={{ marginBottom: '10px', marginTop: '10px' }}>
+                                                            <Grid
+                                                                display={enableblock3 ? 'flex' : 'none'}
+                                                                style={{ marginBottom: '10px', marginTop: '10px' }}
+                                                            >
                                                                 <Grid item>
                                                                     <Typography variant="h4">Location Wise Expenses</Typography>
                                                                 </Grid>
                                                             </Grid>
                                                             <Grid
-                                                                display={enableblock1 ? 'flex' : 'none'}
+                                                                display={enableblock3 ? 'flex' : 'none'}
                                                                 gap="10px"
                                                                 style={{ marginBottom: '10px', marginTop: '10px' }}
                                                             >
@@ -2820,7 +3723,7 @@ function TransportRates({ open, handleClose, mode, code }) {
                                                                                             aria-label="delete"
                                                                                             onClick={() => {
                                                                                                 push({
-                                                                                                    location: '',
+                                                                                                    location: null,
                                                                                                     locationDescription: '',
                                                                                                     expenseCode: '',
                                                                                                     expenseDescription: '',
@@ -2854,84 +3757,116 @@ function TransportRates({ open, handleClose, mode, code }) {
                                                                                                         <>
                                                                                                             <TableRow key={idx} hover>
                                                                                                                 <TableCell>
-                                                                                                                    <TextField
-                                                                                                                        // label="taxOrder"
-                                                                                                                        sx={{
-                                                                                                                            width: {
-                                                                                                                                sm: 200
-                                                                                                                            },
-                                                                                                                            '& .MuiInputBase-root':
-                                                                                                                                {
-                                                                                                                                    height: 40
-                                                                                                                                }
-                                                                                                                        }}
-                                                                                                                        type="text"
-                                                                                                                        variant="outlined"
-                                                                                                                        name={`locationWiseExpenses.${idx}.location`}
-                                                                                                                        disabled={
-                                                                                                                            mode ==
-                                                                                                                            'VIEW_UPDATE'
-                                                                                                                        }
+                                                                                                                    <Autocomplete
                                                                                                                         value={
                                                                                                                             values
                                                                                                                                 .locationWiseExpenses[
                                                                                                                                 idx
-                                                                                                                            ] &&
-                                                                                                                            values
-                                                                                                                                .locationWiseExpenses[
-                                                                                                                                idx
-                                                                                                                            ].location
-                                                                                                                        }
-                                                                                                                        onChange={
-                                                                                                                            handleChange
-                                                                                                                        }
-                                                                                                                        onBlur={handleBlur}
-                                                                                                                        error={Boolean(
-                                                                                                                            touched.locationWiseExpenses &&
-                                                                                                                                touched
-                                                                                                                                    .locationWiseExpenses[
-                                                                                                                                    idx
-                                                                                                                                ] &&
-                                                                                                                                touched
-                                                                                                                                    .locationWiseExpenses[
-                                                                                                                                    idx
-                                                                                                                                ]
-                                                                                                                                    .location &&
-                                                                                                                                errors.locationWiseExpenses &&
-                                                                                                                                errors
-                                                                                                                                    .locationWiseExpenses[
-                                                                                                                                    idx
-                                                                                                                                ] &&
-                                                                                                                                errors
-                                                                                                                                    .locationWiseExpenses[
-                                                                                                                                    idx
-                                                                                                                                ].location
-                                                                                                                        )}
-                                                                                                                        helperText={
-                                                                                                                            touched.locationWiseExpenses &&
-                                                                                                                            touched
-                                                                                                                                .locationWiseExpenses[
-                                                                                                                                idx
-                                                                                                                            ] &&
-                                                                                                                            touched
-                                                                                                                                .locationWiseExpenses[
-                                                                                                                                idx
-                                                                                                                            ].location &&
-                                                                                                                            errors.locationWiseExpenses &&
-                                                                                                                            errors
-                                                                                                                                .locationWiseExpenses[
-                                                                                                                                idx
-                                                                                                                            ] &&
-                                                                                                                            errors
-                                                                                                                                .locationWiseExpenses[
-                                                                                                                                idx
-                                                                                                                            ].location
-                                                                                                                                ? errors
+                                                                                                                            ]
+                                                                                                                                ? values
                                                                                                                                       .locationWiseExpenses[
                                                                                                                                       idx
                                                                                                                                   ].location
-                                                                                                                                : ''
+                                                                                                                                : null
                                                                                                                         }
+                                                                                                                        name={`locationWiseExpenses.${idx}.location`}
+                                                                                                                        onChange={(
+                                                                                                                            _,
+                                                                                                                            value
+                                                                                                                        ) => {
+                                                                                                                            setFieldValue(
+                                                                                                                                `locationWiseExpenses.${idx}.location`,
+                                                                                                                                value
+                                                                                                                            );
+                                                                                                                        }}
+                                                                                                                        options={
+                                                                                                                            activeLocationList
+                                                                                                                        }
+                                                                                                                        getOptionLabel={(
+                                                                                                                            option
+                                                                                                                        ) =>
+                                                                                                                            `${option.code}`
+                                                                                                                        }
+                                                                                                                        isOptionEqualToValue={(
+                                                                                                                            option,
+                                                                                                                            value
+                                                                                                                        ) =>
+                                                                                                                            option.location_id ===
+                                                                                                                            value.location_id
+                                                                                                                        }
+                                                                                                                        renderInput={(
+                                                                                                                            params
+                                                                                                                        ) => (
+                                                                                                                            <TextField
+                                                                                                                                {...params}
+                                                                                                                                // label="tax"
+                                                                                                                                sx={{
+                                                                                                                                    width: {
+                                                                                                                                        sm: 200
+                                                                                                                                    },
+                                                                                                                                    '& .MuiInputBase-root':
+                                                                                                                                        {
+                                                                                                                                            height: 40
+                                                                                                                                        }
+                                                                                                                                }}
+                                                                                                                                placeholder="--Select a Location --"
+                                                                                                                                variant="outlined"
+                                                                                                                                name={`locationWiseExpenses.${idx}.location`}
+                                                                                                                                onBlur={
+                                                                                                                                    handleBlur
+                                                                                                                                }
+                                                                                                                                helperText={
+                                                                                                                                    touched.locationWiseExpenses &&
+                                                                                                                                    touched
+                                                                                                                                        .locationWiseExpenses[
+                                                                                                                                        idx
+                                                                                                                                    ] &&
+                                                                                                                                    touched
+                                                                                                                                        .locationWiseExpenses[
+                                                                                                                                        idx
+                                                                                                                                    ]
+                                                                                                                                        .location &&
+                                                                                                                                    errors.locationWiseExpenses &&
+                                                                                                                                    errors
+                                                                                                                                        .locationWiseExpenses[
+                                                                                                                                        idx
+                                                                                                                                    ] &&
+                                                                                                                                    errors
+                                                                                                                                        .locationWiseExpenses[
+                                                                                                                                        idx
+                                                                                                                                    ]
+                                                                                                                                        .location
+                                                                                                                                        ? errors
+                                                                                                                                              .locationWiseExpenses[
+                                                                                                                                              idx
+                                                                                                                                          ]
+                                                                                                                                              .location
+                                                                                                                                        : ''
+                                                                                                                                }
+                                                                                                                                error={Boolean(
+                                                                                                                                    touched.locationWiseExpenses &&
+                                                                                                                                        touched
+                                                                                                                                            .locationWiseExpenses[
+                                                                                                                                            idx
+                                                                                                                                        ] &&
+                                                                                                                                        touched
+                                                                                                                                            .locationWiseExpenses[
+                                                                                                                                            idx
+                                                                                                                                        ]
+                                                                                                                                            .location &&
+                                                                                                                                        errors.locationWiseExpenses &&
+                                                                                                                                        errors
+                                                                                                                                            .locationWiseExpenses[
+                                                                                                                                            idx
+                                                                                                                                        ] &&
+                                                                                                                                        errors
+                                                                                                                                            .locationWiseExpenses[
+                                                                                                                                            idx
+                                                                                                                                        ]
+                                                                                                                                            .location
+                                                                                                                                )}
+                                                                                                                            />
+                                                                                                                        )}
                                                                                                                     />
                                                                                                                 </TableCell>
                                                                                                                 <TableCell>
@@ -3225,6 +4160,1120 @@ function TransportRates({ open, handleClose, mode, code }) {
                                                                                                     );
                                                                                                 }
                                                                                             )}
+                                                                                        </TableBody>
+                                                                                    </Table>
+                                                                                </TableContainer>
+                                                                            </Paper>
+                                                                        )}
+                                                                    </FieldArray>
+                                                                </Grid>
+                                                            </Grid>
+                                                            <Grid
+                                                                display={enableblock6 ? 'flex' : 'none'}
+                                                                style={{ marginBottom: '10px', marginTop: '10px' }}
+                                                            >
+                                                                <Grid item>
+                                                                    <Typography variant="h4">
+                                                                        {getchargeMethod === 'PER_PAX'
+                                                                            ? 'Per Pax Buy Rate'
+                                                                            : 'Per Vehicle Rate'}
+                                                                    </Typography>
+                                                                </Grid>
+                                                            </Grid>
+                                                            <Grid
+                                                                display={enableblock6 ? 'flex' : 'none'}
+                                                                gap="10px"
+                                                                style={{ marginBottom: '10px', marginTop: '10px' }}
+                                                            >
+                                                                <Grid item>
+                                                                    <FieldArray name="vehiclePaxRates">
+                                                                        {({ insert, remove, push }) => (
+                                                                            <Paper>
+                                                                                {mode != 'VIEW' ? (
+                                                                                    <Box display="flex" flexDirection="row-reverse">
+                                                                                        <IconButton
+                                                                                            aria-label="delete"
+                                                                                            onClick={() => {
+                                                                                                push({
+                                                                                                    fromDate: '',
+                                                                                                    toDate: '',
+                                                                                                    marketCode: null,
+                                                                                                    operatorCode: null,
+                                                                                                    operatorGroupCode: null,
+                                                                                                    currency: null,
+                                                                                                    taxCode: null,
+                                                                                                    tax: '',
+                                                                                                    charterRate: '',
+                                                                                                    charterRatewithTax: '',
+                                                                                                    charterRatewithoutTax: ''
+                                                                                                });
+                                                                                            }}
+                                                                                        >
+                                                                                            <AddBoxIcon />
+                                                                                        </IconButton>
+                                                                                    </Box>
+                                                                                ) : (
+                                                                                    ''
+                                                                                )}
+
+                                                                                <TableContainer>
+                                                                                    <Table stickyHeader size="small">
+                                                                                        <TableHead>
+                                                                                            <TableRow>
+                                                                                                <TableCell>From Date</TableCell>
+                                                                                                <TableCell>To Date</TableCell>
+                                                                                                <TableCell>Market Group</TableCell>
+                                                                                                <TableCell>Operator Code</TableCell>
+                                                                                                <TableCell>Operator Group Code</TableCell>
+                                                                                                <TableCell>Currency</TableCell>
+                                                                                                <TableCell>Tax Code</TableCell>
+                                                                                                <TableCell>Tax</TableCell>
+                                                                                                <TableCell>Charter Rate</TableCell>
+                                                                                                <TableCell>
+                                                                                                    Charter Rate without Tax
+                                                                                                </TableCell>
+                                                                                                <TableCell>Charter Rate wth Tax</TableCell>
+                                                                                                <TableCell>Status</TableCell>
+                                                                                                <TableCell>Action</TableCell>
+                                                                                            </TableRow>
+                                                                                        </TableHead>
+                                                                                        <TableBody>
+                                                                                            {values.vehiclePaxRates.map((record, idx) => {
+                                                                                                return (
+                                                                                                    <>
+                                                                                                        <TableRow key={idx} hover>
+                                                                                                            <TableCell>
+                                                                                                                <LocalizationProvider
+                                                                                                                    dateAdapter={
+                                                                                                                        AdapterDayjs
+                                                                                                                    }
+                                                                                                                    // adapterLocale={locale}
+                                                                                                                >
+                                                                                                                    <DatePicker
+                                                                                                                        disabled={
+                                                                                                                            mode ==
+                                                                                                                            'VIEW_UPDATE'
+                                                                                                                        }
+                                                                                                                        onChange={(
+                                                                                                                            value
+                                                                                                                        ) => {
+                                                                                                                            setFieldValue(
+                                                                                                                                `vehiclePaxRates.${idx}.fromDate`,
+                                                                                                                                value
+                                                                                                                            );
+                                                                                                                        }}
+                                                                                                                        inputFormat="DD/MM/YYYY"
+                                                                                                                        value={
+                                                                                                                            values
+                                                                                                                                .vehiclePaxRates[
+                                                                                                                                idx
+                                                                                                                            ] &&
+                                                                                                                            values
+                                                                                                                                .vehiclePaxRates[
+                                                                                                                                idx
+                                                                                                                            ].fromDate
+                                                                                                                        }
+                                                                                                                        renderInput={(
+                                                                                                                            params
+                                                                                                                        ) => (
+                                                                                                                            <TextField
+                                                                                                                                {...params}
+                                                                                                                                sx={{
+                                                                                                                                    width: {
+                                                                                                                                        sm: 200
+                                                                                                                                    },
+                                                                                                                                    '& .MuiInputBase-root':
+                                                                                                                                        {
+                                                                                                                                            height: 40
+                                                                                                                                        }
+                                                                                                                                }}
+                                                                                                                                variant="outlined"
+                                                                                                                                name={`paxBaggages.${idx}.fromDate`}
+                                                                                                                                onBlur={
+                                                                                                                                    handleBlur
+                                                                                                                                }
+                                                                                                                                error={Boolean(
+                                                                                                                                    touched.vehiclePaxRates &&
+                                                                                                                                        touched
+                                                                                                                                            .vehiclePaxRates[
+                                                                                                                                            idx
+                                                                                                                                        ] &&
+                                                                                                                                        touched
+                                                                                                                                            .vehiclePaxRates[
+                                                                                                                                            idx
+                                                                                                                                        ]
+                                                                                                                                            .fromDate &&
+                                                                                                                                        errors.vehiclePaxRates &&
+                                                                                                                                        errors
+                                                                                                                                            .vehiclePaxRates[
+                                                                                                                                            idx
+                                                                                                                                        ] &&
+                                                                                                                                        errors
+                                                                                                                                            .vehiclePaxRates[
+                                                                                                                                            idx
+                                                                                                                                        ]
+                                                                                                                                            .fromDate
+                                                                                                                                )}
+                                                                                                                                helperText={
+                                                                                                                                    touched.vehiclePaxRates &&
+                                                                                                                                    touched
+                                                                                                                                        .vehiclePaxRates[
+                                                                                                                                        idx
+                                                                                                                                    ] &&
+                                                                                                                                    touched
+                                                                                                                                        .vehiclePaxRates[
+                                                                                                                                        idx
+                                                                                                                                    ]
+                                                                                                                                        .fromDate &&
+                                                                                                                                    errors.vehiclePaxRates &&
+                                                                                                                                    errors
+                                                                                                                                        .vehiclePaxRates[
+                                                                                                                                        idx
+                                                                                                                                    ] &&
+                                                                                                                                    errors
+                                                                                                                                        .vehiclePaxRates[
+                                                                                                                                        idx
+                                                                                                                                    ]
+                                                                                                                                        .fromDate
+                                                                                                                                        ? errors
+                                                                                                                                              .vehiclePaxRates[
+                                                                                                                                              idx
+                                                                                                                                          ]
+                                                                                                                                              .fromDate
+                                                                                                                                        : ''
+                                                                                                                                }
+                                                                                                                            />
+                                                                                                                        )}
+                                                                                                                    />
+                                                                                                                </LocalizationProvider>
+                                                                                                            </TableCell>
+                                                                                                            <TableCell>
+                                                                                                                <LocalizationProvider
+                                                                                                                    dateAdapter={
+                                                                                                                        AdapterDayjs
+                                                                                                                    }
+                                                                                                                    // adapterLocale={locale}
+                                                                                                                >
+                                                                                                                    <DatePicker
+                                                                                                                        disabled={
+                                                                                                                            mode ==
+                                                                                                                            'VIEW_UPDATE'
+                                                                                                                        }
+                                                                                                                        onChange={(
+                                                                                                                            value
+                                                                                                                        ) => {
+                                                                                                                            setFieldValue(
+                                                                                                                                `vehiclePaxRates.${idx}.toDate`,
+                                                                                                                                value
+                                                                                                                            );
+                                                                                                                        }}
+                                                                                                                        inputFormat="DD/MM/YYYY"
+                                                                                                                        value={
+                                                                                                                            values
+                                                                                                                                .vehiclePaxRates[
+                                                                                                                                idx
+                                                                                                                            ] &&
+                                                                                                                            values
+                                                                                                                                .vehiclePaxRates[
+                                                                                                                                idx
+                                                                                                                            ].toDate
+                                                                                                                        }
+                                                                                                                        renderInput={(
+                                                                                                                            params
+                                                                                                                        ) => (
+                                                                                                                            <TextField
+                                                                                                                                {...params}
+                                                                                                                                sx={{
+                                                                                                                                    width: {
+                                                                                                                                        sm: 200
+                                                                                                                                    },
+                                                                                                                                    '& .MuiInputBase-root':
+                                                                                                                                        {
+                                                                                                                                            height: 40
+                                                                                                                                        }
+                                                                                                                                }}
+                                                                                                                                variant="outlined"
+                                                                                                                                name={`vehiclePaxRates.${idx}.toDate`}
+                                                                                                                                onBlur={
+                                                                                                                                    handleBlur
+                                                                                                                                }
+                                                                                                                                error={Boolean(
+                                                                                                                                    touched.vehiclePaxRates &&
+                                                                                                                                        touched
+                                                                                                                                            .vehiclePaxRates[
+                                                                                                                                            idx
+                                                                                                                                        ] &&
+                                                                                                                                        touched
+                                                                                                                                            .vehiclePaxRates[
+                                                                                                                                            idx
+                                                                                                                                        ]
+                                                                                                                                            .toDate &&
+                                                                                                                                        errors.vehiclePaxRates &&
+                                                                                                                                        errors
+                                                                                                                                            .vehiclePaxRates[
+                                                                                                                                            idx
+                                                                                                                                        ] &&
+                                                                                                                                        errors
+                                                                                                                                            .vehiclePaxRates[
+                                                                                                                                            idx
+                                                                                                                                        ]
+                                                                                                                                            .toDate
+                                                                                                                                )}
+                                                                                                                                helperText={
+                                                                                                                                    touched.vehiclePaxRates &&
+                                                                                                                                    touched
+                                                                                                                                        .vehiclePaxRates[
+                                                                                                                                        idx
+                                                                                                                                    ] &&
+                                                                                                                                    touched
+                                                                                                                                        .vehiclePaxRates[
+                                                                                                                                        idx
+                                                                                                                                    ]
+                                                                                                                                        .toDate &&
+                                                                                                                                    errors.vehiclePaxRates &&
+                                                                                                                                    errors
+                                                                                                                                        .vehiclePaxRates[
+                                                                                                                                        idx
+                                                                                                                                    ] &&
+                                                                                                                                    errors
+                                                                                                                                        .vehiclePaxRates[
+                                                                                                                                        idx
+                                                                                                                                    ].toDate
+                                                                                                                                        ? errors
+                                                                                                                                              .vehiclePaxRates[
+                                                                                                                                              idx
+                                                                                                                                          ]
+                                                                                                                                              .toDate
+                                                                                                                                        : ''
+                                                                                                                                }
+                                                                                                                            />
+                                                                                                                        )}
+                                                                                                                    />
+                                                                                                                </LocalizationProvider>
+                                                                                                            </TableCell>
+                                                                                                            <TableCell>
+                                                                                                                <Autocomplete
+                                                                                                                    value={
+                                                                                                                        values
+                                                                                                                            .vehiclePaxRates[
+                                                                                                                            idx
+                                                                                                                        ]
+                                                                                                                            ? values
+                                                                                                                                  .vehiclePaxRates[
+                                                                                                                                  idx
+                                                                                                                              ].marketCode
+                                                                                                                            : null
+                                                                                                                    }
+                                                                                                                    name={`vehiclePaxRates.${idx}.marketCode`}
+                                                                                                                    onChange={(
+                                                                                                                        _,
+                                                                                                                        value
+                                                                                                                    ) => {
+                                                                                                                        setFieldValue(
+                                                                                                                            `vehiclePaxRates.${idx}.marketCode`,
+                                                                                                                            value
+                                                                                                                        );
+                                                                                                                    }}
+                                                                                                                    options={
+                                                                                                                        activeMarketList
+                                                                                                                    }
+                                                                                                                    getOptionLabel={(
+                                                                                                                        option
+                                                                                                                    ) => `${option.code}`}
+                                                                                                                    isOptionEqualToValue={(
+                                                                                                                        option,
+                                                                                                                        value
+                                                                                                                    ) =>
+                                                                                                                        option.marketId ===
+                                                                                                                        value.marketId
+                                                                                                                    }
+                                                                                                                    renderInput={(
+                                                                                                                        params
+                                                                                                                    ) => (
+                                                                                                                        <TextField
+                                                                                                                            {...params}
+                                                                                                                            // label="tax"
+                                                                                                                            sx={{
+                                                                                                                                width: {
+                                                                                                                                    sm: 200
+                                                                                                                                },
+                                                                                                                                '& .MuiInputBase-root':
+                                                                                                                                    {
+                                                                                                                                        height: 40
+                                                                                                                                    }
+                                                                                                                            }}
+                                                                                                                            // placeholder="--Select a Location --"
+                                                                                                                            variant="outlined"
+                                                                                                                            name={`vehiclePaxRates.${idx}.marketCode`}
+                                                                                                                            onBlur={
+                                                                                                                                handleBlur
+                                                                                                                            }
+                                                                                                                            helperText={
+                                                                                                                                touched.vehiclePaxRates &&
+                                                                                                                                touched
+                                                                                                                                    .vehiclePaxRates[
+                                                                                                                                    idx
+                                                                                                                                ] &&
+                                                                                                                                touched
+                                                                                                                                    .vehiclePaxRates[
+                                                                                                                                    idx
+                                                                                                                                ]
+                                                                                                                                    .marketCode &&
+                                                                                                                                errors.vehiclePaxRates &&
+                                                                                                                                errors
+                                                                                                                                    .vehiclePaxRates[
+                                                                                                                                    idx
+                                                                                                                                ] &&
+                                                                                                                                errors
+                                                                                                                                    .vehiclePaxRates[
+                                                                                                                                    idx
+                                                                                                                                ].marketCode
+                                                                                                                                    ? errors
+                                                                                                                                          .vehiclePaxRates[
+                                                                                                                                          idx
+                                                                                                                                      ]
+                                                                                                                                          .marketCode
+                                                                                                                                    : ''
+                                                                                                                            }
+                                                                                                                            error={Boolean(
+                                                                                                                                touched.vehiclePaxRates &&
+                                                                                                                                    touched
+                                                                                                                                        .vehiclePaxRates[
+                                                                                                                                        idx
+                                                                                                                                    ] &&
+                                                                                                                                    touched
+                                                                                                                                        .vehiclePaxRates[
+                                                                                                                                        idx
+                                                                                                                                    ]
+                                                                                                                                        .marketCode &&
+                                                                                                                                    errors.vehiclePaxRates &&
+                                                                                                                                    errors
+                                                                                                                                        .vehiclePaxRates[
+                                                                                                                                        idx
+                                                                                                                                    ] &&
+                                                                                                                                    errors
+                                                                                                                                        .vehiclePaxRates[
+                                                                                                                                        idx
+                                                                                                                                    ]
+                                                                                                                                        .marketCode
+                                                                                                                            )}
+                                                                                                                        />
+                                                                                                                    )}
+                                                                                                                />
+                                                                                                            </TableCell>
+                                                                                                            <TableCell>
+                                                                                                                <Autocomplete
+                                                                                                                    value={
+                                                                                                                        values
+                                                                                                                            .vehiclePaxRates[
+                                                                                                                            idx
+                                                                                                                        ]
+                                                                                                                            ? values
+                                                                                                                                  .vehiclePaxRates[
+                                                                                                                                  idx
+                                                                                                                              ].operatorCode
+                                                                                                                            : null
+                                                                                                                    }
+                                                                                                                    name={`vehiclePaxRates.${idx}.operatorCode`}
+                                                                                                                    onChange={(
+                                                                                                                        _,
+                                                                                                                        value
+                                                                                                                    ) => {
+                                                                                                                        setFieldValue(
+                                                                                                                            `vehiclePaxRates.${idx}.operatorCode`,
+                                                                                                                            value
+                                                                                                                        );
+                                                                                                                    }}
+                                                                                                                    options={
+                                                                                                                        activeLocationList
+                                                                                                                    }
+                                                                                                                    getOptionLabel={(
+                                                                                                                        option
+                                                                                                                    ) => `${option.code}`}
+                                                                                                                    isOptionEqualToValue={(
+                                                                                                                        option,
+                                                                                                                        value
+                                                                                                                    ) =>
+                                                                                                                        option.location_id ===
+                                                                                                                        value.location_id
+                                                                                                                    }
+                                                                                                                    renderInput={(
+                                                                                                                        params
+                                                                                                                    ) => (
+                                                                                                                        <TextField
+                                                                                                                            {...params}
+                                                                                                                            // label="tax"
+                                                                                                                            sx={{
+                                                                                                                                width: {
+                                                                                                                                    sm: 200
+                                                                                                                                },
+                                                                                                                                '& .MuiInputBase-root':
+                                                                                                                                    {
+                                                                                                                                        height: 40
+                                                                                                                                    }
+                                                                                                                            }}
+                                                                                                                            // placeholder="--Select a Location --"
+                                                                                                                            variant="outlined"
+                                                                                                                            name={`vehiclePaxRates.${idx}.operatorCode`}
+                                                                                                                            onBlur={
+                                                                                                                                handleBlur
+                                                                                                                            }
+                                                                                                                            helperText={
+                                                                                                                                touched.vehiclePaxRates &&
+                                                                                                                                touched
+                                                                                                                                    .vehiclePaxRates[
+                                                                                                                                    idx
+                                                                                                                                ] &&
+                                                                                                                                touched
+                                                                                                                                    .vehiclePaxRates[
+                                                                                                                                    idx
+                                                                                                                                ]
+                                                                                                                                    .operatorCode &&
+                                                                                                                                errors.vehiclePaxRates &&
+                                                                                                                                errors
+                                                                                                                                    .vehiclePaxRates[
+                                                                                                                                    idx
+                                                                                                                                ] &&
+                                                                                                                                errors
+                                                                                                                                    .vehiclePaxRates[
+                                                                                                                                    idx
+                                                                                                                                ]
+                                                                                                                                    .operatorCode
+                                                                                                                                    ? errors
+                                                                                                                                          .vehiclePaxRates[
+                                                                                                                                          idx
+                                                                                                                                      ]
+                                                                                                                                          .operatorCode
+                                                                                                                                    : ''
+                                                                                                                            }
+                                                                                                                            error={Boolean(
+                                                                                                                                touched.vehiclePaxRates &&
+                                                                                                                                    touched
+                                                                                                                                        .vehiclePaxRates[
+                                                                                                                                        idx
+                                                                                                                                    ] &&
+                                                                                                                                    touched
+                                                                                                                                        .vehiclePaxRates[
+                                                                                                                                        idx
+                                                                                                                                    ]
+                                                                                                                                        .operatorCode &&
+                                                                                                                                    errors.vehiclePaxRates &&
+                                                                                                                                    errors
+                                                                                                                                        .vehiclePaxRates[
+                                                                                                                                        idx
+                                                                                                                                    ] &&
+                                                                                                                                    errors
+                                                                                                                                        .vehiclePaxRates[
+                                                                                                                                        idx
+                                                                                                                                    ]
+                                                                                                                                        .operatorCode
+                                                                                                                            )}
+                                                                                                                        />
+                                                                                                                    )}
+                                                                                                                />
+                                                                                                            </TableCell>
+                                                                                                            <TableCell>
+                                                                                                                <Autocomplete
+                                                                                                                    value={
+                                                                                                                        values
+                                                                                                                            .vehiclePaxRates[
+                                                                                                                            idx
+                                                                                                                        ]
+                                                                                                                            ? values
+                                                                                                                                  .vehiclePaxRates[
+                                                                                                                                  idx
+                                                                                                                              ]
+                                                                                                                                  .operatorGroupCode
+                                                                                                                            : null
+                                                                                                                    }
+                                                                                                                    name={`vehiclePaxRates.${idx}.operatorGroupCode`}
+                                                                                                                    onChange={(
+                                                                                                                        _,
+                                                                                                                        value
+                                                                                                                    ) => {
+                                                                                                                        setFieldValue(
+                                                                                                                            `vehiclePaxRates.${idx}.operatorGroupCode`,
+                                                                                                                            value
+                                                                                                                        );
+                                                                                                                    }}
+                                                                                                                    options={
+                                                                                                                        activeLocationList
+                                                                                                                    }
+                                                                                                                    getOptionLabel={(
+                                                                                                                        option
+                                                                                                                    ) => `${option.code}`}
+                                                                                                                    isOptionEqualToValue={(
+                                                                                                                        option,
+                                                                                                                        value
+                                                                                                                    ) =>
+                                                                                                                        option.location_id ===
+                                                                                                                        value.location_id
+                                                                                                                    }
+                                                                                                                    renderInput={(
+                                                                                                                        params
+                                                                                                                    ) => (
+                                                                                                                        <TextField
+                                                                                                                            {...params}
+                                                                                                                            // label="tax"
+                                                                                                                            sx={{
+                                                                                                                                width: {
+                                                                                                                                    sm: 200
+                                                                                                                                },
+                                                                                                                                '& .MuiInputBase-root':
+                                                                                                                                    {
+                                                                                                                                        height: 40
+                                                                                                                                    }
+                                                                                                                            }}
+                                                                                                                            placeholder="--Select a Location --"
+                                                                                                                            variant="outlined"
+                                                                                                                            name={`vehiclePaxRates.${idx}.fromLocation`}
+                                                                                                                            onBlur={
+                                                                                                                                handleBlur
+                                                                                                                            }
+                                                                                                                            helperText={
+                                                                                                                                touched.vehiclePaxRates &&
+                                                                                                                                touched
+                                                                                                                                    .vehiclePaxRates[
+                                                                                                                                    idx
+                                                                                                                                ] &&
+                                                                                                                                touched
+                                                                                                                                    .vehiclePaxRates[
+                                                                                                                                    idx
+                                                                                                                                ]
+                                                                                                                                    .operatorGroupCode &&
+                                                                                                                                errors.vehiclePaxRates &&
+                                                                                                                                errors
+                                                                                                                                    .vehiclePaxRates[
+                                                                                                                                    idx
+                                                                                                                                ] &&
+                                                                                                                                errors
+                                                                                                                                    .vehiclePaxRates[
+                                                                                                                                    idx
+                                                                                                                                ]
+                                                                                                                                    .operatorGroupCode
+                                                                                                                                    ? errors
+                                                                                                                                          .vehiclePaxRates[
+                                                                                                                                          idx
+                                                                                                                                      ]
+                                                                                                                                          .operatorGroupCode
+                                                                                                                                    : ''
+                                                                                                                            }
+                                                                                                                            error={Boolean(
+                                                                                                                                touched.vehiclePaxRates &&
+                                                                                                                                    touched
+                                                                                                                                        .vehiclePaxRates[
+                                                                                                                                        idx
+                                                                                                                                    ] &&
+                                                                                                                                    touched
+                                                                                                                                        .vehiclePaxRates[
+                                                                                                                                        idx
+                                                                                                                                    ]
+                                                                                                                                        .operatorGroupCode &&
+                                                                                                                                    errors.vehiclePaxRates &&
+                                                                                                                                    errors
+                                                                                                                                        .vehiclePaxRates[
+                                                                                                                                        idx
+                                                                                                                                    ] &&
+                                                                                                                                    errors
+                                                                                                                                        .vehiclePaxRates[
+                                                                                                                                        idx
+                                                                                                                                    ]
+                                                                                                                                        .operatorGroupCode
+                                                                                                                            )}
+                                                                                                                        />
+                                                                                                                    )}
+                                                                                                                />
+                                                                                                            </TableCell>
+                                                                                                            <TableCell>
+                                                                                                                <Autocomplete
+                                                                                                                    value={
+                                                                                                                        values
+                                                                                                                            .vehiclePaxRates[
+                                                                                                                            idx
+                                                                                                                        ]
+                                                                                                                            ? values
+                                                                                                                                  .vehiclePaxRates[
+                                                                                                                                  idx
+                                                                                                                              ].currency
+                                                                                                                            : null
+                                                                                                                    }
+                                                                                                                    name={`vehiclePaxRates.${idx}.currency`}
+                                                                                                                    onChange={(
+                                                                                                                        _,
+                                                                                                                        value
+                                                                                                                    ) => {
+                                                                                                                        setFieldValue(
+                                                                                                                            `vehiclePaxRates.${idx}.currency`,
+                                                                                                                            value
+                                                                                                                        );
+                                                                                                                    }}
+                                                                                                                    options={
+                                                                                                                        activeLocationList
+                                                                                                                    }
+                                                                                                                    getOptionLabel={(
+                                                                                                                        option
+                                                                                                                    ) => `${option.code}`}
+                                                                                                                    isOptionEqualToValue={(
+                                                                                                                        option,
+                                                                                                                        value
+                                                                                                                    ) =>
+                                                                                                                        option.location_id ===
+                                                                                                                        value.location_id
+                                                                                                                    }
+                                                                                                                    renderInput={(
+                                                                                                                        params
+                                                                                                                    ) => (
+                                                                                                                        <TextField
+                                                                                                                            {...params}
+                                                                                                                            // label="tax"
+                                                                                                                            sx={{
+                                                                                                                                width: {
+                                                                                                                                    sm: 200
+                                                                                                                                },
+                                                                                                                                '& .MuiInputBase-root':
+                                                                                                                                    {
+                                                                                                                                        height: 40
+                                                                                                                                    }
+                                                                                                                            }}
+                                                                                                                            // placeholder="--Select a Location --"
+                                                                                                                            variant="outlined"
+                                                                                                                            name={`vehiclePaxRates.${idx}.currency`}
+                                                                                                                            onBlur={
+                                                                                                                                handleBlur
+                                                                                                                            }
+                                                                                                                            helperText={
+                                                                                                                                touched.vehiclePaxRates &&
+                                                                                                                                touched
+                                                                                                                                    .vehiclePaxRates[
+                                                                                                                                    idx
+                                                                                                                                ] &&
+                                                                                                                                touched
+                                                                                                                                    .vehiclePaxRates[
+                                                                                                                                    idx
+                                                                                                                                ]
+                                                                                                                                    .currency &&
+                                                                                                                                errors.vehiclePaxRates &&
+                                                                                                                                errors
+                                                                                                                                    .vehiclePaxRates[
+                                                                                                                                    idx
+                                                                                                                                ] &&
+                                                                                                                                errors
+                                                                                                                                    .vehiclePaxRates[
+                                                                                                                                    idx
+                                                                                                                                ].currency
+                                                                                                                                    ? errors
+                                                                                                                                          .vehiclePaxRates[
+                                                                                                                                          idx
+                                                                                                                                      ]
+                                                                                                                                          .currency
+                                                                                                                                    : ''
+                                                                                                                            }
+                                                                                                                            error={Boolean(
+                                                                                                                                touched.vehiclePaxRates &&
+                                                                                                                                    touched
+                                                                                                                                        .vehiclePaxRates[
+                                                                                                                                        idx
+                                                                                                                                    ] &&
+                                                                                                                                    touched
+                                                                                                                                        .vehiclePaxRates[
+                                                                                                                                        idx
+                                                                                                                                    ]
+                                                                                                                                        .currency &&
+                                                                                                                                    errors.vehiclePaxRates &&
+                                                                                                                                    errors
+                                                                                                                                        .vehiclePaxRates[
+                                                                                                                                        idx
+                                                                                                                                    ] &&
+                                                                                                                                    errors
+                                                                                                                                        .vehiclePaxRates[
+                                                                                                                                        idx
+                                                                                                                                    ]
+                                                                                                                                        .currency
+                                                                                                                            )}
+                                                                                                                        />
+                                                                                                                    )}
+                                                                                                                />
+                                                                                                            </TableCell>
+                                                                                                            <TableCell>
+                                                                                                                <Autocomplete
+                                                                                                                    value={
+                                                                                                                        values
+                                                                                                                            .vehiclePaxRates[
+                                                                                                                            idx
+                                                                                                                        ]
+                                                                                                                            ? values
+                                                                                                                                  .vehiclePaxRates[
+                                                                                                                                  idx
+                                                                                                                              ].taxCode
+                                                                                                                            : null
+                                                                                                                    }
+                                                                                                                    name={`vehiclePaxRates.${idx}.taxCode`}
+                                                                                                                    onChange={(
+                                                                                                                        _,
+                                                                                                                        value
+                                                                                                                    ) => {
+                                                                                                                        setFieldValue(
+                                                                                                                            `vehiclePaxRates.${idx}.taxCode`,
+                                                                                                                            value
+                                                                                                                        );
+                                                                                                                    }}
+                                                                                                                    options={
+                                                                                                                        activeLocationList
+                                                                                                                    }
+                                                                                                                    getOptionLabel={(
+                                                                                                                        option
+                                                                                                                    ) => `${option.code}`}
+                                                                                                                    isOptionEqualToValue={(
+                                                                                                                        option,
+                                                                                                                        value
+                                                                                                                    ) =>
+                                                                                                                        option.location_id ===
+                                                                                                                        value.location_id
+                                                                                                                    }
+                                                                                                                    renderInput={(
+                                                                                                                        params
+                                                                                                                    ) => (
+                                                                                                                        <TextField
+                                                                                                                            {...params}
+                                                                                                                            // label="tax"
+                                                                                                                            sx={{
+                                                                                                                                width: {
+                                                                                                                                    sm: 200
+                                                                                                                                },
+                                                                                                                                '& .MuiInputBase-root':
+                                                                                                                                    {
+                                                                                                                                        height: 40
+                                                                                                                                    }
+                                                                                                                            }}
+                                                                                                                            placeholder="--Select a Location --"
+                                                                                                                            variant="outlined"
+                                                                                                                            name={`vehiclePaxRates.${idx}.taxCode`}
+                                                                                                                            onBlur={
+                                                                                                                                handleBlur
+                                                                                                                            }
+                                                                                                                            helperText={
+                                                                                                                                touched.vehiclePaxRates &&
+                                                                                                                                touched
+                                                                                                                                    .vehiclePaxRates[
+                                                                                                                                    idx
+                                                                                                                                ] &&
+                                                                                                                                touched
+                                                                                                                                    .vehiclePaxRates[
+                                                                                                                                    idx
+                                                                                                                                ].taxCode &&
+                                                                                                                                errors.vehiclePaxRates &&
+                                                                                                                                errors
+                                                                                                                                    .vehiclePaxRates[
+                                                                                                                                    idx
+                                                                                                                                ] &&
+                                                                                                                                errors
+                                                                                                                                    .vehiclePaxRates[
+                                                                                                                                    idx
+                                                                                                                                ].taxCode
+                                                                                                                                    ? errors
+                                                                                                                                          .vehiclePaxRates[
+                                                                                                                                          idx
+                                                                                                                                      ]
+                                                                                                                                          .taxCode
+                                                                                                                                    : ''
+                                                                                                                            }
+                                                                                                                            error={Boolean(
+                                                                                                                                touched.vehiclePaxRates &&
+                                                                                                                                    touched
+                                                                                                                                        .vehiclePaxRates[
+                                                                                                                                        idx
+                                                                                                                                    ] &&
+                                                                                                                                    touched
+                                                                                                                                        .vehiclePaxRates[
+                                                                                                                                        idx
+                                                                                                                                    ]
+                                                                                                                                        .taxCode &&
+                                                                                                                                    errors.vehiclePaxRates &&
+                                                                                                                                    errors
+                                                                                                                                        .vehiclePaxRates[
+                                                                                                                                        idx
+                                                                                                                                    ] &&
+                                                                                                                                    errors
+                                                                                                                                        .vehiclePaxRates[
+                                                                                                                                        idx
+                                                                                                                                    ]
+                                                                                                                                        .taxCode
+                                                                                                                            )}
+                                                                                                                        />
+                                                                                                                    )}
+                                                                                                                />
+                                                                                                            </TableCell>
+                                                                                                            <TableCell>tax</TableCell>
+                                                                                                            <TableCell>
+                                                                                                                <TextField
+                                                                                                                    // label="taxOrder"
+                                                                                                                    sx={{
+                                                                                                                        width: { sm: 200 },
+                                                                                                                        '& .MuiInputBase-root':
+                                                                                                                            {
+                                                                                                                                height: 40
+                                                                                                                            }
+                                                                                                                    }}
+                                                                                                                    type="text"
+                                                                                                                    variant="outlined"
+                                                                                                                    name={`vehiclePaxRates.${idx}.charterRate`}
+                                                                                                                    value={
+                                                                                                                        values
+                                                                                                                            .vehiclePaxRates[
+                                                                                                                            idx
+                                                                                                                        ] &&
+                                                                                                                        values
+                                                                                                                            .vehiclePaxRates[
+                                                                                                                            idx
+                                                                                                                        ].charterRate
+                                                                                                                    }
+                                                                                                                    onChange={handleChange}
+                                                                                                                    onBlur={handleBlur}
+                                                                                                                    error={Boolean(
+                                                                                                                        touched.vehiclePaxRates &&
+                                                                                                                            touched
+                                                                                                                                .vehiclePaxRates[
+                                                                                                                                idx
+                                                                                                                            ] &&
+                                                                                                                            touched
+                                                                                                                                .vehiclePaxRates[
+                                                                                                                                idx
+                                                                                                                            ].charterRate &&
+                                                                                                                            errors.vehiclePaxRates &&
+                                                                                                                            errors
+                                                                                                                                .vehiclePaxRates[
+                                                                                                                                idx
+                                                                                                                            ] &&
+                                                                                                                            errors
+                                                                                                                                .vehiclePaxRates[
+                                                                                                                                idx
+                                                                                                                            ].charterRate
+                                                                                                                    )}
+                                                                                                                    helperText={
+                                                                                                                        touched.vehiclePaxRates &&
+                                                                                                                        touched
+                                                                                                                            .vehiclePaxRates[
+                                                                                                                            idx
+                                                                                                                        ] &&
+                                                                                                                        touched
+                                                                                                                            .vehiclePaxRates[
+                                                                                                                            idx
+                                                                                                                        ].charterRate &&
+                                                                                                                        errors.vehiclePaxRates &&
+                                                                                                                        errors
+                                                                                                                            .vehiclePaxRates[
+                                                                                                                            idx
+                                                                                                                        ] &&
+                                                                                                                        errors
+                                                                                                                            .vehiclePaxRates[
+                                                                                                                            idx
+                                                                                                                        ].charterRate
+                                                                                                                            ? errors
+                                                                                                                                  .vehiclePaxRates[
+                                                                                                                                  idx
+                                                                                                                              ].charterRate
+                                                                                                                            : ''
+                                                                                                                    }
+                                                                                                                />
+                                                                                                            </TableCell>
+                                                                                                            <TableCell>
+                                                                                                                <TextField
+                                                                                                                    // label="taxOrder"
+                                                                                                                    sx={{
+                                                                                                                        width: { sm: 200 },
+                                                                                                                        '& .MuiInputBase-root':
+                                                                                                                            {
+                                                                                                                                height: 40
+                                                                                                                            }
+                                                                                                                    }}
+                                                                                                                    type="text"
+                                                                                                                    variant="outlined"
+                                                                                                                    name={`vehiclePaxRates.${idx}.charterRatewithTax`}
+                                                                                                                    value={
+                                                                                                                        values
+                                                                                                                            .vehiclePaxRates[
+                                                                                                                            idx
+                                                                                                                        ] &&
+                                                                                                                        values
+                                                                                                                            .vehiclePaxRates[
+                                                                                                                            idx
+                                                                                                                        ].charterRatewithTax
+                                                                                                                    }
+                                                                                                                    onChange={handleChange}
+                                                                                                                    onBlur={handleBlur}
+                                                                                                                    error={Boolean(
+                                                                                                                        touched.vehiclePaxRates &&
+                                                                                                                            touched
+                                                                                                                                .vehiclePaxRates[
+                                                                                                                                idx
+                                                                                                                            ] &&
+                                                                                                                            touched
+                                                                                                                                .vehiclePaxRates[
+                                                                                                                                idx
+                                                                                                                            ]
+                                                                                                                                .charterRatewithTax &&
+                                                                                                                            errors.vehiclePaxRates &&
+                                                                                                                            errors
+                                                                                                                                .vehiclePaxRates[
+                                                                                                                                idx
+                                                                                                                            ] &&
+                                                                                                                            errors
+                                                                                                                                .vehiclePaxRates[
+                                                                                                                                idx
+                                                                                                                            ]
+                                                                                                                                .charterRatewithTax
+                                                                                                                    )}
+                                                                                                                    helperText={
+                                                                                                                        touched.vehiclePaxRates &&
+                                                                                                                        touched
+                                                                                                                            .vehiclePaxRates[
+                                                                                                                            idx
+                                                                                                                        ] &&
+                                                                                                                        touched
+                                                                                                                            .vehiclePaxRates[
+                                                                                                                            idx
+                                                                                                                        ]
+                                                                                                                            .charterRatewithTax &&
+                                                                                                                        errors.vehiclePaxRates &&
+                                                                                                                        errors
+                                                                                                                            .vehiclePaxRates[
+                                                                                                                            idx
+                                                                                                                        ] &&
+                                                                                                                        errors
+                                                                                                                            .vehiclePaxRates[
+                                                                                                                            idx
+                                                                                                                        ].charterRatewithTax
+                                                                                                                            ? errors
+                                                                                                                                  .vehiclePaxRates[
+                                                                                                                                  idx
+                                                                                                                              ]
+                                                                                                                                  .charterRatewithTax
+                                                                                                                            : ''
+                                                                                                                    }
+                                                                                                                />
+                                                                                                            </TableCell>
+                                                                                                            <TableCell>
+                                                                                                                <TextField
+                                                                                                                    // label="taxOrder"
+                                                                                                                    sx={{
+                                                                                                                        width: { sm: 200 },
+                                                                                                                        '& .MuiInputBase-root':
+                                                                                                                            {
+                                                                                                                                height: 40
+                                                                                                                            }
+                                                                                                                    }}
+                                                                                                                    type="text"
+                                                                                                                    variant="outlined"
+                                                                                                                    name={`distances.${idx}.charterRatewithoutTax`}
+                                                                                                                    value={
+                                                                                                                        values
+                                                                                                                            .vehiclePaxRates[
+                                                                                                                            idx
+                                                                                                                        ] &&
+                                                                                                                        values
+                                                                                                                            .vehiclePaxRates[
+                                                                                                                            idx
+                                                                                                                        ]
+                                                                                                                            .charterRatewithoutTax
+                                                                                                                    }
+                                                                                                                    onChange={handleChange}
+                                                                                                                    onBlur={handleBlur}
+                                                                                                                    error={Boolean(
+                                                                                                                        touched.vehiclePaxRates &&
+                                                                                                                            touched
+                                                                                                                                .vehiclePaxRates[
+                                                                                                                                idx
+                                                                                                                            ] &&
+                                                                                                                            touched
+                                                                                                                                .vehiclePaxRates[
+                                                                                                                                idx
+                                                                                                                            ]
+                                                                                                                                .charterRatewithoutTax &&
+                                                                                                                            errors.vehiclePaxRates &&
+                                                                                                                            errors
+                                                                                                                                .vehiclePaxRates[
+                                                                                                                                idx
+                                                                                                                            ] &&
+                                                                                                                            errors
+                                                                                                                                .vehiclePaxRates[
+                                                                                                                                idx
+                                                                                                                            ]
+                                                                                                                                .charterRatewithoutTax
+                                                                                                                    )}
+                                                                                                                    helperText={
+                                                                                                                        touched.vehiclePaxRates &&
+                                                                                                                        touched
+                                                                                                                            .vehiclePaxRates[
+                                                                                                                            idx
+                                                                                                                        ] &&
+                                                                                                                        touched
+                                                                                                                            .vehiclePaxRates[
+                                                                                                                            idx
+                                                                                                                        ]
+                                                                                                                            .charterRatewithoutTax &&
+                                                                                                                        errors.vehiclePaxRates &&
+                                                                                                                        errors
+                                                                                                                            .vehiclePaxRates[
+                                                                                                                            idx
+                                                                                                                        ] &&
+                                                                                                                        errors
+                                                                                                                            .vehiclePaxRates[
+                                                                                                                            idx
+                                                                                                                        ]
+                                                                                                                            .charterRatewithoutTax
+                                                                                                                            ? errors
+                                                                                                                                  .vehiclePaxRates[
+                                                                                                                                  idx
+                                                                                                                              ]
+                                                                                                                                  .charterRatewithoutTax
+                                                                                                                            : ''
+                                                                                                                    }
+                                                                                                                />
+                                                                                                            </TableCell>
+                                                                                                            <TableCell>
+                                                                                                                <FormGroup>
+                                                                                                                    <FormControlLabel
+                                                                                                                        control={
+                                                                                                                            <Checkbox
+                                                                                                                                name={`vehiclePaxRates.${idx}.status`}
+                                                                                                                                onChange={
+                                                                                                                                    handleChange
+                                                                                                                                }
+                                                                                                                                checked={
+                                                                                                                                    values
+                                                                                                                                        .vehiclePaxRates[
+                                                                                                                                        idx
+                                                                                                                                    ].status
+                                                                                                                                }
+                                                                                                                                value={
+                                                                                                                                    values
+                                                                                                                                        .vehiclePaxRates[
+                                                                                                                                        idx
+                                                                                                                                    ] &&
+                                                                                                                                    values
+                                                                                                                                        .vehiclePaxRates[
+                                                                                                                                        idx
+                                                                                                                                    ].status
+                                                                                                                                }
+                                                                                                                            />
+                                                                                                                        }
+                                                                                                                    />
+                                                                                                                </FormGroup>
+                                                                                                            </TableCell>
+                                                                                                            <TableCell>
+                                                                                                                <IconButton
+                                                                                                                    aria-label="delete"
+                                                                                                                    onClick={() => {
+                                                                                                                        remove(idx);
+                                                                                                                    }}
+                                                                                                                >
+                                                                                                                    <HighlightOffIcon />
+                                                                                                                </IconButton>
+                                                                                                            </TableCell>
+                                                                                                        </TableRow>
+                                                                                                    </>
+                                                                                                );
+                                                                                            })}
                                                                                         </TableBody>
                                                                                     </Table>
                                                                                 </TableContainer>
