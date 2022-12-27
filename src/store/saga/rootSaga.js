@@ -91,7 +91,8 @@ import {
     GET_ALL_LOCATION_DATA,
     UPDATE_LOCATION_DATA,
     CHECK_LOCATION_DUPLICATE,
-    GET_LAST_MODIFIED_DATE_TIME_LOCATION
+    GET_LAST_MODIFIED_DATE_TIME_LOCATION,
+    GET_ACTIVE_LOCATIONS
 } from 'store/constant/master/LocationConstant';
 
 import {
@@ -144,7 +145,8 @@ import {
     getLocationByIdSaga,
     updateLocationSaga,
     checkDupicateLocationSaga,
-    checkLatestLocationModifiedDateSaga
+    checkLatestLocationModifiedDateSaga,
+    getAllActiveLocations
 } from './mastersaga/LocationSaga';
 
 import {
@@ -441,6 +443,7 @@ export function* wacherSaga() {
     yield takeLatest(UPDATE_LOCATION_DATA, updateLocationSaga);
     yield takeLatest(CHECK_LOCATION_DUPLICATE, checkDupicateLocationSaga);
     yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_LOCATION, checkLatestLocationModifiedDateSaga);
+    yield takeLatest(GET_ACTIVE_LOCATIONS, getAllActiveLocations);
 
     yield takeLatest(UPDATE_CODE_AND_NAME_DATA, updateCodeAndNameDataSaga);
     yield takeLatest(CHECK_CODE_DUPLICATE, checkDupicateCodeSaga);

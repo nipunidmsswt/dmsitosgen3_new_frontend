@@ -11,7 +11,9 @@ import {
     FAILED_GET_LOCATION_DATA_BY_ID,
     CHECK_LOCATION_DUPLICATE,
     SUCCESS_LAST_MODIFIED_DATE_LOCATION,
-    FAILED_LAST_MODIFIED_DATE_LOCATION
+    FAILED_LAST_MODIFIED_DATE_LOCATION,
+    SUCCESS_GET_ACTIVE_LOCATIONS,
+    FAILED_GET_ACTIVE_LOCATIONS
 } from '../../constant/master/LocationConstant';
 
 //location saga
@@ -101,5 +103,18 @@ export function* checkLatestLocationModifiedDateSaga() {
     } catch (e) {
         console.log('Error:' + e);
         yield put({ type: FAILED_LAST_MODIFIED_DATE_LOCATION, data: '' });
+    }
+}
+
+export function* getAllActiveLocations() {
+    let responseData = [];
+
+    try {
+        responseData = yield call(get, process.env.REACT_APP_ACCOMODATION_URL + '/location/activeLocationDetails');
+        console.log(responseData.data.payload);
+        yield put({ type: SUCCESS_GET_ACTIVE_LOCATIONS, data: responseData.data });
+    } catch (e) {
+        console.log(e);
+        yield put({ type: FAILED_GET_ACTIVE_LOCATIONS, data: responseData.data });
     }
 }
