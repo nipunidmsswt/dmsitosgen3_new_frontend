@@ -107,7 +107,6 @@ const Market = ({ open, handleClose, mode, marketCode }) => {
                     } else {
                         return true;
                     }
-                    return false; // or true as you see fit
                 } catch (error) {}
             }
             return true;

@@ -21,6 +21,7 @@
         "axios": "^1.2.0",
         "date-fns": "^2.29.3",
         "dayjs": "^1.11.6",
+        "dinero.js": "^1.9.1",
         "formik": "^2.2.9",
         "framer-motion": "^6.3.16",
         "material-table": "^2.0.3",

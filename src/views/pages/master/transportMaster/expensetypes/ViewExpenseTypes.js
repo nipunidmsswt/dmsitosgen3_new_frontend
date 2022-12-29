@@ -10,7 +10,7 @@ import MainCard from 'ui-component/cards/MainCard';
 import { FormControlLabel, FormGroup, Grid, Switch } from '@mui/material';
 import { gridSpacing } from 'store/constant';
 import ExpenseTypes from './ExpenseTypes';
-import { getAllExpenseTypesData } from 'store/actions/masterActions/ExpenseTypeAction';
+import { getAllExpenseTypesData, getLatestModifiedDetailsExpenseRates } from 'store/actions/masterActions/ExpenseTypeAction';
 
 function ViewExpenseTypes() {
     const [open, setOpen] = useState(false);
@@ -34,7 +34,7 @@ function ViewExpenseTypes() {
             align: 'center'
         },
         {
-            title: 'Sttaus',
+            title: 'Status',
             field: 'status',
             filterPlaceholder: 'True || False',
             align: 'center',
@@ -64,7 +64,7 @@ function ViewExpenseTypes() {
 
     const dispatch = useDispatch();
     const error = useSelector((state) => state.exchangeRateTypesReducer.errorMsg);
-    const lastModifiedDate = useSelector((state) => state.exchangeRateTypesReducer.lastModifiedDateTime);
+    const lastModifiedDate = useSelector((state) => state.expenseTypesReducer.lastModifiedDateTime);
     const expenseType = useSelector((state) => state.expenseTypesReducer.expenseType);
     const expenseTypesList = useSelector((state) => state.expenseTypesReducer.expenseTypes);
 
@@ -87,11 +87,12 @@ function ViewExpenseTypes() {
             console.log('sucessToast');
             setHandleToast(true);
             dispatch(getAllExpenseTypesData());
+            dispatch(getLatestModifiedDetailsExpenseRates());
         }
     }, [expenseType]);
 
     useEffect(() => {
-        // dispatch(getLatestModifiedDetails());
+        dispatch(getLatestModifiedDetailsExpenseRates());
         dispatch(getAllExpenseTypesData());
     }, []);
 

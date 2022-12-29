@@ -1,8 +1,11 @@
 import {
+    CHECK_EXPENSE_TYPES_CODE_DUPLICATE,
     GET_ALL_CURRENCY_LIST,
     GET_ALL_EXPENSE_TYPES,
     GET_EXPENSE_TYPES_BY_ID,
-    SAVE_EXPENSE_TYPES
+    GET_EXPENSE_TYPES_LAST_MODIFIED_DATE_TIME,
+    SAVE_EXPENSE_TYPES,
+    UPDATE_EXPENSE_TYPES
 } from 'store/constant/master/ExpenseTypesConstant';
 
 export const getAllCurrencyListData = (data) => {
@@ -13,7 +16,6 @@ export const getAllCurrencyListData = (data) => {
 };
 
 export const saveExpenseTypesData = (data) => {
-    console.log(data);
     return {
         type: SAVE_EXPENSE_TYPES,
         data
@@ -33,23 +35,22 @@ export const getExpenseTypesById = (id) => {
     };
 };
 
-// export const updateFacilityCounterData = (data) => {
-//     return {
-//         type: UPDATE_FACILITYCOUNTER_DATA,
-//         data
-//     };
-// };
+export const updateExpenseTypesData = (data) => {
+    return {
+        type: UPDATE_EXPENSE_TYPES,
+        data
+    };
+};
 
-// export const getLatestModifiedDetails = () => {
-//     return {
-//         type: GET_FACILITYCOUNTER_LAST_MODIFIED_DATE_TIME
-//     };
-// };
+export const getLatestModifiedDetailsExpenseRates = () => {
+    return {
+        type: GET_EXPENSE_TYPES_LAST_MODIFIED_DATE_TIME
+    };
+};
 
-// export const checkDuplicateFacilityCounterCode = (code) => {
-//     console.log('owner code:' + code);
-//     return {
-//         type: CHECK_FACILITYCOUNTER_CODE_DUPLICATE,
-//         data: { code }
-//     };
-// };
+export const checkDuplicateExpenseRateCode = (code) => {
+    return {
+        type: CHECK_EXPENSE_TYPES_CODE_DUPLICATE,
+        data: { code }
+    };
+};

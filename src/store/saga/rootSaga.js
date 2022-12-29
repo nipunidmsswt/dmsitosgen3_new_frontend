@@ -313,7 +313,6 @@ import {
     CHECK_MARKET_GROUP_CODE_DUPLICATE,
     GET_ALL_ACTIVE_MARKET_GROUP_DATA,
     GET_ALL_MARKET_GROUP_DATA,
-    GET_ALL_MARKET_GROUP_GROUP_DATA,
     GET_MARKET_GROUP_DETAILS_BY_CODE,
     GET_MARKET_GROUP_LAST_MODIFIED_DATE_TIME,
     SAVE_MARKET_GROUP_DATA,
@@ -363,21 +362,45 @@ import {
     UPDATE_ROOM_CATEGORY
 } from 'store/constant/master/RoomCategoryConstant';
 import {
+    CHECK_EXPENSE_TYPES_CODE_DUPLICATE,
     GET_ALL_CURRENCY_LIST,
     GET_ALL_EXPENSE_TYPES,
     GET_EXPENSE_TYPES_BY_ID,
-    SAVE_EXPENSE_TYPES
+    GET_EXPENSE_TYPES_LAST_MODIFIED_DATE_TIME,
+    SAVE_EXPENSE_TYPES,
+    UPDATE_EXPENSE_TYPES
 } from 'store/constant/master/ExpenseTypesConstant';
 import {
+    checkExpenseTypesDupicateCodeSaga,
     getAllCurrencyListData,
     getAllExpenseTypesDataSaga,
     getExpenseTypesByCodeSaga,
-    saveExpenseTypesDataHandler
+    getExpenseTypesLatestModifiedDateSaga,
+    saveExpenseTypesDataHandler,
+    updateExpenseTypesDataSaga
 } from './mastersaga/ExpenseTypesSaga';
 
 import { getAllChargeMethods, getAllModeOfTransort } from './mastersaga/TransportRateSaga';
 
 import { GET_ALL_CHARGE_METHOD_DATA, GET_ALL_MODE_OF_TRANSPORT_DATA } from 'store/constant/master/TransportRateConstant';
+import {
+    CHECK_GUIDE_CLASS_CODE_DUPLICATE,
+    GET_ALL_ACTIVE_GUIDE_CLASS_DATA,
+    GET_ALL_GUIDE_CLASS_DATA,
+    GET_GUIDE_CLASS_DETAILS_BY_CODE,
+    GET_GUIDE_CLASS_LAST_MODIFIED_DATE_TIME,
+    SAVE_GUIDE_CLASS_DATA,
+    UPDATE_GUIDE_CLASS_DATA
+} from 'store/constant/master/GuideClassConstant';
+import {
+    checkGuideClassDupicateCodeSaga,
+    getAllActiveGuideClassDataSaga,
+    getAllGuideClassDataSaga,
+    getGuideClassDetailsByCodeSaga,
+    getGuideClassLatestModifiedDateSaga,
+    saveGuideClassDataHandler,
+    updateGuideClassDataSaga
+} from './mastersaga/GuideClassSaga';
 
 export function* wacherSaga() {
     // tax setup
@@ -572,9 +595,22 @@ export function* wacherSaga() {
     yield takeLatest(SAVE_EXPENSE_TYPES, saveExpenseTypesDataHandler);
     yield takeLatest(GET_ALL_EXPENSE_TYPES, getAllExpenseTypesDataSaga);
     yield takeLatest(GET_EXPENSE_TYPES_BY_ID, getExpenseTypesByCodeSaga);
+    yield takeLatest(UPDATE_EXPENSE_TYPES, updateExpenseTypesDataSaga);
+    yield takeLatest(GET_EXPENSE_TYPES_LAST_MODIFIED_DATE_TIME, getExpenseTypesLatestModifiedDateSaga);
+    yield takeLatest(CHECK_EXPENSE_TYPES_CODE_DUPLICATE, checkExpenseTypesDupicateCodeSaga);
     //charge method
     yield takeLatest(GET_ALL_CHARGE_METHOD_DATA, getAllChargeMethods);
 
     //mode of transport
     yield takeLatest(GET_ALL_MODE_OF_TRANSPORT_DATA, getAllModeOfTransort);
+
+    //Guide Class
+
+    yield takeLatest(SAVE_GUIDE_CLASS_DATA, saveGuideClassDataHandler);
+    yield takeLatest(GET_ALL_GUIDE_CLASS_DATA, getAllGuideClassDataSaga);
+    yield takeLatest(GET_GUIDE_CLASS_DETAILS_BY_CODE, getGuideClassDetailsByCodeSaga);
+    yield takeLatest(GET_GUIDE_CLASS_LAST_MODIFIED_DATE_TIME, getGuideClassLatestModifiedDateSaga);
+    yield takeLatest(CHECK_GUIDE_CLASS_CODE_DUPLICATE, checkGuideClassDupicateCodeSaga);
+    yield takeLatest(UPDATE_GUIDE_CLASS_DATA, updateGuideClassDataSaga);
+    yield takeLatest(GET_ALL_ACTIVE_GUIDE_CLASS_DATA, getAllActiveGuideClassDataSaga);
 }
