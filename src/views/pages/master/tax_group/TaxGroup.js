@@ -178,20 +178,6 @@ function TaxGroup({ open, handleClose, mode, taxGroupCode }) {
         dispatch(getAllTaxData());
     }, []);
 
-    useEffect(() => {
-        dispatch(getAllTaxData());
-    }, []);
-
-    const addIndex = () => {
-        console.log(ref.current);
-        console.log(ref.current.values.taxGroupDetails.length + 1);
-
-        // setFieldValue(
-        //   `taxGroupDetails.${ref.current.values.taxGroupDetails.length}.taxOrder`,
-        //   2
-        // );
-    };
-
     const handleCancel = () => {
         setLoadValues(initialValues1);
     };

@@ -183,6 +183,20 @@ const utilities = {
                     url: '/master/ownerview',
                     breadcrumbs: false
                 },
+                {
+                    id: 'company-profile-id',
+                    title: 'Company Profile',
+                    type: 'item',
+                    url: '/master/companyprofileview',
+                    breadcrumbs: false
+                },
+                {
+                    id: 'department-designation-id',
+                    title: 'Designation / Department',
+                    type: 'item',
+                    url: '/master/designationdepartmentview',
+                    breadcrumbs: false
+                },
 
                 {
                     id: 'Hotel-master',
