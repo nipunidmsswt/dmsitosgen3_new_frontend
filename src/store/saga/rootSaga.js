@@ -379,6 +379,44 @@ import { getAllChargeMethods, getAllModeOfTransort } from './mastersaga/Transpor
 
 import { GET_ALL_CHARGE_METHOD_DATA, GET_ALL_MODE_OF_TRANSPORT_DATA } from 'store/constant/master/TransportRateConstant';
 
+import { checkDuplicateCompanyProfileCode } from 'store/actions/masterActions/CompanyProfileAction';
+
+import {
+    saveDepartMentDesignationSaga,
+    getAllDepartMentDesignationDataSaga,
+    checkDupicateDepartMentDesignationSaga,
+    updateDepartMentDesignationSaga,
+    getDepartMentDesignationByIdSaga,
+    checkLatestDepartMentDesignationModifiedDateSaga
+} from '../saga/mastersaga/DepartmentDesignationSaga';
+
+import {
+    SAVE_DEPARTMENT_DESIGNATION,
+    GET_ALL_DEPARTMENT_DESIGNATION,
+    GET_DEPARTMENT_DESIGNATION_BY_ID,
+    UPDATE_DEPARTMENT_DESIGNATION,
+    CHECK_DEPARTMENT_DESIGNATION_CODE_DUPLICATE,
+    GET_DEPARTMENT_DESIGNATION_LAST_MODIFIED_DATE_TIME
+} from '../constant/master/DepartmentDesignationConstant';
+
+import {
+    SAVE_COMPANY_PROFILE,
+    GET_ALL_COMPANY_PROFILE,
+    GET_COMPANY_PROFILE_BY_ID,
+    UPDATE_COMPANY_PROFILE,
+    CHECK_COMPANY_PROFILE_CODE_DUPLICATE,
+    GET_COMPANY_PROFILE_LAST_MODIFIED_DATE_TIME
+} from '../constant/master/CompanyProfilrConstant';
+
+import {
+    saveCompanyProfileSaga,
+    getAllCompanyProfileDataSaga,
+    checkDupicateCompanyProfileSaga,
+    updateCompanyProfileSaga,
+    getCompanyProfileByIdSaga,
+    checkLatestCompanyPrfileModifiedDateSaga
+} from '../saga/mastersaga/CompanyProfileSaga';
+
 export function* wacherSaga() {
     // tax setup
     yield takeLatest(SAVE_TAX_DATA, saveTaxSaga);
@@ -577,4 +615,20 @@ export function* wacherSaga() {
 
     //mode of transport
     yield takeLatest(GET_ALL_MODE_OF_TRANSPORT_DATA, getAllModeOfTransort);
+
+    //company profile
+    yield takeLatest(SAVE_COMPANY_PROFILE, saveCompanyProfileSaga);
+    yield takeLatest(GET_COMPANY_PROFILE_BY_ID, getCompanyProfileByIdSaga);
+    yield takeLatest(GET_ALL_COMPANY_PROFILE, getAllCompanyProfileDataSaga);
+    yield takeLatest(UPDATE_COMPANY_PROFILE, updateCompanyProfileSaga);
+    yield takeLatest(CHECK_COMPANY_PROFILE_CODE_DUPLICATE, checkDuplicateCompanyProfileCode);
+    yield takeLatest(GET_COMPANY_PROFILE_LAST_MODIFIED_DATE_TIME, checkLatestCompanyPrfileModifiedDateSaga);
+
+    //designation / department
+    yield takeLatest(SAVE_DEPARTMENT_DESIGNATION, saveDepartMentDesignationSaga);
+    yield takeLatest(GET_DEPARTMENT_DESIGNATION_BY_ID, getDepartMentDesignationByIdSaga);
+    yield takeLatest(GET_ALL_DEPARTMENT_DESIGNATION, getAllDepartMentDesignationDataSaga);
+    yield takeLatest(UPDATE_DEPARTMENT_DESIGNATION, updateDepartMentDesignationSaga);
+    yield takeLatest(CHECK_DEPARTMENT_DESIGNATION_CODE_DUPLICATE, checkDupicateDepartMentDesignationSaga);
+    yield takeLatest(GET_DEPARTMENT_DESIGNATION_LAST_MODIFIED_DATE_TIME, checkLatestDepartMentDesignationModifiedDateSaga);
 }
