@@ -167,23 +167,7 @@ import {
     updateHotelCateogrySaga
 } from './mastersaga/HotelCategorySaga';
 
-// import {
-//     SAVE_ROOM_RECREATION_DATA,
-//     GET_ROOM_RECREATION_DATA_BY_ID,
-//     GET_ALL_ROOM_RECREATION_DATA,
-//     UPDATE_ROOM_RECREATION_DATA,
-//     CHECK_ROOM_RECREATION_DUPLICATE,
-//     GET_LAST_MODIFIED_DATE_TIME_ROOM_RECREATION
-// } from 'store/constant/master/RoomRecreationConstant';
 
-// import {
-//     saveRoomRecreationSaga,
-//     getAllRoomRecreationSaga,
-//     getRoomRecreationByIdSaga,
-//     updateRoomRecreationSaga,
-//     checkDupicateRoomRecreationCodeSaga,
-//     checkLatestRoomCreationModifiedDateSaga
-// } from './masterSaga/RoomRecreationSaga';
 
 import {
     saveManagingCompanySaga,
@@ -222,22 +206,7 @@ import {
     UPDATE_MARKET_DATA
 } from 'store/constant/master/MarketConstant';
 
-// import {
-//     CHECK_SERVICEOFFERED_CODE_DUPLICATE,
-//     GET_ALL_SERVICEOFFERED_DATA,
-//     GET_SERVICEOFFERED_DATA_BY_ID,
-//     GET_SERVICEOFFERED_LAST_MODIFIED_DATE_TIME,
-//     SAVE_SERVICEOFFERED_DATA,
-//     UPDATE_SERVICEOFFERED_DATA
-// } from 'store/constant/master/ServiceOfferedConstant';
-// import {
-//     checkDupicateServiceOfferedCodeSaga,
-//     checkServiceOfferedLatestModifiedDateSaga,
-//     getAllServiceOfferedSaga,
-//     getServiceOfferedByIdSaga,
-//     saveServiceOffered,
-//     updateServiceOfferedSaga
-// } from './masterSaga/ServiceOfferedSaga';
+
 import {
     CHECK_TOURTYPE_CODE_DUPLICATE,
     GET_ALL_TOURTYPE_DATA,
@@ -254,7 +223,7 @@ import {
     updateTourTypeSaga
 } from './mastersaga/TourTypeSaga';
 import { checkDuplicateTourTypeCode } from 'store/actions/masterActions/TourTypeAction';
-// import { checkDuplicateTourTypeCode, getAllTourTypeData } from '../actions/masterActions/TourTypeAction';
+
 import {
     CHECK_OWNER_CODE_DUPLICATE,
     GET_ALL_OWNER_DATA,
@@ -419,6 +388,44 @@ import {
     saveUserSaga,
     updateUserSaga
 } from './authenticationSaga/UserSaga';
+
+import { checkDuplicateCompanyProfileCode } from 'store/actions/masterActions/CompanyProfileAction';
+
+import {
+    saveDepartMentDesignationSaga,
+    getAllDepartMentDesignationDataSaga,
+    checkDupicateDepartMentDesignationSaga,
+    updateDepartMentDesignationSaga,
+    getDepartMentDesignationByIdSaga,
+    checkLatestDepartMentDesignationModifiedDateSaga
+} from '../saga/mastersaga/DepartmentDesignationSaga';
+
+import {
+    SAVE_DEPARTMENT_DESIGNATION,
+    GET_ALL_DEPARTMENT_DESIGNATION,
+    GET_DEPARTMENT_DESIGNATION_BY_ID,
+    UPDATE_DEPARTMENT_DESIGNATION,
+    CHECK_DEPARTMENT_DESIGNATION_CODE_DUPLICATE,
+    GET_DEPARTMENT_DESIGNATION_LAST_MODIFIED_DATE_TIME
+} from '../constant/master/DepartmentDesignationConstant';
+
+import {
+    SAVE_COMPANY_PROFILE,
+    GET_ALL_COMPANY_PROFILE,
+    GET_COMPANY_PROFILE_BY_ID,
+    UPDATE_COMPANY_PROFILE,
+    CHECK_COMPANY_PROFILE_CODE_DUPLICATE,
+    GET_COMPANY_PROFILE_LAST_MODIFIED_DATE_TIME
+} from '../constant/master/CompanyProfilrConstant';
+
+import {
+    saveCompanyProfileSaga,
+    getAllCompanyProfileDataSaga,
+    checkDupicateCompanyProfileSaga,
+    updateCompanyProfileSaga,
+    getCompanyProfileByIdSaga,
+    checkLatestCompanyPrfileModifiedDateSaga
+} from '../saga/mastersaga/CompanyProfileSaga';
 
 export function* wacherSaga() {
     // tax setup
@@ -640,4 +647,19 @@ export function* wacherSaga() {
     yield takeLatest(CHECK_USER_DUPLICATE, checkDupicateUserSaga);
     yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_USER, checkLatestUserModifiedDateSaga);
     yield takeLatest(GET_ACTIVE_USERS, getAllActiveUsers);
+    //company profile
+    yield takeLatest(SAVE_COMPANY_PROFILE, saveCompanyProfileSaga);
+    yield takeLatest(GET_COMPANY_PROFILE_BY_ID, getCompanyProfileByIdSaga);
+    yield takeLatest(GET_ALL_COMPANY_PROFILE, getAllCompanyProfileDataSaga);
+    yield takeLatest(UPDATE_COMPANY_PROFILE, updateCompanyProfileSaga);
+    yield takeLatest(CHECK_COMPANY_PROFILE_CODE_DUPLICATE, checkDuplicateCompanyProfileCode);
+    yield takeLatest(GET_COMPANY_PROFILE_LAST_MODIFIED_DATE_TIME, checkLatestCompanyPrfileModifiedDateSaga);
+
+    //designation / department
+    yield takeLatest(SAVE_DEPARTMENT_DESIGNATION, saveDepartMentDesignationSaga);
+    yield takeLatest(GET_DEPARTMENT_DESIGNATION_BY_ID, getDepartMentDesignationByIdSaga);
+    yield takeLatest(GET_ALL_DEPARTMENT_DESIGNATION, getAllDepartMentDesignationDataSaga);
+    yield takeLatest(UPDATE_DEPARTMENT_DESIGNATION, updateDepartMentDesignationSaga);
+    yield takeLatest(CHECK_DEPARTMENT_DESIGNATION_CODE_DUPLICATE, checkDupicateDepartMentDesignationSaga);
+    yield takeLatest(GET_DEPARTMENT_DESIGNATION_LAST_MODIFIED_DATE_TIME, checkLatestDepartMentDesignationModifiedDateSaga);
 }

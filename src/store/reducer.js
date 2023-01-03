@@ -26,6 +26,8 @@ import { expenseTypesReducer } from './reducers/masterReducer/ExpenseTypesReduce
 import { chargeMethodReducer, modeOfTransortReducer } from './reducers/masterReducer/TransportRateReducer';
 import { guideClassReducer } from './reducers/masterReducer/GuideClassReducer';
 import { userReducer } from './reducers/athenticationReducers/UserReducer';
+import { companyProfileReducer } from './reducers/masterReducer/CompanyProfileReducer';
+import { departmentDesignationReducer } from './reducers/masterReducer/DepartmentDesignationReducer';
 // ==============================|| COMBINE REDUCER ||============================== //
 
 const reducer = combineReducers({
@@ -56,7 +58,9 @@ const reducer = combineReducers({
     chargeMethodReducer,
     modeOfTransortReducer,
     guideClassReducer,
-    userReducer
+    userReducer,
+    companyProfileReducer,
+    departmentDesignationReducer
 });
 
 export default reducer;
