@@ -1,12 +1,17 @@
 import {
     ADD_FAILED_EXPENSE_TYPES,
     ADD_SUCCESS_EXPENSE_TYPES,
+    EXPENSE_TYPES_CODE_DUPLICATE,
+    FAILED_EXPENSE_TYPES_LAST_MODIFIED_DATE,
     FAILED_EXPENSE_TYPES_LIST_DATA,
     FAILED_GET_ALL_CURRENCY_LIST,
     FAILED_GET_EXPENSE_TYPES_BY_ID,
+    SUCCESS_EXPENSE_TYPES_LAST_MODIFIED_DATE,
     SUCCESS_EXPENSE_TYPES_LIST_DATA,
     SUCCESS_GET_EXPENSE_TYPES_BY_ID,
-    SUCESS_GET_ALL_CURRENCY_LIST
+    SUCESS_GET_ALL_CURRENCY_LIST,
+    UPDATE_FAILED_EXPENSE_TYPES,
+    UPDATE_SUCCESS_EXPENSE_TYPES
 } from 'store/constant/master/ExpenseTypesConstant';
 
 const initialState = {
@@ -51,20 +56,20 @@ export const expenseTypesReducer = (state = initialState, action) => {
                 errorMsg: data ? data.errorMessages : 'netwok error'
             };
 
-        // case UPDATE_SUCCESS_TAX_DATA:
-        //     console.log(data.payload[0]);
-        //     console.warn('UPDATE_SUCCESS_TAX_DATA', action);
-        //     console.log(data.payload[0]);
-        //     return { ...state, tax: data.payload[0] };
+        case UPDATE_SUCCESS_EXPENSE_TYPES:
+            console.log(data.payload[0]);
+            console.warn('UPDATE_SUCCESS_TAX_DATA', action);
+            console.log(data.payload[0]);
+            return { ...state, expenseType: data.payload[0] };
 
-        // case UPDATE_FAILED_TAX_DATA:
-        //     console.warn('UPDATE_FAILED_TAX_DATA', action);
-        //     console.log(data);
-        //     return {
-        //         ...state,
-        //         tax: null,
-        //         errorMsg: data ? data.errorMessages : 'netwok error'
-        //     };
+        case UPDATE_FAILED_EXPENSE_TYPES:
+            console.warn('UPDATE_FAILED_TAX_DATA', action);
+            console.log(data);
+            return {
+                ...state,
+                expenseType: null,
+                errorMsg: data ? data.errorMessages : 'netwok error'
+            };
 
         case SUCESS_GET_ALL_CURRENCY_LIST:
             console.log(data.payload[0]);
@@ -74,15 +79,15 @@ export const expenseTypesReducer = (state = initialState, action) => {
             console.log(data);
             return { ...state, currencyList: data };
 
-        // case TAX_DUPLICATE:
-        //     return { ...state, duplicateTax: data };
+        case EXPENSE_TYPES_CODE_DUPLICATE:
+            return { ...state, duplicateExpenseType: data };
 
-        // case SUCCESS_LAST_MODIFIED_DATE_TAX:
-        //     console.log('reducer:' + data.payload[0]);
-        //     return { ...state, lastModifiedDateTime: data.payload[0].dateTime };
+        case SUCCESS_EXPENSE_TYPES_LAST_MODIFIED_DATE:
+            console.log('reducer:' + data.payload[0]);
+            return { ...state, lastModifiedDateTime: data.payload[0].dateTime };
 
-        // case FAILED_LAST_MODIFIED_DATE_TAX:
-        //     return { ...state, lastModifiedDateTime: data };
+        case FAILED_EXPENSE_TYPES_LAST_MODIFIED_DATE:
+            return { ...state, lastModifiedDateTime: data };
 
         default:
             return state;

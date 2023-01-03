@@ -1,40 +1,62 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, forwardRef } from 'react';
 import MaterialTable from 'material-table';
 
 import SuccessMsg from 'messages/SuccessMsg';
 import ErrorMsg from 'messages/ErrorMsg';
 import tableIcons from 'utils/MaterialTableIcons';
-import { useSelector, useDispatch } from 'react-redux';
-import { getAllExChangeRateData, getLatestModifiedDetails } from 'store/actions/masterActions/exchangeRateActions/ExchangeRateActions';
-import MainCard from 'ui-component/cards/MainCard';
-import { FormControlLabel, FormGroup, Grid, Switch } from '@mui/material';
 import { gridSpacing } from 'store/constant';
-import ExpenseTypes from './ExpenseTypes';
-import { getAllExpenseTypesData, getLatestModifiedDetailsExpenseRates } from 'store/actions/masterActions/ExpenseTypeAction';
+import { useSelector, useDispatch } from 'react-redux';
+import Grid from '@mui/material/Grid';
+import MainCard from 'ui-component/cards/MainCard';
+import { getAllUserDetails, getLatestModifiedUserDetails } from 'store/actions/authenticationActions/UserAction';
+import User from './UserCreation';
 
-function ViewExpenseTypes() {
+function ViewUserCreation() {
     const [open, setOpen] = useState(false);
-    const [Code, setCode] = useState('');
+    const [userCode, setUserCode] = useState('');
     const [mode, setMode] = useState('INSERT');
     const [openToast, setHandleToast] = useState(false);
     const [openErrorToast, setOpenErrorToast] = useState(false);
     const [tableData, setTableData] = useState([]);
     const [lastModifiedTimeDate, setLastModifiedTimeDate] = useState(null);
+
     const columns = [
         {
-            title: 'Expense Code',
-            field: 'expenseCode',
+            title: 'User Name',
+            field: 'code',
             filterPlaceholder: 'filter',
             align: 'center'
         },
         {
-            title: 'Description',
-            field: 'description',
+            title: 'First Name',
+            field: 'name',
             filterPlaceholder: 'filter',
             align: 'center'
         },
         {
-            title: 'Status',
+            title: 'Last Name',
+            field: 'province',
+            align: 'center',
+            grouping: false,
+            filterPlaceholder: 'filter'
+        },
+        {
+            title: 'NIC',
+            field: 'geoName',
+            align: 'center',
+            grouping: false,
+            filterPlaceholder: 'filter'
+        },
+        {
+            title: 'Email',
+            field: 'geoName',
+            align: 'center',
+            grouping: false,
+            filterPlaceholder: 'filter'
+        },
+
+        {
+            title: 'Active',
             field: 'status',
             filterPlaceholder: 'True || False',
             align: 'center',
@@ -42,86 +64,69 @@ function ViewExpenseTypes() {
             render: (rowData) => (
                 <div
                     style={{
-                        alignItems: 'center',
-                        align: 'center',
-                        display: 'flex',
-                        justifyContent: 'center'
+                        color: rowData.status === true ? '#008000aa' : '#f90000aa',
+                        fontWeight: 'bold',
+                        // background: rowData.status === true ? "#008000aa" : "#f90000aa",
+                        borderRadius: '4px',
+                        paddingLeft: 5,
+                        paddingRight: 5
                     }}
                 >
-                    {rowData.status === true ? (
-                        <FormGroup>
-                            <FormControlLabel control={<Switch color="success" size="small" />} checked={true} />
-                        </FormGroup>
-                    ) : (
-                        <FormGroup>
-                            <FormControlLabel control={<Switch color="error" size="small" />} checked={false} />
-                        </FormGroup>
-                    )}
+                    {rowData.status === true ? 'Active' : 'Inactive'}
                 </div>
             )
         }
     ];
 
     const dispatch = useDispatch();
-    const error = useSelector((state) => state.exchangeRateTypesReducer.errorMsg);
-    const lastModifiedDate = useSelector((state) => state.expenseTypesReducer.lastModifiedDateTime);
-    const expenseType = useSelector((state) => state.expenseTypesReducer.expenseType);
-    const expenseTypesList = useSelector((state) => state.expenseTypesReducer.expenseTypes);
+    const error = useSelector((state) => state.userReducer.errorMsg);
+    const users = useSelector((state) => state.userReducer.users);
+    const user = useSelector((state) => state.userReducer.user);
+    const lastModifiedDate = useSelector((state) => state.userReducer.lastModifiedDateTime);
 
     useEffect(() => {
-        console.log(expenseTypesList);
-        if (expenseTypesList?.length > 0) {
-            setTableData(expenseTypesList);
+        setLastModifiedTimeDate(lastModifiedDate);
+    }, [lastModifiedDate]);
+
+    useEffect(() => {
+        if (users?.payload?.length > 0) {
+            // setTableData(users?.payload[0]);
         }
-    }, [expenseTypesList]);
+    }, [users]);
 
     useEffect(() => {
+        console.log(error);
         if (error != null) {
+            console.log('failed Toast');
             setOpenErrorToast(true);
         }
     }, [error]);
 
     useEffect(() => {
-        console.log(expenseType);
-        if (expenseType) {
+        if (user) {
             console.log('sucessToast');
             setHandleToast(true);
-            dispatch(getAllExpenseTypesData());
-            dispatch(getLatestModifiedDetailsExpenseRates());
+            // dispatch(getAlluserDetails());
         }
-    }, [expenseType]);
+    }, [user]);
 
     useEffect(() => {
-        dispatch(getLatestModifiedDetailsExpenseRates());
-        dispatch(getAllExpenseTypesData());
+        dispatch(getAllUserDetails());
+        dispatch(getLatestModifiedUserDetails());
     }, []);
 
-    useEffect(() => {
-        setLastModifiedTimeDate(
-            lastModifiedDate === null
-                ? ''
-                : new Date(lastModifiedDate).toLocaleString('en-GB', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: '2-digit',
-                      hour: 'numeric',
-                      minute: 'numeric',
-                      hour12: true
-                  })
-        );
-    }, [lastModifiedDate]);
-
     const handleClickOpen = (type, data) => {
+        console.log(type);
+        console.log(data);
         if (type === 'VIEW_UPDATE') {
-            console.log('expenseCode:' + data.expenseCode);
             setMode(type);
-            setCode(data.expenseCode);
+            setUserCode(data.code);
         } else if (type === 'INSERT') {
-            setCode('');
+            setUserCode('');
             setMode(type);
         } else {
             setMode(type);
-            setCode(data.expenseCode);
+            setUserCode(data.code);
         }
         setOpen(true);
     };
@@ -138,7 +143,7 @@ function ViewExpenseTypes() {
     };
     return (
         <div>
-            <MainCard>
+            <MainCard title="User">
                 <div style={{ textAlign: 'right' }}> Last Modified Date : {lastModifiedTimeDate}</div>
                 <br />
                 <Grid container spacing={gridSpacing}>
@@ -207,7 +212,7 @@ function ViewExpenseTypes() {
                                     }}
                                 />
 
-                                {open ? <ExpenseTypes open={open} handleClose={handleClose} code={Code} mode={mode} /> : ''}
+                                {open ? <User open={open} handleClose={handleClose} userCode={userCode} mode={mode} /> : ''}
                                 {openToast ? <SuccessMsg openToast={openToast} handleToast={handleToast} mode={mode} /> : null}
                                 {openErrorToast ? (
                                     <ErrorMsg openToast={openErrorToast} handleToast={setOpenErrorToast} mode={mode} />
@@ -222,4 +227,4 @@ function ViewExpenseTypes() {
     );
 }
 
-export default ViewExpenseTypes;
+export default ViewUserCreation;

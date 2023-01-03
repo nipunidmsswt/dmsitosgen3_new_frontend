@@ -107,7 +107,6 @@ const Market = ({ open, handleClose, mode, marketCode }) => {
                     } else {
                         return true;
                     }
-                    return false; // or true as you see fit
                 } catch (error) {}
             }
             return true;
@@ -218,9 +217,7 @@ const Market = ({ open, handleClose, mode, marketCode }) => {
                                                                             name="manager"
                                                                             disabled={mode == 'VIEW'}
                                                                             onChange={(_, value) => {
-                                                                                console.log('selectd:' + value.shortName);
                                                                                 setFieldValue(`manager`, value);
-                                                                                console.log('manager:' + values.manager.shortName);
                                                                             }}
                                                                             options={clusterListOptions}
                                                                             getOptionLabel={(option) =>

@@ -32,7 +32,13 @@ import Paper from '@mui/material/Paper';
 import * as yup from 'yup';
 import { gridSpacing } from 'store/constant';
 import { getAllTaxData, getTaxDataById, getTaxDataByUniqueId } from 'store/actions/masterActions/TaxActions/TaxAction';
-import { getAllCurrencyListData, getExpenseTypesById, saveExpenseTypesData } from 'store/actions/masterActions/ExpenseTypeAction';
+import {
+    checkDuplicateExpenseRateCode,
+    getAllCurrencyListData,
+    getExpenseTypesById,
+    saveExpenseTypesData,
+    updateExpenseTypesData
+} from 'store/actions/masterActions/ExpenseTypeAction';
 import CreatedUpdatedUserDetailsWithTableFormat from '../../userTimeDetails/CreatedUpdatedUserDetailsWithTableFormat';
 import axios from 'axios';
 const Transition = forwardRef(function Transition(props, ref) {
@@ -118,30 +124,24 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
     //   });
     // });
 
-    // yup.addMethod(yup.string, "checkDuplicateTaxGroup", function (message) {
-    //   return this.test(
-    //     "checkDuplicateTaxGroup",
-    //     "Duplicate Tax group",
-    //     async function validateValue(value) {
-    //       try {
-    //         dispatch(checkDuplicateTaxGroupCode(value));
-
-    //         if (
-    //           duplicateTaxGroup != null &&
-    //           duplicateTaxGroup.errorMessages.length != 0
-    //         ) {
-    //           return false;
-    //         } else {
-    //           return true;
-    //         }
-    //         return false; // or true as you see fit
-    //       } catch (error) {}
-    //     }
-    //   );
-    // });
+    yup.addMethod(yup.string, 'checkDuplicateExpenseCode', function (message) {
+        return this.test('checkDuplicateExpenseCode', 'Duplicate Expense Code', async function validateValue(value) {
+            try {
+                console.log(value);
+                dispatch(checkDuplicateExpenseRateCode(value));
+                console.log(duplicateCode);
+                if (duplicateCode != null && duplicateCode.errorMessages.length != 0) {
+                    return false;
+                } else {
+                    return true;
+                }
+            } catch (error) {}
+            return true;
+        });
+    });
 
     const validationSchema = yup.object().shape({
-        expenseCode: yup.string().required('Required field'),
+        expenseCode: yup.string().required('Required field').checkDuplicateExpenseCode('ggg'),
         description: yup.string().required('Required field'),
         // currencyISOCode: yup.string().required('Required field'),
 
@@ -164,9 +164,11 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
         //   .uniqueTaxCode("Must be unique"),
         expenseTypeDetails: yup.array().of(
             yup.object().shape({
-                // tax: yup.object().typeError("Required field"),
-                fromDate: yup.date().required('Required field')
-                // rate: yup.string().required('Required field')
+                tax: yup.object().typeError('Required field'),
+                fromDate: yup.date().required('Required field'),
+                toDate: yup.date().required('Required field'),
+                currencyList: yup.object().typeError('Required field'),
+                expenseRate: yup.string().required('Required field')
             })
         )
     });
@@ -197,13 +199,14 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
 
     const taxToUpdate = useSelector((state) => state.taxReducer.taxToUpdate);
     const taxToEdit = useSelector((state) => state.taxReducer.taxToEdit);
+    console.log(taxToEdit);
 
-    useEffect(() => {
-        if ((mode === 'VIEW_UPDATE' && taxToEdit != null) || (mode === 'VIEW' && taxToEdit != null)) {
-            console.log('tax to edit:' + taxToEdit.taxCode);
-            setTaxValues(taxToEdit);
-        }
-    }, [taxToEdit != null]);
+    // useEffect(() => {
+    //     if ((mode === 'VIEW_UPDATE' && taxToEdit != null) || (mode === 'VIEW' && taxToEdit != null)) {
+    //         console.log('tax to edit:' + taxToEdit.taxCode);
+    //         setTaxValues(taxToEdit);
+    //     }
+    // }, [taxToEdit != null]);
 
     // useEffect(() => {
     //     (async () => {
@@ -228,25 +231,26 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
     // }, [expenseTypeToUpdate]);
 
     const [taxData, setData] = useState(null);
-    async function getData(userId) {
-        console.log(userId);
-        const realData1 = null;
-        const data = await axios
-            .get(`${process.env.REACT_APP_FINANCE_URL}/taxDetails/${userId}`)
-            .then((promise) => {
-                console.log(promise);
-                console.log(promise.data.payload[0]);
-                const realData1 = promise.data.payload[0];
-                return realData1;
-            })
-            .catch((e) => {
-                console.error(e);
-            });
-        console.log(data);
-        // const realData = data.data.payload[0];
-        // setData(realData);
-        return data;
-    }
+    // async function getData(userId) {
+    //     console.log(userId);
+    //     // const realData1 = null;
+    //     const data = await axios
+    //         .get(`${process.env.REACT_APP_FINANCE_URL}/taxDetails/${userId}`)
+    //         .then((result) => {
+    //             console.log(result.json);
+    //             console.log(result.data.payload[0]);
+    //             const realData1 = result.data.payload[0];
+    //             return realData1;
+    //         })
+    //         .catch((e) => {
+    //             console.error(e);
+    //         });
+    //     console.log(data);
+
+    //     // // const realData = data.data.payload[0];
+    //     // // setData(realData);
+    //     return data;
+    // }
 
     // useEffect(() => {
     //     console.log(taxData);
@@ -256,9 +260,32 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
     //     //   }
     // }, [taxData]);
 
+    async function getData(userId) {
+        const data = await getTaxDetails(userId);
+        const value = data.data.payload[0];
+        console.log(value);
+        return value;
+    }
+
+    const getTaxDetails = async (userId) => {
+        const response = axios.get(`${process.env.REACT_APP_FINANCE_URL}/taxDetails/${userId}`);
+        return response;
+    };
+    // getTaxDetails(item.tax);
+    async function getTaxDetailsn(value) {
+        try {
+            await dispatch(getTaxDataByUniqueId(value));
+            console.log(taxToEdit);
+            // if (duplicateCode != null && duplicateCode.errorMessages.length != 0) {
+            //     return false;
+            // } else {
+            //     return true;
+            // }
+        } catch (error) {}
+        return taxToEdit;
+    }
+
     useEffect(() => {
-        console.log('yyyy');
-        console.log(expenseTypeToUpdate);
         // fetchData();
         // declare the data fetching function
         // const fetchData = () => {
@@ -269,6 +296,9 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                 if (expenseTypeToUpdate.expenseTypeDetails.length > 0) {
                     expenseTypeToUpdate.expenseTypeDetails.map((item) => {
                         console.log(item.tax);
+
+                        const taxDe = getTaxDetailsn(item.tax);
+                        console.log(taxDe);
                         // setTaxIdValues(item.Tax);
                         // console.log('inside');
                         // dispatch(getTaxDataByUniqueId(item.tax));
@@ -283,6 +313,7 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                         //     await dispatch(getTaxDataByUniqueId(item.tax));
                         //     console.log(taxValues);
                         // };
+                        // getList();
                         // const fetchData = async () => {
                         //     try {
                         //         const list = await dispatch(getTaxDataByUniqueId(item.tax));
@@ -315,8 +346,13 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                         // };
                         // fetchData();
                         const data = getData(item.tax);
-                        // setData(getData(item.tax));
+                        // // setData(getData(item.tax));
                         console.log(data);
+                        const taxDes = data;
+                        // console.log(taxDes);
+                        // let allPromises = null;
+                        // allPromises == data;
+                        // console.log(allPromises);
                         // async () => {
                         //     const value = dispatch(getTaxDataByUniqueId(item.tax)).then;
                         //     if (value) {
@@ -335,14 +371,14 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                         // const fetchData = async () => {
                         //     const data = await fetch('https://yourapi.com');
                         //   }
-                        console.log(taxData);
+                        // console.log(taxData);
 
                         const expenseTypeDetails = {
                             fromDate: item.fromDate,
                             toDate: item.toDate,
                             // currencyList: item.currencyList,
 
-                            tax: data,
+                            tax: taxDes,
                             expenseRate: item.expenseRate,
                             rateWithoutTax: '',
                             rateWithTax: '',
@@ -492,7 +528,47 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
             // dispatch(saveExpenseTypesData(data));
             // setTableData(dataArray);
         } else if (mode === 'VIEW_UPDATE') {
-            // dispatch(updateExChangeRateData(data));
+            const dataArray = [];
+
+            console.log(data.expenseTypeDetails.length);
+            console.log(data.expenseTypeDetails.size);
+            if (data.expenseTypeDetails.length > 0) {
+                data.expenseTypeDetails.map((item) => {
+                    const expenseTypeDetails = {
+                        fromDate: item.fromDate,
+                        toDate: item.toDate,
+                        currencyList: item.currencyList.currencyListId,
+                        tax: item.tax.taxId,
+                        expenseRate: item.expenseRate,
+                        rateWithoutTax: '',
+                        rateWithTax: '',
+                        status: item.status
+                    };
+                    dataArray.push(expenseTypeDetails);
+                });
+
+                const saveValues = {
+                    expenseCode: data.expenseCode,
+                    description: data.description,
+                    status: data.status,
+                    expenseTypeDetails: dataArray
+
+                    // expenseTypeDetails: [
+                    //     {
+                    //         fromDate: item.fromDate,
+                    //         toDate: item.toDate,
+                    //         currencyList: item.currencyList.currencyListId,
+                    //         tax: item.tax.taxId,
+                    //         expenseRate: item.expenseRate,
+                    //         rateWithoutTax: '',
+                    //         rateWithTax: '',
+                    //         status:item.status,
+                    //     }
+                    // ]
+                };
+                console.log(saveValues);
+                dispatch(updateExpenseTypesData(saveValues));
+            }
         }
         handleClose();
     };
@@ -503,7 +579,7 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
 
     const taxListData = useSelector((state) => state.taxReducer.taxes);
     const currencyListData = useSelector((state) => state.expenseTypesReducer.currencyList);
-
+    const duplicateCode = useSelector((state) => state.expenseTypesReducer.duplicateExpenseType);
     const [taxListOptions, setTaxListOptions] = useState([]);
     const [currencyListOptions, setCurrencyListOptions] = useState([]);
 
@@ -580,6 +656,7 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                                                                             shrink: true
                                                                         }}
                                                                         name="expenseCode"
+                                                                        disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
                                                                         label="Expense Code"
                                                                         onChange={handleChange}
                                                                         onBlur={handleBlur}
@@ -604,6 +681,7 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                                                                         InputLabelProps={{
                                                                             shrink: true
                                                                         }}
+                                                                        disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
                                                                         label="Description"
                                                                         onChange={handleChange}
                                                                         onBlur={handleBlur}
@@ -620,6 +698,7 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                                                                     <FormGroup>
                                                                         <FormControlLabel
                                                                             name="status"
+                                                                            disabled={mode == 'VIEW'}
                                                                             onChange={handleChange}
                                                                             value={values.status}
                                                                             control={<Switch color="success" />}
@@ -697,6 +776,10 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                                                                                                                 value
                                                                                                             );
                                                                                                         }}
+                                                                                                        disabled={
+                                                                                                            mode == 'VIEW_UPDATE' ||
+                                                                                                            mode == 'VIEW'
+                                                                                                        }
                                                                                                         inputFormat="DD/MM/YYYY"
                                                                                                         value={
                                                                                                             values.expenseTypeDetails[
@@ -710,7 +793,7 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                                                                                                                 {...params}
                                                                                                                 sx={{
                                                                                                                     width: {
-                                                                                                                        sm: 200
+                                                                                                                        sm: 150
                                                                                                                     },
                                                                                                                     '& .MuiInputBase-root':
                                                                                                                         {
@@ -782,6 +865,10 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                                                                                                                 value
                                                                                                             );
                                                                                                         }}
+                                                                                                        disabled={
+                                                                                                            mode == 'VIEW_UPDATE' ||
+                                                                                                            mode == 'VIEW'
+                                                                                                        }
                                                                                                         inputFormat="DD/MM/YYYY"
                                                                                                         value={
                                                                                                             values.expenseTypeDetails[
@@ -795,7 +882,7 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                                                                                                                 {...params}
                                                                                                                 sx={{
                                                                                                                     width: {
-                                                                                                                        sm: 200
+                                                                                                                        sm: 150
                                                                                                                     },
                                                                                                                     '& .MuiInputBase-root':
                                                                                                                         {
@@ -876,6 +963,10 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                                                                                                             value
                                                                                                         );
                                                                                                     }}
+                                                                                                    disabled={
+                                                                                                        mode == 'VIEW_UPDATE' ||
+                                                                                                        mode == 'VIEW'
+                                                                                                    }
                                                                                                     options={currencyListOptions}
                                                                                                     getOptionLabel={(option) =>
                                                                                                         `${option.currencyCode} - ${option.currencyDescription}`
@@ -898,47 +989,47 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                                                                                                             variant="outlined"
                                                                                                             name={`expenseTypeDetails.${idx}.currencyList`}
                                                                                                             onBlur={handleBlur}
-                                                                                                            // helperText={
-                                                                                                            //     touched.expenseTypeDetails &&
-                                                                                                            //     touched.expenseTypeDetails[
-                                                                                                            //         idx
-                                                                                                            //     ] &&
-                                                                                                            //     touched.expenseTypeDetails[
-                                                                                                            //         idx
-                                                                                                            //     ].tax &&
-                                                                                                            //     errors.expenseTypeDetails &&
-                                                                                                            //     errors.expenseTypeDetails[
-                                                                                                            //         idx
-                                                                                                            //     ] &&
-                                                                                                            //     errors.expenseTypeDetails[
-                                                                                                            //         idx
-                                                                                                            //     ].tax
-                                                                                                            //         ? errors
-                                                                                                            //               .expenseTypeDetails[
-                                                                                                            //               idx
-                                                                                                            //           ].tax
-                                                                                                            //         : ''
-                                                                                                            // }
-                                                                                                            // error={Boolean(
-                                                                                                            //     touched.expenseTypeDetails &&
-                                                                                                            //         touched
-                                                                                                            //             .expenseTypeDetails[
-                                                                                                            //             idx
-                                                                                                            //         ] &&
-                                                                                                            //         touched
-                                                                                                            //             .expenseTypeDetails[
-                                                                                                            //             idx
-                                                                                                            //         ].tax &&
-                                                                                                            //         errors.expenseTypeDetails &&
-                                                                                                            //         errors
-                                                                                                            //             .expenseTypeDetails[
-                                                                                                            //             idx
-                                                                                                            //         ] &&
-                                                                                                            //         errors
-                                                                                                            //             .expenseTypeDetails[
-                                                                                                            //             idx
-                                                                                                            //         ].tax
-                                                                                                            // )}
+                                                                                                            helperText={
+                                                                                                                touched.expenseTypeDetails &&
+                                                                                                                touched.expenseTypeDetails[
+                                                                                                                    idx
+                                                                                                                ] &&
+                                                                                                                touched.expenseTypeDetails[
+                                                                                                                    idx
+                                                                                                                ].currencyList &&
+                                                                                                                errors.expenseTypeDetails &&
+                                                                                                                errors.expenseTypeDetails[
+                                                                                                                    idx
+                                                                                                                ] &&
+                                                                                                                errors.expenseTypeDetails[
+                                                                                                                    idx
+                                                                                                                ].currencyList
+                                                                                                                    ? errors
+                                                                                                                          .expenseTypeDetails[
+                                                                                                                          idx
+                                                                                                                      ].currencyList
+                                                                                                                    : ''
+                                                                                                            }
+                                                                                                            error={Boolean(
+                                                                                                                touched.expenseTypeDetails &&
+                                                                                                                    touched
+                                                                                                                        .expenseTypeDetails[
+                                                                                                                        idx
+                                                                                                                    ] &&
+                                                                                                                    touched
+                                                                                                                        .expenseTypeDetails[
+                                                                                                                        idx
+                                                                                                                    ].currencyList &&
+                                                                                                                    errors.expenseTypeDetails &&
+                                                                                                                    errors
+                                                                                                                        .expenseTypeDetails[
+                                                                                                                        idx
+                                                                                                                    ] &&
+                                                                                                                    errors
+                                                                                                                        .expenseTypeDetails[
+                                                                                                                        idx
+                                                                                                                    ].currencyList
+                                                                                                            )}
                                                                                                         />
                                                                                                     )}
                                                                                                 />
@@ -951,6 +1042,10 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                                                                                                                   .tax
                                                                                                             : null
                                                                                                     }
+                                                                                                    // disabled={
+                                                                                                    //     mode == 'VIEW_UPDATE' ||
+                                                                                                    //     mode == 'VIEW'
+                                                                                                    // }
                                                                                                     name={`expenseTypeDetails.${idx}.tax`}
                                                                                                     onChange={(_, value) => {
                                                                                                         console.log(value);
@@ -980,69 +1075,77 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                                                                                                             variant="outlined"
                                                                                                             name={`expenseTypeDetails.${idx}.tax`}
                                                                                                             onBlur={handleBlur}
-                                                                                                            // helperText={
-                                                                                                            //     touched.expenseTypeDetails &&
-                                                                                                            //     touched.expenseTypeDetails[
-                                                                                                            //         idx
-                                                                                                            //     ] &&
-                                                                                                            //     touched.expenseTypeDetails[
-                                                                                                            //         idx
-                                                                                                            //     ].tax &&
-                                                                                                            //     errors.expenseTypeDetails &&
-                                                                                                            //     errors.expenseTypeDetails[
-                                                                                                            //         idx
-                                                                                                            //     ] &&
-                                                                                                            //     errors.expenseTypeDetails[
-                                                                                                            //         idx
-                                                                                                            //     ].tax
-                                                                                                            //         ? errors
-                                                                                                            //               .expenseTypeDetails[
-                                                                                                            //               idx
-                                                                                                            //           ].tax
-                                                                                                            //         : ''
-                                                                                                            // }
-                                                                                                            // error={Boolean(
-                                                                                                            //     touched.expenseTypeDetails &&
-                                                                                                            //         touched
-                                                                                                            //             .expenseTypeDetails[
-                                                                                                            //             idx
-                                                                                                            //         ] &&
-                                                                                                            //         touched
-                                                                                                            //             .expenseTypeDetails[
-                                                                                                            //             idx
-                                                                                                            //         ].tax &&
-                                                                                                            //         errors.expenseTypeDetails &&
-                                                                                                            //         errors
-                                                                                                            //             .expenseTypeDetails[
-                                                                                                            //             idx
-                                                                                                            //         ] &&
-                                                                                                            //         errors
-                                                                                                            //             .expenseTypeDetails[
-                                                                                                            //             idx
-                                                                                                            //         ].tax
-                                                                                                            // )}
+                                                                                                            helperText={
+                                                                                                                touched.expenseTypeDetails &&
+                                                                                                                touched.expenseTypeDetails[
+                                                                                                                    idx
+                                                                                                                ] &&
+                                                                                                                touched.expenseTypeDetails[
+                                                                                                                    idx
+                                                                                                                ].tax &&
+                                                                                                                errors.expenseTypeDetails &&
+                                                                                                                errors.expenseTypeDetails[
+                                                                                                                    idx
+                                                                                                                ] &&
+                                                                                                                errors.expenseTypeDetails[
+                                                                                                                    idx
+                                                                                                                ].tax
+                                                                                                                    ? errors
+                                                                                                                          .expenseTypeDetails[
+                                                                                                                          idx
+                                                                                                                      ].tax
+                                                                                                                    : ''
+                                                                                                            }
+                                                                                                            error={Boolean(
+                                                                                                                touched.expenseTypeDetails &&
+                                                                                                                    touched
+                                                                                                                        .expenseTypeDetails[
+                                                                                                                        idx
+                                                                                                                    ] &&
+                                                                                                                    touched
+                                                                                                                        .expenseTypeDetails[
+                                                                                                                        idx
+                                                                                                                    ].tax &&
+                                                                                                                    errors.expenseTypeDetails &&
+                                                                                                                    errors
+                                                                                                                        .expenseTypeDetails[
+                                                                                                                        idx
+                                                                                                                    ] &&
+                                                                                                                    errors
+                                                                                                                        .expenseTypeDetails[
+                                                                                                                        idx
+                                                                                                                    ].tax
+                                                                                                            )}
                                                                                                         />
                                                                                                     )}
                                                                                                 />
                                                                                             </TableCell>
                                                                                             <TableCell>
-                                                                                                {/* {values.expenseTypeDetails[idx] &&
+                                                                                                {values.expenseTypeDetails[idx] &&
                                                                                                 values.expenseTypeDetails[idx].tax
                                                                                                     ? values.expenseTypeDetails[idx].tax
                                                                                                           .percentage
-                                                                                                    : 0} */}
+                                                                                                    : 0}
                                                                                             </TableCell>
                                                                                             <TableCell>
                                                                                                 <TextField
                                                                                                     sx={{
-                                                                                                        width: { sm: 200 },
+                                                                                                        width: { sm: 100 },
                                                                                                         '& .MuiInputBase-root': {
                                                                                                             height: 40
                                                                                                         }
                                                                                                     }}
+                                                                                                    min="0.00"
+                                                                                                    step="0.001"
+                                                                                                    max="1.00"
+                                                                                                    presicion={2}
                                                                                                     // label="Additional Price"
                                                                                                     type="number"
                                                                                                     variant="outlined"
+                                                                                                    disabled={
+                                                                                                        mode == 'VIEW_UPDATE' ||
+                                                                                                        mode == 'VIEW'
+                                                                                                    }
                                                                                                     placeholder="0"
                                                                                                     name={`expenseTypeDetails.${idx}.expenseRate`}
                                                                                                     value={
@@ -1055,32 +1158,33 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                                                                                                     //     setRateWithTax(e.target.value)
                                                                                                     // }
                                                                                                     onBlur={handleBlur}
-                                                                                                    // error={Boolean(
-                                                                                                    //     touched.expenseTypeDetails &&
-                                                                                                    //         touched.expenseTypeDetails[
-                                                                                                    //             idx
-                                                                                                    //         ] &&
-                                                                                                    //         touched.expenseTypeDetails[idx]
-                                                                                                    //             .rate &&
-                                                                                                    //         errors.expenseTypeDetails &&
-                                                                                                    //         errors.expenseTypeDetails[
-                                                                                                    //             idx
-                                                                                                    //         ] &&
-                                                                                                    //         errors.expenseTypeDetails[idx]
-                                                                                                    //             .rate
-                                                                                                    // )}
-                                                                                                    // helperText={
-                                                                                                    //     touched.expenseTypeDetails &&
-                                                                                                    //     touched.expenseTypeDetails[idx] &&
-                                                                                                    //     touched.expenseTypeDetails[idx]
-                                                                                                    //         .rate &&
-                                                                                                    //     errors.expenseTypeDetails &&
-                                                                                                    //     errors.expenseTypeDetails[idx] &&
-                                                                                                    //     errors.expenseTypeDetails[idx].rate
-                                                                                                    //         ? errors.expenseTypeDetails[idx]
-                                                                                                    //               .rate
-                                                                                                    //         : ''
-                                                                                                    // }
+                                                                                                    error={Boolean(
+                                                                                                        touched.expenseTypeDetails &&
+                                                                                                            touched.expenseTypeDetails[
+                                                                                                                idx
+                                                                                                            ] &&
+                                                                                                            touched.expenseTypeDetails[idx]
+                                                                                                                .expenseRate &&
+                                                                                                            errors.expenseTypeDetails &&
+                                                                                                            errors.expenseTypeDetails[
+                                                                                                                idx
+                                                                                                            ] &&
+                                                                                                            errors.expenseTypeDetails[idx]
+                                                                                                                .expenseRate
+                                                                                                    )}
+                                                                                                    helperText={
+                                                                                                        touched.expenseTypeDetails &&
+                                                                                                        touched.expenseTypeDetails[idx] &&
+                                                                                                        touched.expenseTypeDetails[idx]
+                                                                                                            .expenseRate &&
+                                                                                                        errors.expenseTypeDetails &&
+                                                                                                        errors.expenseTypeDetails[idx] &&
+                                                                                                        errors.expenseTypeDetails[idx]
+                                                                                                            .expenseRate
+                                                                                                            ? errors.expenseTypeDetails[idx]
+                                                                                                                  .expenseRate
+                                                                                                            : ''
+                                                                                                    }
                                                                                                 />
                                                                                             </TableCell>
                                                                                             <TableCell>
@@ -1091,7 +1195,7 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                                                                                                     : 0}
                                                                                             </TableCell>
                                                                                             <TableCell>
-                                                                                                {/* {values.expenseTypeDetails[idx] &&
+                                                                                                {values.expenseTypeDetails[idx] &&
                                                                                                 values.expenseTypeDetails[idx].expenseRate
                                                                                                     ? values.expenseTypeDetails[idx]
                                                                                                           .expenseRate *
@@ -1100,7 +1204,7 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                                                                                                               100) +
                                                                                                       values.expenseTypeDetails[idx]
                                                                                                           .expenseRate
-                                                                                                    : 0} */}
+                                                                                                    : 0}
                                                                                                 {/* <TextField
                                                                                                     sx={{
                                                                                                         width: { sm: 200 },
@@ -1112,10 +1216,10 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                                                                                                     type="number"
                                                                                                     variant="outlined"
                                                                                                     placeholder="0"
-                                                                                                    // name={`expenseTypeDetails.${idx}.rate`}
+                                                                                                    // name={`expenseTypeDetails.${idx}.expenseRate`}
                                                                                                     // value={
                                                                                                     //     values.expenseTypeDetails[idx] &&
-                                                                                                    //     values.expenseTypeDetails[idx].rate
+                                                                                                    //     values.expenseTypeDetails[idx].expenseRate
                                                                                                     // }
                                                                                                     onChange={handleChange}
                                                                                                     onBlur={handleBlur}
