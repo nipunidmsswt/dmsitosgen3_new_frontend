@@ -217,9 +217,7 @@ const Market = ({ open, handleClose, mode, marketCode }) => {
                                                                             name="manager"
                                                                             disabled={mode == 'VIEW'}
                                                                             onChange={(_, value) => {
-                                                                                console.log('selectd:' + value.shortName);
                                                                                 setFieldValue(`manager`, value);
-                                                                                console.log('manager:' + values.manager.shortName);
                                                                             }}
                                                                             options={clusterListOptions}
                                                                             getOptionLabel={(option) =>

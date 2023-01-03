@@ -401,6 +401,24 @@ import {
     saveGuideClassDataHandler,
     updateGuideClassDataSaga
 } from './mastersaga/GuideClassSaga';
+import {
+    CHECK_USER_DUPLICATE,
+    GET_ACTIVE_USERS,
+    GET_ALL_USER_DATA,
+    GET_LAST_MODIFIED_DATE_TIME_USER,
+    GET_USER_DATA_BY_ID,
+    SAVE_USER_DATA,
+    UPDATE_USER_DATA
+} from 'store/constant/authentication/UserConstant';
+import {
+    checkDupicateUserSaga,
+    checkLatestUserModifiedDateSaga,
+    getAllActiveUsers,
+    getAllUserSaga,
+    getUserByIdSaga,
+    saveUserSaga,
+    updateUserSaga
+} from './authenticationSaga/UserSaga';
 
 export function* wacherSaga() {
     // tax setup
@@ -613,4 +631,13 @@ export function* wacherSaga() {
     yield takeLatest(CHECK_GUIDE_CLASS_CODE_DUPLICATE, checkGuideClassDupicateCodeSaga);
     yield takeLatest(UPDATE_GUIDE_CLASS_DATA, updateGuideClassDataSaga);
     yield takeLatest(GET_ALL_ACTIVE_GUIDE_CLASS_DATA, getAllActiveGuideClassDataSaga);
+
+    // //User data
+    yield takeLatest(SAVE_USER_DATA, saveUserSaga);
+    yield takeLatest(GET_USER_DATA_BY_ID, getUserByIdSaga);
+    yield takeLatest(GET_ALL_USER_DATA, getAllUserSaga);
+    yield takeLatest(UPDATE_USER_DATA, updateUserSaga);
+    yield takeLatest(CHECK_USER_DUPLICATE, checkDupicateUserSaga);
+    yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_USER, checkLatestUserModifiedDateSaga);
+    yield takeLatest(GET_ACTIVE_USERS, getAllActiveUsers);
 }
