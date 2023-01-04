@@ -389,8 +389,6 @@ import {
     updateUserSaga
 } from './authenticationSaga/UserSaga';
 
-import { checkDuplicateCompanyProfileCode } from 'store/actions/masterActions/CompanyProfileAction';
-
 import {
     saveDepartMentDesignationSaga,
     getAllDepartMentDesignationDataSaga,
@@ -652,7 +650,7 @@ export function* wacherSaga() {
     yield takeLatest(GET_COMPANY_PROFILE_BY_ID, getCompanyProfileByIdSaga);
     yield takeLatest(GET_ALL_COMPANY_PROFILE, getAllCompanyProfileDataSaga);
     yield takeLatest(UPDATE_COMPANY_PROFILE, updateCompanyProfileSaga);
-    yield takeLatest(CHECK_COMPANY_PROFILE_CODE_DUPLICATE, checkDuplicateCompanyProfileCode);
+    yield takeLatest(CHECK_COMPANY_PROFILE_CODE_DUPLICATE, checkDupicateCompanyProfileSaga);
     yield takeLatest(GET_COMPANY_PROFILE_LAST_MODIFIED_DATE_TIME, checkLatestCompanyPrfileModifiedDateSaga);
 
     //designation / department
