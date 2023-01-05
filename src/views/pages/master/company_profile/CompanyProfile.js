@@ -1,7 +1,20 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Dialog, FormControlLabel, Box, DialogContent, TextField, DialogTitle, FormGroup, Button, MenuItem, Switch } from '@mui/material';
-
+import {
+    Dialog,
+    FormControlLabel,
+    Box,
+    Paper,
+    DialogContent,
+    TextField,
+    DialogTitle,
+    FormGroup,
+    Button,
+    MenuItem,
+    Switch
+} from '@mui/material';
+// material-ui
+import { alpha, styled } from '@mui/material/styles';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import {
@@ -15,6 +28,104 @@ import { Formik, Form } from 'formik';
 import Grid from '@mui/material/Grid';
 import * as yup from 'yup';
 import CreatedUpdatedUserDetailsWithTableFormat from '../userTimeDetails/CreatedUpdatedUserDetailsWithTableFormat';
+import { useDropzone } from 'react-dropzone';
+import AddRoundedIcon from '@mui/icons-material/AddRounded';
+import { isString } from 'lodash';
+import CancelIcon from '@mui/icons-material/Cancel';
+const DropZoneStyle = styled('div')(({ theme }) => ({
+    width: 64,
+    height: 64,
+    fontSize: 24,
+    display: 'flex',
+    cursor: 'pointer',
+    alignItems: 'center',
+    justifyContent: 'center',
+    margin: theme.spacing(0.5),
+    borderRadius: theme.shape.borderRadius,
+    '&:hover': { opacity: 0.72 }
+}));
+const thumbsContainer = {
+    display: 'flex',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: 16
+};
+
+const thumb = {
+    display: 'inline-flex',
+    borderRadius: 2,
+    border: '1px solid #000',
+    marginBottom: 8,
+    marginRight: 8,
+    width: 100,
+    height: 100,
+    padding: 4,
+    boxSizing: 'border-box'
+};
+
+const thumbInner = {
+    display: 'flex',
+    minWidth: 0,
+    overflow: 'hidden'
+};
+
+const img = {
+    display: 'block',
+    width: 'auto',
+    height: '100%'
+};
+function Previews(props) {
+    const [files, setFiles] = useState([]);
+    const { getRootProps, getInputProps } = useDropzone({
+        accept: 'image/*',
+        onDrop: (acceptedFiles) => {
+            acceptedFiles.map((file, index) => {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    acceptedFiles[index].base64 = event.target.result;
+                };
+                reader.onerror = (error) => {
+                    // Handle error here
+                };
+                reader.readAsDataURL(file);
+            });
+
+            props.setFieldValue('avatars', [...props.avatars, ...acceptedFiles]);
+            setFiles(
+                acceptedFiles.map((file) =>
+                    Object.assign(file, {
+                        preview: URL.createObjectURL(file)
+                    })
+                )
+            );
+        }
+    });
+
+    const thumbs = files.map((file) => (
+        <div style={thumb} key={file.name}>
+            <div style={thumbInner}>
+                <img src={file.preview} style={img} alt="jhcfjkds" />
+            </div>
+        </div>
+    ));
+
+    useEffect(
+        () => () => {
+            files.forEach((file) => URL.revokeObjectURL(file.preview));
+        },
+        [files]
+    );
+
+    return (
+        <div className="container">
+            <div {...getRootProps()} style={{ border: '1px solid #000', padding: '1rem' }}>
+                <input {...getInputProps()} />
+                <p>Drag 'n' drop some files here, or click to select files</p>
+            </div>
+            <aside style={thumbsContainer}>{thumbs}</aside>
+        </div>
+    );
+}
 
 function CompanyProfile({ open, handleClose, mode, code }) {
     const initialValues = {
@@ -34,85 +145,45 @@ function CompanyProfile({ open, handleClose, mode, code }) {
         files: ''
     };
 
-    const [taxListOptions, setTaxListOptions] = useState([]);
     const [loadValues, setLoadValues] = useState(null);
-
-    yup.addMethod(yup.array, 'uniqueTaxOrder', function (message) {
-        return this.test('uniqueTaxOrder', message, function (list) {
-            const mapper = (x) => {
-                return x.taxOrder;
-            };
-            const set = [...new Set(list.map(mapper))];
-            const isUnique = list.length === set.length;
-            if (isUnique) {
-                return true;
-            }
-
-            const idx = list.findIndex((l, i) => mapper(l) !== set[i]);
-            return this.createError({
-                path: `taxGroupDetails[${idx}].taxOrder`,
-                message: message
-            });
-        });
-    });
-
-    yup.addMethod(yup.array, 'uniqueTaxCode', function (message) {
-        return this.test('uniqueTaxCode', message, function (list) {
-            const mapper = (x) => {
-                return x.tax?.taxCode;
-            };
-            const set = [...new Set(list.map(mapper))];
-            const isUnique = list.length === set.length;
-            if (isUnique) {
-                return true;
-            }
-
-            const idx = list.findIndex((l, i) => mapper(l) !== set[i]);
-            return this.createError({
-                path: `taxGroupDetails[${idx}].tax`,
-                message: message
-            });
-        });
-    });
-
-    yup.addMethod(yup.string, 'checkDuplicateTaxGroup', function (message) {
-        return this.test('checkDuplicateTaxGroup', message, async function validateValue(value) {
+    yup.addMethod(yup.string, 'checkDuplicateCompanyName', function (message) {
+        return this.test('checkDuplicateCompanyName', message, async function validateValue(value) {
             if (mode === 'INSERT') {
                 try {
-                    await dispatch(checkDuplicatecode(value));
+                    console.log('sjhgchs');
+                    await dispatch(checkDuplicateCompanyProfileCode(value));
 
-                    if (duplicateTaxGroup != null && duplicateTaxGroup.errorMessages.length != 0) {
+                    if (duplicatecompanyProfileGroup != null && duplicatecompanyProfileGroup.errorMessages.length != 0) {
                         return false;
                     } else {
                         return true;
                     }
-                    return false; // or true as you see fit
+                    return false;
                 } catch (error) {}
             }
             return true;
         });
     });
-
     const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
 
     const validationSchema = yup.object().shape({
-        companyName: yup.string().required('Required field'),
-        companyId: yup.string().required('Required field'),
-        version: yup.string().required('Required field'),
-        address: yup.string().required('Required field'),
-        email: yup.string().required('Required field').email(),
-        fax: yup.string().required('Required field'),
-        phone: yup.string().required('Required field').matches(phoneRegExp, 'Phone number is not valid'),
-        website: yup.string().required('Required field'),
-        fax: yup.string().required('Required field'),
-        website: yup.string().required('Required field'),
-        allocatedLicenceCount: yup.string().required('Required field')
+        // companyName: yup.string().required('Required field').checkDuplicateCompanyName('Duplicate Code'),
+        // companyId: yup.string().required('Required field'),
+        // version: yup.string().required('Required field'),
+        // address: yup.string().required('Required field'),
+        // email: yup.string().required('Required field').email(),
+        // fax: yup.string().required('Required field'),
+        // phone: yup.string().required('Required field').matches(phoneRegExp, 'Phone number is not valid'),
+        // website: yup.string().required('Required field'),
+        // fax: yup.string().required('Required field'),
+        // website: yup.string().required('Required field'),
+        // allocatedLicenceCount: yup.string().required('Required field')
     });
 
     //get data from reducers
-    const duplicateTax = useSelector((state) => state.companyProfileReducer.duplicateTax);
+    const duplicatecompanyProfileGroup = useSelector((state) => state.companyProfileReducer.duplicatecompanyProfileGroup);
+    console.log(duplicatecompanyProfileGroup);
     const companyProfileToUpdate = useSelector((state) => state.companyProfileReducer.companyProfileToUpdate);
-    const duplicateTaxGroup = useSelector((state) => state.companyProfileReducer.duplicateTaxGroup);
 
     const dispatch = useDispatch();
 
@@ -130,18 +201,49 @@ function CompanyProfile({ open, handleClose, mode, code }) {
 
     const handleSubmitForm = (data) => {
         console.log(data);
-        if (mode === 'INSERT') {
-            dispatch(saveCompanyProfileData(data));
-        } else if (mode === 'VIEW_UPDATE') {
-            dispatch(updateCompanyProfileData(data));
-        }
-        handleClose();
+        console.log(files);
+        // if (mode === 'INSERT') {
+        //     dispatch(saveCompanyProfileData(data));
+        // } else if (mode === 'VIEW_UPDATE') {
+        //     dispatch(updateCompanyProfileData(data));
+        // }
+        // handleClose();
     };
 
-    const handleCancel = () => {
-        setLoadValues(initialValues);
+    const [files, setFiles] = useState([]);
+
+    const handleRemove = (file) => {
+        const filteredItems = files.filter((_file) => _file !== file);
+        setFiles(filteredItems);
     };
 
+    const handleDrop = useCallback(
+        (acceptedFiles) => {
+            setFiles(
+                acceptedFiles.map((file) => {
+                    const reader = new FileReader();
+
+                    reader.onabort = () => console.log('file reading was aborted');
+                    reader.onerror = () => console.log('file reading has failed');
+                    reader.onload = () => {
+                        const binaryStr = reader.result;
+                        console.log(binaryStr);
+                    };
+                    reader.readAsArrayBuffer(file);
+
+                    console.log(reader);
+                    return Object.assign(file, {
+                        preview: URL.createObjectURL(file)
+                    });
+                })
+            );
+        },
+        [setFiles]
+    );
+
+    const { getRootProps, getInputProps, isDragActive } = useDropzone({
+        onDrop: handleDrop
+    });
     return (
         <div>
             <Dialog fullWidth maxWidth="md" open={open} keepMounted onClose={handleClose} aria-describedby="alert-dialog-slide-description">
@@ -185,6 +287,7 @@ function CompanyProfile({ open, handleClose, mode, code }) {
                                                         InputLabelProps={{
                                                             shrink: true
                                                         }}
+                                                        disabled={mode == 'VIEW_UPDATE'}
                                                         label="Company Name"
                                                         name="companyName"
                                                         onChange={handleChange}
@@ -194,7 +297,7 @@ function CompanyProfile({ open, handleClose, mode, code }) {
                                                         helperText={touched.companyName && errors.companyName ? errors.companyName : ''}
                                                     ></TextField>
                                                 </Grid>
-                                                <Grid item xs={3}>
+                                                <Grid item xs={3} hidden={mode == 'INSERT' ? true : false}>
                                                     <TextField
                                                         sx={{
                                                             width: { xs: 100, sm: 200 },
@@ -214,7 +317,7 @@ function CompanyProfile({ open, handleClose, mode, code }) {
                                                         helperText={touched.companyId && errors.companyId ? errors.companyId : ''}
                                                     ></TextField>
                                                 </Grid>
-                                                <Grid item xs={3}>
+                                                <Grid item xs={mode == 'INSERT' ? 4 : 3}>
                                                     <TextField
                                                         sx={{
                                                             width: { xs: 100, sm: 200 },
@@ -421,6 +524,70 @@ function CompanyProfile({ open, handleClose, mode, code }) {
                                                         }}
                                                     />
                                                 </Grid>
+                                                <>
+                                                    {/* {files.map((file) => {
+                                                        const { name, preview } = file;
+                                                        const key = isString(file) ? file : name;
+
+                                                        return (
+                                                            <Box
+                                                                key={key}
+                                                                sx={{
+                                                                    p: 0,
+                                                                    m: 0.5,
+                                                                    width: 64,
+                                                                    height: 64,
+                                                                    borderRadius: 0.25,
+                                                                    overflow: 'hidden',
+                                                                    position: 'relative'
+                                                                }}
+                                                            >
+                                                                <Paper
+                                                                    variant="outlined"
+                                                                    component="img"
+                                                                    src={isString(file) ? file : preview}
+                                                                    sx={{
+                                                                        width: '100%',
+                                                                        height: '100%',
+                                                                        objectFit: 'cover',
+                                                                        position: 'absolute',
+                                                                        borderRadius: 1
+                                                                    }}
+                                                                />
+                                                                <Box sx={{ top: 6, right: 6, position: 'absolute' }}>
+                                                                    <IconButton
+                                                                        size="small"
+                                                                        onClick={() => handleRemove(file)}
+                                                                        sx={{
+                                                                            p: '1px',
+                                                                            color: 'common.white',
+                                                                            bgcolor: (theme) => alpha(theme.palette.grey[900], 0.72),
+                                                                            '&:hover': {
+                                                                                bgcolor: (theme) => alpha(theme.palette.grey[900], 0.48)
+                                                                            }
+                                                                        }}
+                                                                    >
+                                                                        <CancelIcon />
+                                                                    </IconButton>
+                                                                </Box>
+                                                            </Box>
+                                                        );
+                                                    })} */}
+
+                                                    {/* <DropZoneStyle
+                                                        {...getRootProps()}
+                                                        sx={{
+                                                            ...(isDragActive && { opacity: 0.72 })
+                                                        }}
+                                                    >
+                                                        <input {...getInputProps()} />
+
+                                                        <Button variant="outlined" size="large" sx={{ p: 2.25 }}>
+                                                            <AddRoundedIcon />
+                                                        </Button>
+                                                    </DropZoneStyle> */}
+                                                    <Previews setFieldValue={setFieldValue} avatars={values.avatars} />
+                                                </>
                                             </Grid>
                                         </Box>
                                         <Box display="flex" flexDirection="row-reverse" style={{ marginTop: '20px' }}>

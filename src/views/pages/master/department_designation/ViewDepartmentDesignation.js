@@ -5,8 +5,10 @@ import DepartmentDesignation from './DepartmentDesignation';
 import SuccessMsg from '../../../../messages/SuccessMsg';
 import ErrorMsg from '../../../../messages/ErrorMsg';
 import { useSelector, useDispatch } from 'react-redux';
-import { getAllTaxData } from '../../../../store/actions/masterActions/TaxActions/TaxAction';
-import { getAllTaxGroupDetails, getLatestModifiedTaxGroupDetails } from '../../../../store/actions/masterActions/TaxActions/TaxGroupAction';
+import {
+    getAllDepartmentDesignationData,
+    getLatestModifiedDetails
+} from '../../../../store/actions/masterActions/DepartmentDesignationAction';
 import Grid from '@mui/material/Grid';
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
@@ -14,23 +16,24 @@ import { FormControlLabel, FormGroup, Switch } from '@mui/material';
 
 function ViewDepartmentDesignation() {
     const [open, setOpen] = useState(false);
-    const [taxGroupCode, setTaxGroupCode] = useState('');
+    const [code, setCode] = useState('');
     const [mode, setMode] = useState('INSERT');
     const [openToast, setHandleToast] = useState(false);
     const [openErrorToast, setOpenErrorToast] = useState(false);
     const [tableData, setTableData] = useState([]);
     const [lastModifiedTimeDate, setLastModifiedTimeDate] = useState(null);
+    const [type, setType] = useState('');
 
     const columns = [
         {
-            title: 'Company ID',
-            field: 'companyId',
+            title: 'Type',
+            field: 'type',
             filterPlaceholder: 'filter',
             align: 'center'
         },
         {
-            title: 'Name',
-            field: 'companyName',
+            title: 'Description',
+            field: 'description',
             filterPlaceholder: 'filter',
             align: 'center'
         },
@@ -69,16 +72,15 @@ function ViewDepartmentDesignation() {
     const dispatch = useDispatch();
     const error = useSelector((state) => state.taxReducer.errorMsg);
 
-    const taxGroupListData = useSelector((state) => state.taxGroupReducer.taxgroups);
-    const taxGroupData = useSelector((state) => state.taxGroupReducer.taxgroup);
-    console.log(taxGroupListData);
-    const lastModifiedDate = useSelector((state) => state.taxGroupReducer.lastModifiedDateTime);
+    const departmentDesignationList = useSelector((state) => state.departmentDesignationReducer.departmentDesignationList);
+    const departmentDesignation = useSelector((state) => state.departmentDesignationReducer.departmentDesignation);
+    const lastModifiedDate = useSelector((state) => state.departmentDesignationReducer.lastModifiedDateTime);
 
     useEffect(() => {
-        if (taxGroupListData?.payload?.length > 0) {
-            setTableData(taxGroupListData?.payload[0]);
+        if (departmentDesignationList?.payload?.length > 0) {
+            setTableData(departmentDesignationList?.payload[0]);
         }
-    }, [taxGroupListData]);
+    }, [departmentDesignationList]);
 
     useEffect(() => {
         console.log(error);
@@ -89,24 +91,24 @@ function ViewDepartmentDesignation() {
     }, [error]);
 
     useEffect(() => {
-        console.log(taxGroupData);
-        if (taxGroupData) {
+        console.log(departmentDesignation);
+        if (departmentDesignation) {
             console.log('sucessToast');
             setHandleToast(true);
-            dispatch(getAllTaxGroupDetails());
-            dispatch(getLatestModifiedTaxGroupDetails());
+            dispatch(getAllDepartmentDesignationData());
+            dispatch(getLatestModifiedDetails());
         }
-    }, [taxGroupData]);
+    }, [departmentDesignation]);
 
     useEffect(() => {
-        dispatch(getAllTaxGroupDetails());
-        dispatch(getAllTaxData());
-        dispatch(getLatestModifiedTaxGroupDetails());
+        dispatch(getAllDepartmentDesignationData());
+        dispatch(getLatestModifiedDetails());
     }, []);
 
     useEffect(() => {
+        console.log(typeof lastModifiedDate);
         setLastModifiedTimeDate(
-            lastModifiedDate === null
+            lastModifiedDate === null || lastModifiedDate === ''
                 ? ''
                 : new Date(lastModifiedDate).toLocaleString('en-GB', {
                       year: 'numeric',
@@ -124,13 +126,24 @@ function ViewDepartmentDesignation() {
         console.log(data);
         if (type === 'VIEW_UPDATE') {
             setMode(type);
-            setTaxGroupCode(data.taxGroupCode);
+            setCode(data.id);
+            if (data.type === 'Department') {
+                setType(data.type);
+            } else if (data.type === 'Designation') {
+                setType(data.type);
+            }
         } else if (type === 'INSERT') {
-            setTaxGroupCode('');
+            setCode('');
             setMode(type);
+            setType('');
         } else {
             setMode(type);
-            setTaxGroupCode(data.taxGroupCode);
+            setCode(data.id);
+            if (data.type === 'Department') {
+                setType(data.type);
+            } else if (data.type === 'Designation') {
+                setType(data.type);
+            }
         }
         setOpen(true);
     };
@@ -219,7 +232,7 @@ function ViewDepartmentDesignation() {
                                 />
 
                                 {open ? (
-                                    <DepartmentDesignation open={open} handleClose={handleClose} taxGroupCode={taxGroupCode} mode={mode} />
+                                    <DepartmentDesignation open={open} handleClose={handleClose} code={code} mode={mode} type={type} />
                                 ) : (
                                     ''
                                 )}

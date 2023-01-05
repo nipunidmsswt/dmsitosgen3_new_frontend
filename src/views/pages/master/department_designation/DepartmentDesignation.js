@@ -5,18 +5,18 @@ import { Dialog, FormControlLabel, Box, DialogContent, TextField, DialogTitle, F
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import {
-    saveCompanyProfileData,
-    getCompanyProfileDataById,
-    updateCompanyProfileData,
-    checkDuplicateCompanyProfileCode
-} from '../../../../store/actions/masterActions/CompanyProfileAction';
+    saveDepartmentDesignationData,
+    getDepartmentDesignationDataById,
+    updateDepartmentDesignationData,
+    checkDuplicateDepartmentDesignationCode
+} from '../../../../store/actions/masterActions/DepartmentDesignationAction';
 
 import { Formik, Form } from 'formik';
 import Grid from '@mui/material/Grid';
 import * as yup from 'yup';
 import CreatedUpdatedUserDetailsWithTableFormat from '../userTimeDetails/CreatedUpdatedUserDetailsWithTableFormat';
 
-function DepartmentDesignation({ open, handleClose, mode, taxGroupCode }) {
+function DepartmentDesignation({ open, handleClose, mode, code, type }) {
     const initialValues = {
         type: '',
         description: '',
@@ -25,57 +25,18 @@ function DepartmentDesignation({ open, handleClose, mode, taxGroupCode }) {
 
     const [loadValues, setLoadValues] = useState(null);
 
-    yup.addMethod(yup.array, 'uniqueTaxOrder', function (message) {
-        return this.test('uniqueTaxOrder', message, function (list) {
-            const mapper = (x) => {
-                return x.taxOrder;
-            };
-            const set = [...new Set(list.map(mapper))];
-            const isUnique = list.length === set.length;
-            if (isUnique) {
-                return true;
-            }
-
-            const idx = list.findIndex((l, i) => mapper(l) !== set[i]);
-            return this.createError({
-                path: `taxGroupDetails[${idx}].taxOrder`,
-                message: message
-            });
-        });
-    });
-
-    yup.addMethod(yup.array, 'uniqueTaxCode', function (message) {
-        return this.test('uniqueTaxCode', message, function (list) {
-            const mapper = (x) => {
-                return x.tax?.taxCode;
-            };
-            const set = [...new Set(list.map(mapper))];
-            const isUnique = list.length === set.length;
-            if (isUnique) {
-                return true;
-            }
-
-            const idx = list.findIndex((l, i) => mapper(l) !== set[i]);
-            return this.createError({
-                path: `taxGroupDetails[${idx}].tax`,
-                message: message
-            });
-        });
-    });
-
-    yup.addMethod(yup.string, 'checkDuplicateTaxGroup', function (message) {
-        return this.test('checkDuplicateTaxGroup', message, async function validateValue(value) {
+    yup.addMethod(yup.string, 'checkDuplicateCode', function (message) {
+        return this.test('checkDuplicateCode', message, async function validateValue(value) {
             if (mode === 'INSERT') {
-                try {
-                    await dispatch(checkDuplicateTaxGroupCode(value));
-
-                    if (duplicateTaxGroup != null && duplicateTaxGroup.errorMessages.length != 0) {
-                        return false;
-                    } else {
-                        return true;
-                    }
-                    return false; // or true as you see fit
-                } catch (error) {}
+                // try {
+                //     await dispatch(checkDuplicateDepartmentDesignationCode(value));
+                //     if (duplicateDepartmentDesignation != null && duplicateDepartmentDesignation.errorMessages.length != 0) {
+                //         return false;
+                //     } else {
+                //         return true;
+                //     }
+                //     return false; // or true as you see fit
+                // } catch (error) {}
             }
             return true;
         });
@@ -83,41 +44,39 @@ function DepartmentDesignation({ open, handleClose, mode, taxGroupCode }) {
 
     const validationSchema = yup.object().shape({
         type: yup.string().required('Required field'),
-        description: yup.string().required('Required field'),
+        description: yup.string().required('Required field').checkDuplicateCode('Duplicate Code'),
         status: yup.boolean()
     });
 
     //get data from reducers
-    const duplicateTax = useSelector((state) => state.taxReducer.duplicateTax);
-    const taxGroupToUpdate = useSelector((state) => state.taxGroupReducer.taxGroupToUpdate);
-    const duplicateTaxGroup = useSelector((state) => state.taxGroupReducer.duplicateTaxGroup);
+    const departmentDesignationToUpdate = useSelector((state) => state.departmentDesignationReducer.departmentDesignationToUpdate);
+    const duplicateDepartmentDesignation = useSelector((state) => state.departmentDesignationReducer.duplicateDepartmentDesignation);
 
     const dispatch = useDispatch();
 
     useEffect(() => {
         if (mode === 'VIEW_UPDATE' || mode === 'VIEW') {
-            dispatch(getTaxGroupDataById(taxGroupCode));
+            dispatch(getDepartmentDesignationDataById(code, type));
         }
     }, [mode]);
 
     useEffect(() => {
-        if ((mode === 'VIEW_UPDATE' && taxGroupToUpdate != null) || (mode === 'VIEW' && taxGroupToUpdate != null)) {
-            setLoadValues(taxGroupToUpdate);
+        if (
+            (mode === 'VIEW_UPDATE' && departmentDesignationToUpdate != null) ||
+            (mode === 'VIEW' && departmentDesignationToUpdate != null)
+        ) {
+            setLoadValues(departmentDesignationToUpdate);
         }
-    }, [taxGroupToUpdate]);
+    }, [departmentDesignationToUpdate]);
 
     const handleSubmitForm = (data) => {
         console.log(data);
         if (mode === 'INSERT') {
-            dispatch(saveCompanyProfileData(data));
+            dispatch(saveDepartmentDesignationData(data));
         } else if (mode === 'VIEW_UPDATE') {
-            dispatch(updateCompanyProfileData(data));
+            dispatch(updateDepartmentDesignationData(data));
         }
-        // handleClose();
-    };
-
-    const handleCancel = () => {
-        setLoadValues(initialValues);
+        handleClose();
     };
 
     return (
@@ -165,7 +124,7 @@ function DepartmentDesignation({ open, handleClose, mode, taxGroupCode }) {
                                                         InputLabelProps={{
                                                             shrink: true
                                                         }}
-                                                        label="Desination / Department"
+                                                        label="type"
                                                         name="type"
                                                         onChange={handleChange}
                                                         onBlur={handleBlur}
@@ -189,6 +148,7 @@ function DepartmentDesignation({ open, handleClose, mode, taxGroupCode }) {
                                                                 height: 40
                                                             }
                                                         }}
+                                                        disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
                                                         InputLabelProps={{
                                                             shrink: true
                                                         }}

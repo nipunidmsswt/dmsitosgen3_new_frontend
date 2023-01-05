@@ -10,7 +10,8 @@ import {
     FAILED_COMPANY_PROFILE_LAST_MODIFIED_DATE,
     UPDATE_SUCCESS_COMPANY_PROFILE,
     SUCCESS_COMPANY_PROFILE_LIST_DATA,
-    FAILED_COMPANY_PROFILE_LIST_DATA
+    FAILED_COMPANY_PROFILE_LIST_DATA,
+    COMPANY_PROFILE_CODE_DUPLICATE
 } from '../../constant/master/CompanyProfilrConstant';
 
 //exchange rate type saga
@@ -85,12 +86,11 @@ export function* getAllCompanyProfileDataSaga() {
 export function* checkDupicateCompanyProfileSaga(action) {
     let responseData = [];
     try {
-        responseData = yield call(getById, `${process.env.REACT_APP_COMPANY_INFO_URL}/codeDuplicate/${action.data.taxCode}`);
-        console.log(responseData);
-        yield put({ type: TAX_DUPLICATE, data: responseData.data });
+        responseData = yield call(getById, `${process.env.REACT_APP_COMPANY_INFO_URL}/codeDuplicate/${action.data.CompanyProfileCode}`);
+        yield put({ type: COMPANY_PROFILE_CODE_DUPLICATE, data: responseData.data });
     } catch (e) {
         console.log(responseData);
-        yield put({ type: TAX_DUPLICATE, data: responseData });
+        yield put({ type: COMPANY_PROFILE_CODE_DUPLICATE, data: responseData });
     }
 }
 

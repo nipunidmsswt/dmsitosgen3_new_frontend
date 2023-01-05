@@ -26,10 +26,10 @@ export const getLatestModifiedDetails = () => {
     };
 };
 
-export const getDepartmentDesignationDataById = (id) => {
+export const getDepartmentDesignationDataById = (id, type) => {
     return {
         type: GET_DEPARTMENT_DESIGNATION_BY_ID,
-        data: { id }
+        data: { id, type }
     };
 };
 

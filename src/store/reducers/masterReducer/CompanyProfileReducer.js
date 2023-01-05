@@ -8,7 +8,8 @@ import {
     FAILED_COMPANY_PROFILE_LAST_MODIFIED_DATE,
     UPDATE_SUCCESS_COMPANY_PROFILE,
     SUCCESS_COMPANY_PROFILE_LIST_DATA,
-    FAILED_COMPANY_PROFILE_LIST_DATA
+    FAILED_COMPANY_PROFILE_LIST_DATA,
+    COMPANY_PROFILE_CODE_DUPLICATE
 } from '../../constant/master/CompanyProfilrConstant';
 
 const initialState = {
@@ -25,8 +26,6 @@ export const companyProfileReducer = (state = initialState, action) => {
     console.log(data);
     switch (action.type) {
         case ADD_SUCCESS_COMPANY_PROFILE:
-            console.log('ADD_SUCCESS_COMPANY_PROFILE');
-            console.log(data);
             return { ...state, companyProfile: data };
 
         case ADD_FAILED_COMPANY_PROFILE:
@@ -37,7 +36,6 @@ export const companyProfileReducer = (state = initialState, action) => {
             };
 
         case SUCCESS_GET_COMPANY_PROFILE_BY_ID:
-            console.log(data.payload[0].body.payload[0]?.companyProfile);
             return { ...state, companyProfileToUpdate: data.payload[0].body.payload[0]?.companyProfile };
 
         case FAILED_GET_COMPANY_PROFILE_BY_ID:
@@ -68,6 +66,9 @@ export const companyProfileReducer = (state = initialState, action) => {
 
         case FAILED_COMPANY_PROFILE_LAST_MODIFIED_DATE:
             return { ...state, lastModifiedDateTime: data };
+
+        case COMPANY_PROFILE_CODE_DUPLICATE:
+            return { ...state, duplicatecompanyProfileGroup: data };
 
         default:
             return state;
