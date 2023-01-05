@@ -1,10 +1,12 @@
 import {
     ADD_FAILED_MARKET_GROUP_DATA,
     ADD_SUCCESS_MARKET_GROUP_DATA,
+    FAILED_GET_ALL_ACTIVE_MARKET_GROUP_DATA,
     FAILED_GET_ALL_MARKET_GROUP_DATA,
     FAILED_GET_MARKET_GROUP_DETAILS_BY_CODE,
     FAILED_GET_MARKET_GROUP_LAST_MODIFIED_DATE_TIME,
     MARKET_GROUP_CODE_DUPLICATE,
+    SUCCESS_GET_ALL_ACTIVE_MARKET_GROUP_DATA,
     SUCCESS_GET_ALL_MARKET_GROUP_DATA,
     SUCCESS_GET_MARKET_GROUP_DETAILS_BY_CODE,
     SUCCESS_GET_MARKET_GROUP_LAST_MODIFIED_DATE_TIME,
@@ -78,11 +80,11 @@ export const marketGroupReducer = (state = initialState, action) => {
         case FAILED_GET_MARKET_GROUP_LAST_MODIFIED_DATE_TIME:
             return { ...state, lastModifiedDateTime: data };
 
-        // case SUCCESS_GET_ALL_ACTIVE_MARKET_GROUP_DATA:
-        //   return { ...state, marketActiveList: data.payload[0] };
+        case SUCCESS_GET_ALL_ACTIVE_MARKET_GROUP_DATA:
+            return { ...state, marketActiveList: data.payload[0] };
 
-        // case FAILED_GET_ALL_ACTIVE_MARKET_GROUP_DATA:
-        //   return { ...state, marketActiveList: data.payload[0] };
+        case FAILED_GET_ALL_ACTIVE_MARKET_GROUP_DATA:
+            return { ...state, marketActiveList: data.payload[0] };
 
         default:
             return state;

@@ -24,6 +24,8 @@ import { hotelBasisReducer } from './reducers/masterReducer/HotelBasisReducer';
 import { roomCategoryReducer } from './reducers/masterReducer/RoomCategoryReducer';
 import { expenseTypesReducer } from './reducers/masterReducer/ExpenseTypesReducer';
 import { chargeMethodReducer, modeOfTransortReducer } from './reducers/masterReducer/TransportRateReducer';
+import { guideClassReducer } from './reducers/masterReducer/GuideClassReducer';
+import { userReducer } from './reducers/athenticationReducers/UserReducer';
 import { companyProfileReducer } from './reducers/masterReducer/CompanyProfileReducer';
 import { departmentDesignationReducer } from './reducers/masterReducer/DepartmentDesignationReducer';
 // ==============================|| COMBINE REDUCER ||============================== //
@@ -55,6 +57,8 @@ const reducer = combineReducers({
     // transportRateReducer,
     chargeMethodReducer,
     modeOfTransortReducer,
+    guideClassReducer,
+    userReducer,
     companyProfileReducer,
     departmentDesignationReducer
 });

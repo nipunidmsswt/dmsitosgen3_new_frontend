@@ -60,6 +60,7 @@ const MarketGroup = ({ open, handleClose, mode, marketGroupCode }) => {
 
     const handleSubmitForm = (data) => {
         if (mode === 'INSERT') {
+            console.log(data);
             dispatch(saveMarketGroupData(data));
         } else if (mode === 'VIEW_UPDATE') {
             // console.log("yes click");
@@ -125,7 +126,6 @@ const MarketGroup = ({ open, handleClose, mode, marketGroupCode }) => {
                     } else {
                         return true;
                     }
-                    return false; // or true as you see fit
                 } catch (error) {}
             }
             return true;
