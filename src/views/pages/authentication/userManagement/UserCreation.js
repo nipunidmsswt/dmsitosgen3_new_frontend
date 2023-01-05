@@ -39,6 +39,7 @@ import { getUserDataById, saveUserData, updateUserData } from 'store/actions/aut
 import CreatedUpdatedUserDetailsWithTableFormat from 'views/pages/master/userTimeDetails/CreatedUpdatedUserDetailsWithTableFormat';
 import { getAllActiveMarketData } from 'store/actions/masterActions/operatorActions/MarketAction';
 import { getAllClusterData } from 'store/actions/masterActions/CodeAndNameAction';
+import { getAllCompanyProfileData } from 'store/actions/masterActions/CompanyProfileAction';
 
 const Transition = forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -125,8 +126,10 @@ function User({ open, handleClose, mode, userCode }) {
     const userToUpdate = useSelector((state) => state.userReducer.userToUpdate);
     const [marketListOptions, setMarketListOptions] = useState([]);
     const clusterListData = useSelector((state) => state.codeAndNameReducer.cluterTypesDetails);
+    const companyProfile = useSelector((state) => state.companyProfileReducer.companyProfileList);
     const [clusterListOptions, setClusterListOptions] = useState([]);
     const [titleListOptions, setTitleListOptions] = useState([]);
+    const [companyListOptions, setCompanyListOptions] = useState([]);
     const dispatch = useDispatch();
     const [inputMarketValue, setMarketInputValue] = useState(initialValues.market);
     const titleItems = [
@@ -179,6 +182,12 @@ function User({ open, handleClose, mode, userCode }) {
         setMarketListOptions(marketListData);
     }, [marketListData]);
 
+    useEffect(() => {
+        if (companyProfile?.payload?.length > 0) {
+            setCompanyListOptions(companyProfile?.payload[0]);
+        }
+    }, [companyProfile]);
+
     // useEffect(() => {
     //     console.log(userToUpdate);
 
@@ -212,6 +221,7 @@ function User({ open, handleClose, mode, userCode }) {
     useEffect(() => {
         dispatch(getAllActiveMarketData());
         dispatch(getAllClusterData());
+        dispatch(getAllCompanyProfileData());
         setTitleListOptions(titleItems);
         // console.log('provinces');
         // let provinces = provinceDistricts.getProvinces();
@@ -334,21 +344,21 @@ function User({ open, handleClose, mode, userCode }) {
                                                                     </Grid> */}
                                                                     <Grid item>
                                                                         <Autocomplete
-                                                                            // multiple={true}
-                                                                            // value={values.company}
-                                                                            name="company"
+                                                                            // value={
+                                                                            //     values.taxGroupDetails[idx]
+                                                                            //         ? values.taxGroupDetails[
+                                                                            //               idx
+                                                                            //           ].tax
+                                                                            //         : null
+                                                                            // }
+                                                                            // name={`taxGroupDetails.${idx}.tax`}
                                                                             // onChange={(_, value) => {
                                                                             //     console.log(value);
                                                                             //     setFieldValue(`taxGroupDetails.${idx}.tax`, value);
                                                                             // }}
-                                                                            // options={taxListOptions}
-                                                                            // getOptionLabel={(option) =>
-                                                                            //     `${option.taxCode} - (${option.taxDescription})`
-                                                                            // }
-                                                                            // isOptionEqualToValue={(
-                                                                            //     option,
-                                                                            //     value
-                                                                            // ) => option.taxId === value.taxId}
+                                                                            options={companyListOptions}
+                                                                            getOptionLabel={(option) => `${option.companyName}`}
+                                                                            isOptionEqualToValue={(option, value) => option.id === value.id}
                                                                             renderInput={(params) => (
                                                                                 <TextField
                                                                                     {...params}
@@ -374,24 +384,6 @@ function User({ open, handleClose, mode, userCode }) {
                                                                                 />
                                                                             )}
                                                                         />
-
-                                                                        {/* <TextField
-                                                                            label="Location Name"
-                                                                            sx={{
-                                                                                width: { sm: 200, md: 300 },
-                                                                                '& .MuiInputBase-root': {
-                                                                                    height: 40
-                                                                                }
-                                                                            }}
-                                                                            type="text"
-                                                                            variant="outlined"
-                                                                            name="name"
-                                                                            // value={values.name}
-                                                                            onChange={handleChange}
-                                                                            onBlur={handleBlur}
-                                                                            // error={Boolean(touched.name && errors.name)}
-                                                                            // helperText={touched.name && errors.name ? errors.name : ''}
-                                                                        /> */}
                                                                     </Grid>
                                                                     <Grid item>
                                                                         <Autocomplete
@@ -748,53 +740,12 @@ function User({ open, handleClose, mode, userCode }) {
                                                                                     variant="outlined"
                                                                                     name="department"
                                                                                     onBlur={handleBlur}
-                                                                                    // error={Boolean(touched.department && errors.department)}
-                                                                                    // helperText={
-                                                                                    //     touched.department && errors.department
-                                                                                    //         ? errors.department
-                                                                                    //         : ''
-                                                                                    // }
-                                                                                    // helperText={
-                                                                                    //     touched.taxGroupDetails &&
-                                                                                    //     touched.taxGroupDetails[
-                                                                                    //         idx
-                                                                                    //     ] &&
-                                                                                    //     touched.taxGroupDetails[
-                                                                                    //         idx
-                                                                                    //     ].tax &&
-                                                                                    //     errors.taxGroupDetails &&
-                                                                                    //     errors.taxGroupDetails[
-                                                                                    //         idx
-                                                                                    //     ] &&
-                                                                                    //     errors.taxGroupDetails[
-                                                                                    //         idx
-                                                                                    //     ].tax
-                                                                                    //         ? errors
-                                                                                    //               .taxGroupDetails[
-                                                                                    //               idx
-                                                                                    //           ].tax
-                                                                                    //         : ''
-                                                                                    // }
-                                                                                    // error={Boolean(
-                                                                                    //     touched.taxGroupDetails &&
-                                                                                    //         touched
-                                                                                    //             .taxGroupDetails[
-                                                                                    //             idx
-                                                                                    //         ] &&
-                                                                                    //         touched
-                                                                                    //             .taxGroupDetails[
-                                                                                    //             idx
-                                                                                    //         ].tax &&
-                                                                                    //         errors.taxGroupDetails &&
-                                                                                    //         errors
-                                                                                    //             .taxGroupDetails[
-                                                                                    //             idx
-                                                                                    //         ] &&
-                                                                                    //         errors
-                                                                                    //             .taxGroupDetails[
-                                                                                    //             idx
-                                                                                    //         ].tax
-                                                                                    // )}
+                                                                                    error={Boolean(touched.department && errors.department)}
+                                                                                    helperText={
+                                                                                        touched.department && errors.department
+                                                                                            ? errors.department
+                                                                                            : ''
+                                                                                    }
                                                                                 />
                                                                             )}
                                                                         />
@@ -833,83 +784,19 @@ function User({ open, handleClose, mode, userCode }) {
                                                                                     InputLabelProps={{
                                                                                         shrink: true
                                                                                     }}
-                                                                                    // placeholder="--Select a Company Code --"
                                                                                     variant="outlined"
                                                                                     name="cluster"
                                                                                     onBlur={handleBlur}
-                                                                                    // error={Boolean(touched.cluster && errors.cluster)}
-                                                                                    // helperText={
-                                                                                    //     touched.cluster && errors.cluster
-                                                                                    //         ? errors.cluster
-                                                                                    //         : ''
-                                                                                    // }
-                                                                                    // helperText={
-                                                                                    //     touched.taxGroupDetails &&
-                                                                                    //     touched.taxGroupDetails[
-                                                                                    //         idx
-                                                                                    //     ] &&
-                                                                                    //     touched.taxGroupDetails[
-                                                                                    //         idx
-                                                                                    //     ].tax &&
-                                                                                    //     errors.taxGroupDetails &&
-                                                                                    //     errors.taxGroupDetails[
-                                                                                    //         idx
-                                                                                    //     ] &&
-                                                                                    //     errors.taxGroupDetails[
-                                                                                    //         idx
-                                                                                    //     ].tax
-                                                                                    //         ? errors
-                                                                                    //               .taxGroupDetails[
-                                                                                    //               idx
-                                                                                    //           ].tax
-                                                                                    //         : ''
-                                                                                    // }
-                                                                                    // error={Boolean(
-                                                                                    //     touched.taxGroupDetails &&
-                                                                                    //         touched
-                                                                                    //             .taxGroupDetails[
-                                                                                    //             idx
-                                                                                    //         ] &&
-                                                                                    //         touched
-                                                                                    //             .taxGroupDetails[
-                                                                                    //             idx
-                                                                                    //         ].tax &&
-                                                                                    //         errors.taxGroupDetails &&
-                                                                                    //         errors
-                                                                                    //             .taxGroupDetails[
-                                                                                    //             idx
-                                                                                    //         ] &&
-                                                                                    //         errors
-                                                                                    //             .taxGroupDetails[
-                                                                                    //             idx
-                                                                                    //         ].tax
-                                                                                    // )}
+                                                                                    error={Boolean(touched.cluster && errors.cluster)}
+                                                                                    helperText={
+                                                                                        touched.cluster && errors.cluster
+                                                                                            ? errors.cluster
+                                                                                            : ''
+                                                                                    }
                                                                                 />
                                                                             )}
                                                                         />
                                                                     </Grid>
-                                                                    {/* <Grid item>
-                                                                        {' '}
-                                                                        <TextField
-                                                                            sx={{
-                                                                                width: { sm: 200, md: 300 },
-                                                                                '& .MuiInputBase-root': {
-                                                                                    height: 40
-                                                                                }
-                                                                            }}
-                                                                            label="Narration"
-                                                                            name="narration"
-                                                                            onChange={handleChange}
-                                                                            onBlur={handleBlur}
-                                                                            // value={values.narration}
-                                                                            // error={Boolean(touched.narration && errors.narration)}
-                                                                            // helperText={
-                                                                            //     touched.narration && errors.narration
-                                                                            //         ? errors.narration
-                                                                            //         : ''
-                                                                            // }
-                                                                        ></TextField>
-                                                                    </Grid> */}
                                                                 </Grid>
                                                                 <Grid gap="10px" display="flex" style={{ marginTop: '10px' }}>
                                                                     <Grid>
@@ -950,99 +837,14 @@ function User({ open, handleClose, mode, userCode }) {
                                                                                     }}
                                                                                     name="market"
                                                                                     onBlur={handleBlur}
-                                                                                    // error={Boolean(touched.market && errors.market)}
-                                                                                    // helperText={
-                                                                                    //     touched.market && errors.market ? errors.market : ''
-                                                                                    // }
-                                                                                    // helperText={
-                                                                                    //     touched.taxGroupDetails &&
-                                                                                    //     touched.taxGroupDetails[
-                                                                                    //         idx
-                                                                                    //     ] &&
-                                                                                    //     touched.taxGroupDetails[
-                                                                                    //         idx
-                                                                                    //     ].tax &&
-                                                                                    //     errors.taxGroupDetails &&
-                                                                                    //     errors.taxGroupDetails[
-                                                                                    //         idx
-                                                                                    //     ] &&
-                                                                                    //     errors.taxGroupDetails[
-                                                                                    //         idx
-                                                                                    //     ].tax
-                                                                                    //         ? errors
-                                                                                    //               .taxGroupDetails[
-                                                                                    //               idx
-                                                                                    //           ].tax
-                                                                                    //         : ''
-                                                                                    // }
-                                                                                    // error={Boolean(
-                                                                                    //     touched.taxGroupDetails &&
-                                                                                    //         touched
-                                                                                    //             .taxGroupDetails[
-                                                                                    //             idx
-                                                                                    //         ] &&
-                                                                                    //         touched
-                                                                                    //             .taxGroupDetails[
-                                                                                    //             idx
-                                                                                    //         ].tax &&
-                                                                                    //         errors.taxGroupDetails &&
-                                                                                    //         errors
-                                                                                    //             .taxGroupDetails[
-                                                                                    //             idx
-                                                                                    //         ] &&
-                                                                                    //         errors
-                                                                                    //             .taxGroupDetails[
-                                                                                    //             idx
-                                                                                    //         ].tax
-                                                                                    // )}
+                                                                                    error={Boolean(touched.market && errors.market)}
+                                                                                    helperText={
+                                                                                        touched.market && errors.market ? errors.market : ''
+                                                                                    }
                                                                                 />
                                                                             )}
                                                                         />
                                                                     </Grid>
-
-                                                                    {/* <Grid item>
-                                                                        {' '}
-                                                                        <TextField
-                                                                            sx={{
-                                                                                width: { sm: 200, md: 300 },
-                                                                                '& .MuiInputBase-root': {
-                                                                                    height: 40
-                                                                                }
-                                                                            }}
-                                                                            label="Narration"
-                                                                            name="narration"
-                                                                            onChange={handleChange}
-                                                                            onBlur={handleBlur}
-                                                                            // value={values.narration}
-                                                                            // error={Boolean(touched.narration && errors.narration)}
-                                                                            // helperText={
-                                                                            //     touched.narration && errors.narration
-                                                                            //         ? errors.narration
-                                                                            //         : ''
-                                                                            // }
-                                                                        ></TextField>
-                                                                    </Grid> */}
-
-                                                                    {/* <Grid item display="flex">
-                                                                        <Grid item style={{ paddingTop: '10px' }}>
-                                                                            Active
-                                                                        </Grid>
-
-                                                                        <Grid item>
-                                                                            <FormGroup>
-                                                                                <FormControlLabel
-                                                                                    control={
-                                                                                        <Checkbox
-                                                                                            name="status"
-                                                                                            onChange={handleChange}
-                                                                                            // checked={values.status}
-                                                                                            // value={values.status}
-                                                                                        />
-                                                                         g           }
-                                                                                />
-                                                                            </FormGroup>
-                                                                        </Grid>
-                                                                    </Grid> */}
                                                                 </Grid>
 
                                                                 <Grid gap="10px" display="flex" style={{ marginTop: '10px' }}>
@@ -1085,53 +887,12 @@ function User({ open, handleClose, mode, userCode }) {
                                                                                     variant="outlined"
                                                                                     name="userRole"
                                                                                     onBlur={handleBlur}
-                                                                                    // error={Boolean(touched.userRole && errors.userRole)}
-                                                                                    // helperText={
-                                                                                    //     touched.userRole && errors.userRole
-                                                                                    //         ? errors.userRole
-                                                                                    //         : ''
-                                                                                    // }
-                                                                                    // helperText={
-                                                                                    //     touched.taxGroupDetails &&
-                                                                                    //     touched.taxGroupDetails[
-                                                                                    //         idx
-                                                                                    //     ] &&
-                                                                                    //     touched.taxGroupDetails[
-                                                                                    //         idx
-                                                                                    //     ].tax &&
-                                                                                    //     errors.taxGroupDetails &&
-                                                                                    //     errors.taxGroupDetails[
-                                                                                    //         idx
-                                                                                    //     ] &&
-                                                                                    //     errors.taxGroupDetails[
-                                                                                    //         idx
-                                                                                    //     ].tax
-                                                                                    //         ? errors
-                                                                                    //               .taxGroupDetails[
-                                                                                    //               idx
-                                                                                    //           ].tax
-                                                                                    //         : ''
-                                                                                    // }
-                                                                                    // error={Boolean(
-                                                                                    //     touched.taxGroupDetails &&
-                                                                                    //         touched
-                                                                                    //             .taxGroupDetails[
-                                                                                    //             idx
-                                                                                    //         ] &&
-                                                                                    //         touched
-                                                                                    //             .taxGroupDetails[
-                                                                                    //             idx
-                                                                                    //         ].tax &&
-                                                                                    //         errors.taxGroupDetails &&
-                                                                                    //         errors
-                                                                                    //             .taxGroupDetails[
-                                                                                    //             idx
-                                                                                    //         ] &&
-                                                                                    //         errors
-                                                                                    //             .taxGroupDetails[
-                                                                                    //             idx
-                                                                                    //         ].tax
-                                                                                    // )}
+                                                                                    error={Boolean(touched.userRole && errors.userRole)}
+                                                                                    helperText={
+                                                                                        touched.userRole && errors.userRole
+                                                                                            ? errors.userRole
+                                                                                            : ''
+                                                                                    }
                                                                                 />
                                                                             )}
                                                                         />
