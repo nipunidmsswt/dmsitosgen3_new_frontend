@@ -11,7 +11,11 @@ import {
     UPDATE_SUCCESS_DEPARTMENT_DESIGNATION,
     SUCCESS_DEPARTMENT_DESIGNATION_LIST_DATA,
     FAILED_DEPARTMENT_DESIGNATION_LIST_DATA,
-    CHECK_DEPARTMENT_DESIGNATION_CODE_DUPLICATE
+    CHECK_DEPARTMENT_DESIGNATION_CODE_DUPLICATE,
+    SUCCESS_GET_ALL_DEPARTMENT_ACTIVE_LIST_DATA,
+    FAILED_GET_ALL_DEPARTMENT_ACTIVE_LIST_DATA,
+    SUCCESS_GET_ALL_DESIGNATION_ACTIVE_LIST_DATA,
+    FAILED_GET_ALL_DESIGNATION_ACTIVE_LIST_DATA
 } from '../../constant/master/DepartmentDesignationConstant';
 
 export function* saveDepartMentDesignationSaga(action) {
@@ -70,7 +74,7 @@ export function* getAllDepartMentDesignationDataSaga() {
     let responseData = [];
 
     try {
-        responseData = yield call(get, process.env.REACT_APP_USER_MANAGEMENT_URL + '/departmentsAndDesignations');
+        responseData = yield call(get, process.env.REACT_APP_USER_MANAGEMENT_URL + '/department/departmentsAndDesignations');
         console.log(responseData.data.payload);
         yield put({ type: SUCCESS_DEPARTMENT_DESIGNATION_LIST_DATA, data: responseData.data });
     } catch (e) {
@@ -103,5 +107,31 @@ export function* checkLatestDepartMentDesignationModifiedDateSaga() {
     } catch (e) {
         console.log('Error:' + e);
         yield put({ type: FAILED_DEPARTMENT_DESIGNATION_LAST_MODIFIED_DATE, data: '' });
+    }
+}
+
+export function* getAllDepartmentDataSaga() {
+    let responseData = [];
+
+    try {
+        responseData = yield call(get, process.env.REACT_APP_USER_MANAGEMENT_URL + '/department/departments');
+        console.log(responseData.data.payload);
+        yield put({ type: SUCCESS_GET_ALL_DEPARTMENT_ACTIVE_LIST_DATA, data: responseData.data });
+    } catch (e) {
+        console.log(e);
+        yield put({ type: FAILED_GET_ALL_DEPARTMENT_ACTIVE_LIST_DATA, data: responseData.data });
+    }
+}
+
+export function* getAllDesignationDataSaga() {
+    let responseData = [];
+
+    try {
+        responseData = yield call(get, process.env.REACT_APP_USER_MANAGEMENT_URL + '/department/designations');
+        console.log(responseData.data.payload);
+        yield put({ type: SUCCESS_GET_ALL_DESIGNATION_ACTIVE_LIST_DATA, data: responseData.data });
+    } catch (e) {
+        console.log(e);
+        yield put({ type: FAILED_GET_ALL_DESIGNATION_ACTIVE_LIST_DATA, data: responseData.data });
     }
 }

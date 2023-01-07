@@ -5,7 +5,8 @@ import {
     UPDATE_USER_DATA,
     CHECK_USER_DUPLICATE,
     GET_LAST_MODIFIED_DATE_TIME_USER,
-    GET_ACTIVE_USERS
+    GET_ACTIVE_USERS,
+    GET_ALL_USER_ROLES
 } from 'store/constant/authentication/UserConstant';
 
 export const saveUserData = (data) => {
@@ -56,5 +57,12 @@ export const getLatestModifiedUserDetails = () => {
 export const getActiveUsers = () => {
     return {
         type: GET_ACTIVE_USERS
+    };
+};
+
+export const getAllRolesData = () => {
+    console.log('getAllRoles');
+    return {
+        type: GET_ALL_USER_ROLES
     };
 };

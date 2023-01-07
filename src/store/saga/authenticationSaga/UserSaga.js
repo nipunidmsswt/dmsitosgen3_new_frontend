@@ -12,18 +12,21 @@ import {
     SUCCESS_LAST_MODIFIED_DATE_USER,
     FAILED_LAST_MODIFIED_DATE_USER,
     SUCCESS_GET_ACTIVE_USERS,
-    FAILED_GET_ACTIVE_USERS
+    FAILED_GET_ACTIVE_USERS,
+    SUCCESS_GET_ALL_USER_ROLES,
+    FAILED_GET_GET_ALL_USER_ROLES,
+    FAILED_GET_ALL_USER_ROLES
 } from 'store/constant/authentication/UserConstant';
 import { create, getById, updateWithUpload, get, createWithUpload } from '../../../apis/Apis';
 
 //User saga
 
 export function* saveUserSaga(action) {
-    action.data.path = `${process.env.REACT_APP_USER_MANAGEMENT_URL}/User/`;
+    action.data.path = `${process.env.REACT_APP_USER_MANAGEMENT_URL}/register`;
     let responseData = [];
     try {
         console.log('saga started');
-        responseData = yield call(createWithUpload, action.data);
+        responseData = yield call(create, action.data);
         // console.log(responseData.staus);
         console.log('saga finished');
         if (responseData.status == 201 || responseData.status == 200) {
@@ -116,5 +119,19 @@ export function* getAllActiveUsers() {
     } catch (e) {
         console.log(e);
         yield put({ type: FAILED_GET_ACTIVE_USERS, data: responseData.data });
+    }
+}
+
+export function* getAllRolesSaga() {
+    console.log('tee hkere');
+    let responseData = [];
+
+    try {
+        responseData = yield call(get, process.env.REACT_APP_USER_MANAGEMENT_URL + '/role/roles');
+        console.log(responseData);
+        yield put({ type: SUCCESS_GET_ALL_USER_ROLES, data: responseData.data });
+    } catch (e) {
+        console.log(e);
+        yield put({ type: FAILED_GET_ALL_USER_ROLES, data: responseData.data });
     }
 }

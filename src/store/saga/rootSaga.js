@@ -371,6 +371,7 @@ import {
     CHECK_USER_DUPLICATE,
     GET_ACTIVE_USERS,
     GET_ALL_USER_DATA,
+    GET_ALL_USER_ROLES,
     GET_LAST_MODIFIED_DATE_TIME_USER,
     GET_USER_DATA_BY_ID,
     SAVE_USER_DATA,
@@ -380,6 +381,7 @@ import {
     checkDupicateUserSaga,
     checkLatestUserModifiedDateSaga,
     getAllActiveUsers,
+    getAllRolesSaga,
     getAllUserSaga,
     getUserByIdSaga,
     saveUserSaga,
@@ -392,7 +394,9 @@ import {
     checkDupicateDepartMentDesignationSaga,
     updateDepartMentDesignationSaga,
     getDepartMentDesignationByIdSaga,
-    checkLatestDepartMentDesignationModifiedDateSaga
+    checkLatestDepartMentDesignationModifiedDateSaga,
+    getAllDepartmentDataSaga,
+    getAllDesignationDataSaga
 } from '../saga/mastersaga/DepartmentDesignationSaga';
 
 import {
@@ -401,7 +405,9 @@ import {
     GET_DEPARTMENT_DESIGNATION_BY_ID,
     UPDATE_DEPARTMENT_DESIGNATION,
     CHECK_DEPARTMENT_DESIGNATION_CODE_DUPLICATE,
-    GET_DEPARTMENT_DESIGNATION_LAST_MODIFIED_DATE_TIME
+    GET_DEPARTMENT_DESIGNATION_LAST_MODIFIED_DATE_TIME,
+    GET_ALL_DEPARTMENT_ACTIVE,
+    GET_ALL_DESIGNATION_ACTIVE
 } from '../constant/master/DepartmentDesignationConstant';
 
 import {
@@ -642,6 +648,7 @@ export function* wacherSaga() {
     yield takeLatest(CHECK_USER_DUPLICATE, checkDupicateUserSaga);
     yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_USER, checkLatestUserModifiedDateSaga);
     yield takeLatest(GET_ACTIVE_USERS, getAllActiveUsers);
+    yield takeLatest(GET_ALL_USER_ROLES, getAllRolesSaga);
     //company profile
     yield takeLatest(SAVE_COMPANY_PROFILE, saveCompanyProfileSaga);
     yield takeLatest(GET_COMPANY_PROFILE_BY_ID, getCompanyProfileByIdSaga);
@@ -657,4 +664,6 @@ export function* wacherSaga() {
     yield takeLatest(UPDATE_DEPARTMENT_DESIGNATION, updateDepartMentDesignationSaga);
     yield takeLatest(CHECK_DEPARTMENT_DESIGNATION_CODE_DUPLICATE, checkDupicateDepartMentDesignationSaga);
     yield takeLatest(GET_DEPARTMENT_DESIGNATION_LAST_MODIFIED_DATE_TIME, checkLatestDepartMentDesignationModifiedDateSaga);
+    yield takeLatest(GET_ALL_DEPARTMENT_ACTIVE, getAllDepartmentDataSaga);
+    yield takeLatest(GET_ALL_DESIGNATION_ACTIVE, getAllDesignationDataSaga);
 }

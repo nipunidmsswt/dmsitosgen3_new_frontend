@@ -9,7 +9,11 @@ import {
     UPDATE_SUCCESS_DEPARTMENT_DESIGNATION,
     SUCCESS_DEPARTMENT_DESIGNATION_LIST_DATA,
     FAILED_DEPARTMENT_DESIGNATION_LIST_DATA,
-    DEPARTMENT_DESIGNATION_CODE_DUPLICATE
+    DEPARTMENT_DESIGNATION_CODE_DUPLICATE,
+    SUCCESS_GET_ALL_DESIGNATION_ACTIVE_LIST_DATA,
+    FAILED_GET_ALL_DESIGNATION_ACTIVE_LIST_DATA,
+    SUCCESS_GET_ALL_DEPARTMENT_ACTIVE_LIST_DATA,
+    FAILED_GET_ALL_DEPARTMENT_ACTIVE_LIST_DATA
 } from '../../constant/master/DepartmentDesignationConstant';
 
 const initialState = {
@@ -18,7 +22,9 @@ const initialState = {
     departmentDesignationToUpdate: null,
     errorMsg: null,
     duplicateDepartmentDesignation: null,
-    lastModifiedDateTime: null
+    lastModifiedDateTime: null,
+    departmentActiveList: [],
+    designationActiveList: []
 };
 
 export const departmentDesignationReducer = (state = initialState, action) => {
@@ -69,6 +75,20 @@ export const departmentDesignationReducer = (state = initialState, action) => {
 
         case DEPARTMENT_DESIGNATION_CODE_DUPLICATE:
             return { ...state, duplicateDepartmentDesignation: data };
+
+        case SUCCESS_GET_ALL_DESIGNATION_ACTIVE_LIST_DATA:
+            console.log(data.payload[0]);
+            return { ...state, designationActiveList: data.payload[0] };
+
+        case FAILED_GET_ALL_DESIGNATION_ACTIVE_LIST_DATA:
+            return { ...state, designationActiveList: data.payload[0] };
+
+        case SUCCESS_GET_ALL_DEPARTMENT_ACTIVE_LIST_DATA:
+            console.log(data.payload[0]);
+            return { ...state, departmentActiveList: data.payload[0] };
+
+        case FAILED_GET_ALL_DEPARTMENT_ACTIVE_LIST_DATA:
+            return { ...state, departmentActiveList: data.payload[0] };
         default:
             return state;
     }
