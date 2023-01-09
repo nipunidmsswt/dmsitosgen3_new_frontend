@@ -113,10 +113,9 @@ function ViewCompanyProfile() {
         console.log(companyProfileData);
         console.log(typeof companyProfileData);
         if (companyProfileData) {
-            console.log('sucessToast');
             setHandleToast(true);
-            // dispatch(getAllTaxGroupDetails());
-            // dispatch(getLatestModifiedTaxGroupDetails());
+            dispatch(getAllCompanyProfileData());
+            dispatch(getLatestModifiedDetails());
         }
     }, [companyProfileData]);
 

@@ -167,8 +167,6 @@ import {
     updateHotelCateogrySaga
 } from './mastersaga/HotelCategorySaga';
 
-
-
 import {
     saveManagingCompanySaga,
     getAllManagingCompanySaga,
@@ -205,7 +203,6 @@ import {
     SAVE_MARKET_DATA,
     UPDATE_MARKET_DATA
 } from 'store/constant/master/MarketConstant';
-
 
 import {
     CHECK_TOURTYPE_CODE_DUPLICATE,
