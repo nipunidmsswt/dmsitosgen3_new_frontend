@@ -124,7 +124,7 @@ export function* getAllActiveUsers() {
 //user login
 
 export function* userLoginSaga(action) {
-    action.data.path = `${process.env.REACT_APP_USER_MANAGEMENT_URL}/User/`;
+    action.data.path = `${process.env.REACT_APP_USER_MANAGEMENT_URL}/authenticate`;
     let responseData = [];
     try {
         responseData = yield call(create, action.data);

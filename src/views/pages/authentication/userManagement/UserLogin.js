@@ -18,6 +18,9 @@ import InputAdornment from '@mui/material/InputAdornment';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import IconButton from '@mui/material/IconButton';
 import * as yup from 'yup';
+import { useNavigate } from 'react-router-dom';
+import { userLogin } from 'store/actions/authenticationActions/UserAction';
+import { useDispatch, useSelector } from 'react-redux';
 
 function Copyright(props) {
     return (
@@ -39,7 +42,8 @@ export default function Login() {
         userName: '',
         password: ''
     };
-
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
 
     const validationSchema = yup.object().shape({
@@ -55,6 +59,9 @@ export default function Login() {
 
     const handleSubmitForm = (data) => {
         console.log(data);
+        navigate('/dashboard/default');
+        dispatch(userLogin(data));
+        // navigate('/dashboard/default');
     };
 
     return (

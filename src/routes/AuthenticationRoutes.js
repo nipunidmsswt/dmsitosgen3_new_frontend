@@ -24,23 +24,27 @@ const AuthenticationRoutes = {
         {
             path: '/pages/register/register3',
             element: <AuthRegister3 />
+        },
+        {
+            path: '/pages/login',
+            element: <Login />
         }
         // {
         //     path: '/pages/usermanagement/login',
         //     element: <Login />
         // }
-    ],
-    element: <MainLayout />,
-    children: [
-        {
-            path: '/pages/usermanagement/usercreation',
-            element: <ViewUserCreation />
-        }
-        // {
-        //     path: '/pages/register/register3',
-        //     element: <AuthRegister3 />
-        // }
     ]
+    // element: <MainLayout />,
+    // children: [
+    //     {
+    //         path: '/pages/usermanagement/usercreation',
+    //         element: <ViewUserCreation />
+    //     }
+    //     // {
+    //     //     path: '/pages/register/register3',
+    //     //     element: <AuthRegister3 />
+    //     // }
+    // ]
 };
 
 export default AuthenticationRoutes;
