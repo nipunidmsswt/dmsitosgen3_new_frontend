@@ -70,7 +70,7 @@ function ViewDepartmentDesignation() {
     ];
 
     const dispatch = useDispatch();
-    const error = useSelector((state) => state.taxReducer.errorMsg);
+    const error = useSelector((state) => state.departmentDesignationReducer.errorMsg);
 
     const departmentDesignationList = useSelector((state) => state.departmentDesignationReducer.departmentDesignationList);
     const departmentDesignation = useSelector((state) => state.departmentDesignationReducer.departmentDesignation);

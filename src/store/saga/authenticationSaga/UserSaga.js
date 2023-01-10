@@ -12,11 +12,13 @@ import {
     SUCCESS_LAST_MODIFIED_DATE_USER,
     FAILED_LAST_MODIFIED_DATE_USER,
     SUCCESS_GET_ACTIVE_USERS,
-    FAILED_GET_ACTIVE_USERS
+    FAILED_GET_ACTIVE_USERS,
+    SUCCESS_USER_LOGIN_DATA,
+    FAILED_USER_LOGIN_DATA
 } from 'store/constant/authentication/UserConstant';
 import { create, getById, updateWithUpload, get, createWithUpload } from '../../../apis/Apis';
 
-//User saga
+//User creation saga
 
 export function* saveUserSaga(action) {
     action.data.path = `${process.env.REACT_APP_USER_MANAGEMENT_URL}/User/`;
@@ -116,5 +118,25 @@ export function* getAllActiveUsers() {
     } catch (e) {
         console.log(e);
         yield put({ type: FAILED_GET_ACTIVE_USERS, data: responseData.data });
+    }
+}
+
+//user login
+
+export function* userLoginSaga(action) {
+    action.data.path = `${process.env.REACT_APP_USER_MANAGEMENT_URL}/authenticate`;
+    let responseData = [];
+    try {
+        responseData = yield call(create, action.data);
+
+        yield put({
+            type: SUCCESS_USER_LOGIN_DATA,
+            data: responseData.data
+        });
+    } catch (e) {
+        yield put({
+            type: FAILED_USER_LOGIN_DATA,
+            data: responseData.data
+        });
     }
 }

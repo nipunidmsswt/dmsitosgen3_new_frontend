@@ -28,15 +28,15 @@ function DepartmentDesignation({ open, handleClose, mode, code, type }) {
     yup.addMethod(yup.string, 'checkDuplicateCode', function (message) {
         return this.test('checkDuplicateCode', message, async function validateValue(value) {
             if (mode === 'INSERT') {
-                // try {
-                //     await dispatch(checkDuplicateDepartmentDesignationCode(value));
-                //     if (duplicateDepartmentDesignation != null && duplicateDepartmentDesignation.errorMessages.length != 0) {
-                //         return false;
-                //     } else {
-                //         return true;
-                //     }
-                //     return false; // or true as you see fit
-                // } catch (error) {}
+                try {
+                    await dispatch(checkDuplicateDepartmentDesignationCode(value));
+                    if (duplicateDepartmentDesignation != null && duplicateDepartmentDesignation.errorMessages.length != 0) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                    return false; // or true as you see fit
+                } catch (error) {}
             }
             return true;
         });

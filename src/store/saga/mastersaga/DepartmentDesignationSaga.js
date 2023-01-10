@@ -11,13 +11,12 @@ import {
     UPDATE_SUCCESS_DEPARTMENT_DESIGNATION,
     SUCCESS_DEPARTMENT_DESIGNATION_LIST_DATA,
     FAILED_DEPARTMENT_DESIGNATION_LIST_DATA,
-    CHECK_DEPARTMENT_DESIGNATION_CODE_DUPLICATE
+    DEPARTMENT_DESIGNATION_CODE_DUPLICATE
 } from '../../constant/master/DepartmentDesignationConstant';
 
 export function* saveDepartMentDesignationSaga(action) {
     action.data.path = `${process.env.REACT_APP_USER_MANAGEMENT_URL}/departmentAndDesignation`;
     let responseData = [];
-    let imageUploadResponseData = [];
     try {
         responseData = yield call(create, action.data);
 
@@ -81,13 +80,14 @@ export function* getAllDepartMentDesignationDataSaga() {
 
 export function* checkDupicateDepartMentDesignationSaga(action) {
     let responseData = [];
+    console.log(action.data.code);
     try {
-        responseData = yield call(getById, `${process.env.REACT_APP_USER_MANAGEMENT_URL}/taxCodeCheck/${action.data.taxCode}`);
+        responseData = yield call(getById, `${process.env.REACT_APP_USER_MANAGEMENT_URL}/${action.data.code}`);
         console.log(responseData);
-        yield put({ type: CHECK_DEPARTMENT_DESIGNATION_CODE_DUPLICATE, data: responseData.data });
+        yield put({ type: DEPARTMENT_DESIGNATION_CODE_DUPLICATE, data: responseData.data });
     } catch (e) {
         console.log(responseData);
-        yield put({ type: CHECK_DEPARTMENT_DESIGNATION_CODE_DUPLICATE, data: responseData });
+        yield put({ type: DEPARTMENT_DESIGNATION_CODE_DUPLICATE, data: responseData });
     }
 }
 

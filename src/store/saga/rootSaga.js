@@ -167,8 +167,6 @@ import {
     updateHotelCateogrySaga
 } from './mastersaga/HotelCategorySaga';
 
-
-
 import {
     saveManagingCompanySaga,
     getAllManagingCompanySaga,
@@ -205,7 +203,6 @@ import {
     SAVE_MARKET_DATA,
     UPDATE_MARKET_DATA
 } from 'store/constant/master/MarketConstant';
-
 
 import {
     CHECK_TOURTYPE_CODE_DUPLICATE,
@@ -377,7 +374,8 @@ import {
     GET_LAST_MODIFIED_DATE_TIME_USER,
     GET_USER_DATA_BY_ID,
     SAVE_USER_DATA,
-    UPDATE_USER_DATA
+    UPDATE_USER_DATA,
+    CHECK_USER_LOGIN_CREDENTIALS
 } from 'store/constant/authentication/UserConstant';
 import {
     checkDupicateUserSaga,
@@ -386,7 +384,8 @@ import {
     getAllUserSaga,
     getUserByIdSaga,
     saveUserSaga,
-    updateUserSaga
+    updateUserSaga,
+    userLoginSaga
 } from './authenticationSaga/UserSaga';
 
 import {
@@ -660,4 +659,7 @@ export function* wacherSaga() {
     yield takeLatest(UPDATE_DEPARTMENT_DESIGNATION, updateDepartMentDesignationSaga);
     yield takeLatest(CHECK_DEPARTMENT_DESIGNATION_CODE_DUPLICATE, checkDupicateDepartMentDesignationSaga);
     yield takeLatest(GET_DEPARTMENT_DESIGNATION_LAST_MODIFIED_DATE_TIME, checkLatestDepartMentDesignationModifiedDateSaga);
+
+    //login
+    yield takeLatest(CHECK_USER_LOGIN_CREDENTIALS, userLoginSaga);
 }
