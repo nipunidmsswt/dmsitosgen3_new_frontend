@@ -6,9 +6,11 @@ import {
     CHECK_USER_DUPLICATE,
     GET_LAST_MODIFIED_DATE_TIME_USER,
     GET_ACTIVE_USERS,
-    GET_ALL_USER_ROLES
+    GET_ALL_USER_ROLES,
+    CHECK_USER_LOGIN_CREDENTIALS
 } from 'store/constant/authentication/UserConstant';
 
+//user creation
 export const saveUserData = (data) => {
     console.log('saveUserData  Data action s called', data);
     return {
@@ -64,5 +66,13 @@ export const getAllRolesData = () => {
     console.log('getAllRoles');
     return {
         type: GET_ALL_USER_ROLES
+    };
+};
+//user login
+export const userLogin = (data) => {
+    console.log('login  Data action s called', data);
+    return {
+        type: CHECK_USER_LOGIN_CREDENTIALS,
+        data
     };
 };

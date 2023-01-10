@@ -1,5 +1,5 @@
 import { put, takeEvery, call } from 'redux-saga/effects';
-import { create, getById, update, get } from '../../../apis/Apis';
+import { create, getById, update, get, createWithUpload } from '../../../apis/Apis';
 import {
     ADD_SUCCESS_COMPANY_PROFILE,
     ADD_FAILED_COMPANY_PROFILE,
@@ -19,20 +19,53 @@ import {
 export function* saveCompanyProfileSaga(action) {
     action.data.path = `${process.env.REACT_APP_COMPANY_INFO_URL}/`;
     let responseData = [];
+    let responseData2 = [];
     let imageUploadResponseData = [];
     try {
         responseData = yield call(create, action.data);
         // imageUploadResponseData = yield call();
-        console.log(responseData.data.payload);
 
-        yield put({
-            type: ADD_SUCCESS_COMPANY_PROFILE,
-            data: responseData.data
-        });
+        console.log(responseData.data.payload[0].companyProfile.id);
+        console.log(responseData.data);
+
+        console.log(responseData.data.payload[0].companyProfile);
+        console.log(responseData.data.errorMessages);
+        if (responseData.data.errorMessages.length === 0) {
+            console.log('in side hfcsfsek');
+            let formData = new FormData();
+            console.log(action.data.files);
+            if (action.data.files.length !== 0) {
+                console.log('in side gdywetwytwu');
+                // formData.append(`files`, JSON.stringify(action.data.files));
+                formData.append(`id`, responseData.data.payload[0].companyProfile.id);
+                if (action.data.files != undefined) {
+                    for (let i = 0; i < action.data.files.length; i++) {
+                        formData.append(`files`, action.data.files[i]);
+                    }
+                }
+                for (let [key, val] of Object.entries(action.data)) {
+                    console.log(val);
+                    formData.append(key, val);
+                }
+                const requestOptions = {
+                    method: 'POST',
+                    body: formData
+                };
+                requestOptions.path = `${process.env.REACT_APP_COMPANY_INFO_URL}/companyImg/`;
+                responseData2 = yield call(createWithUpload, requestOptions);
+            }
+        }
+        console.log(responseData2);
+        if (responseData2.status == 201 || responseData2.status == 200) {
+            console.log('responseData2');
+            yield put({ type: ADD_SUCCESS_COMPANY_PROFILE, data: responseData.data });
+        } else {
+            yield put({ type: ADD_FAILED_COMPANY_PROFILE, data: 'error' });
+        }
     } catch (e) {
         yield put({
             type: ADD_FAILED_COMPANY_PROFILE,
-            data: responseData.data
+            data: responseData2.data
         });
     }
 }
