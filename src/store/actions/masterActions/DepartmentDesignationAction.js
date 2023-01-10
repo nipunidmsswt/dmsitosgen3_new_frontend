@@ -4,7 +4,9 @@ import {
     GET_DEPARTMENT_DESIGNATION_BY_ID,
     UPDATE_DEPARTMENT_DESIGNATION,
     CHECK_DEPARTMENT_DESIGNATION_CODE_DUPLICATE,
-    GET_DEPARTMENT_DESIGNATION_LAST_MODIFIED_DATE_TIME
+    GET_DEPARTMENT_DESIGNATION_LAST_MODIFIED_DATE_TIME,
+    GET_ALL_DEPARTMENT_ACTIVE,
+    GET_ALL_DESIGNATION_ACTIVE
 } from '../../constant/master/DepartmentDesignationConstant';
 
 export const saveDepartmentDesignationData = (data) => {
@@ -44,5 +46,17 @@ export const checkDuplicateDepartmentDesignationCode = (code) => {
     return {
         type: CHECK_DEPARTMENT_DESIGNATION_CODE_DUPLICATE,
         data: { code }
+    };
+};
+
+export const getAllDepartmentData = () => {
+    return {
+        type: GET_ALL_DEPARTMENT_ACTIVE
+    };
+};
+
+export const getAllDesignationData = () => {
+    return {
+        type: GET_ALL_DESIGNATION_ACTIVE
     };
 };

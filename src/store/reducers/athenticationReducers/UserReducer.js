@@ -11,7 +11,9 @@ import {
     SUCCESS_LAST_MODIFIED_DATE_USER,
     FAILED_LAST_MODIFIED_DATE_USER,
     SUCCESS_GET_ACTIVE_USERS,
-    FAILED_GET_ACTIVE_USERS
+    FAILED_GET_ACTIVE_USERS,
+    SUCCESS_GET_ALL_USER_ROLES,
+    FAILED_GET_ALL_USER_ROLES
 } from 'store/constant/authentication/UserConstant';
 
 const initialState = {
@@ -21,7 +23,8 @@ const initialState = {
     errorMsg: null,
     duplicateLoction: null,
     lastModifiedDateTime: null,
-    activeUsers: []
+    activeUsers: [],
+    userRole: []
 };
 
 export const userReducer = (state = initialState, action) => {
@@ -100,6 +103,14 @@ export const userReducer = (state = initialState, action) => {
         case FAILED_GET_ACTIVE_USERS:
             console.warn('FAILED_USER_LIST_DATA', action);
             return { ...state, activeUsers: data.payload[0] };
+
+        case SUCCESS_GET_ALL_USER_ROLES:
+            console.log('SUCCESS_GET_ALL_USER_ROLES', data);
+            return { ...state, userRole: data.payload[0] };
+
+        case FAILED_GET_ALL_USER_ROLES:
+            console.warn('FAILED_ALL_USER_ROLES', action);
+            return { ...state, userRole: data.payload[0] };
         default:
             return state;
     }
