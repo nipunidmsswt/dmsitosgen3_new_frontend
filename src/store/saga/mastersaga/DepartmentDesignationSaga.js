@@ -17,7 +17,6 @@ import {
 export function* saveDepartMentDesignationSaga(action) {
     action.data.path = `${process.env.REACT_APP_USER_MANAGEMENT_URL}/departmentAndDesignation`;
     let responseData = [];
-    let imageUploadResponseData = [];
     try {
         responseData = yield call(create, action.data);
 

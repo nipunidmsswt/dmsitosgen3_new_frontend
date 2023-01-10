@@ -27,6 +27,7 @@ import ViewExpenseTypes from 'views/pages/master/transportMaster/expensetypes/Vi
 import ViewTransportRates from 'views/pages/master/transportMaster/transportRates/ViewTransportRates';
 import ViewCompanyProfile from 'views/pages/master/company_profile/ViewCompanyProfile';
 import ViewDepartmentDesignation from 'views/pages/master/department_designation/ViewDepartmentDesignation';
+import Login from 'views/pages/authentication/userManagement/UserLogin';
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
 
@@ -210,6 +211,10 @@ const MainRoutes = {
                     element: <ViewDepartmentDesignation />
                 }
             ]
+        },
+        {
+            path: '/pages/login',
+            element: <Login />
         }
     ]
 };
