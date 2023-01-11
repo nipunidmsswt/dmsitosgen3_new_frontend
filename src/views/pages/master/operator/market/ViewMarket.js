@@ -7,7 +7,7 @@ import tableIcons from 'utils/MaterialTableIcons';
 import { gridSpacing } from 'store/constant';
 import { useSelector, useDispatch } from 'react-redux';
 
-import { Grid } from '@mui/material';
+import { FormControlLabel, FormGroup, Grid, Switch } from '@mui/material';
 import Market from './Market';
 import { getAllMarketData, getLatestModifiedDetails } from 'store/actions/masterActions/operatorActions/MarketAction';
 import MainCard from 'ui-component/cards/MainCard';
@@ -56,15 +56,26 @@ function ViewMarket() {
             render: (rowData) => (
                 <div
                     style={{
-                        color: rowData.status === true ? '#008000aa' : '#f90000aa',
-                        fontWeight: 'bold',
+                        alignItems: 'center',
+                        align: 'center',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center'
                         // background: rowData.status === true ? "#008000aa" : "#f90000aa",
-                        borderRadius: '4px',
-                        paddingLeft: 5,
-                        paddingRight: 5
+                        // borderRadius: "4px",
+                        // paddingLeft: 5,
+                        // paddingRight: 5,
                     }}
                 >
-                    {rowData.status === true ? 'Active' : 'Inactive'}
+                    {rowData.status === true ? (
+                        <FormGroup>
+                            <FormControlLabel control={<Switch color="success" size="small" />} checked={true} />
+                        </FormGroup>
+                    ) : (
+                        <FormGroup>
+                            <FormControlLabel control={<Switch color="error" size="small" />} checked={false} />
+                        </FormGroup>
+                    )}
                 </div>
             )
         }

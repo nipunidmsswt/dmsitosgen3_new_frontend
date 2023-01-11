@@ -11,6 +11,7 @@ import {
     Grid,
     IconButton,
     Slide,
+    Switch,
     TextField,
     Typography
 } from '@mui/material';
@@ -225,12 +226,15 @@ function HotelCategory({ open, mode, handleClose, hotelCategoryCode }) {
 
                                         {/* <Grid item> */}
                                         <Grid item>
-                                            <Typography variant="subtitle1" component="h2">
-                                                Status
-                                            </Typography>
                                             <FormGroup>
                                                 <FormControlLabel
-                                                    control={<Field as={Checkbox} name="status" checked={props.values.status} />}
+                                                    name="status"
+                                                    onChange={handleInputChange}
+                                                    value={formValues.status}
+                                                    control={<Switch color="success" />}
+                                                    label="Status"
+                                                    checked={formValues.status}
+                                                    disabled={mode == 'VIEW'}
                                                 />
                                             </FormGroup>
                                         </Grid>

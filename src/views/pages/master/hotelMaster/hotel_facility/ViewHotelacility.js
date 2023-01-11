@@ -8,7 +8,7 @@ import { gridSpacing } from 'store/constant';
 import MainCard from 'ui-component/cards/MainCard';
 import { useSelector, useDispatch } from 'react-redux';
 import { getAllHotelFacilityData } from 'store/actions/masterActions/HotelFacilityAction';
-import { Grid } from '@mui/material';
+import { FormControlLabel, FormGroup, Grid, Switch } from '@mui/material';
 
 function ViewHotelFacility() {
     const [open, setOpen] = useState(false);
@@ -39,21 +39,36 @@ function ViewHotelFacility() {
         {
             title: 'Active',
             field: 'status',
-            filterPlaceholder: 'True || False',
+            //filterPlaceholder: 'True || False',
             align: 'center',
+            lookup: {
+                true: 'Active',
+                false: 'Inactive'
+            },
             emptyValue: () => <em>null</em>,
             render: (rowData) => (
                 <div
                     style={{
-                        color: rowData.status === true ? '#008000aa' : '#f90000aa',
-                        fontWeight: 'bold',
+                        alignItems: 'center',
+                        align: 'center',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center'
                         // background: rowData.status === true ? "#008000aa" : "#f90000aa",
-                        borderRadius: '4px',
-                        paddingLeft: 5,
-                        paddingRight: 5
+                        // borderRadius: "4px",
+                        // paddingLeft: 5,
+                        // paddingRight: 5,
                     }}
                 >
-                    {rowData.status === true ? 'Active' : 'Inactive'}
+                    {rowData.status === true ? (
+                        <FormGroup>
+                            <FormControlLabel control={<Switch color="success" size="small" />} checked={true} />
+                        </FormGroup>
+                    ) : (
+                        <FormGroup>
+                            <FormControlLabel control={<Switch color="error" size="small" />} checked={false} />
+                        </FormGroup>
+                    )}
                 </div>
             )
         }

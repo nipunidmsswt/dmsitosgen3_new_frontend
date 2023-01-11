@@ -44,9 +44,13 @@ function ViewTaxGroup() {
         {
             title: 'Status',
             field: 'status',
-            filterPlaceholder: 'True || False',
+            //filterPlaceholder: 'True || False',
             align: 'center',
-            emptyValue: () => <em>null</em>,
+            lookup: {
+                true: 'Active',
+                false: 'Inactive'
+            },
+            //emptyValue: () => <em>null</em>,
             render: (rowData) => (
                 <div
                     style={{
@@ -55,6 +59,10 @@ function ViewTaxGroup() {
                         display: 'flex',
                         justifyContent: 'center',
                         alignItems: 'center'
+                        // background: rowData.status === true ? "#008000aa" : "#f90000aa",
+                        // borderRadius: "4px",
+                        // paddingLeft: 5,
+                        // paddingRight: 5,
                     }}
                 >
                     {rowData.status === true ? (

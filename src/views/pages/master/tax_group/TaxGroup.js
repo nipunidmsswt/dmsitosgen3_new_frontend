@@ -18,7 +18,8 @@ import {
     TableBody,
     TableCell,
     TableHead,
-    TableRow
+    TableRow,
+    Switch
 } from '@mui/material';
 
 import AddBoxIcon from '@mui/icons-material/AddBox';
@@ -192,6 +193,16 @@ function TaxGroup({ open, handleClose, mode, taxGroupCode }) {
         // );
     };
 
+    const handleInputChange = (e) => {
+        const target = e.target;
+        const value = target.type === 'checkbox' ? target.checked : target.value;
+        const name = target.name;
+        setFormValues({
+            ...formValues,
+            [name]: value
+        });
+    };
+
     const handleCancel = () => {
         setLoadValues(initialValues1);
     };
@@ -308,6 +319,20 @@ function TaxGroup({ open, handleClose, mode, taxGroupCode }) {
                                                                                     : ''
                                                                             }
                                                                         />
+                                                                    </Grid>
+
+                                                                    <Grid item>
+                                                                        <FormGroup>
+                                                                            <FormControlLabel
+                                                                                name="status"
+                                                                                onChange={handleInputChange}
+                                                                                value={formValues.status}
+                                                                                control={<Switch color="success" />}
+                                                                                label="Status"
+                                                                                checked={formValues.status}
+                                                                                disabled={mode == 'VIEW'}
+                                                                            />
+                                                                        </FormGroup>
                                                                     </Grid>
                                                                 </Grid>
 

@@ -5,7 +5,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import tableIcons from 'utils/MaterialTableIcons';
 import { gridSpacing } from 'store/constant';
 import CodeAndName from './CodeAndName';
-import { Grid } from '@mui/material';
+import { FormControlLabel, FormGroup, Grid, Switch } from '@mui/material';
 import SuccessMsg from 'messages/SuccessMsg';
 import ErrorMsg from 'messages/ErrorMsg';
 import { getAllCodeAndNameDetails, getLatestModifiedDetails } from 'store/actions/masterActions/CodeAndNameAction';
@@ -22,13 +22,13 @@ function ViewCodeAndName() {
         {
             title: 'Code Type',
             field: 'codeType',
-            filterPlaceholder: 'filter',
+            filterPlaceholder: 'Code Type',
             align: 'center'
         },
         {
             title: ' Code',
             field: 'code',
-            filterPlaceholder: 'filter',
+            filterPlaceholder: 'Code',
             align: 'center'
         },
         {
@@ -36,25 +36,41 @@ function ViewCodeAndName() {
             field: 'name',
             align: 'center',
             grouping: false,
-            filterPlaceholder: 'filter'
+            filterPlaceholder: 'Description'
         },
         {
             title: 'Active',
             field: 'status',
-            filterPlaceholder: 'True || False',
+            //filterPlaceholder: 'True || False',
             align: 'center',
+            lookup: {
+                true: 'Active',
+                false: 'Inactive'
+            },
             emptyValue: () => <em>null</em>,
             render: (rowData) => (
                 <div
                     style={{
-                        color: rowData.status === true ? '#008000aa' : '#f90000aa',
-                        borderRadius: '4px',
-                        fontWeight: 'bold',
-                        paddingLeft: 5,
-                        paddingRight: 5
+                        alignItems: 'center',
+                        align: 'center',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center'
+                        // background: rowData.status === true ? "#008000aa" : "#f90000aa",
+                        // borderRadius: "4px",
+                        // paddingLeft: 5,
+                        // paddingRight: 5,
                     }}
                 >
-                    {rowData.status === true ? 'ACTIVE' : 'INACTIVE'}
+                    {rowData.status === true ? (
+                        <FormGroup>
+                            <FormControlLabel control={<Switch color="success" size="small" />} checked={true} />
+                        </FormGroup>
+                    ) : (
+                        <FormGroup>
+                            <FormControlLabel control={<Switch color="error" size="small" />} checked={false} />
+                        </FormGroup>
+                    )}
                 </div>
             )
         }

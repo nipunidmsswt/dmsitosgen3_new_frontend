@@ -17,7 +17,8 @@ import {
     Checkbox,
     Button,
     Typography,
-    Grid
+    Grid,
+    Switch
 } from '@mui/material';
 
 import './tourCategory.scss';
@@ -329,23 +330,17 @@ function TourCategory({ open, handleClose, mode, rowTourCategoryCode }) {
                                 </Grid>
 
                                 <Grid item>
-                                    <Grid item>
-                                        <Typography variant="subtitle1" component="h2">
-                                            Active
-                                        </Typography>
-                                        <FormGroup>
-                                            <FormControlLabel
-                                                control={
-                                                    <Checkbox
-                                                        name="status"
-                                                        onChange={handleInputChange}
-                                                        value={formValues.status}
-                                                        checked={formValues.status}
-                                                    />
-                                                }
-                                            />
-                                        </FormGroup>
-                                    </Grid>
+                                    <FormGroup>
+                                        <FormControlLabel
+                                            name="status"
+                                            onChange={handleInputChange}
+                                            value={formValues.status}
+                                            control={<Switch color="success" />}
+                                            label="Status"
+                                            checked={formValues.status}
+                                            disabled={mode == 'VIEW'}
+                                        />
+                                    </FormGroup>
                                 </Grid>
 
                                 {/* {mode === "VIEW" ? <DynamicElement /> : null} */}

@@ -115,8 +115,12 @@ function ViewTourType() {
         {
             title: 'Status',
             field: 'status',
-            filterPlaceholder: 'True || False',
+            //filterPlaceholder: 'True || False',
             align: 'center',
+            lookup: {
+                true: 'Active',
+                false: 'Inactive'
+            },
             emptyValue: () => <em>null</em>,
             render: (rowData) => (
                 <div
