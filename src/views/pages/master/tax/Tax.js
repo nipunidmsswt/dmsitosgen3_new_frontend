@@ -144,14 +144,11 @@ function Tax({ open, handleClose, mode, rowTaxCode }) {
                 <form onSubmit={handleSubmitForm}>
                     <DialogContent>
                         <div>
-                            <Grid container direction="column" gap={'20px'} justifyContent="center" alignContent="center">
-                                <Grid item>
+                            <Grid container spacing={10}>
+                                <Grid container item xs={6} direction="column" gap="20px">
                                     <TextField
                                         disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
                                         label={taxCode}
-                                        InputLabelProps={{
-                                            shrink: true
-                                        }}
                                         sx={{
                                             width: { sm: 200, md: 300 },
                                             '& .MuiInputBase-root': {
@@ -160,6 +157,9 @@ function Tax({ open, handleClose, mode, rowTaxCode }) {
                                         }}
                                         type="text"
                                         variant="outlined"
+                                        InputLabelProps={{
+                                            shrink: true
+                                        }}
                                         // className="txt"
                                         id="taxCode"
                                         name="taxCode"
@@ -175,8 +175,6 @@ function Tax({ open, handleClose, mode, rowTaxCode }) {
                                         value={formValues.taxCode}
                                         onBlur={checkDuplicateTaxes}
                                     />
-                                </Grid>
-                                <Grid item>
                                     <TextField
                                         sx={{
                                             width: { sm: 200, md: 300 },
@@ -199,9 +197,6 @@ function Tax({ open, handleClose, mode, rowTaxCode }) {
                                         helperText={error && formValues.taxDescription.length === 0 ? 'Required Field' : ''}
                                         value={formValues.taxDescription}
                                     />
-                                </Grid>
-
-                                <Grid item>
                                     <TextField
                                         label={percentage}
                                         sx={{
@@ -222,25 +217,30 @@ function Tax({ open, handleClose, mode, rowTaxCode }) {
                                         helperText={error && formValues.percentage.length === 0 ? 'Required Field' : ''}
                                         value={formValues.percentage}
                                     />
-                                </Grid>
-
-                                <Grid item>
                                     <FormGroup>
                                         <FormControlLabel
                                             name="status"
                                             onChange={handleInputChange}
                                             value={formValues.status}
-                                            control={<Switch color="success" />}
+                                            control={<Switch />}
                                             label="Status"
                                             checked={formValues.status}
                                             disabled={mode == 'VIEW'}
                                         />
+                                        {/* <FormControlLabel
+                      disabled
+                      control={<Switch />}
+                      label="Disabled"
+                    /> */}
                                     </FormGroup>
                                 </Grid>
-                            </Grid>
 
-                            <br></br>
-                            <Grid>{mode === 'VIEW' ? <CreatedUpdatedUserDetails formValues={formValues} /> : null}</Grid>
+                                {mode === 'VIEW' ? (
+                                    <Grid container item xs={6} direction="column">
+                                        <CreatedUpdatedUserDetails formValues={formValues} />
+                                    </Grid>
+                                ) : null}
+                            </Grid>
                         </div>
                     </DialogContent>
                     <DialogActions>

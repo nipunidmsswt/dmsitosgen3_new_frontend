@@ -173,7 +173,7 @@ function ViewTaxGroup() {
                                     actions={[
                                         {
                                             icon: tableIcons.Add,
-                                            tooltip: 'Add',
+                                            tooltip: 'Add New',
                                             isFreeAction: true,
                                             onClick: () => handleClickOpen('INSERT', null)
                                         },

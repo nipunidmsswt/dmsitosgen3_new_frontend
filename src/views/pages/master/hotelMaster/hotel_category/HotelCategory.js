@@ -246,24 +246,25 @@ function HotelCategory({ open, mode, handleClose, hotelCategoryCode }) {
                                 <Button
                                     variant="contained"
                                     type="submit"
+                                    className="btnSave"
                                     style={{
-                                        backgroundColor: '#00AB55',
+                                        // backgroundColor: '#00AB55',
                                         display: mode == 'VIEW' ? 'none' : 'block'
                                     }}
                                 >
                                     {mode === 'INSERT' ? 'SAVE' : 'UPDATE'}
                                 </Button>
                                 <Button
-                                    variant="contained"
+                                    variant="outlined"
                                     type="button"
                                     style={{
-                                        backgroundColor: '#B22222',
+                                        // backgroundColor: '#B22222',
                                         display: mode == 'VIEW' ? 'none' : 'block'
                                     }}
                                     // onClick={clearForm}
                                     onClick={handleReset.bind(null, props.resetForm)}
                                 >
-                                    Cancel
+                                    CLEAR
                                 </Button>
                             </DialogActions>
                         </Form>

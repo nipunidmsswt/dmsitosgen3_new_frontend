@@ -22,6 +22,13 @@ const pages = {
 
             children: [
                 {
+                    id: 'register3',
+                    title: 'User Creation',
+                    type: 'item',
+                    url: '/pages/usermanagement/usercreation',
+                    breadcrumbs: false
+                },
+                {
                     id: 'login3',
                     title: 'Login',
                     type: 'item',

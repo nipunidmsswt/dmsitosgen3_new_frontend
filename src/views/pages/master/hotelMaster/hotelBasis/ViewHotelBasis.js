@@ -169,20 +169,20 @@ function ViewHotelBasis() {
                                     actions={[
                                         {
                                             icon: tableIcons.Add,
-                                            tooltip: 'Add Hotel Basis',
+                                            tooltip: 'Add New',
                                             isFreeAction: true,
                                             onClick: () => handleClickOpen('INSERT', null)
                                         },
                                         (rowData) => ({
                                             icon: tableIcons.Edit,
                                             filtering: true,
-                                            tooltip: 'Edit Hotel Basis',
+                                            tooltip: 'Edit',
                                             // iconProps: { color: "primary" },
                                             onClick: () => handleClickOpen('VIEW_UPDATE', rowData)
                                         }),
                                         (rowData) => ({
                                             icon: tableIcons.VisibilityIcon,
-                                            tooltip: 'View Hotel Basis',
+                                            tooltip: 'View',
                                             // iconProps: { color: "action" },
                                             onClick: () => handleClickOpen('VIEW', rowData)
                                         })

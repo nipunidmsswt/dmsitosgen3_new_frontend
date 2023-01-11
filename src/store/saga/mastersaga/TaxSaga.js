@@ -6,12 +6,14 @@ import {
     ADD_SUCCESS_TAX_DATA,
     ADD_SUCCESS_TAX_GROUP_DATA,
     FAILED_GET_TAX_DATA_BY_ID,
+    FAILED_GET_TAX_DATA_BY_UNIQUE_ID,
     FAILED_GET_TAX_GROUP_DATA_BY_ID,
     FAILED_LAST_MODIFIED_DATE_TAX,
     FAILED_LAST_MODIFIED_DATE_TAX_GROUP,
     FAILED_TAX_GROUP_LIST_DATA,
     FAILED_TAX_LIST_DATA,
     SUCCESS_GET_TAX_DATA_BY_ID,
+    SUCCESS_GET_TAX_DATA_BY_UNIQUE_ID,
     SUCCESS_GET_TAX_GROUP_DATA_BY_ID,
     SUCCESS_LAST_MODIFIED_DATE_TAX,
     SUCCESS_LAST_MODIFIED_DATE_TAX_GROUP,
@@ -52,6 +54,21 @@ export function* getTaxByIdSaga(action) {
     } catch (e) {
         console.log(e);
         yield put({ type: FAILED_GET_TAX_DATA_BY_ID, data: responseData.data });
+    }
+}
+
+export function* getTaxByUniqueIdSaga(action) {
+    console.log('getTaxByUniqueIdSaga');
+    console.log(action);
+
+    let responseData = [];
+    try {
+        responseData = yield call(getById, `${process.env.REACT_APP_FINANCE_URL}/taxDetails/${action.data.id}`);
+        console.log(responseData.data.payload);
+        yield put({ type: SUCCESS_GET_TAX_DATA_BY_UNIQUE_ID, data: responseData.data });
+    } catch (e) {
+        console.log(e);
+        yield put({ type: FAILED_GET_TAX_DATA_BY_UNIQUE_ID, data: responseData.data });
     }
 }
 

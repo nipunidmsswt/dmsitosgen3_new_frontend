@@ -17,6 +17,16 @@ import ViewHotelBasis from 'views/pages/master/hotelMaster/hotelBasis/ViewHotelB
 import ViewRoomCategory from 'views/pages/master/hotelMaster/roomCategory/ViewRoomCategory';
 import ViewHotelCategory from 'views/pages/master/hotelMaster/hotel_category/ViewHotelCategory';
 import ViewHotelFacility from 'views/pages/master/hotelMaster/hotel_facility/ViewHotelacility';
+import ViewOwner from 'views/pages/master/owner/ViewOwner';
+import ViewProduct from 'views/pages/master/product/ViewProduct';
+import ViewExchangeRateTypes from 'views/pages/master/exchange_rate_types/ViewExchangeRateTypes';
+import ViewLocation from 'views/pages/master/transportMaster/location/ViewLocation';
+import ViewFacilityCounter from 'views/pages/master/hotelMaster/facility_count/ViewFacilityCount';
+import ViewGuideClass from 'views/pages/master/guideMaster/guide_class/ViewGuideClass';
+import ViewExpenseTypes from 'views/pages/master/transportMaster/expensetypes/ViewExpenseTypes';
+import ViewTransportRates from 'views/pages/master/transportMaster/transportRates/ViewTransportRates';
+import ViewCompanyProfile from 'views/pages/master/company_profile/ViewCompanyProfile';
+import ViewDepartmentDesignation from 'views/pages/master/department_designation/ViewDepartmentDesignation';
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
 
@@ -158,6 +168,46 @@ const MainRoutes = {
                 {
                     path: 'hotelFacilityview',
                     element: <ViewHotelFacility />
+                },
+                {
+                    path: 'ownerview',
+                    element: <ViewOwner />
+                },
+                {
+                    path: 'productview',
+                    element: <ViewProduct />
+                },
+                {
+                    path: 'exchangeratetypeview',
+                    element: <ViewExchangeRateTypes />
+                },
+                {
+                    path: 'locationview',
+                    element: <ViewLocation />
+                },
+                {
+                    path: 'facilitycountview',
+                    element: <ViewFacilityCounter />
+                },
+                {
+                    path: 'guideclassview',
+                    element: <ViewGuideClass />
+                },
+                {
+                    path: 'expensetypesview',
+                    element: <ViewExpenseTypes />
+                },
+                {
+                    path: 'trasportrateview',
+                    element: <ViewTransportRates />
+                },
+                {
+                    path: 'companyprofileview',
+                    element: <ViewCompanyProfile />
+                },
+                {
+                    path: 'designationdepartmentview',
+                    element: <ViewDepartmentDesignation />
                 }
             ]
         }

@@ -26,7 +26,7 @@ const ViewTax = () => {
             align: 'center'
         },
         {
-            title: 'Percentage',
+            title: 'Percentage %',
             field: 'percentage',
             align: 'center',
             grouping: false,

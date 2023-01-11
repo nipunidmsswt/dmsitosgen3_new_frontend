@@ -12,7 +12,8 @@ import {
     updateTaxGroupSaga,
     checkDupicateTaxGroupCodeSaga,
     checkLatestTaxModifiedDateSaga,
-    checkLatestTaxGrupModifiedDateSaga
+    checkLatestTaxGrupModifiedDateSaga,
+    getTaxByUniqueIdSaga
 } from './mastersaga/TaxSaga';
 import {
     SAVE_TAX_DATA,
@@ -26,7 +27,8 @@ import {
     UPDATE_TAX_GROUP_DATA,
     CHECK_TAX_GROUP_DUPLICATE,
     GET_LAST_MODIFIED_DATE_TIME_TAX,
-    GET_LAST_MODIFIED_DATE_TIME_TAX_GROUP
+    GET_LAST_MODIFIED_DATE_TIME_TAX_GROUP,
+    GET_TAX_DATA_BY_UNIQUE_ID
 } from 'store/constant/master/TaxMasterConstant';
 
 import {
@@ -47,54 +49,58 @@ import {
     GET_LAST_MODIFIED_DATE_TIME
 } from 'store/constant/master/TourCategoryMasterConstant';
 
-// import { getAllCurrenciesSaga } from '../saga/ApiServiceSaga/ApiServiceSaga';
-// import { GET_ALL_CURRENCIES } from 'store/constant/apiServiceConstant/ApiServiceConstant';
+import { getAllCurrenciesSaga } from '../saga/ApiServiceSaga/ApiServiceSaga';
+import { GET_ALL_CURRENCIES } from 'store/constant/apiServiceConstant/ApiServiceConstant';
 
-// import {
-//     SAVE_EXCHNAGE_RATE_TYPE_DATA,
-//     UPDATE_EXCHNAGE_RATE_TYPE_DATA,
-//     GET_ALL_EXCHNAGE_RATE_TYPE_DATA,
-//     GET_EXCHNAGE_RATE_TYPE_BY_ID
-// } from 'store/constant/master/ExchangeRateConstant';
+import {
+    SAVE_EXCHNAGE_RATE_TYPE_DATA,
+    UPDATE_EXCHNAGE_RATE_TYPE_DATA,
+    GET_ALL_EXCHNAGE_RATE_TYPE_DATA,
+    GET_EXCHNAGE_RATE_TYPE_BY_ID,
+    GET_LAST_MODIFIED_DATE_TIME_EXCHNAGE_RATE_TYPE
+} from 'store/constant/master/ExchangeRateConstant';
 
-// import {
-//     saveExchangeRateTypeSaga,
-//     updateExchangeRateTypeSaga,
-//     getAllExchnageRateTypeDataSaga,
-//     getExchangeRateTypeByIdSaga
-// } from './masterSaga/ExchangeRateTypeSaga';
+import {
+    saveExchangeRateTypeSaga,
+    updateExchangeRateTypeSaga,
+    getAllExchnageRateTypeDataSaga,
+    getExchangeRateTypeByIdSaga,
+    checkLatestCurrencyModifiedDateSaga
+} from './mastersaga/ExchangeRateTypeSaga';
 
-// import {
-//     saveProductDataHandler,
-//     getAllProductSaga,
-//     getProductByIdSaga,
-//     updateProductDataSaga,
-//     checkProductLatestModifiedDateSaga,
-//     checkDupicateProductCodeSaga
-// } from './masterSaga/ProductDataSaga';
-// import {
-//     CHECK_PRODUCT_CODE_DUPLICATE,
-//     GET_ALL_PRODUCT_DATA,
-//     GET_PRODUCT_DATA_BY_ID,
-//     GET_PRODUCT_LAST_MODIFIED_DATE_TIME,
-//     SAVE_PRODUCT_DATA,
-//     UPDATE_PRODUCT_DATA
-// } from 'store/constant/master/ProductDataMasterConstant';
+import {
+    saveProductDataHandler,
+    getAllProductSaga,
+    getProductByIdSaga,
+    updateProductDataSaga,
+    checkProductLatestModifiedDateSaga,
+    checkDupicateProductCodeSaga
+} from './mastersaga/ProductDataSaga';
+import {
+    CHECK_PRODUCT_CODE_DUPLICATE,
+    GET_ALL_PRODUCT_DATA,
+    GET_PRODUCT_DATA_BY_ID,
+    GET_PRODUCT_LAST_MODIFIED_DATE_TIME,
+    SAVE_PRODUCT_DATA,
+    UPDATE_PRODUCT_DATA
+} from 'store/constant/master/ProductDataMasterConstant';
 
-// import {
-//     SAVE_LOCATION_DATA,
-//     GET_LOCATION_DATA_BY_ID,
-//     GET_ALL_LOCATION_DATA,
-//     UPDATE_LOCATION_DATA,
-//     CHECK_LOCATION_DUPLICATE,
-//     GET_LAST_MODIFIED_DATE_TIME_LOCATION
-// } from 'store/constant/master/LocationConstant';
+import {
+    SAVE_LOCATION_DATA,
+    GET_LOCATION_DATA_BY_ID,
+    GET_ALL_LOCATION_DATA,
+    UPDATE_LOCATION_DATA,
+    CHECK_LOCATION_DUPLICATE,
+    GET_LAST_MODIFIED_DATE_TIME_LOCATION,
+    GET_ACTIVE_LOCATIONS
+} from 'store/constant/master/LocationConstant';
 
 import {
     CHECK_CODE_DUPLICATE,
     CHECK_CODE_TYPE_DUPLICATE,
     GET_ALL_CLUSTER_DATA,
     GET_ALL_CODE_AND_NAME_DATA,
+    GET_ALL_OPERATOR_DATA,
     GET_CODE_LAST_MODIFIED_DATE_TIME,
     GET_CODE_NAME_DATA_BY_CODE,
     SAVE_CODE_AND_NAME_DATA,
@@ -109,7 +115,8 @@ import {
     checkDupicateCodeSaga,
     checkDupicateCodeTypeSaga,
     checkCodeLatestModifiedDateSaga,
-    getAllClusterTypeData
+    getAllClusterTypeData,
+    getAllActiveOperatorSaga
 } from './mastersaga/CodeAndNameSaga';
 
 import {
@@ -132,14 +139,15 @@ import {
     getAllActiveManagerDataSaga
 } from './mastersaga/ManagerSaga';
 
-// import {
-//     saveLocationSaga,
-//     getAllLocatonSaga,
-//     getLocationByIdSaga,
-//     updateLocationSaga,
-//     checkDupicateLocationSaga,
-//     checkLatestLocationModifiedDateSaga
-// } from './masterSaga/LocationSaga';
+import {
+    saveLocationSaga,
+    getAllLocatonSaga,
+    getLocationByIdSaga,
+    updateLocationSaga,
+    checkDupicateLocationSaga,
+    checkLatestLocationModifiedDateSaga,
+    getAllActiveLocations
+} from './mastersaga/LocationSaga';
 
 import {
     SAVE_HOTEL_CATEGORY_DATA,
@@ -159,41 +167,23 @@ import {
     updateHotelCateogrySaga
 } from './mastersaga/HotelCategorySaga';
 
-// import {
-//     SAVE_ROOM_RECREATION_DATA,
-//     GET_ROOM_RECREATION_DATA_BY_ID,
-//     GET_ALL_ROOM_RECREATION_DATA,
-//     UPDATE_ROOM_RECREATION_DATA,
-//     CHECK_ROOM_RECREATION_DUPLICATE,
-//     GET_LAST_MODIFIED_DATE_TIME_ROOM_RECREATION
-// } from 'store/constant/master/RoomRecreationConstant';
+import {
+    saveManagingCompanySaga,
+    getAllManagingCompanySaga,
+    getManagingCompanyByIdSaga,
+    updateManagingCompanySaga,
+    checkDupicateManagingCompanyCodeSaga,
+    checkLatestManagingCompanyModifiedDateSaga
+} from './mastersaga/ManagingCompanySaga';
 
-// import {
-//     saveRoomRecreationSaga,
-//     getAllRoomRecreationSaga,
-//     getRoomRecreationByIdSaga,
-//     updateRoomRecreationSaga,
-//     checkDupicateRoomRecreationCodeSaga,
-//     checkLatestRoomCreationModifiedDateSaga
-// } from './masterSaga/RoomRecreationSaga';
-
-// import {
-//     saveManagingCompanySaga,
-//     getAllManagingCompanySaga,
-//     getManagingCompanyByIdSaga,
-//     updateManagingCompanySaga,
-//     checkDupicateManagingCompanyCodeSaga,
-//     checkLatestManagingCompanyModifiedDateSaga
-// } from './masterSaga/ManagingCompanySaga';
-
-// import {
-//     CHECK_MANAGING_COMAPANY_DUPLICATE,
-//     GET_ALL_MANAGING_COMAPANY_DATA,
-//     GET_LAST_MODIFIED_DATE_TIME_MANAGING_COMAPANY,
-//     GET_MANAGING_COMAPANY_DATA_BY_ID,
-//     SAVE_MANAGING_COMAPANY_DATA,
-//     UPDATE_MANAGING_COMAPANY_DATA
-// } from 'store/constant/master/ManagingCompanyConstant';
+import {
+    CHECK_MANAGING_COMAPANY_DUPLICATE,
+    GET_ALL_MANAGING_COMAPANY_DATA,
+    GET_LAST_MODIFIED_DATE_TIME_MANAGING_COMAPANY,
+    GET_MANAGING_COMAPANY_DATA_BY_ID,
+    SAVE_MANAGING_COMAPANY_DATA,
+    UPDATE_MANAGING_COMAPANY_DATA
+} from 'store/constant/master/ManagingCompanyConstant';
 
 import {
     saveMarketDataHandler,
@@ -214,22 +204,6 @@ import {
     UPDATE_MARKET_DATA
 } from 'store/constant/master/MarketConstant';
 
-// import {
-//     CHECK_SERVICEOFFERED_CODE_DUPLICATE,
-//     GET_ALL_SERVICEOFFERED_DATA,
-//     GET_SERVICEOFFERED_DATA_BY_ID,
-//     GET_SERVICEOFFERED_LAST_MODIFIED_DATE_TIME,
-//     SAVE_SERVICEOFFERED_DATA,
-//     UPDATE_SERVICEOFFERED_DATA
-// } from 'store/constant/master/ServiceOfferedConstant';
-// import {
-//     checkDupicateServiceOfferedCodeSaga,
-//     checkServiceOfferedLatestModifiedDateSaga,
-//     getAllServiceOfferedSaga,
-//     getServiceOfferedByIdSaga,
-//     saveServiceOffered,
-//     updateServiceOfferedSaga
-// } from './masterSaga/ServiceOfferedSaga';
 import {
     CHECK_TOURTYPE_CODE_DUPLICATE,
     GET_ALL_TOURTYPE_DATA,
@@ -246,23 +220,23 @@ import {
     updateTourTypeSaga
 } from './mastersaga/TourTypeSaga';
 import { checkDuplicateTourTypeCode } from 'store/actions/masterActions/TourTypeAction';
-// import { checkDuplicateTourTypeCode, getAllTourTypeData } from '../actions/masterActions/TourTypeAction';
-// import {
-//     CHECK_OWNER_CODE_DUPLICATE,
-//     GET_ALL_OWNER_DATA,
-//     GET_OWNER_DATA_BY_ID,
-//     GET_OWNER_LAST_MODIFIED_DATE_TIME,
-//     SAVE_OWNER_DATA,
-//     UPDATE_OWNER_DATA
-// } from 'store/constant/master/OwnerConstant';
-// import {
-//     checkDupicateOwnerCodeSaga,
-//     checkOwnerLatestModifiedDateSaga,
-//     getAllOwnerSaga,
-//     getOwnerByIdSaga,
-//     saveOwner,
-//     updateOwnerSaga
-// } from './masterSaga/OwnerSaga';
+
+import {
+    CHECK_OWNER_CODE_DUPLICATE,
+    GET_ALL_OWNER_DATA,
+    GET_OWNER_DATA_BY_ID,
+    GET_OWNER_LAST_MODIFIED_DATE_TIME,
+    SAVE_OWNER_DATA,
+    UPDATE_OWNER_DATA
+} from 'store/constant/master/OwnerConstant';
+import {
+    checkDupicateOwnerCodeSaga,
+    checkOwnerLatestModifiedDateSaga,
+    getAllOwnerSaga,
+    getOwnerByIdSaga,
+    saveOwner,
+    updateOwnerSaga
+} from './mastersaga/OwnerSaga';
 
 import {
     CHECK_SEASON_DUPLICATE,
@@ -305,12 +279,12 @@ import {
     CHECK_MARKET_GROUP_CODE_DUPLICATE,
     GET_ALL_ACTIVE_MARKET_GROUP_DATA,
     GET_ALL_MARKET_GROUP_DATA,
-    GET_ALL_MARKET_GROUP_GROUP_DATA,
     GET_MARKET_GROUP_DETAILS_BY_CODE,
     GET_MARKET_GROUP_LAST_MODIFIED_DATE_TIME,
     SAVE_MARKET_GROUP_DATA,
     UPDATE_MARKET_GROUP_DATA
 } from 'store/constant/master/MarketGroupConstant';
+
 import {
     checkMarketGroupDupicateCodeSaga,
     getAllMarketGroupDataSaga,
@@ -344,6 +318,7 @@ import {
     saveRoomCategoryDataHandler,
     updateRoomCategoryDataSaga
 } from './mastersaga/RoomCategorySaga';
+
 import {
     CHECK_ROOM_CATEGORY_CODE_DUPLICATE,
     GET_ALL_ROOM_CATEGORY,
@@ -352,6 +327,108 @@ import {
     SAVE_ROOM_CATEGORY,
     UPDATE_ROOM_CATEGORY
 } from 'store/constant/master/RoomCategoryConstant';
+import {
+    CHECK_EXPENSE_TYPES_CODE_DUPLICATE,
+    GET_ALL_CURRENCY_LIST,
+    GET_ALL_EXPENSE_TYPES,
+    GET_EXPENSE_TYPES_BY_ID,
+    GET_EXPENSE_TYPES_LAST_MODIFIED_DATE_TIME,
+    SAVE_EXPENSE_TYPES,
+    UPDATE_EXPENSE_TYPES
+} from 'store/constant/master/ExpenseTypesConstant';
+import {
+    checkExpenseTypesDupicateCodeSaga,
+    getAllCurrencyListData,
+    getAllExpenseTypesDataSaga,
+    getExpenseTypesByCodeSaga,
+    getExpenseTypesLatestModifiedDateSaga,
+    saveExpenseTypesDataHandler,
+    updateExpenseTypesDataSaga
+} from './mastersaga/ExpenseTypesSaga';
+
+import { getAllChargeMethods, getAllModeOfTransort } from './mastersaga/TransportRateSaga';
+
+import { GET_ALL_CHARGE_METHOD_DATA, GET_ALL_MODE_OF_TRANSPORT_DATA } from 'store/constant/master/TransportRateConstant';
+import {
+    CHECK_GUIDE_CLASS_CODE_DUPLICATE,
+    GET_ALL_ACTIVE_GUIDE_CLASS_DATA,
+    GET_ALL_GUIDE_CLASS_DATA,
+    GET_GUIDE_CLASS_DETAILS_BY_CODE,
+    GET_GUIDE_CLASS_LAST_MODIFIED_DATE_TIME,
+    SAVE_GUIDE_CLASS_DATA,
+    UPDATE_GUIDE_CLASS_DATA
+} from 'store/constant/master/GuideClassConstant';
+import {
+    checkGuideClassDupicateCodeSaga,
+    getAllActiveGuideClassDataSaga,
+    getAllGuideClassDataSaga,
+    getGuideClassDetailsByCodeSaga,
+    getGuideClassLatestModifiedDateSaga,
+    saveGuideClassDataHandler,
+    updateGuideClassDataSaga
+} from './mastersaga/GuideClassSaga';
+import {
+    CHECK_USER_DUPLICATE,
+    GET_ACTIVE_USERS,
+    GET_ALL_USER_DATA,
+    GET_ALL_USER_ROLES,
+    GET_LAST_MODIFIED_DATE_TIME_USER,
+    GET_USER_DATA_BY_ID,
+    SAVE_USER_DATA,
+    UPDATE_USER_DATA,
+    CHECK_USER_LOGIN_CREDENTIALS
+} from 'store/constant/authentication/UserConstant';
+import {
+    checkDupicateUserSaga,
+    checkLatestUserModifiedDateSaga,
+    getAllActiveUsers,
+    getAllRolesSaga,
+    getAllUserSaga,
+    getUserByIdSaga,
+    saveUserSaga,
+    updateUserSaga,
+    userLoginSaga
+} from './authenticationSaga/UserSaga';
+
+import {
+    saveDepartMentDesignationSaga,
+    getAllDepartMentDesignationDataSaga,
+    checkDupicateDepartMentDesignationSaga,
+    updateDepartMentDesignationSaga,
+    getDepartMentDesignationByIdSaga,
+    checkLatestDepartMentDesignationModifiedDateSaga,
+    getAllDepartmentDataSaga,
+    getAllDesignationDataSaga
+} from '../saga/mastersaga/DepartmentDesignationSaga';
+
+import {
+    SAVE_DEPARTMENT_DESIGNATION,
+    GET_ALL_DEPARTMENT_DESIGNATION,
+    GET_DEPARTMENT_DESIGNATION_BY_ID,
+    UPDATE_DEPARTMENT_DESIGNATION,
+    CHECK_DEPARTMENT_DESIGNATION_CODE_DUPLICATE,
+    GET_DEPARTMENT_DESIGNATION_LAST_MODIFIED_DATE_TIME,
+    GET_ALL_DEPARTMENT_ACTIVE,
+    GET_ALL_DESIGNATION_ACTIVE
+} from '../constant/master/DepartmentDesignationConstant';
+
+import {
+    SAVE_COMPANY_PROFILE,
+    GET_ALL_COMPANY_PROFILE,
+    GET_COMPANY_PROFILE_BY_ID,
+    UPDATE_COMPANY_PROFILE,
+    CHECK_COMPANY_PROFILE_CODE_DUPLICATE,
+    GET_COMPANY_PROFILE_LAST_MODIFIED_DATE_TIME
+} from '../constant/master/CompanyProfilrConstant';
+
+import {
+    saveCompanyProfileSaga,
+    getAllCompanyProfileDataSaga,
+    checkDupicateCompanyProfileSaga,
+    updateCompanyProfileSaga,
+    getCompanyProfileByIdSaga,
+    checkLatestCompanyPrfileModifiedDateSaga
+} from '../saga/mastersaga/CompanyProfileSaga';
 
 export function* wacherSaga() {
     // tax setup
@@ -361,6 +438,7 @@ export function* wacherSaga() {
     yield takeLatest(UPDATE_TAX_DATA, updateTaxSaga);
     yield takeLatest(CHECK_TAX_DUPLICATE, checkDupicateTaxCodeSaga);
     yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_TAX, checkLatestTaxModifiedDateSaga);
+    yield takeLatest(GET_TAX_DATA_BY_UNIQUE_ID, getTaxByUniqueIdSaga);
 
     //tax group setup
     yield takeLatest(SAVE_TAX_GROUP_DATA, saveTaxGroupSaga);
@@ -379,23 +457,23 @@ export function* wacherSaga() {
     yield takeLatest(GET_LAST_MODIFIED_DATE_TIME, checkLeatestModifiedDateSaga);
 
     // //currency
-    // yield takeLatest(GET_ALL_CURRENCIES, getAllCurrenciesSaga);
+    yield takeLatest(GET_ALL_CURRENCIES, getAllCurrenciesSaga);
 
-    // //exchange rate type
-    // yield takeLatest(SAVE_EXCHNAGE_RATE_TYPE_DATA, saveExchangeRateTypeSaga);
-    // yield takeLatest(GET_EXCHNAGE_RATE_TYPE_BY_ID, getExchangeRateTypeByIdSaga);
-    // yield takeLatest(GET_ALL_EXCHNAGE_RATE_TYPE_DATA, getAllExchnageRateTypeDataSaga);
-    // yield takeLatest(UPDATE_EXCHNAGE_RATE_TYPE_DATA, updateExchangeRateTypeSaga);
-    // // yield takeLatest(CHECK_TAX_DUPLICATE, checkDupicateTaxCodeSaga);
+    //exchange rate type
+    yield takeLatest(SAVE_EXCHNAGE_RATE_TYPE_DATA, saveExchangeRateTypeSaga);
+    yield takeLatest(GET_EXCHNAGE_RATE_TYPE_BY_ID, getExchangeRateTypeByIdSaga);
+    yield takeLatest(GET_ALL_EXCHNAGE_RATE_TYPE_DATA, getAllExchnageRateTypeDataSaga);
+    yield takeLatest(UPDATE_EXCHNAGE_RATE_TYPE_DATA, updateExchangeRateTypeSaga);
+    yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_EXCHNAGE_RATE_TYPE, checkLatestCurrencyModifiedDateSaga);
 
     // //product  setup
 
-    // yield takeLatest(SAVE_PRODUCT_DATA, saveProductDataHandler);
-    // yield takeLatest(GET_ALL_PRODUCT_DATA, getAllProductSaga);
-    // yield takeLatest(GET_PRODUCT_DATA_BY_ID, getProductByIdSaga);
-    // yield takeLatest(UPDATE_PRODUCT_DATA, updateProductDataSaga);
-    // yield takeLatest(GET_PRODUCT_LAST_MODIFIED_DATE_TIME, checkProductLatestModifiedDateSaga);
-    // yield takeLatest(CHECK_PRODUCT_CODE_DUPLICATE, checkDupicateProductCodeSaga);
+    yield takeLatest(SAVE_PRODUCT_DATA, saveProductDataHandler);
+    yield takeLatest(GET_ALL_PRODUCT_DATA, getAllProductSaga);
+    yield takeLatest(GET_PRODUCT_DATA_BY_ID, getProductByIdSaga);
+    yield takeLatest(UPDATE_PRODUCT_DATA, updateProductDataSaga);
+    yield takeLatest(GET_PRODUCT_LAST_MODIFIED_DATE_TIME, checkProductLatestModifiedDateSaga);
+    yield takeLatest(CHECK_PRODUCT_CODE_DUPLICATE, checkDupicateProductCodeSaga);
 
     // //code&Name setup
 
@@ -406,30 +484,22 @@ export function* wacherSaga() {
     yield takeLatest(CHECK_CODE_DUPLICATE, checkDupicateCodeSaga);
     yield takeLatest(CHECK_CODE_TYPE_DUPLICATE, checkDupicateCodeTypeSaga);
     yield takeLatest(GET_CODE_LAST_MODIFIED_DATE_TIME, checkCodeLatestModifiedDateSaga);
+    yield takeLatest(GET_ALL_CLUSTER_DATA, getAllClusterTypeData);
+    yield takeLatest(GET_ALL_OPERATOR_DATA, getAllActiveOperatorSaga);
 
     // //location data
-    // yield takeLatest(SAVE_LOCATION_DATA, saveLocationSaga);
-    // yield takeLatest(GET_LOCATION_DATA_BY_ID, getLocationByIdSaga);
-    // yield takeLatest(GET_ALL_LOCATION_DATA, getAllLocatonSaga);
-    // yield takeLatest(UPDATE_LOCATION_DATA, updateLocationSaga);
-    // yield takeLatest(CHECK_LOCATION_DUPLICATE, checkDupicateLocationSaga);
-    // yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_LOCATION, checkLatestLocationModifiedDateSaga);
+    yield takeLatest(SAVE_LOCATION_DATA, saveLocationSaga);
+    yield takeLatest(GET_LOCATION_DATA_BY_ID, getLocationByIdSaga);
+    yield takeLatest(GET_ALL_LOCATION_DATA, getAllLocatonSaga);
+    yield takeLatest(UPDATE_LOCATION_DATA, updateLocationSaga);
+    yield takeLatest(CHECK_LOCATION_DUPLICATE, checkDupicateLocationSaga);
+    yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_LOCATION, checkLatestLocationModifiedDateSaga);
+    yield takeLatest(GET_ACTIVE_LOCATIONS, getAllActiveLocations);
 
-    // yield takeLatest(UPDATE_CODE_AND_NAME_DATA, updateCodeAndNameDataSaga);
-    // yield takeLatest(CHECK_CODE_DUPLICATE, checkDupicateCodeSaga);
-    // yield takeLatest(CHECK_CODE_TYPE_DUPLICATE, checkDupicateCodeTypeSaga);
-    // yield takeLatest(GET_CODE_LAST_MODIFIED_DATE_TIME, checkCodeLatestModifiedDateSaga);
-
-    //hotel category
-    // yield takeLatest(SAVE_TAX_DATA, saveTaxSaga);
-    // yield takeLatest(GET_TAX_DATA_BY_ID, getTaxByIdSaga);
-    // yield takeLatest(GET_ALL_TAX_DATA, getAllTaxSaga);
-    // yield takeLatest(UPDATE_TAX_DATA, updateTaxSaga);
-    // yield takeLatest(CHECK_TAX_DUPLICATE, checkDupicateTaxCodeSaga);
-    // yield takeLatest(
-    //   GET_LAST_MODIFIED_DATE_TIME_TAX,
-    //   checkLatestTaxModifiedDateSaga
-    // );
+    yield takeLatest(UPDATE_CODE_AND_NAME_DATA, updateCodeAndNameDataSaga);
+    yield takeLatest(CHECK_CODE_DUPLICATE, checkDupicateCodeSaga);
+    yield takeLatest(CHECK_CODE_TYPE_DUPLICATE, checkDupicateCodeTypeSaga);
+    yield takeLatest(GET_CODE_LAST_MODIFIED_DATE_TIME, checkCodeLatestModifiedDateSaga);
 
     //hotel category
     yield takeLatest(SAVE_HOTEL_CATEGORY_DATA, saveHotelCateogrySaga);
@@ -446,7 +516,6 @@ export function* wacherSaga() {
     // yield takeLatest(UPDATE_ROOM_RECREATION_DATA, updateRoomRecreationSaga);
     // yield takeLatest(CHECK_ROOM_RECREATION_DUPLICATE, checkDupicateRoomRecreationCodeSaga);
     // yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_ROOM_RECREATION, checkLatestRoomCreationModifiedDateSaga);
-    // yield takeLatest(GET_ALL_CLUSTER_DATA, getAllClusterTypeData);
 
     // //Manager
 
@@ -494,21 +563,21 @@ export function* wacherSaga() {
     yield takeLatest(UPDATE_MARKET_GROUP_DATA, updateMarketGroupDataSaga);
     yield takeLatest(GET_ALL_ACTIVE_MARKET_GROUP_DATA, getAllMarketGroupDataSaga);
 
-    // //managing company
-    // yield takeLatest(SAVE_MANAGING_COMAPANY_DATA, saveManagingCompanySaga);
-    // yield takeLatest(GET_MANAGING_COMAPANY_DATA_BY_ID, getManagingCompanyByIdSaga);
-    // yield takeLatest(GET_ALL_MANAGING_COMAPANY_DATA, getAllManagingCompanySaga);
-    // yield takeLatest(UPDATE_MANAGING_COMAPANY_DATA, updateManagingCompanySaga);
-    // yield takeLatest(CHECK_MANAGING_COMAPANY_DUPLICATE, checkDupicateManagingCompanyCodeSaga);
-    // yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_MANAGING_COMAPANY, checkLatestManagingCompanyModifiedDateSaga);
+    //managing company
+    yield takeLatest(SAVE_MANAGING_COMAPANY_DATA, saveManagingCompanySaga);
+    yield takeLatest(GET_MANAGING_COMAPANY_DATA_BY_ID, getManagingCompanyByIdSaga);
+    yield takeLatest(GET_ALL_MANAGING_COMAPANY_DATA, getAllManagingCompanySaga);
+    yield takeLatest(UPDATE_MANAGING_COMAPANY_DATA, updateManagingCompanySaga);
+    yield takeLatest(CHECK_MANAGING_COMAPANY_DUPLICATE, checkDupicateManagingCompanyCodeSaga);
+    yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_MANAGING_COMAPANY, checkLatestManagingCompanyModifiedDateSaga);
 
     // //owner setup
-    // yield takeLatest(SAVE_OWNER_DATA, saveOwner);
-    // yield takeLatest(GET_ALL_OWNER_DATA, getAllOwnerSaga);
-    // yield takeLatest(GET_OWNER_DATA_BY_ID, getOwnerByIdSaga);
-    // yield takeLatest(UPDATE_OWNER_DATA, updateOwnerSaga);
-    // yield takeLatest(GET_OWNER_LAST_MODIFIED_DATE_TIME, checkOwnerLatestModifiedDateSaga);
-    // yield takeLatest(CHECK_OWNER_CODE_DUPLICATE, checkDupicateOwnerCodeSaga);
+    yield takeLatest(SAVE_OWNER_DATA, saveOwner);
+    yield takeLatest(GET_ALL_OWNER_DATA, getAllOwnerSaga);
+    yield takeLatest(GET_OWNER_DATA_BY_ID, getOwnerByIdSaga);
+    yield takeLatest(UPDATE_OWNER_DATA, updateOwnerSaga);
+    yield takeLatest(GET_OWNER_LAST_MODIFIED_DATE_TIME, checkOwnerLatestModifiedDateSaga);
+    yield takeLatest(CHECK_OWNER_CODE_DUPLICATE, checkDupicateOwnerCodeSaga);
     // //season data
     yield takeLatest(SAVE_SEASON_DATA, saveSeasonSaga);
     yield takeLatest(GET_SEASON_DATA_BY_ID, getSeasonByIdSaga);
@@ -548,4 +617,58 @@ export function* wacherSaga() {
     yield takeLatest(GET_ROOM_CATEGORY_LAST_MODIFIED_DATE_TIME, getRoomCategoryLatestModifiedDateSaga);
     yield takeLatest(CHECK_ROOM_CATEGORY_CODE_DUPLICATE, checkRoomCategoryDupicateCodeSaga);
     yield takeLatest(UPDATE_ROOM_CATEGORY, updateRoomCategoryDataSaga);
+
+    //EXPENSE TYPES
+    yield takeLatest(GET_ALL_CURRENCY_LIST, getAllCurrencyListData);
+    yield takeLatest(SAVE_EXPENSE_TYPES, saveExpenseTypesDataHandler);
+    yield takeLatest(GET_ALL_EXPENSE_TYPES, getAllExpenseTypesDataSaga);
+    yield takeLatest(GET_EXPENSE_TYPES_BY_ID, getExpenseTypesByCodeSaga);
+    yield takeLatest(UPDATE_EXPENSE_TYPES, updateExpenseTypesDataSaga);
+    yield takeLatest(GET_EXPENSE_TYPES_LAST_MODIFIED_DATE_TIME, getExpenseTypesLatestModifiedDateSaga);
+    yield takeLatest(CHECK_EXPENSE_TYPES_CODE_DUPLICATE, checkExpenseTypesDupicateCodeSaga);
+    //charge method
+    yield takeLatest(GET_ALL_CHARGE_METHOD_DATA, getAllChargeMethods);
+
+    //mode of transport
+    yield takeLatest(GET_ALL_MODE_OF_TRANSPORT_DATA, getAllModeOfTransort);
+
+    //Guide Class
+
+    yield takeLatest(SAVE_GUIDE_CLASS_DATA, saveGuideClassDataHandler);
+    yield takeLatest(GET_ALL_GUIDE_CLASS_DATA, getAllGuideClassDataSaga);
+    yield takeLatest(GET_GUIDE_CLASS_DETAILS_BY_CODE, getGuideClassDetailsByCodeSaga);
+    yield takeLatest(GET_GUIDE_CLASS_LAST_MODIFIED_DATE_TIME, getGuideClassLatestModifiedDateSaga);
+    yield takeLatest(CHECK_GUIDE_CLASS_CODE_DUPLICATE, checkGuideClassDupicateCodeSaga);
+    yield takeLatest(UPDATE_GUIDE_CLASS_DATA, updateGuideClassDataSaga);
+    yield takeLatest(GET_ALL_ACTIVE_GUIDE_CLASS_DATA, getAllActiveGuideClassDataSaga);
+
+    // //User data
+    yield takeLatest(SAVE_USER_DATA, saveUserSaga);
+    yield takeLatest(GET_USER_DATA_BY_ID, getUserByIdSaga);
+    yield takeLatest(GET_ALL_USER_DATA, getAllUserSaga);
+    yield takeLatest(UPDATE_USER_DATA, updateUserSaga);
+    yield takeLatest(CHECK_USER_DUPLICATE, checkDupicateUserSaga);
+    yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_USER, checkLatestUserModifiedDateSaga);
+    yield takeLatest(GET_ACTIVE_USERS, getAllActiveUsers);
+    yield takeLatest(GET_ALL_USER_ROLES, getAllRolesSaga);
+    //company profile
+    yield takeLatest(SAVE_COMPANY_PROFILE, saveCompanyProfileSaga);
+    yield takeLatest(GET_COMPANY_PROFILE_BY_ID, getCompanyProfileByIdSaga);
+    yield takeLatest(GET_ALL_COMPANY_PROFILE, getAllCompanyProfileDataSaga);
+    yield takeLatest(UPDATE_COMPANY_PROFILE, updateCompanyProfileSaga);
+    yield takeLatest(CHECK_COMPANY_PROFILE_CODE_DUPLICATE, checkDupicateCompanyProfileSaga);
+    yield takeLatest(GET_COMPANY_PROFILE_LAST_MODIFIED_DATE_TIME, checkLatestCompanyPrfileModifiedDateSaga);
+
+    //designation / department
+    yield takeLatest(SAVE_DEPARTMENT_DESIGNATION, saveDepartMentDesignationSaga);
+    yield takeLatest(GET_DEPARTMENT_DESIGNATION_BY_ID, getDepartMentDesignationByIdSaga);
+    yield takeLatest(GET_ALL_DEPARTMENT_DESIGNATION, getAllDepartMentDesignationDataSaga);
+    yield takeLatest(UPDATE_DEPARTMENT_DESIGNATION, updateDepartMentDesignationSaga);
+    yield takeLatest(CHECK_DEPARTMENT_DESIGNATION_CODE_DUPLICATE, checkDupicateDepartMentDesignationSaga);
+    yield takeLatest(GET_DEPARTMENT_DESIGNATION_LAST_MODIFIED_DATE_TIME, checkLatestDepartMentDesignationModifiedDateSaga);
+    yield takeLatest(GET_ALL_DEPARTMENT_ACTIVE, getAllDepartmentDataSaga);
+    yield takeLatest(GET_ALL_DESIGNATION_ACTIVE, getAllDesignationDataSaga);
+
+    //login
+    yield takeLatest(CHECK_USER_LOGIN_CREDENTIALS, userLoginSaga);
 }

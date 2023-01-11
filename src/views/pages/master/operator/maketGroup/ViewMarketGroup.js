@@ -163,7 +163,7 @@ function ViewMarketGroup() {
     };
     return (
         <div>
-            <MainCard title="Market Group">
+            <MainCard title="Operator / Market Group">
                 <div style={{ textAlign: 'right' }}> Last Modified Date : {lastModifiedTimeDate}</div>
                 <br />
                 <Grid container spacing={gridSpacing}>
@@ -176,18 +176,18 @@ function ViewMarketGroup() {
                                     actions={[
                                         {
                                             icon: tableIcons.Add,
-                                            tooltip: 'Add Market Group',
+                                            tooltip: 'Add New',
                                             isFreeAction: true,
                                             onClick: () => handleClickOpen('INSERT', null)
                                         },
                                         (rowData) => ({
                                             icon: tableIcons.Edit,
-                                            tooltip: 'Edit Market Group',
+                                            tooltip: 'Edit',
                                             onClick: () => handleClickOpen('VIEW_UPDATE', rowData)
                                         }),
                                         (rowData) => ({
                                             icon: tableIcons.VisibilityIcon,
-                                            tooltip: 'View Market Group',
+                                            tooltip: 'View',
                                             onClick: () => handleClickOpen('VIEW', rowData)
                                         })
                                     ]}
