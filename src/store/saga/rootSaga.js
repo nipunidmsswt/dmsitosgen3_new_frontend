@@ -375,7 +375,9 @@ import {
     GET_USER_DATA_BY_ID,
     SAVE_USER_DATA,
     UPDATE_USER_DATA,
-    CHECK_USER_LOGIN_CREDENTIALS
+    CHECK_USER_LOGIN_CREDENTIALS,
+    FORGOT_PASSWORD_CREDENTIALS,
+    RESET_PASSWORD_CREDENTIALS
 } from 'store/constant/authentication/UserConstant';
 import {
     checkDupicateUserSaga,
@@ -385,7 +387,9 @@ import {
     getUserByIdSaga,
     saveUserSaga,
     updateUserSaga,
-    userLoginSaga
+    userLoginSaga,
+    forgotPasswordSaga,
+    resetPasswordSaga
 } from './authenticationSaga/UserSaga';
 
 import {
@@ -662,4 +666,10 @@ export function* wacherSaga() {
 
     //login
     yield takeLatest(CHECK_USER_LOGIN_CREDENTIALS, userLoginSaga);
+
+    //forgot password
+    yield takeLatest(FORGOT_PASSWORD_CREDENTIALS, forgotPasswordSaga);
+
+    //reset password
+    yield takeLatest(RESET_PASSWORD_CREDENTIALS, resetPasswordSaga);
 }

@@ -15,7 +15,7 @@ import {
 } from '../../constant/master/DepartmentDesignationConstant';
 
 export function* saveDepartMentDesignationSaga(action) {
-    action.data.path = `${process.env.REACT_APP_USER_MANAGEMENT_URL}/departmentAndDesignation`;
+    action.data.path = `${process.env.REACT_APP_USER_MANAGEMENT_URL}/department/departmentAndDesignation`;
     let responseData = [];
     try {
         responseData = yield call(create, action.data);
@@ -35,7 +35,7 @@ export function* saveDepartMentDesignationSaga(action) {
 export function* getDepartMentDesignationByIdSaga(action) {
     console.log('getDepartMentDesignationByIdSaga tax saga');
     console.log(action);
-    action.data.path = `${process.env.REACT_APP_USER_MANAGEMENT_URL}/departmentDesignation`;
+    action.data.path = `${process.env.REACT_APP_USER_MANAGEMENT_URL}/department/departmentDesignation`;
     let responseData = [];
     try {
         responseData = yield call(create, action.data);
@@ -50,7 +50,7 @@ export function* getDepartMentDesignationByIdSaga(action) {
 export function* updateDepartMentDesignationSaga(action) {
     console.log('updateDepartMentDesignationSaga tax saga');
     console.log(action);
-    action.data.path = `${process.env.REACT_APP_USER_MANAGEMENT_URL}/departmentAndDesignation`;
+    action.data.path = `${process.env.REACT_APP_USER_MANAGEMENT_URL}/department/departmentAndDesignation`;
     let responseData = [];
     try {
         responseData = yield call(update, action.data);
@@ -69,7 +69,7 @@ export function* getAllDepartMentDesignationDataSaga() {
     let responseData = [];
 
     try {
-        responseData = yield call(get, process.env.REACT_APP_USER_MANAGEMENT_URL + '/departmentsAndDesignations');
+        responseData = yield call(get, process.env.REACT_APP_USER_MANAGEMENT_URL + '/department/departmentsAndDesignations');
         console.log(responseData.data.payload);
         yield put({ type: SUCCESS_DEPARTMENT_DESIGNATION_LIST_DATA, data: responseData.data });
     } catch (e) {
@@ -82,7 +82,7 @@ export function* checkDupicateDepartMentDesignationSaga(action) {
     let responseData = [];
     console.log(action.data.code);
     try {
-        responseData = yield call(getById, `${process.env.REACT_APP_USER_MANAGEMENT_URL}/${action.data.code}`);
+        responseData = yield call(getById, `${process.env.REACT_APP_USER_MANAGEMENT_URL}/department/${action.data.code}`);
         console.log(responseData);
         yield put({ type: DEPARTMENT_DESIGNATION_CODE_DUPLICATE, data: responseData.data });
     } catch (e) {
@@ -94,7 +94,7 @@ export function* checkDupicateDepartMentDesignationSaga(action) {
 export function* checkLatestDepartMentDesignationModifiedDateSaga() {
     let responseData = [];
     try {
-        responseData = yield call(get, `${process.env.REACT_APP_USER_MANAGEMENT_URL}/lastModifiedTime`);
+        responseData = yield call(get, `${process.env.REACT_APP_USER_MANAGEMENT_URL}/department/lastModifiedTime`);
         console.log('response data last:' + responseData);
         yield put({
             type: SUCCESS_DEPARTMENT_DESIGNATION_LAST_MODIFIED_DATE,
