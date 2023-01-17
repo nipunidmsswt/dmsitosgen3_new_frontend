@@ -8,7 +8,8 @@ import {
     GET_ACTIVE_USERS,
     CHECK_USER_LOGIN_CREDENTIALS,
     FORGOT_PASSWORD_CREDENTIALS,
-    RESET_PASSWORD_CREDENTIALS
+    RESET_PASSWORD_CREDENTIALS,
+    GET_ALL_USER_ROLES
 } from 'store/constant/authentication/UserConstant';
 
 //user creation
@@ -63,6 +64,12 @@ export const getActiveUsers = () => {
     };
 };
 
+export const getAllRolesData = () => {
+    console.log('getAllRoles');
+    return {
+        type: GET_ALL_USER_ROLES
+    };
+};
 //user login
 export const userLogin = (data) => {
     console.log('login  Data action s called', data);

@@ -17,7 +17,9 @@ import {
     SUCCESS_FORGOT_PASSWORD_CREDENTIALS,
     FAILED_FORGOT_PASSWORD_CREDENTIALS,
     SUCCESS_RESET_PASSWORD_CREDENTIALS,
-    FAILED_RESET_PASSWORD_CREDENTIALS
+    FAILED_RESET_PASSWORD_CREDENTIALS,
+    SUCCESS_GET_ALL_USER_ROLES,
+    FAILED_GET_ALL_USER_ROLES
 } from 'store/constant/authentication/UserConstant';
 
 const initialState = {
@@ -30,7 +32,8 @@ const initialState = {
     activeUsers: [],
     loggedUserData: null,
     forgotPasswordData: null,
-    resetPasswordData: null
+    resetPasswordData: null,
+    userRole: []
 };
 
 export const userReducer = (state = initialState, action) => {
@@ -133,6 +136,13 @@ export const userReducer = (state = initialState, action) => {
         case FAILED_RESET_PASSWORD_CREDENTIALS:
             console.warn('FAILED_RESET_PASSWORD_CREDENTIALS', data);
             return { ...state, resetPasswordData: null, errorMsg: data ? data : 'netwok error' };
+        case SUCCESS_GET_ALL_USER_ROLES:
+            console.log('SUCCESS_GET_ALL_USER_ROLES', data);
+            return { ...state, userRole: data.payload[0] };
+
+        case FAILED_GET_ALL_USER_ROLES:
+            console.warn('FAILED_ALL_USER_ROLES', action);
+            return { ...state, userRole: data.payload[0] };
         default:
             return state;
     }
