@@ -3,7 +3,7 @@ import { lazy } from 'react';
 // project imports
 import Loadable from 'ui-component/Loadable';
 import MinimalLayout from 'layout/MinimalLayout';
-import ViewUserCreation from 'views/pages/authentication/userManagement/ViewUserCreation';
+
 import MainLayout from 'layout/MainLayout';
 import Login from 'views/pages/authentication/userManagement/UserLogin';
 import ForgotPassword from 'views/pages/authentication/userManagement/ForgotPassword';

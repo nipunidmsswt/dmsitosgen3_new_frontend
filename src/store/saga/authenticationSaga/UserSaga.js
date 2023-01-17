@@ -28,20 +28,15 @@ import { create, getById, updateWithUpload, get, createWithUpload } from '../../
 //User creation saga
 
 export function* saveUserSaga(action) {
+    console.log('yaaa');
     action.data.path = `${process.env.REACT_APP_USER_MANAGEMENT_URL}/register`;
     let responseData = [];
     try {
-        console.log('saga started');
         responseData = yield call(create, action.data);
-        // console.log(responseData.staus);
-        console.log('saga finished');
-        if (responseData.status == 201 || responseData.status == 200) {
-            yield put({ type: ADD_SUCCESS_USER_DATA, data: action.data });
-        } else {
-            yield put({ type: ADD_FAILED_USER_DATA, data: 'error' });
-        }
+        yield put({ type: ADD_SUCCESS_USER_DATA, data: responseData.data });
     } catch (e) {
-        yield put({ type: ADD_FAILED_USER_DATA, data: 'error' });
+        console.log('e:' + e);
+        yield put({ type: ADD_FAILED_USER_DATA, data: responseData.data });
     }
 }
 

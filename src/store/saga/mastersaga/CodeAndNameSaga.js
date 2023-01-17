@@ -8,11 +8,13 @@ import {
     FAILED_CODE_LAST_MODIFIED_DATE,
     FAILED_GET_ALL_OPERATOR_DATA,
     FAILED_GET_CODE_NAME_DATA_BY_CODE,
+    FAILED_GET_CODE_NAME_DATA_BY_TYPE,
     SUCCESS_ALL_CLUSTER_TYPE_DATA,
     SUCCESS_ALL_CODE_AND_NAME_DATA,
     SUCCESS_CODE_LAST_MODIFIED_DATE,
     SUCCESS_GET_ALL_OPERATOR_DATA,
     SUCCESS_GET_CODE_NAME_DATA_BY_CODE,
+    SUCCESS_GET_CODE_NAME_DATA_BY_TYPE,
     UPDATE_FAILED_CODE_AND_NAME_DATA,
     UPDATE_SUCCESS_CODE_AND_NAME_DATA
 } from 'store/constant/master/CodeAndNameConstant';
@@ -46,7 +48,7 @@ export function* getAllCodeAndNameSaga() {
 export function* getAllClusterTypeData() {
     let responseData = [];
     try {
-        responseData = yield call(get, `${process.env.REACT_APP_OPERATOR_URL}/codeAndName/clusterTypes/`);
+        responseData = yield call(get, `${process.env.REACT_APP_OPERATOR_URL}/codeAndName/clusterTypes`);
         yield put({ type: SUCCESS_ALL_CLUSTER_TYPE_DATA, data: responseData.data });
     } catch (e) {
         yield put({ type: FAILED_ALL_CLUSTER_TYPE_DATA, data: responseData.data });
@@ -56,7 +58,7 @@ export function* getAllClusterTypeData() {
 export function* getAllActiveOperatorSaga() {
     let responseData = [];
     try {
-        responseData = yield call(get, `${process.env.REACT_APP_OPERATOR_URL}/codeAndName/operatorTypes/`);
+        responseData = yield call(get, `${process.env.REACT_APP_OPERATOR_URL}/codeAndName/operatorTypes`);
         yield put({ type: SUCCESS_GET_ALL_OPERATOR_DATA, data: responseData.data });
     } catch (e) {
         yield put({ type: FAILED_GET_ALL_OPERATOR_DATA, data: responseData.data });
@@ -71,6 +73,18 @@ export function* getCodeAndNameByCodeSaga(action) {
         yield put({ type: SUCCESS_GET_CODE_NAME_DATA_BY_CODE, data: responseData.data });
     } catch (e) {
         yield put({ type: FAILED_GET_CODE_NAME_DATA_BY_CODE, data: responseData.data });
+    }
+}
+
+export function* getAllCodeAndNameByTypeSaga(action) {
+    console.log(action.data.type);
+    let responseData = [];
+    try {
+        responseData = yield call(getById, `${process.env.REACT_APP_OPERATOR_URL}/codeAndName/codeAndNameDetails/${action.data.type}`);
+        console.log('response data:' + responseData);
+        yield put({ type: SUCCESS_GET_CODE_NAME_DATA_BY_TYPE, data: responseData.data });
+    } catch (e) {
+        yield put({ type: FAILED_GET_CODE_NAME_DATA_BY_TYPE, data: responseData.data });
     }
 }
 

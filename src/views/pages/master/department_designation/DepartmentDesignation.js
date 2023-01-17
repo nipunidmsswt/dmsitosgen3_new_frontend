@@ -100,9 +100,10 @@ function DepartmentDesignation({ open, handleClose, mode, code, type }) {
                         <Formik
                             maxWidth
                             enableReinitialize={true}
-                            initialValues={loadValues || initialValues}
-                            onSubmit={(values) => {
+                            initialValues={{ ...initialValues }}
+                            onSubmit={(values, resetForm) => {
                                 handleSubmitForm(values);
+                                resetForm('');
                             }}
                             validationSchema={validationSchema}
                         >
