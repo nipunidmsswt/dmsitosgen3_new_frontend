@@ -9,12 +9,14 @@ import {
     FAILED_GET_ALL_OPERATOR_DATA,
     FAILED_GET_CODE_NAME_DATA_BY_CODE,
     FAILED_GET_CODE_NAME_DATA_BY_TYPE,
+    FAILED_SAVE_CLUSTER_MARKET_MAPPING_DATA,
     SUCCESS_ALL_CLUSTER_TYPE_DATA,
     SUCCESS_ALL_CODE_AND_NAME_DATA,
     SUCCESS_CODE_LAST_MODIFIED_DATE,
     SUCCESS_GET_ALL_OPERATOR_DATA,
     SUCCESS_GET_CODE_NAME_DATA_BY_CODE,
     SUCCESS_GET_CODE_NAME_DATA_BY_TYPE,
+    SUCESS_SAVE_CLUSTER_MARKET_MAPPING_DATA,
     UPDATE_FAILED_CODE_AND_NAME_DATA,
     UPDATE_SUCCESS_CODE_AND_NAME_DATA
 } from 'store/constant/master/CodeAndNameConstant';
@@ -22,6 +24,7 @@ import { put, takeEvery, call } from 'redux-saga/effects';
 import { create, get, getById, update } from 'apis/Apis';
 
 export function* saveCodeAndNameDataHandler(action) {
+    console.log(action.data);
     action.data.path = `${process.env.REACT_APP_OPERATOR_URL}/codeAndName/`;
     let responseData = [];
     try {
@@ -32,6 +35,20 @@ export function* saveCodeAndNameDataHandler(action) {
         });
     } catch (e) {
         yield put({ type: ADD_FAILED_CODE_AND_NAME_DATA, data: responseData.data });
+    }
+}
+
+export function* saveClusterAndMarketMappingDataSaga(action) {
+    action.data.path = `${process.env.REACT_APP_OPERATOR_URL}/clusterMarketMapping/`;
+    let responseData = [];
+    try {
+        responseData = yield call(create, action.data);
+        yield put({
+            type: SUCESS_SAVE_CLUSTER_MARKET_MAPPING_DATA,
+            data: responseData.data
+        });
+    } catch (e) {
+        yield put({ type: FAILED_SAVE_CLUSTER_MARKET_MAPPING_DATA, data: responseData.data });
     }
 }
 
