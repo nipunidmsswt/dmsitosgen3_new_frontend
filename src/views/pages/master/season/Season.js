@@ -46,8 +46,8 @@ function Season({ open, handleClose, mode, code }) {
         seasonToDate: '',
         seasonDetails: [
             {
-                subSeason: '',
-                specialOfferSeason: '',
+                ratePeriod: '',
+                // specialOfferSeason: '',
                 toDate: '',
                 status: true,
                 fromDate: ''
@@ -116,15 +116,15 @@ function Season({ open, handleClose, mode, code }) {
     const validationSchema = yup.object().shape({
         mainSeason: yup.string().required('Required field'),
         //   .checkDuplicateSeason("Duplicate Code"),
-        seasonFromDate: yup.date().required(),
+        seasonFromDate: yup.date().required('Required field'),
         // toDate: yup.date(),
-        seasonToDate: yup.date().required().min(yup.ref('seasonFromDate'), "End date can't be before start date"),
+        seasonToDate: yup.date().required('Required field').min(yup.ref('seasonFromDate'), "End date can't be before start date"),
         seasonDetails: yup.array().of(
             yup.object().shape({
-                subSeason: yup.string().required('Required field'),
+                ratePeriod: yup.string().required('Required field'),
                 fromDate: yup.date().required('Required field'),
                 toDate: yup.date().required('Required field').min(yup.ref('fromDate'), "End date can't be before start date")
-                // .max(yup.ref('seasonToDate'), "End date can't be before season start date")
+                // .min(yup.ref('seasonToDate'), "End date can't be before season start date")
             })
         )
     });
@@ -157,21 +157,21 @@ function Season({ open, handleClose, mode, code }) {
         console.log(data);
         console.log(data.seasonFromDate);
         console.log(data.seasonDetails[data.seasonDetails.length - 1].toDate);
-        const x = new Date(data.seasonFromDate);
-        const y = new Date(data.seasonDetails[data.seasonDetails.length - 1].toDate);
+        const x = new Date(data.seasonToDate).toISOString().split('T')[0];
+        const y = new Date(data.seasonDetails[data.seasonDetails.length - 1].toDate).toISOString().split('T')[0];
         console.log(x);
         console.log(y);
         if (x < y) {
             console.log('yuiy');
             setOpenDialogBox(true);
         } else {
-            // if (mode === 'INSERT') {
-            //     dispatch(saveSeasonData(data));
-            // } else if (mode === 'VIEW_UPDATE') {
-            //     console.log('yes click');
-            //     dispatch(updateSeasonData(data));
-            // }
-            // handleClose();
+            if (mode === 'INSERT') {
+                dispatch(saveSeasonData(data));
+            } else if (mode === 'VIEW_UPDATE') {
+                console.log('yes click');
+                dispatch(updateSeasonData(data));
+            }
+            handleClose();
         }
     };
 
@@ -180,6 +180,12 @@ function Season({ open, handleClose, mode, code }) {
     const handleCancel = () => {
         setLoadValues(initialValues);
     };
+
+    function addDays(date, days) {
+        var result = new Date(date);
+        result.setDate(result.getDate() + days);
+        return result;
+    }
     return (
         <div>
             <Dialog maxWidth="220px" open={open} keepMounted onClose={handleClose} aria-describedby="alert-dialog-slide-description">
@@ -225,7 +231,10 @@ function Season({ open, handleClose, mode, code }) {
                                                                                     height: 40
                                                                                 }
                                                                             }}
-                                                                            disabled={mode == 'VIEW_UPDATE'}
+                                                                            InputLabelProps={{
+                                                                                shrink: true
+                                                                            }}
+                                                                            disabled={mode != 'INSERT'}
                                                                             type="text"
                                                                             variant="outlined"
                                                                             name="mainSeason"
@@ -246,7 +255,7 @@ function Season({ open, handleClose, mode, code }) {
                                                                             // adapterLocale={locale}
                                                                         >
                                                                             <DatePicker
-                                                                                disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                                disabled={mode != 'INSERT'}
                                                                                 onChange={(value) => {
                                                                                     let idx = 0;
                                                                                     setFieldValue(`seasonFromDate`, value);
@@ -289,7 +298,7 @@ function Season({ open, handleClose, mode, code }) {
                                                                             // adapterLocale={locale}
                                                                         >
                                                                             <DatePicker
-                                                                                disabled={mode == 'VIEW'}
+                                                                                disabled={mode != 'INSERT'}
                                                                                 onChange={(value) => {
                                                                                     setFieldValue(`seasonToDate`, value);
                                                                                 }}
@@ -372,11 +381,13 @@ function Season({ open, handleClose, mode, code }) {
                                                                                             ].toDate
                                                                                         );
                                                                                         const x = new Date(ref.current.values.seasonToDate);
+
                                                                                         const y = new Date(
                                                                                             ref.current.values.seasonDetails[
                                                                                                 ref.current.values.seasonDetails.length - 1
                                                                                             ].toDate
                                                                                         );
+
                                                                                         if (x < y) {
                                                                                             // alert('sry cant');
                                                                                             setOpenDialogBox(true);
@@ -384,18 +395,17 @@ function Season({ open, handleClose, mode, code }) {
                                                                                             console.log(x);
                                                                                             console.log(y);
                                                                                             push({
-                                                                                                subSeason: '',
-                                                                                                specialOfferSeason: '',
+                                                                                                ratePeriod: '',
+                                                                                                // specialOfferSeason: '',
                                                                                                 toDate: '',
                                                                                                 status: true,
                                                                                                 fromDate: ''
                                                                                             });
+                                                                                            var date = addDays(y, 1);
+                                                                                            console.log(date);
                                                                                             setFieldValue(
                                                                                                 `seasonDetails.${ref.current.values.seasonDetails.length}.fromDate`,
-                                                                                                ref.current.values.seasonDetails[
-                                                                                                    ref.current.values.seasonDetails
-                                                                                                        .length - 1
-                                                                                                ].toDate
+                                                                                                date
                                                                                             );
                                                                                         }
                                                                                     }}
@@ -412,7 +422,7 @@ function Season({ open, handleClose, mode, code }) {
                                                                                 <TableHead>
                                                                                     <TableRow>
                                                                                         <TableCell>Sub Season</TableCell>
-                                                                                        <TableCell>Special Offer Season</TableCell>
+                                                                                        {/* <TableCell>Special Offer Season</TableCell> */}
                                                                                         {/* <TableCell>Free</TableCell> */}
                                                                                         <TableCell>From Date</TableCell>
                                                                                         <TableCell>To Date</TableCell>
@@ -436,12 +446,12 @@ function Season({ open, handleClose, mode, code }) {
                                                                                                         }}
                                                                                                         type="text"
                                                                                                         variant="outlined"
-                                                                                                        name={`seasonDetails.${idx}.subSeason`}
-                                                                                                        disabled={mode == 'VIEW_UPDATE'}
+                                                                                                        name={`seasonDetails.${idx}.ratePeriod`}
+                                                                                                        disabled={mode != 'INSERT'}
                                                                                                         value={
                                                                                                             values.seasonDetails[idx] &&
                                                                                                             values.seasonDetails[idx]
-                                                                                                                .subSeason
+                                                                                                                .ratePeriod
                                                                                                         }
                                                                                                         onChange={handleChange}
                                                                                                         onBlur={handleBlur}
@@ -451,28 +461,28 @@ function Season({ open, handleClose, mode, code }) {
                                                                                                                     idx
                                                                                                                 ] &&
                                                                                                                 touched.seasonDetails[idx]
-                                                                                                                    .subSeason &&
+                                                                                                                    .ratePeriod &&
                                                                                                                 errors.seasonDetails &&
                                                                                                                 errors.seasonDetails[idx] &&
                                                                                                                 errors.seasonDetails[idx]
-                                                                                                                    .subSeason
+                                                                                                                    .ratePeriod
                                                                                                         )}
                                                                                                         helperText={
                                                                                                             touched.seasonDetails &&
                                                                                                             touched.seasonDetails[idx] &&
                                                                                                             touched.seasonDetails[idx]
-                                                                                                                .subSeason &&
+                                                                                                                .ratePeriod &&
                                                                                                             errors.seasonDetails &&
                                                                                                             errors.seasonDetails[idx] &&
                                                                                                             errors.seasonDetails[idx]
-                                                                                                                .subSeason
+                                                                                                                .ratePeriod
                                                                                                                 ? errors.seasonDetails[idx]
-                                                                                                                      .subSeason
+                                                                                                                      .ratePeriod
                                                                                                                 : ''
                                                                                                         }
                                                                                                     />
                                                                                                 </TableCell>
-                                                                                                <TableCell>
+                                                                                                {/* <TableCell>
                                                                                                     <TextField
                                                                                                         // label="taxOrder"
                                                                                                         sx={{
@@ -517,7 +527,7 @@ function Season({ open, handleClose, mode, code }) {
                                                                                                                 : ''
                                                                                                         }
                                                                                                     />
-                                                                                                </TableCell>
+                                                                                                </TableCell> */}
 
                                                                                                 <TableCell>
                                                                                                     <LocalizationProvider
@@ -525,11 +535,7 @@ function Season({ open, handleClose, mode, code }) {
                                                                                                         // adapterLocale={locale}
                                                                                                     >
                                                                                                         <DatePicker
-                                                                                                            disabled={
-                                                                                                                mode == 'VIEW_UPDATE' ||
-                                                                                                                mode == 'VIEW' ||
-                                                                                                                mode == 'INSERT'
-                                                                                                            }
+                                                                                                            disabled={mode != 'INSERT'}
                                                                                                             onChange={(value) => {
                                                                                                                 console.log(value);
                                                                                                                 console.log(ref.current);
@@ -616,7 +622,7 @@ function Season({ open, handleClose, mode, code }) {
                                                                                                         // adapterLocale={locale}
                                                                                                     >
                                                                                                         <DatePicker
-                                                                                                            disabled={mode == 'VIEW_UPDATE'}
+                                                                                                            disabled={mode != 'INSERT'}
                                                                                                             onChange={(value) => {
                                                                                                                 console.log(value);
                                                                                                                 console.log(ref.current);

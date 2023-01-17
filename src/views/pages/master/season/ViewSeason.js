@@ -85,7 +85,7 @@ function ViewSeason() {
 
     useEffect(() => {
         setLastModifiedTimeDate(
-            lastModifiedDate === null
+            lastModifiedDate === ''
                 ? ''
                 : new Date(lastModifiedDate).toLocaleString('en-GB', {
                       year: 'numeric',
