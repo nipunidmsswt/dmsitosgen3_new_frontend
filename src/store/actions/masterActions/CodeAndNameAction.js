@@ -6,6 +6,7 @@ import {
     GET_ALL_OPERATOR_DATA,
     GET_CODE_LAST_MODIFIED_DATE_TIME,
     GET_CODE_NAME_DATA_BY_CODE,
+    GET_CODE_NAME_DATA_BY_TYPE,
     SAVE_CODE_AND_NAME_DATA,
     UPDATE_CODE_AND_NAME_DATA
 } from '../../constant/master/CodeAndNameConstant';
@@ -28,6 +29,14 @@ export const getCodeAndNameDataByCode = (id) => {
     return {
         type: GET_CODE_NAME_DATA_BY_CODE,
         data: { id }
+    };
+};
+
+export const getCodeAndNameDataByType = (type) => {
+    console.log(type);
+    return {
+        type: GET_CODE_NAME_DATA_BY_TYPE,
+        data: { type }
     };
 };
 

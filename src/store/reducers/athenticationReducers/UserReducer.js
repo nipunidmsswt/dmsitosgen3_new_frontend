@@ -17,9 +17,9 @@ import {
 } from 'store/constant/authentication/UserConstant';
 
 const initialState = {
-    User: null,
-    Users: [],
-    UserToUpdate: null,
+    user: null,
+    users: [],
+    userToUpdate: null,
     errorMsg: null,
     duplicateLoction: null,
     lastModifiedDateTime: null,
@@ -33,15 +33,15 @@ export const userReducer = (state = initialState, action) => {
     switch (action.type) {
         case ADD_SUCCESS_USER_DATA:
             console.warn('ADD_SUCCESS_USER_DATA', action.payload);
-            // console.log(data.payload[0]);
-            return { ...state, User: data };
+            console.log(data.payload[0]);
+            return { ...state, user: data };
 
         case ADD_FAILED_USER_DATA:
             console.warn('ADD_FAILED_User_DATA', action);
             console.log(data);
             return {
                 ...state,
-                User: null,
+                user: null,
                 errorMsg: data ? data : 'netwok error'
             };
 

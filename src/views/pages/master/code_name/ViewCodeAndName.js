@@ -5,19 +5,61 @@ import { useSelector, useDispatch } from 'react-redux';
 import tableIcons from 'utils/MaterialTableIcons';
 import { gridSpacing } from 'store/constant';
 import CodeAndName from './CodeAndName';
-import { Grid } from '@mui/material';
+import { Autocomplete, Button, Grid, TextField } from '@mui/material';
 import SuccessMsg from 'messages/SuccessMsg';
 import ErrorMsg from 'messages/ErrorMsg';
-import { getAllCodeAndNameDetails, getLatestModifiedDetails } from 'store/actions/masterActions/CodeAndNameAction';
+import {
+    getAllActiveOperatorData,
+    getAllClusterData,
+    getAllCodeAndNameDetails,
+    getLatestModifiedDetails
+} from 'store/actions/masterActions/CodeAndNameAction';
 import MainCard from 'ui-component/cards/MainCard';
+import Accordion from '@mui/material/Accordion';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import Typography from '@mui/material/Typography';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { Formik, Form, FieldArray, useFormikContext } from 'formik';
+import { useRef } from 'react';
+import * as yup from 'yup';
+import { Box } from '@mui/system';
+import { getAllActiveMarketData } from 'store/actions/masterActions/operatorActions/MarketAction';
 
 function ViewCodeAndName() {
+    const ref = useRef(null);
+    const initialValues1 = {
+        code: '',
+        initials: '',
+        surName: '',
+        shortName: '',
+        address: '',
+        codeAndNameDetail: null,
+        status: true,
+        managerAdditionalDetails: [
+            {
+                homeTelNumber: '',
+                officeTelNumber: '',
+                fax1: '',
+                fax2: ''
+            }
+        ]
+    };
+
+    const initialValuesClusterMarketMapping = {
+        cluster: null,
+        marketList: null
+    };
     const [open, setOpen] = useState(false);
     const [ccode, setCode] = useState('');
     const [mode, setMode] = useState('INSERT');
     const [openToast, setHandleToast] = useState(false);
     const [openErrorToast, setOpenErrorToast] = useState(false);
     const [tableData, setTableData] = useState([]);
+    const [clusterListOptions, setClusterListOptions] = useState([]);
+    const [marketListOptions, setMarketListOptions] = useState([]);
+    const [operatorListOptions, setOperatorListOptions] = useState([]);
+
     const columns = [
         {
             title: 'Code Type',
@@ -65,9 +107,10 @@ function ViewCodeAndName() {
 
     const codeAndNameListData = useSelector((state) => state.codeAndNameReducer.codeAndNameList);
     const codeAndNameData = useSelector((state) => state.codeAndNameReducer.codeAndName);
-
+    const clusterListData = useSelector((state) => state.codeAndNameReducer.cluterTypesDetails);
+    const marketListData = useSelector((state) => state.marketReducer.marketActiveList);
     const lastModifiedDate = useSelector((state) => state.codeAndNameReducer.lastModifiedDateTime);
-    console.log(codeAndNameData);
+    const operatorListData = useSelector((state) => state.codeAndNameReducer.operatorTypesDetails);
     const [allValues, setAllValues] = useState({
         codeType: '',
         code: '',
@@ -86,11 +129,17 @@ function ViewCodeAndName() {
         if (codeAndNameData) {
             setHandleToast(true);
 
-            dispatch(getAllCodeAndNameDetails());
-            dispatch(getLatestModifiedDetails());
+            // dispatch(getAllCodeAndNameDetails());
+            // dispatch(getLatestModifiedDetails());
         } else {
         }
     }, [codeAndNameData]);
+
+    useEffect(() => {
+        if (clusterListData != null) {
+            setClusterListOptions(clusterListData);
+        }
+    }, [clusterListData]);
 
     useEffect(() => {
         if (error != null) {
@@ -99,9 +148,26 @@ function ViewCodeAndName() {
     }, [error]);
 
     useEffect(() => {
-        dispatch(getAllCodeAndNameDetails());
-        dispatch(getLatestModifiedDetails());
+        setMarketListOptions(marketListData);
+    }, [marketListData]);
+
+    useEffect(() => {
+        dispatch(getAllClusterData());
+        dispatch(getAllActiveMarketData());
+        dispatch(getAllActiveOperatorData());
     }, []);
+
+    useEffect(() => {
+        if (operatorListData != null) {
+            console.log(operatorListData);
+            setOperatorListOptions(operatorListData);
+        }
+    }, [operatorListData]);
+
+    // useEffect(() => {
+    //     dispatch(getAllCodeAndNameDetails());
+    //     dispatch(getLatestModifiedDetails());
+    // }, []);
 
     const [lastModifiedTimeDate, setLastModifiedTimeDate] = useState(null);
 
@@ -124,17 +190,23 @@ function ViewCodeAndName() {
         );
     }, [lastModifiedDate]);
 
-    const handleClickOpen = (type, data) => {
-        if (type === 'VIEW_UPDATE') {
-            setMode(type);
-            setCode(data.code);
-        } else if (type === 'INSERT') {
-            setCode('');
-            setMode(type);
-        } else {
-            setMode(type);
-            setCode(data.code);
-        }
+    const validationSchema = yup.object().shape({
+        cluster: yup.object().typeError('Required field')
+        // marketList: yup.object().typeError('Required field')
+    });
+
+    const handleClickOpen = () => {
+        const type = 'INSERT';
+        // if (type === 'VIEW_UPDATE') {
+        //     setMode(type);
+        //     setCode(data.code);
+        // } else if (type === 'INSERT') {
+        setCode('');
+        setMode(type);
+        // } else {
+        // setMode(type);
+        // setCode(data.code);
+        // }
 
         setOpen(true);
     };
@@ -152,13 +224,358 @@ function ViewCodeAndName() {
     return (
         <div>
             <MainCard title="Code And Name">
-                <div style={{ textAlign: 'right' }}> Last Modified Date : {lastModifiedTimeDate}</div>
+                <div style={{ textAlign: 'right' }}>
+                    {' '}
+                    {/* Last Modified Date : {lastModifiedTimeDate} */}
+                    <Button variant="contained" type="button" className="btnSave" onClick={handleClickOpen}>
+                        Add new
+                    </Button>
+                </div>
                 <br />
                 <Grid container spacing={gridSpacing}>
                     <Grid item xs={12}>
                         <Grid container spacing={gridSpacing}>
                             <Grid item xs={12}>
-                                <MaterialTable
+                                <Accordion>
+                                    <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1a-content" id="panel1a-header">
+                                        <Typography align="center">Map Cluster,Market And Operator</Typography>
+                                    </AccordionSummary>
+                                    <AccordionDetails>
+                                        <Typography>
+                                            <Grid container spacing={2}>
+                                                <Grid item xs={6}>
+                                                    <Formik
+                                                        innerRef={ref}
+                                                        enableReinitialize={true}
+                                                        initialValues={initialValuesClusterMarketMapping}
+                                                        onSubmit={(values) => {
+                                                            handleSubmitForm(values);
+                                                        }}
+                                                        // onReset={handleReset}
+                                                        validationSchema={validationSchema}
+                                                    >
+                                                        {({ values, handleChange, setFieldValue, errors, handleBlur, touched }) => {
+                                                            return (
+                                                                <Form>
+                                                                    <div style={{ marginTop: '6px', margin: '10px' }}>
+                                                                        <Grid gap="10px" display="flex">
+                                                                            <Grid item>
+                                                                                <Autocomplete
+                                                                                    // value={values.cluster}
+                                                                                    name="cluster"
+                                                                                    disabled={mode == 'VIEW'}
+                                                                                    onChange={(_, value) => {
+                                                                                        setFieldValue(`cluster`, value);
+                                                                                    }}
+                                                                                    InputLabelProps={{
+                                                                                        shrink: true
+                                                                                    }}
+                                                                                    options={clusterListOptions}
+                                                                                    getOptionLabel={(option) =>
+                                                                                        `${option.code} - ${option.name}`
+                                                                                    }
+                                                                                    renderInput={(params) => (
+                                                                                        <TextField
+                                                                                            {...params}
+                                                                                            label="Cluster"
+                                                                                            sx={{
+                                                                                                width: { sm: 300 },
+                                                                                                '& .MuiInputBase-root': {
+                                                                                                    height: 41
+                                                                                                }
+                                                                                            }}
+                                                                                            InputLabelProps={{
+                                                                                                shrink: true
+                                                                                            }}
+                                                                                            error={Boolean(
+                                                                                                touched.cluster && errors.cluster
+                                                                                            )}
+                                                                                            helperText={
+                                                                                                touched.cluster && errors.cluster
+                                                                                                    ? errors.cluster
+                                                                                                    : ''
+                                                                                            }
+                                                                                            // placeholder="--Select a Manager Code --"
+                                                                                            variant="outlined"
+                                                                                            name="cluster"
+                                                                                            onBlur={handleBlur}
+                                                                                        />
+                                                                                    )}
+                                                                                />
+                                                                            </Grid>
+                                                                        </Grid>
+                                                                        <br />
+
+                                                                        <Grid gap="10px" display="flex">
+                                                                            <Grid>
+                                                                                <Autocomplete
+                                                                                    // value={values.marketList}
+                                                                                    name="marketList"
+                                                                                    multiple={true}
+                                                                                    disabled={mode == 'VIEW'}
+                                                                                    onChange={(_, value) => {
+                                                                                        setFieldValue(`marketList`, value);
+                                                                                    }}
+                                                                                    InputLabelProps={{
+                                                                                        shrink: true
+                                                                                    }}
+                                                                                    options={marketListOptions}
+                                                                                    getOptionLabel={(option) =>
+                                                                                        `${option.code} - ${option.name}`
+                                                                                    }
+                                                                                    isOptionEqualToValue={(option, value) =>
+                                                                                        option.marketId === value.marketId
+                                                                                    }
+                                                                                    renderInput={(params) => (
+                                                                                        <TextField
+                                                                                            {...params}
+                                                                                            label="Markets"
+                                                                                            sx={{
+                                                                                                width: { sm: 300 },
+                                                                                                '& .MuiInputBase-root': {
+                                                                                                    height: 41
+                                                                                                }
+                                                                                            }}
+                                                                                            InputLabelProps={{
+                                                                                                shrink: true
+                                                                                            }}
+                                                                                            error={Boolean(
+                                                                                                touched.marketList && errors.marketList
+                                                                                            )}
+                                                                                            helperText={
+                                                                                                touched.marketList && errors.marketList
+                                                                                                    ? errors.marketList
+                                                                                                    : ''
+                                                                                            }
+                                                                                            // placeholder="--Select a Manager Code --"
+                                                                                            variant="outlined"
+                                                                                            name="marketList"
+                                                                                            onBlur={handleBlur}
+                                                                                        />
+                                                                                    )}
+                                                                                />
+                                                                            </Grid>
+                                                                        </Grid>
+                                                                    </div>
+
+                                                                    {/* <br /> */}
+                                                                    {/* <Box>
+                                                                        <Grid item>
+                                                                            {mode === 'VIEW' ? (
+                                                                                <CreatedUpdatedUserDetailsWithTableFormat
+                                                                                    formValues={values}
+                                                                                />
+                                                                            ) : null}
+                                                                        </Grid>
+                                                                    </Box> */}
+
+                                                                    <Box
+                                                                        display="flex"
+                                                                        flexDirection="row-reverse"
+                                                                        style={{ marginTop: '20px' }}
+                                                                    >
+                                                                        {mode != 'VIEW' ? (
+                                                                            <Button
+                                                                                variant="outlined"
+                                                                                type="reset"
+                                                                                style={{
+                                                                                    // backgroundColor: '#B22222',
+                                                                                    marginLeft: '10px'
+                                                                                }}
+                                                                                // onClick={handleCancel}
+                                                                            >
+                                                                                Clear
+                                                                            </Button>
+                                                                        ) : (
+                                                                            ''
+                                                                        )}
+
+                                                                        {mode != 'VIEW' ? (
+                                                                            <Button variant="contained" type="submit" className="btnSave">
+                                                                                {mode === 'INSERT' ? 'SAVE' : 'UPDATE'}
+                                                                            </Button>
+                                                                        ) : (
+                                                                            ''
+                                                                        )}
+                                                                    </Box>
+                                                                </Form>
+                                                            );
+                                                        }}
+                                                    </Formik>
+                                                    {/* <Item>xs=8</Item> */}
+                                                </Grid>
+                                                <Grid item xs={6}>
+                                                    <Formik
+                                                        innerRef={ref}
+                                                        enableReinitialize={true}
+                                                        initialValues={initialValues1}
+                                                        onSubmit={(values) => {
+                                                            handleSubmitForm(values);
+                                                        }}
+                                                        // onReset={handleReset}
+                                                        // validationSchema={validationSchema}
+                                                    >
+                                                        {({ values, handleChange, setFieldValue, errors, handleBlur, touched }) => {
+                                                            return (
+                                                                <Form>
+                                                                    <div style={{ marginTop: '6px', margin: '10px' }}>
+                                                                        <Grid gap="10px" display="flex">
+                                                                            <Grid item>
+                                                                                <Autocomplete
+                                                                                    // value={values.manager}
+                                                                                    name="manager"
+                                                                                    disabled={mode == 'VIEW'}
+                                                                                    onChange={(_, value) => {
+                                                                                        setFieldValue(`manager`, value);
+                                                                                    }}
+                                                                                    InputLabelProps={{
+                                                                                        shrink: true
+                                                                                    }}
+                                                                                    options={operatorListOptions}
+                                                                                    getOptionLabel={(option) =>
+                                                                                        `${option.code} - ${option.name}`
+                                                                                    }
+                                                                                    renderInput={(params) => (
+                                                                                        <TextField
+                                                                                            {...params}
+                                                                                            label="Operators"
+                                                                                            sx={{
+                                                                                                width: { sm: 300 },
+                                                                                                '& .MuiInputBase-root': {
+                                                                                                    height: 41
+                                                                                                }
+                                                                                            }}
+                                                                                            InputLabelProps={{
+                                                                                                shrink: true
+                                                                                            }}
+                                                                                            // placeholder="--Select a Manager Code --"
+                                                                                            variant="outlined"
+                                                                                            name="manager"
+                                                                                            onBlur={handleBlur}
+                                                                                        />
+                                                                                    )}
+                                                                                />
+                                                                            </Grid>
+                                                                        </Grid>
+                                                                        <br />
+
+                                                                        <Grid gap="10px" display="flex">
+                                                                            <Grid>
+                                                                                <Autocomplete
+                                                                                    // value={values.manager}
+                                                                                    name="manager"
+                                                                                    multiple={true}
+                                                                                    disabled={mode == 'VIEW'}
+                                                                                    onChange={(_, value) => {
+                                                                                        setFieldValue(`manager`, value);
+                                                                                    }}
+                                                                                    InputLabelProps={{
+                                                                                        shrink: true
+                                                                                    }}
+                                                                                    options={marketListOptions}
+                                                                                    getOptionLabel={(option) =>
+                                                                                        `${option.code} - ${option.name}`
+                                                                                    }
+                                                                                    isOptionEqualToValue={(option, value) =>
+                                                                                        option.marketId === value.marketId
+                                                                                    }
+                                                                                    renderInput={(params) => (
+                                                                                        <TextField
+                                                                                            {...params}
+                                                                                            label="Markets"
+                                                                                            sx={{
+                                                                                                width: { sm: 300 },
+                                                                                                '& .MuiInputBase-root': {
+                                                                                                    height: 41
+                                                                                                }
+                                                                                            }}
+                                                                                            InputLabelProps={{
+                                                                                                shrink: true
+                                                                                            }}
+                                                                                            // placeholder="--Select a Manager Code --"
+                                                                                            variant="outlined"
+                                                                                            name="manager"
+                                                                                            onBlur={handleBlur}
+                                                                                        />
+                                                                                    )}
+                                                                                />
+                                                                            </Grid>
+                                                                        </Grid>
+                                                                    </div>
+
+                                                                    {/* <br /> */}
+                                                                    {/* <Box>
+                                                                        <Grid item>
+                                                                            {mode === 'VIEW' ? (
+                                                                                <CreatedUpdatedUserDetailsWithTableFormat
+                                                                                    formValues={values}
+                                                                                />
+                                                                            ) : null}
+                                                                        </Grid>
+                                                                    </Box> */}
+
+                                                                    <Box
+                                                                        display="flex"
+                                                                        flexDirection="row-reverse"
+                                                                        style={{ marginTop: '20px' }}
+                                                                    >
+                                                                        {mode != 'VIEW' ? (
+                                                                            <Button
+                                                                                variant="outlined"
+                                                                                type="reset"
+                                                                                style={{
+                                                                                    // backgroundColor: '#B22222',
+                                                                                    marginLeft: '10px'
+                                                                                }}
+                                                                                // onClick={handleCancel}
+                                                                            >
+                                                                                Clear
+                                                                            </Button>
+                                                                        ) : (
+                                                                            ''
+                                                                        )}
+
+                                                                        {mode != 'VIEW' ? (
+                                                                            <Button variant="contained" type="submit" className="btnSave">
+                                                                                {mode === 'INSERT' ? 'SAVE' : 'UPDATE'}
+                                                                            </Button>
+                                                                        ) : (
+                                                                            ''
+                                                                        )}
+                                                                    </Box>
+                                                                </Form>
+                                                            );
+                                                        }}
+                                                    </Formik>
+                                                    {/* <Item>xs=4</Item> */}
+                                                </Grid>
+                                                {/* <Grid item xs={4}>
+                                                    <Item>xs=4</Item>
+                                                </Grid>
+                                                <Grid item xs={8}>
+                                                    <Item>xs=8</Item>
+                                                </Grid> */}
+                                            </Grid>
+                                        </Typography>
+                                    </AccordionDetails>
+                                </Accordion>
+                                <Accordion>
+                                    <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel2a-content" id="panel2a-header">
+                                        <Typography>Cluster, Market And Operator List</Typography>
+                                    </AccordionSummary>
+                                    <AccordionDetails>
+                                        <Typography>
+                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex, sit
+                                            amet blandit leo lobortis eget.
+                                        </Typography>
+                                    </AccordionDetails>
+                                </Accordion>
+                                {/* <Accordion disabled>
+                                    <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel3a-content" id="panel3a-header">
+                                        <Typography>Disabled Accordion</Typography>
+                                    </AccordionSummary>
+                                </Accordion> */}
+                                {/* <MaterialTable
                                     columns={columns}
                                     data={tableData}
                                     actions={[
@@ -218,7 +635,7 @@ function ViewCodeAndName() {
                                             padding: 0
                                         }
                                     }}
-                                />
+                                /> */}
 
                                 {open ? <CodeAndName open={open} handleClose={handleClose} ccode={ccode} mode={mode} /> : ''}
                                 {openToast ? <SuccessMsg openToast={openToast} handleToast={handleToast} mode={mode} /> : null}

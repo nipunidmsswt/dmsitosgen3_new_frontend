@@ -19,7 +19,7 @@ import {
 } from '../../constant/master/DepartmentDesignationConstant';
 
 export function* saveDepartMentDesignationSaga(action) {
-    action.data.path = `${process.env.REACT_APP_USER_MANAGEMENT_URL}/departmentAndDesignation`;
+    action.data.path = `${process.env.REACT_APP_USER_MANAGEMENT_URL}/department/departmentAndDesignation`;
     let responseData = [];
     try {
         responseData = yield call(create, action.data);
