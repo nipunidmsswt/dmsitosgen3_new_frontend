@@ -7,6 +7,7 @@ import {
     GET_CODE_LAST_MODIFIED_DATE_TIME,
     GET_CODE_NAME_DATA_BY_CODE,
     GET_CODE_NAME_DATA_BY_TYPE,
+    SAVE_CLUSTER_MARKET_MAPPING_DATA,
     SAVE_CODE_AND_NAME_DATA,
     UPDATE_CODE_AND_NAME_DATA
 } from '../../constant/master/CodeAndNameConstant';
@@ -14,6 +15,13 @@ import {
 export const saveCodeAndNameData = (data) => {
     return {
         type: SAVE_CODE_AND_NAME_DATA,
+        data
+    };
+};
+
+export const saveClusterAndMarketMappingData = (data) => {
+    return {
+        type: SAVE_CLUSTER_MARKET_MAPPING_DATA,
         data
     };
 };

@@ -12,7 +12,8 @@ import {
     getAllActiveOperatorData,
     getAllClusterData,
     getAllCodeAndNameDetails,
-    getLatestModifiedDetails
+    getLatestModifiedDetails,
+    saveClusterAndMarketMappingData
 } from 'store/actions/masterActions/CodeAndNameAction';
 import MainCard from 'ui-component/cards/MainCard';
 import Accordion from '@mui/material/Accordion';
@@ -47,8 +48,8 @@ function ViewCodeAndName() {
     };
 
     const initialValuesClusterMarketMapping = {
-        cluster: null,
-        marketList: null
+        cluster: null
+        // marketList: null
     };
     const [open, setOpen] = useState(false);
     const [ccode, setCode] = useState('');
@@ -191,8 +192,8 @@ function ViewCodeAndName() {
     }, [lastModifiedDate]);
 
     const validationSchema = yup.object().shape({
-        cluster: yup.object().typeError('Required field')
-        // marketList: yup.object().typeError('Required field')
+        cluster: yup.object().typeError('Required field'),
+        marketList: yup.object().typeError('Required field')
     });
 
     const handleClickOpen = () => {
@@ -209,6 +210,17 @@ function ViewCodeAndName() {
         // }
 
         setOpen(true);
+    };
+
+    const handleSubmitForm = async (data) => {
+        console.log(data);
+        if (mode === 'INSERT') {
+            console.log(data);
+            dispatch(saveClusterAndMarketMappingData(data));
+        } else if (mode === 'VIEW_UPDATE') {
+            // dispatch(updateCodeAndNameData(data));
+        }
+        handleClose();
     };
 
     const handleClose = () => {
@@ -339,14 +351,14 @@ function ViewCodeAndName() {
                                                                                             InputLabelProps={{
                                                                                                 shrink: true
                                                                                             }}
-                                                                                            error={Boolean(
-                                                                                                touched.marketList && errors.marketList
-                                                                                            )}
-                                                                                            helperText={
-                                                                                                touched.marketList && errors.marketList
-                                                                                                    ? errors.marketList
-                                                                                                    : ''
-                                                                                            }
+                                                                                            // error={Boolean(
+                                                                                            //     touched.marketList && errors.marketList
+                                                                                            // )}
+                                                                                            // helperText={
+                                                                                            //     touched.marketList && errors.marketList
+                                                                                            //         ? errors.marketList
+                                                                                            //         : ''
+                                                                                            // }
                                                                                             // placeholder="--Select a Manager Code --"
                                                                                             variant="outlined"
                                                                                             name="marketList"
