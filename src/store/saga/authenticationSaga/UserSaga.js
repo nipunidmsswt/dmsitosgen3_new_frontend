@@ -17,7 +17,11 @@ import {
     FAILED_GET_GET_ALL_USER_ROLES,
     FAILED_GET_ALL_USER_ROLES,
     SUCCESS_USER_LOGIN_DATA,
-    FAILED_USER_LOGIN_DATA
+    FAILED_USER_LOGIN_DATA,
+    SUCCESS_FORGOT_PASSWORD_CREDENTIALS,
+    FAILED_FORGOT_PASSWORD_CREDENTIALS,
+    SUCCESS_RESET_PASSWORD_CREDENTIALS,
+    FAILED_RESET_PASSWORD_CREDENTIALS
 } from 'store/constant/authentication/UserConstant';
 import { create, getById, updateWithUpload, get, createWithUpload } from '../../../apis/Apis';
 
@@ -142,17 +146,60 @@ export function* getAllRolesSaga() {
 export function* userLoginSaga(action) {
     action.data.path = `${process.env.REACT_APP_USER_MANAGEMENT_URL}/authenticate`;
     let responseData = [];
+
     try {
         responseData = yield call(create, action.data);
-
+        console.log(responseData);
         yield put({
             type: SUCCESS_USER_LOGIN_DATA,
             data: responseData.data
         });
     } catch (e) {
+        console.log(e);
+        console.log(e.response.data.errorMessages);
         yield put({
             type: FAILED_USER_LOGIN_DATA,
+            data: e.response.data.errorMessages
+        });
+    }
+}
+
+//forgot password
+
+export function* forgotPasswordSaga(action) {
+    action.data.path = `${process.env.REACT_APP_USER_MANAGEMENT_URL}/user/resetMail/${action.data.username}`;
+    let responseData = [];
+    try {
+        responseData = yield call(create, action.data);
+
+        yield put({
+            type: SUCCESS_FORGOT_PASSWORD_CREDENTIALS,
             data: responseData.data
+        });
+    } catch (e) {
+        yield put({
+            type: FAILED_FORGOT_PASSWORD_CREDENTIALS,
+            data: e.response.data.errorMessages
+        });
+    }
+}
+
+//forgot password
+
+export function* resetPasswordSaga(action) {
+    action.data.path = `${process.env.REACT_APP_USER_MANAGEMENT_URL}/user/resetpwd`;
+    let responseData = [];
+    try {
+        responseData = yield call(create, action.data);
+
+        yield put({
+            type: SUCCESS_RESET_PASSWORD_CREDENTIALS,
+            data: responseData.data
+        });
+    } catch (e) {
+        yield put({
+            type: FAILED_RESET_PASSWORD_CREDENTIALS,
+            data: e.response.data.errorMessages
         });
     }
 }

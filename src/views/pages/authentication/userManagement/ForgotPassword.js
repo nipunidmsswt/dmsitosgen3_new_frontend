@@ -1,12 +1,8 @@
 import { useState } from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
-import Visibility from '@mui/icons-material/Visibility';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
-import Link from '@mui/material/Link';
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
@@ -14,16 +10,14 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Formik, Form } from 'formik';
-import InputAdornment from '@mui/material/InputAdornment';
-import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import IconButton from '@mui/material/IconButton';
 import * as yup from 'yup';
 import { useNavigate } from 'react-router-dom';
-import { userLogin } from 'store/actions/authenticationActions/UserAction';
+import { forgotPassword } from 'store/actions/authenticationActions/UserAction';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import SuccessMsg from 'messages/SuccessMsg';
 import ErrorMsg from 'messages/ErrorMsg';
+import Link from '@mui/material/Link';
 
 function Copyright(props) {
     return (
@@ -40,38 +34,29 @@ function Copyright(props) {
 
 const theme = createTheme();
 
-export default function Login() {
+export default function ForgotPassword() {
     const initialValues = {
-        username: '',
-        password: ''
+        username: ''
     };
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const loggedUserData = useSelector((state) => state.userReducer.loggedUserData);
+    const forgotPasswordData = useSelector((state) => state.userReducer.forgotPasswordData);
     const error = useSelector((state) => state.userReducer.errorMsg);
-    const [showPassword, setShowPassword] = useState(false);
     const [openErrorToast, setOpenErrorToast] = useState(false);
-    const [errMsg, setErrorMsg] = useState('');
     const [openToast, setHandleToast] = useState(false);
+    const [errMsg, setErrorMsg] = useState('');
 
     const validationSchema = yup.object().shape({
-        username: yup.string().required('Requied field'),
-        password: yup.string().required('Requied field')
+        username: yup.string().required('Requied field')
     });
 
-    const handleClickShowPassword = () => setShowPassword((show) => !show);
-
-    const handleMouseDownPassword = (event) => {
-        event.preventDefault();
-    };
-
     useEffect(() => {
-        console.log(loggedUserData);
-        if (loggedUserData !== null) {
-            navigate('/dashboard/default');
+        console.log(forgotPasswordData);
+        if (forgotPasswordData !== null) {
+            // navigate('/dashboard/default');
         }
-    }, [loggedUserData]);
+    }, [forgotPasswordData]);
 
     useEffect(() => {
         console.log(error);
@@ -89,7 +74,7 @@ export default function Login() {
     const handleSubmitForm = (data) => {
         console.log(data);
         // navigate('/dashboard/default');
-        dispatch(userLogin(data));
+        dispatch(forgotPassword(data));
         // navigate('/dashboard/default');
     };
 
@@ -104,7 +89,7 @@ export default function Login() {
                     md={7}
                     sx={{
                         backgroundImage:
-                            'url(https://images.unsplash.com/photo-1530521954074-e64f6810b32d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=870&q=80)',
+                            'url(https://images.unsplash.com/photo-1634804306598-f2efe3ead034?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=869&q=80)',
                         backgroundRepeat: 'no-repeat',
                         backgroundColor: (t) => (t.palette.mode === 'light' ? t.palette.grey[50] : t.palette.grey[900]),
                         backgroundSize: 'cover',
@@ -136,7 +121,7 @@ export default function Login() {
                                             <LockOutlinedIcon />
                                         </Avatar>
                                         <Typography component="h1" variant="h5">
-                                            Sign in
+                                            Forgot Your Password ?
                                         </Typography>
                                         <Box sx={{ mt: 1 }}>
                                             <TextField
@@ -154,61 +139,22 @@ export default function Login() {
                                                 helperText={touched.username && errors.username ? errors.username : ''}
                                             />
 
-                                            <TextField
-                                                label="Password"
-                                                id="outlined-start-adornment"
-                                                name="password"
-                                                fullWidth
-                                                InputLabelProps={{
-                                                    shrink: true
-                                                }}
-                                                type={showPassword ? 'text' : 'password'}
-                                                margin="normal"
-                                                InputProps={{
-                                                    endAdornment: (
-                                                        <InputAdornment position="end">
-                                                            <IconButton
-                                                                aria-label="toggle password visibility"
-                                                                onClick={handleClickShowPassword}
-                                                                onMouseDown={handleMouseDownPassword}
-                                                                edge="end"
-                                                            >
-                                                                {showPassword ? <VisibilityOff /> : <Visibility />}
-                                                            </IconButton>
-                                                        </InputAdornment>
-                                                    )
-                                                }}
-                                                onChange={handleChange}
-                                                onBlur={handleBlur}
-                                                value={values.password}
-                                                error={Boolean(touched.password && errors.password)}
-                                                helperText={touched.password && errors.password ? errors.password : ''}
-                                            />
-                                            <FormControlLabel control={<Checkbox value="remember" color="primary" />} label="Remember me" />
                                             <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
-                                                Sign In
+                                                SEND VERIFICATION CODE
                                             </Button>
 
-                                            <Grid container>
-                                                <Grid item xs>
-                                                    <Link href="/iTos3/pages/forgotpassword" variant="body2">
-                                                        Forgot password?
-                                                    </Link>
-                                                </Grid>
-                                                <Grid item>
-                                                    <Link href="#" variant="body2">
-                                                        {"Don't have an account? Sign Up"}
-                                                    </Link>
-                                                </Grid>
-                                            </Grid>
+                                            <Button type="button" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
+                                                BACK TO SIGNIN
+                                            </Button>
+
                                             <Copyright sx={{ mt: 5 }} />
                                         </Box>
-                                        {openToast ? <SuccessMsg openToast={openToast} handleToast={handleToast} mode={'LOGIN'} /> : null}
+                                        {/* {openToast ? <SuccessMsg openToast={openToast} handleToast={handleToast} mode={'LOGIN'} /> : null} */}
                                         {openErrorToast ? (
                                             <ErrorMsg
                                                 openToast={openErrorToast}
                                                 handleToast={setOpenErrorToast}
-                                                mode={'LOGIN'}
+                                                mode={'FORGOT'}
                                                 messages={errMsg}
                                             />
                                         ) : null}

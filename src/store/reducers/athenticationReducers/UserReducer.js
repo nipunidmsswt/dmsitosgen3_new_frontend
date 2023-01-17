@@ -12,6 +12,12 @@ import {
     FAILED_LAST_MODIFIED_DATE_USER,
     SUCCESS_GET_ACTIVE_USERS,
     FAILED_GET_ACTIVE_USERS,
+    SUCCESS_USER_LOGIN_DATA,
+    FAILED_USER_LOGIN_DATA,
+    SUCCESS_FORGOT_PASSWORD_CREDENTIALS,
+    FAILED_FORGOT_PASSWORD_CREDENTIALS,
+    SUCCESS_RESET_PASSWORD_CREDENTIALS,
+    FAILED_RESET_PASSWORD_CREDENTIALS,
     SUCCESS_GET_ALL_USER_ROLES,
     FAILED_GET_ALL_USER_ROLES
 } from 'store/constant/authentication/UserConstant';
@@ -24,6 +30,9 @@ const initialState = {
     duplicateLoction: null,
     lastModifiedDateTime: null,
     activeUsers: [],
+    loggedUserData: null,
+    forgotPasswordData: null,
+    resetPasswordData: null,
     userRole: []
 };
 
@@ -104,6 +113,29 @@ export const userReducer = (state = initialState, action) => {
             console.warn('FAILED_USER_LIST_DATA', action);
             return { ...state, activeUsers: data.payload[0] };
 
+        case SUCCESS_USER_LOGIN_DATA:
+            console.log('SUCCESS_USER_LOGIN_DATA', data);
+            return { ...state, loggedUserData: data.payload[0] };
+
+        case FAILED_USER_LOGIN_DATA:
+            console.warn('FAILED_USER_LOGIN_DATA', data);
+            return { ...state, loggedUserData: null, errorMsg: data ? data : 'netwok error' };
+
+        case SUCCESS_FORGOT_PASSWORD_CREDENTIALS:
+            console.log('SUCCESS_FORGOT_PASSWORD_CREDENTIALS', data);
+            return { ...state, forgotPasswordData: data.payload[0] };
+
+        case FAILED_FORGOT_PASSWORD_CREDENTIALS:
+            console.warn('FAILED_FORGOT_PASSWORD_CREDENTIALS', data);
+            return { ...state, forgotPasswordData: null, errorMsg: data ? data : 'netwok error' };
+
+        case SUCCESS_RESET_PASSWORD_CREDENTIALS:
+            console.log('SUCCESS_RESET_PASSWORD_CREDENTIALS', data);
+            return { ...state, resetPasswordData: data.payload[0] };
+
+        case FAILED_RESET_PASSWORD_CREDENTIALS:
+            console.warn('FAILED_RESET_PASSWORD_CREDENTIALS', data);
+            return { ...state, resetPasswordData: null, errorMsg: data ? data : 'netwok error' };
         case SUCCESS_GET_ALL_USER_ROLES:
             console.log('SUCCESS_GET_ALL_USER_ROLES', data);
             return { ...state, userRole: data.payload[0] };

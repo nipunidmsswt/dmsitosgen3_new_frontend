@@ -107,14 +107,15 @@ const ViewTax = () => {
     }, []);
 
     useEffect(() => {
-        if (taxListData?.payload?.length > 0) {
-            setTableData(taxListData?.payload[0]);
+        console.log(taxListData);
+        if (taxListData?.length > 0) {
+            setTableData(taxListData);
         }
     }, [taxListData]);
 
     useEffect(() => {
         setLastModifiedTimeDate(
-            lastModifiedDate === null
+            lastModifiedDate === ''
                 ? ''
                 : new Date(lastModifiedDate).toLocaleString('en-GB', {
                       year: 'numeric',
