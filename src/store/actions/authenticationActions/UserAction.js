@@ -6,8 +6,10 @@ import {
     CHECK_USER_DUPLICATE,
     GET_LAST_MODIFIED_DATE_TIME_USER,
     GET_ACTIVE_USERS,
-    GET_ALL_USER_ROLES,
-    CHECK_USER_LOGIN_CREDENTIALS
+    CHECK_USER_LOGIN_CREDENTIALS,
+    FORGOT_PASSWORD_CREDENTIALS,
+    RESET_PASSWORD_CREDENTIALS,
+    GET_ALL_USER_ROLES
 } from 'store/constant/authentication/UserConstant';
 
 //user creation
@@ -73,6 +75,24 @@ export const userLogin = (data) => {
     console.log('login  Data action s called', data);
     return {
         type: CHECK_USER_LOGIN_CREDENTIALS,
+        data
+    };
+};
+
+//forgot password
+export const forgotPassword = (data) => {
+    console.log('forgotPassword', data);
+    return {
+        type: FORGOT_PASSWORD_CREDENTIALS,
+        data
+    };
+};
+
+//reset password
+export const resetPassword = (data) => {
+    console.log('resetPassword', data);
+    return {
+        type: RESET_PASSWORD_CREDENTIALS,
         data
     };
 };

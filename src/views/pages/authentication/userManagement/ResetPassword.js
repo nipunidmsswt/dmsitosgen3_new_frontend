@@ -4,8 +4,6 @@ import Button from '@mui/material/Button';
 import Visibility from '@mui/icons-material/Visibility';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 import Link from '@mui/material/Link';
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
@@ -19,7 +17,7 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import IconButton from '@mui/material/IconButton';
 import * as yup from 'yup';
 import { useNavigate } from 'react-router-dom';
-import { userLogin } from 'store/actions/authenticationActions/UserAction';
+import { resetPassword } from 'store/actions/authenticationActions/UserAction';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import SuccessMsg from 'messages/SuccessMsg';
@@ -40,24 +38,29 @@ function Copyright(props) {
 
 const theme = createTheme();
 
-export default function Login() {
+export default function ResetPassword() {
     const initialValues = {
         username: '',
-        password: ''
+        temPassword: '',
+        newPassword: '',
+        reEnteredNewPassword: ''
     };
+
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const loggedUserData = useSelector((state) => state.userReducer.loggedUserData);
+    const resetPasswordData = useSelector((state) => state.userReducer.resetPasswordData);
     const error = useSelector((state) => state.userReducer.errorMsg);
     const [showPassword, setShowPassword] = useState(false);
     const [openErrorToast, setOpenErrorToast] = useState(false);
-    const [errMsg, setErrorMsg] = useState('');
     const [openToast, setHandleToast] = useState(false);
+    const [errMsg, setErrorMsg] = useState('');
 
     const validationSchema = yup.object().shape({
         username: yup.string().required('Requied field'),
-        password: yup.string().required('Requied field')
+        temPassword: yup.string().required('Requied field'),
+        newPassword: yup.string().required('Requied field'),
+        reEnteredNewPassword: yup.string().oneOf([yup.ref('newPassword'), null], 'Passwords must match')
     });
 
     const handleClickShowPassword = () => setShowPassword((show) => !show);
@@ -67,11 +70,11 @@ export default function Login() {
     };
 
     useEffect(() => {
-        console.log(loggedUserData);
-        if (loggedUserData !== null) {
+        console.log(resetPasswordData);
+        if (resetPasswordData !== null) {
             navigate('/dashboard/default');
         }
-    }, [loggedUserData]);
+    }, [resetPasswordData]);
 
     useEffect(() => {
         console.log(error);
@@ -89,7 +92,7 @@ export default function Login() {
     const handleSubmitForm = (data) => {
         console.log(data);
         // navigate('/dashboard/default');
-        dispatch(userLogin(data));
+        dispatch(resetPassword(data));
         // navigate('/dashboard/default');
     };
 
@@ -104,7 +107,7 @@ export default function Login() {
                     md={7}
                     sx={{
                         backgroundImage:
-                            'url(https://images.unsplash.com/photo-1530521954074-e64f6810b32d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=870&q=80)',
+                            'url(https://images.unsplash.com/photo-1642025967715-0410af8d7077?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80)',
                         backgroundRepeat: 'no-repeat',
                         backgroundColor: (t) => (t.palette.mode === 'light' ? t.palette.grey[50] : t.palette.grey[900]),
                         backgroundSize: 'cover',
@@ -136,11 +139,11 @@ export default function Login() {
                                             <LockOutlinedIcon />
                                         </Avatar>
                                         <Typography component="h1" variant="h5">
-                                            Sign in
+                                            Reset Your Password ?
                                         </Typography>
                                         <Box sx={{ mt: 1 }}>
                                             <TextField
-                                                id="outlined-required"
+                                                margin="normal"
                                                 label="User Name"
                                                 name="username"
                                                 fullWidth
@@ -155,9 +158,23 @@ export default function Login() {
                                             />
 
                                             <TextField
-                                                label="Password"
-                                                id="outlined-start-adornment"
-                                                name="password"
+                                                label="Temporary Password"
+                                                name="temPassword"
+                                                margin="normal"
+                                                fullWidth
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                InputLabelProps={{
+                                                    shrink: true
+                                                }}
+                                                value={values.temPassword}
+                                                error={Boolean(touched.temPassword && errors.temPassword)}
+                                                helperText={touched.temPassword && errors.temPassword ? errors.temPassword : ''}
+                                            />
+
+                                            <TextField
+                                                label="New Password"
+                                                name="newPassword"
                                                 fullWidth
                                                 InputLabelProps={{
                                                     shrink: true
@@ -180,35 +197,55 @@ export default function Login() {
                                                 }}
                                                 onChange={handleChange}
                                                 onBlur={handleBlur}
-                                                value={values.password}
-                                                error={Boolean(touched.password && errors.password)}
-                                                helperText={touched.password && errors.password ? errors.password : ''}
+                                                value={values.newPassword}
+                                                error={Boolean(touched.newPassword && errors.newPassword)}
+                                                helperText={touched.newPassword && errors.newPassword ? errors.newPassword : ''}
                                             />
-                                            <FormControlLabel control={<Checkbox value="remember" color="primary" />} label="Remember me" />
-                                            <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
-                                                Sign In
-                                            </Button>
+                                            <TextField
+                                                label="Re-Enter New Password"
+                                                name="reEnteredNewPassword"
+                                                fullWidth
+                                                InputLabelProps={{
+                                                    shrink: true
+                                                }}
+                                                type={showPassword ? 'text' : 'password'}
+                                                margin="normal"
+                                                InputProps={{
+                                                    endAdornment: (
+                                                        <InputAdornment position="end">
+                                                            <IconButton
+                                                                aria-label="toggle password visibility"
+                                                                onClick={handleClickShowPassword}
+                                                                onMouseDown={handleMouseDownPassword}
+                                                                edge="end"
+                                                            >
+                                                                {showPassword ? <VisibilityOff /> : <Visibility />}
+                                                            </IconButton>
+                                                        </InputAdornment>
+                                                    )
+                                                }}
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                value={values.reEnteredNewPassword}
+                                                error={Boolean(touched.reEnteredNewPassword && errors.reEnteredNewPassword)}
+                                                helperText={
+                                                    touched.reEnteredNewPassword && errors.reEnteredNewPassword
+                                                        ? errors.reEnteredNewPassword
+                                                        : ''
+                                                }
+                                            />
 
-                                            <Grid container>
-                                                <Grid item xs>
-                                                    <Link href="/iTos3/pages/forgotpassword" variant="body2">
-                                                        Forgot password?
-                                                    </Link>
-                                                </Grid>
-                                                <Grid item>
-                                                    <Link href="#" variant="body2">
-                                                        {"Don't have an account? Sign Up"}
-                                                    </Link>
-                                                </Grid>
-                                            </Grid>
+                                            <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
+                                                RESET PASSWORD
+                                            </Button>
                                             <Copyright sx={{ mt: 5 }} />
                                         </Box>
-                                        {openToast ? <SuccessMsg openToast={openToast} handleToast={handleToast} mode={'LOGIN'} /> : null}
+                                        {/* {openToast ? <SuccessMsg openToast={openToast} handleToast={handleToast} mode={'LOGIN'} /> : null} */}
                                         {openErrorToast ? (
                                             <ErrorMsg
                                                 openToast={openErrorToast}
                                                 handleToast={setOpenErrorToast}
-                                                mode={'LOGIN'}
+                                                mode={'RESET'}
                                                 messages={errMsg}
                                             />
                                         ) : null}

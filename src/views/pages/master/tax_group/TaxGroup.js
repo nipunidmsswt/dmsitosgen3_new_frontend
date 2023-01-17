@@ -1,4 +1,4 @@
-import { useEffect, forwardRef, useState, Fragment, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -31,7 +31,7 @@ import {
     checkDuplicateTaxGroupCode
 } from '../../../../store/actions/masterActions/TaxActions/TaxGroupAction';
 
-import { Formik, Form, FieldArray, useFormikContext } from 'formik';
+import { Formik, Form, FieldArray } from 'formik';
 import Grid from '@mui/material/Grid';
 import TableContainer from '@mui/material/TableContainer';
 import Autocomplete from '@mui/material/Autocomplete';
@@ -39,8 +39,9 @@ import Paper from '@mui/material/Paper';
 import * as yup from 'yup';
 import { getAllTaxData } from '../../../../store/actions/masterActions/TaxActions/TaxAction';
 import CreatedUpdatedUserDetailsWithTableFormat from '../userTimeDetails/CreatedUpdatedUserDetailsWithTableFormat';
+
 function TaxGroup({ open, handleClose, mode, taxGroupCode }) {
-    const initialValues1 = {
+    const initialValues = {
         taxGroupType: '',
         taxGroupCode: '',
         description: '',
@@ -49,7 +50,7 @@ function TaxGroup({ open, handleClose, mode, taxGroupCode }) {
             {
                 tax: null,
                 taxOrder: '',
-                onOriginal: '',
+                // onOriginal: '',
                 status: true
             }
         ]
@@ -57,7 +58,6 @@ function TaxGroup({ open, handleClose, mode, taxGroupCode }) {
 
     const [taxListOptions, setTaxListOptions] = useState([]);
     const [loadValues, setLoadValues] = useState(null);
-    const ref = useRef(null);
 
     yup.addMethod(yup.array, 'uniqueTaxOrder', function (message) {
         return this.test('uniqueTaxOrder', message, function (list) {
@@ -125,8 +125,8 @@ function TaxGroup({ open, handleClose, mode, taxGroupCode }) {
             .of(
                 yup.object().shape({
                     tax: yup.object().typeError('Required field'),
-                    taxOrder: yup.string(),
-                    onOriginal: yup.string().required('Required field')
+                    taxOrder: yup.string()
+                    // onOriginal: yup.string().required('Required field')
                 })
             )
             .uniqueTaxOrder('Must be unique')
@@ -179,7 +179,7 @@ function TaxGroup({ open, handleClose, mode, taxGroupCode }) {
     }, []);
 
     const handleCancel = () => {
-        setLoadValues(initialValues1);
+        setLoadValues(initialValues);
     };
     return (
         <div>
@@ -205,15 +205,14 @@ function TaxGroup({ open, handleClose, mode, taxGroupCode }) {
                                     <Grid item lg={12} md={12} xs={12}>
                                         <>
                                             <Formik
-                                                innerRef={ref}
                                                 enableReinitialize={true}
-                                                initialValues={loadValues || initialValues1}
+                                                initialValues={loadValues || initialValues}
                                                 onSubmit={(values) => {
                                                     handleSubmitForm(values);
                                                 }}
                                                 validationSchema={validationSchema}
                                             >
-                                                {({ values, handleChange, setFieldValue, errors, handleBlur, touched }) => {
+                                                {({ values, handleChange, setFieldValue, errors, handleBlur, touched, resetForm }) => {
                                                     return (
                                                         <Form>
                                                             <div style={{ marginTop: '6px', margin: '10px' }}>
@@ -221,6 +220,7 @@ function TaxGroup({ open, handleClose, mode, taxGroupCode }) {
                                                                     <Grid item>
                                                                         {' '}
                                                                         <TextField
+                                                                            disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
                                                                             sx={{
                                                                                 width: { sm: 200, md: 300 },
                                                                                 '& .MuiInputBase-root': {
@@ -251,6 +251,7 @@ function TaxGroup({ open, handleClose, mode, taxGroupCode }) {
                                                                     </Grid>
                                                                     <Grid item>
                                                                         <TextField
+                                                                            disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
                                                                             label="Tax Group Code"
                                                                             sx={{
                                                                                 width: { sm: 200, md: 300 },
@@ -258,7 +259,6 @@ function TaxGroup({ open, handleClose, mode, taxGroupCode }) {
                                                                                     height: 40
                                                                                 }
                                                                             }}
-                                                                            disabled={mode == 'VIEW_UPDATE'}
                                                                             type="text"
                                                                             variant="outlined"
                                                                             name="taxGroupCode"
@@ -275,6 +275,7 @@ function TaxGroup({ open, handleClose, mode, taxGroupCode }) {
                                                                     </Grid>
                                                                     <Grid>
                                                                         <TextField
+                                                                            disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
                                                                             sx={{
                                                                                 width: { sm: 200, md: 300 },
                                                                                 '& .MuiInputBase-root': {
@@ -304,6 +305,7 @@ function TaxGroup({ open, handleClose, mode, taxGroupCode }) {
                                                                     <FormControlLabel
                                                                         control={
                                                                             <Checkbox
+                                                                                disabled={mode == 'VIEW'}
                                                                                 name="status"
                                                                                 onChange={handleChange}
                                                                                 checked={values.status}
@@ -321,6 +323,7 @@ function TaxGroup({ open, handleClose, mode, taxGroupCode }) {
                                                                             <Box display="flex" flexDirection="row-reverse">
                                                                                 <IconButton
                                                                                     aria-label="delete"
+                                                                                    disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
                                                                                     onClick={() => {
                                                                                         // setFieldValue(
                                                                                         //   `taxGroupDetails.${ref.current.values.taxGroupDetails.length}.taxOrder`,
@@ -329,7 +332,7 @@ function TaxGroup({ open, handleClose, mode, taxGroupCode }) {
                                                                                         push({
                                                                                             tax: null,
                                                                                             taxOrder: '',
-                                                                                            onOriginal: '',
+                                                                                            // onOriginal: '',
                                                                                             status: true
                                                                                         });
                                                                                     }}
@@ -347,9 +350,8 @@ function TaxGroup({ open, handleClose, mode, taxGroupCode }) {
                                                                                     <TableRow>
                                                                                         <TableCell>Tax Order</TableCell>
                                                                                         <TableCell>Tax Code</TableCell>
-                                                                                        {/* <TableCell>Free</TableCell> */}
                                                                                         <TableCell>Tax %</TableCell>
-                                                                                        <TableCell>Tax % on original</TableCell>
+                                                                                        {/* <TableCell>Tax % on original</TableCell> */}
                                                                                         <TableCell>Status</TableCell>
                                                                                         <TableCell>Actions</TableCell>
                                                                                     </TableRow>
@@ -358,12 +360,13 @@ function TaxGroup({ open, handleClose, mode, taxGroupCode }) {
                                                                                     {values.taxGroupDetails.map((record, idx) => {
                                                                                         return (
                                                                                             <TableRow key={idx} hover>
-                                                                                                {/* <TableCell>
-                                                    {idx + 1}
-                                                  </TableCell> */}
                                                                                                 <TableCell>
                                                                                                     <TextField
                                                                                                         // label="taxOrder"
+                                                                                                        disabled={
+                                                                                                            mode == 'VIEW_UPDATE' ||
+                                                                                                            mode == 'VIEW'
+                                                                                                        }
                                                                                                         sx={{
                                                                                                             width: { sm: 200 },
                                                                                                             '& .MuiInputBase-root': {
@@ -413,6 +416,10 @@ function TaxGroup({ open, handleClose, mode, taxGroupCode }) {
                                                                                                 </TableCell>
                                                                                                 <TableCell>
                                                                                                     <Autocomplete
+                                                                                                        disabled={
+                                                                                                            mode == 'VIEW_UPDATE' ||
+                                                                                                            mode == 'VIEW'
+                                                                                                        }
                                                                                                         value={
                                                                                                             values.taxGroupDetails[idx]
                                                                                                                 ? values.taxGroupDetails[
@@ -440,6 +447,7 @@ function TaxGroup({ open, handleClose, mode, taxGroupCode }) {
                                                                                                             <TextField
                                                                                                                 {...params}
                                                                                                                 // label="tax"
+
                                                                                                                 sx={{
                                                                                                                     width: { sm: 200 },
                                                                                                                     '& .MuiInputBase-root':
@@ -505,7 +513,7 @@ function TaxGroup({ open, handleClose, mode, taxGroupCode }) {
                                                                                                         : 0}
                                                                                                 </TableCell>
 
-                                                                                                <TableCell>
+                                                                                                {/* <TableCell>
                                                                                                     <TextField
                                                                                                         sx={{
                                                                                                             width: { sm: 200 },
@@ -554,12 +562,17 @@ function TaxGroup({ open, handleClose, mode, taxGroupCode }) {
                                                                                                                 : ''
                                                                                                         }
                                                                                                     />
-                                                                                                </TableCell>
+                                                                                                </TableCell> */}
                                                                                                 <TableCell>
                                                                                                     <FormGroup>
                                                                                                         <FormControlLabel
                                                                                                             control={
                                                                                                                 <Checkbox
+                                                                                                                    disabled={
+                                                                                                                        mode ==
+                                                                                                                            'VIEW_UPDATE' ||
+                                                                                                                        mode == 'VIEW'
+                                                                                                                    }
                                                                                                                     name={`taxGroupDetails.${idx}.status`}
                                                                                                                     onChange={handleChange}
                                                                                                                     checked={
@@ -585,6 +598,11 @@ function TaxGroup({ open, handleClose, mode, taxGroupCode }) {
                                                                                                 </TableCell>
                                                                                                 <TableCell>
                                                                                                     <IconButton
+                                                                                                        disabled={
+                                                                                                            mode == 'VIEW_UPDATE' ||
+                                                                                                            mode == 'VIEW'
+                                                                                                        }
+                                                                                                        disa
                                                                                                         aria-label="delete"
                                                                                                         onClick={() => {
                                                                                                             remove(idx);
@@ -607,12 +625,12 @@ function TaxGroup({ open, handleClose, mode, taxGroupCode }) {
                                                                 {mode != 'VIEW' ? (
                                                                     <Button
                                                                         variant="outlined"
-                                                                        type="button"
+                                                                        type="reset"
                                                                         style={{
                                                                             // backgroundColor: '#B22222',
                                                                             marginLeft: '10px'
                                                                         }}
-                                                                        onClick={handleCancel}
+                                                                        onClick={(e) => resetForm()}
                                                                     >
                                                                         CLEAR
                                                                     </Button>
