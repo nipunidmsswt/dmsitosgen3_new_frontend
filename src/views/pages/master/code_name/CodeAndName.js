@@ -33,17 +33,12 @@ import Grid from '@mui/material/Grid';
 import TableContainer from '@mui/material/TableContainer';
 import Paper from '@mui/material/Paper';
 import * as yup from 'yup';
-import {
-    getAllCodeAndNameDetails,
-    getCodeAndNameDataByCode,
-    getCodeAndNameDataByType,
-    saveCodeAndNameData,
-    updateCodeAndNameData
-} from 'store/actions/masterActions/CodeAndNameAction';
+import { getCodeAndNameDataByType, saveCodeAndNameData, updateCodeAndNameData } from 'store/actions/masterActions/CodeAndNameAction';
 import CreatedUpdatedUserDetailsWithTableFormat from '../userTimeDetails/CreatedUpdatedUserDetailsWithTableFormat';
 import { openSnackbar } from 'messages/snackbar';
 import AlertItemDelete from 'messages/AlertItemDelete';
 import { useRef } from 'react';
+import AlertItemExist from 'messages/AlertItemExist';
 
 const Transition = forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -66,6 +61,7 @@ function CodeAndName({ open, handleClose, mode, ccode }) {
 
     const [initialValues, setInitial] = useState(initialValues1);
     const [openModal, setOpenModal] = useState(false);
+    const [existOpenModal, setExistOpenModal] = useState(false);
     const [loadValues, setLoadValues] = useState({
         codeType: '',
         code: '',
@@ -154,22 +150,23 @@ function CodeAndName({ open, handleClose, mode, ccode }) {
     // }, [mode]);
 
     useEffect(() => {
+        // console.log(loadValues.codeAndNameDetails[0].codeType);
         if (categoryType !== null) {
             if (detailsType.length != 0) {
-                console.log('detailsType.length:' + detailsType.codeAndNameDetails.length);
-                console.log(loadValues.codeAndNameDetails[0].codeType);
                 if (
                     loadValues.codeAndNameDetails[0].codeType != '' &&
                     loadValues.codeAndNameDetails[0].codeType != undefined &&
                     loadValues.codeAndNameDetails[0].codeType != null
                 ) {
-                    if (detailsType.codeAndNameDetails.length != loadValues.codeAndNameDetails.length) {
-                        setOpenModal(true);
-                    } else {
-                        dispatch(getCodeAndNameDataByType(categoryType));
-                    }
+                    // if (detailsType.codeAndNameDetails.length != loadValues.codeAndNameDetails.length) {
+                    //     setOpenModal(false);
+                    // } else {
+                    dispatch(getCodeAndNameDataByType(categoryType));
+                    // }
                 } else {
                     if (detailsType.codeAndNameDetails.length != loadValues.codeAndNameDetails.length) {
+                        console.log('codetypedata:' + loadValues.codeAndNameDetails);
+                        // alert('ccccc');
                         setOpenModal(true);
                     } else {
                         dispatch(getCodeAndNameDataByType(categoryType));
@@ -210,7 +207,6 @@ function CodeAndName({ open, handleClose, mode, ccode }) {
     const handleSubmitForm = async (data) => {
         console.log(data);
         if (mode === 'INSERT') {
-            console.log(data);
             dispatch(saveCodeAndNameData(data));
         } else if (mode === 'VIEW_UPDATE') {
             dispatch(updateCodeAndNameData(data));
@@ -245,9 +241,7 @@ function CodeAndName({ open, handleClose, mode, ccode }) {
     //     }
     // }
 
-    const handleSubmit = async (values, { resetForm }) => {
-        // alert(values.codeType);
-
+    const handleSubmit = async (values) => {
         const initialValuesNew = {
             codeType: values.codeType,
             // code: '',
@@ -264,17 +258,22 @@ function CodeAndName({ open, handleClose, mode, ccode }) {
         };
 
         loadValues.codeAndNameDetails?.map((s) =>
-            s.code === values.code && s.name === values.name && s.category == values.codeType
-                ? ''
-                : s.code === '' && s.name === ''
-                ? setTempData(initialValuesNew)
-                : s.category !== values.codeType
-                ? (setOpenModal(true), setInitialData(loadValues), setTempData(initialValuesNew), (initialValuesNew = loadValues))
-                : initialValuesNew.codeAndNameDetails.push(s)
+            s.code === values.code && s.category == values.codeType ? setExistOpenModal(true) : initialValuesNew.codeAndNameDetails.push(s)
         );
 
+        // console.log('length:' + loadValues.codeAndNameDetails?.length);
+        // loadValues.codeAndNameDetails?.map((s) =>
+        //     s.code === values.code && s.name === values.name && s.category == values.codeType
+        //         ? ''
+        //         : s.code === '' && s.name === ''
+        //         ? setTempData(initialValuesNew)
+        //         : s.category !== values.codeType
+        //         ? (setOpenModal(true), setInitialData(loadValues), setTempData(initialValuesNew), (initialValuesNew = loadValues))
+        //         : initialValuesNew.codeAndNameDetails.push(s)
+        // );
+
         setLoadValues(initialValuesNew);
-        resetForm();
+        // resetForm();
     };
 
     return (
@@ -313,10 +312,11 @@ function CodeAndName({ open, handleClose, mode, ccode }) {
                                             <Formik
                                                 enableReinitialize={true}
                                                 initialValues={initialValues1 || loadValues}
-                                                onSubmit={handleSubmit}
-                                                // onSubmit={(values, e) => {
-                                                //     handleSubmitFormToTable(values);
-                                                // }}
+                                                // onSubmit={handleSubmit}
+                                                onSubmit={(values, { resetForm }) => {
+                                                    handleSubmit(values);
+                                                    resetForm('');
+                                                }}
                                                 validationSchema={validationSchema1}
                                             >
                                                 {({ values, handleChange, setFieldValue, errors, handleBlur, touched, resetForm }) => {
@@ -474,7 +474,11 @@ function CodeAndName({ open, handleClose, mode, ccode }) {
                                             //     alert(values);
                                             //     handleSubmitForm(values);
                                             // }}
-                                            onSubmit={handleSubmitForm}
+                                            onSubmit={(values, resetForm) => {
+                                                handleSubmitForm(values);
+                                                resetForm('');
+                                            }}
+                                            // onSubmit={handleSubmitForm}
                                             validationSchema={validationSchema}
                                         >
                                             {({ values, handleChange, setFieldValue, errors, handleBlur, touched, resetForm }) => {
@@ -532,9 +536,6 @@ function CodeAndName({ open, handleClose, mode, ccode }) {
                                                                                                     disabled
                                                                                                     //   type="number"
                                                                                                     variant="outlined"
-                                                                                                    // placeholder="code"
-                                                                                                    // validate={checkDuplicateCodeForCodeAndName}
-
                                                                                                     name={`codeAndNameDetails.${idx}.category`}
                                                                                                     value={
                                                                                                         values.codeAndNameDetails[idx] &&
@@ -728,6 +729,16 @@ function CodeAndName({ open, handleClose, mode, ccode }) {
                                                                     <AlertItemDelete
                                                                         title="dev"
                                                                         open={openModal}
+                                                                        handleClose={handleModalClose}
+                                                                    />
+                                                                ) : null}
+                                                            </Grid>
+
+                                                            <Grid item>
+                                                                {existOpenModal ? (
+                                                                    <AlertItemExist
+                                                                        title="dev"
+                                                                        open={existOpenModal}
                                                                         handleClose={handleModalClose}
                                                                     />
                                                                 ) : null}
