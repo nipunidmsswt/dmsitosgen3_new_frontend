@@ -16,7 +16,8 @@ import {
     TableBody,
     TableCell,
     TableHead,
-    TableRow
+    TableRow,
+    Switch
 } from '@mui/material';
 import { Formik, Form, FieldArray, useFormikContext } from 'formik';
 import Grid from '@mui/material/Grid';
@@ -49,6 +50,7 @@ const MarketGroup = ({ open, handleClose, mode, marketGroupCode }) => {
         marketGroupDetails: [
             {
                 market: null,
+                operator: null,
                 description: '',
                 status: true
                 // officeTelNumber: "",
@@ -59,12 +61,70 @@ const MarketGroup = ({ open, handleClose, mode, marketGroupCode }) => {
     };
 
     const handleSubmitForm = (data) => {
+        const dataArray = [];
+        console.log(data.marketGroupDetails[0].market);
         if (mode === 'INSERT') {
-            console.log(data);
-            dispatch(saveMarketGroupData(data));
+            if (data.groupType === 'Operator Group') {
+                console.log(data.marketGroupDetails);
+                const initialValues = {
+                    groupType: data.groupType,
+                    code: data.code,
+                    description: data.description,
+                    status: data.status,
+                    marketGroupDetails: []
+                };
+
+                data.marketGroupDetails.map((item) => {
+                    const details = {
+                        operator: item.market,
+                        market: null,
+                        status: item.status
+                        // officeTelNumber: "",
+                        // fax1: "",
+                        // fax2: "",
+                    };
+
+                    // dataArray.push(details);
+                    initialValues.marketGroupDetails.push(details);
+                });
+                console.log(initialValues);
+                dispatch(saveMarketGroupData(initialValues));
+            } else {
+                dispatch(saveMarketGroupData(data));
+            }
+
+            // console.log(data);
+            // console.log(dataArray);
         } else if (mode === 'VIEW_UPDATE') {
+            if (data.groupType === 'Operator Group') {
+                console.log(data.marketGroupDetails);
+                const initialValues = {
+                    groupType: data.groupType,
+                    code: data.code,
+                    description: data.description,
+                    status: data.status,
+                    marketGroupDetails: []
+                };
+
+                data.marketGroupDetails.map((item) => {
+                    const details = {
+                        operator: item.market,
+                        market: null,
+                        status: item.status
+                        // officeTelNumber: "",
+                        // fax1: "",
+                        // fax2: "",
+                    };
+
+                    // dataArray.push(details);
+                    initialValues.marketGroupDetails.push(details);
+                });
+                console.log(initialValues);
+                dispatch(updateMarketGroupData(initialValues));
+            } else {
+                dispatch(updateMarketGroupData(data));
+            }
             // console.log("yes click");
-            dispatch(updateMarketGroupData(data));
         }
         handleClose();
     };
@@ -89,12 +149,17 @@ const MarketGroup = ({ open, handleClose, mode, marketGroupCode }) => {
     //     }
     // }, [marketListData]);
 
-    // useEffect(() => {
-    //     if (operatorListData != null) {
-    //         console.log(operatorListData.codeAndNameDetails);
-    //         setMarketListOptions(operatorListData.codeAndNameDetails);
-    //     }
-    // }, [operatorListData]);
+    useEffect(() => {
+        if (marketListData != null) {
+            setListOptions(marketListData);
+        }
+    }, [marketListData]);
+
+    useEffect(() => {
+        if (operatorListData != null) {
+            setListOptions(operatorListData);
+        }
+    }, [operatorListData]);
 
     const duplicateCode = useSelector((state) => state.marketGroupReducer.duplicateCode);
 
@@ -105,7 +170,29 @@ const MarketGroup = ({ open, handleClose, mode, marketGroupCode }) => {
 
     useEffect(() => {
         if ((mode === 'VIEW_UPDATE' && marketToUpdate != null) || (mode === 'VIEW' && marketToUpdate != null)) {
-            setLoadValues(marketToUpdate);
+            if (marketToUpdate.groupType == 'Operator Group') {
+                const initialValues = {
+                    groupType: marketToUpdate.groupType,
+                    code: marketToUpdate.code,
+                    description: marketToUpdate.description,
+                    status: marketToUpdate.status,
+                    marketGroupDetails: []
+                };
+
+                marketToUpdate.marketGroupDetails.map((item) => {
+                    const details = {
+                        operator: null,
+                        market: item.operator,
+                        status: item.status
+                    };
+
+                    // dataArray.push(details);
+                    initialValues.marketGroupDetails.push(details);
+                    setLoadValues(initialValues);
+                });
+            } else {
+                setLoadValues(marketToUpdate);
+            }
         }
     }, [marketToUpdate]);
 
@@ -169,8 +256,10 @@ const MarketGroup = ({ open, handleClose, mode, marketGroupCode }) => {
     });
 
     function handleClick(e) {
+        console.log('Market Group:' + operatorListData);
         let selectedValue = e.target.dataset.value;
-        selectedValue === 'Market Group' ? setListOptions(marketListData) : setListOptions(operatorListData.codeAndNameDetails);
+        selectedValue === 'Market Group' ? dispatch(getAllActiveMarketData()) : dispatch(getAllActiveOperatorData());
+        // selectedValue === 'Market Group' ? setListOptions(marketListData) : setListOptions(operatorListData.codeAndNameDetails);
     }
 
     return (
@@ -303,6 +392,17 @@ const MarketGroup = ({ open, handleClose, mode, marketGroupCode }) => {
                                                                     <Grid item>
                                                                         <FormGroup>
                                                                             <FormControlLabel
+                                                                                name="status"
+                                                                                onChange={handleChange}
+                                                                                value={values.status}
+                                                                                control={<Switch color="success" />}
+                                                                                label="Status"
+                                                                                checked={values.status}
+                                                                                // disabled={mode == 'VIEW'}
+                                                                            />
+                                                                        </FormGroup>
+                                                                        {/* <FormGroup>
+                                                                            <FormControlLabel
                                                                                 label="Status"
                                                                                 labelPlacement="start"
                                                                                 control={
@@ -315,7 +415,7 @@ const MarketGroup = ({ open, handleClose, mode, marketGroupCode }) => {
                                                                                     />
                                                                                 }
                                                                             />
-                                                                        </FormGroup>
+                                                                        </FormGroup> */}
                                                                     </Grid>
                                                                 </Grid>
 
@@ -345,6 +445,7 @@ const MarketGroup = ({ open, handleClose, mode, marketGroupCode }) => {
                                                                                     onClick={() => {
                                                                                         push({
                                                                                             market: null,
+
                                                                                             description: '',
                                                                                             status: true
                                                                                         });
@@ -392,6 +493,7 @@ const MarketGroup = ({ open, handleClose, mode, marketGroupCode }) => {
                                                                                                         name={`marketGroupDetails.${idx}.market`}
                                                                                                         onChange={(_, value) => {
                                                                                                             console.log(value);
+
                                                                                                             setFieldValue(
                                                                                                                 `marketGroupDetails.${idx}.market`,
                                                                                                                 value
@@ -556,7 +658,32 @@ const MarketGroup = ({ open, handleClose, mode, marketGroupCode }) => {
                                                                                                     />
                                                                                                 </TableCell>
                                                                                                 <TableCell>
-                                                                                                    <Checkbox
+                                                                                                    <FormGroup>
+                                                                                                        <FormControlLabel
+                                                                                                            name={`marketGroupDetails.${idx}.status`}
+                                                                                                            onChange={handleChange}
+                                                                                                            value={
+                                                                                                                values.marketGroupDetails[
+                                                                                                                    idx
+                                                                                                                ] &&
+                                                                                                                values.marketGroupDetails[
+                                                                                                                    idx
+                                                                                                                ].status
+                                                                                                            }
+                                                                                                            control={
+                                                                                                                <Switch color="success" />
+                                                                                                            }
+                                                                                                            // label="Status"
+                                                                                                            checked={
+                                                                                                                values.marketGroupDetails[
+                                                                                                                    idx
+                                                                                                                ].status
+                                                                                                            }
+
+                                                                                                            // disabled={mode == 'VIEW'}
+                                                                                                        />
+                                                                                                    </FormGroup>
+                                                                                                    {/* <Checkbox
                                                                                                         onChange={handleChange}
                                                                                                         name={`marketGroupDetails.${idx}.status`}
                                                                                                         checked={
@@ -567,7 +694,7 @@ const MarketGroup = ({ open, handleClose, mode, marketGroupCode }) => {
                                                                                                                 .status
                                                                                                         }
                                                                                                         disabled={mode == 'VIEW'}
-                                                                                                    ></Checkbox>
+                                                                                                    ></Checkbox> */}
                                                                                                 </TableCell>
                                                                                                 <TableCell>
                                                                                                     <IconButton

@@ -113,13 +113,13 @@ function ViewCodeAndName() {
             title: 'Market',
             field: 'marketList',
             filterPlaceholder: 'filter',
-            align: 'center'
+            align: 'left'
         },
         {
             title: 'Operator',
             field: 'operatorList',
             filterPlaceholder: 'filter',
-            align: 'center'
+            align: 'left'
         }
     ];
 
@@ -152,7 +152,7 @@ function ViewCodeAndName() {
     }, [operatorMappingWithMarket]);
 
     useEffect(() => {
-        if (codeAndNameData) {
+        if (codeAndNameData != null) {
             setHandleToast(true);
 
             // dispatch(getAllCodeAndNameDetails());
@@ -162,17 +162,16 @@ function ViewCodeAndName() {
     }, [codeAndNameData]);
 
     useEffect(() => {
-        if (clusterMarketMappingData) {
+        if (clusterMarketMappingData != null) {
             setHandleToast(true);
 
             // dispatch(getAllCodeAndNameDetails());
             // dispatch(getLatestModifiedDetails());
-        } else {
         }
     }, [clusterMarketMappingData]);
 
     useEffect(() => {
-        if (marketOperatorMappingData) {
+        if (marketOperatorMappingData != null) {
             setHandleToast(true);
 
             // dispatch(getAllCodeAndNameDetails());
@@ -206,22 +205,11 @@ function ViewCodeAndName() {
 
     useEffect(() => {
         if (operatorListData != null) {
-            console.log(operatorListData);
             setOperatorListOptions(operatorListData);
         }
     }, [operatorListData]);
 
-    // useEffect(() => {
-    //     dispatch(getAllCodeAndNameDetails());
-    //     dispatch(getLatestModifiedDetails());
-    // }, []);
-
     const [lastModifiedTimeDate, setLastModifiedTimeDate] = useState(null);
-
-    // useEffect(() => {
-    //     setLastModifiedTimeDate(lastModifiedDate === null ? '' : new Date(lastModifiedDate).toLocaleString('en-GB'));
-    // }, [lastModifiedDate]);
-
     useEffect(() => {
         setLastModifiedTimeDate(
             lastModifiedDate === null
@@ -239,22 +227,14 @@ function ViewCodeAndName() {
 
     const handleClickOpen = () => {
         const type = 'INSERT';
-        // if (type === 'VIEW_UPDATE') {
-        //     setMode(type);
-        //     setCode(data.code);
-        // } else if (type === 'INSERT') {
         setCode('');
         setMode(type);
-        // } else {
-        // setMode(type);
-        // setCode(data.code);
-        // }
-
         setOpen(true);
     };
 
     const handleSubmitForm = async (data) => {
         if (mode === 'INSERT') {
+            console.log('data:' + data);
             dispatch(saveClusterAndMarketMappingData(data));
         } else if (mode === 'VIEW_UPDATE') {
             // dispatch(updateCodeAndNameData(data));
@@ -291,12 +271,7 @@ function ViewCodeAndName() {
     };
 
     const loadTableData = (value) => {
-        console.log(value.clusterId);
-        // const selectedType = event.currentTarget.dataset.value;
         dispatch(getAllMarketAndOperatorForCluster(value.clusterId));
-        // if (loadValues.length != 0) {
-        // }
-        // setCategoryType(selectedType);
     };
     return (
         <div>

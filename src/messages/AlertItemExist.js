@@ -17,9 +17,9 @@ export default function AlertItemExist({ title, open, handleClose }) {
                 <>
                     <DialogTitle id="item-delete-title">Already Exist</DialogTitle>
                     <DialogActions sx={{ mr: 2 }}>
-                        <Button onClick={() => handleClose(false)} color="error">
-                            Cancel
-                        </Button>
+                        {/* <Button onClick={() => handleClose(false)} color="error">
+                            OK
+                        </Button> */}
                         <Button variant="contained" size="small" onClick={() => handleClose(true)}>
                             OK
                         </Button>
