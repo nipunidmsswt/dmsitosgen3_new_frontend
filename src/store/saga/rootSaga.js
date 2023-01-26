@@ -104,8 +104,12 @@ import {
     GET_CODE_LAST_MODIFIED_DATE_TIME,
     GET_CODE_NAME_DATA_BY_CODE,
     GET_CODE_NAME_DATA_BY_TYPE,
+    GET_DATA_TO_TABLE_VIEW,
+    GET_EXISITING_MARKETCODE_FOR_CLUSTER,
+    GET_EXISITING_OPERATOR_CODE_FOR_MARKET,
     SAVE_CLUSTER_MARKET_MAPPING_DATA,
     SAVE_CODE_AND_NAME_DATA,
+    SAVE_MARKET_OPERATOR_MAPPING_DATA,
     UPDATE_CODE_AND_NAME_DATA
 } from 'store/constant/master/CodeAndNameConstant';
 
@@ -120,7 +124,12 @@ import {
     getAllClusterTypeData,
     getAllActiveOperatorSaga,
     getAllCodeAndNameByTypeSaga,
-    saveClusterAndMarketMappingDataSaga
+    saveClusterAndMarketMappingDataSaga,
+    getExisitngMarketCodesForCluster,
+    saveOperatorAndMarketMappingData,
+    saveOperatorAndMarketMappingDataSaga,
+    getExisitngOperatorCodesForMarketSaga,
+    getExisitngDataToTableSaga
 } from './mastersaga/CodeAndNameSaga';
 
 import {
@@ -501,6 +510,7 @@ export function* wacherSaga() {
     yield takeLatest(GET_CODE_NAME_DATA_BY_TYPE, getAllCodeAndNameByTypeSaga);
     yield takeLatest(SAVE_CLUSTER_MARKET_MAPPING_DATA, saveClusterAndMarketMappingDataSaga);
 
+    yield takeLatest(SAVE_MARKET_OPERATOR_MAPPING_DATA, saveOperatorAndMarketMappingDataSaga);
     // //location data
     yield takeLatest(SAVE_LOCATION_DATA, saveLocationSaga);
     yield takeLatest(GET_LOCATION_DATA_BY_ID, getLocationByIdSaga);
@@ -514,7 +524,9 @@ export function* wacherSaga() {
     yield takeLatest(CHECK_CODE_DUPLICATE, checkDupicateCodeSaga);
     yield takeLatest(CHECK_CODE_TYPE_DUPLICATE, checkDupicateCodeTypeSaga);
     yield takeLatest(GET_CODE_LAST_MODIFIED_DATE_TIME, checkCodeLatestModifiedDateSaga);
-
+    yield takeLatest(GET_EXISITING_MARKETCODE_FOR_CLUSTER, getExisitngMarketCodesForCluster);
+    yield takeLatest(GET_EXISITING_OPERATOR_CODE_FOR_MARKET, getExisitngOperatorCodesForMarketSaga);
+    yield takeLatest(GET_DATA_TO_TABLE_VIEW, getExisitngDataToTableSaga);
     //hotel category
     yield takeLatest(SAVE_HOTEL_CATEGORY_DATA, saveHotelCateogrySaga);
     yield takeLatest(GET_HOTEL_CATEGORY_DATA_BY_ID, getHotelCateogryByIdSaga);

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 // material-ui
 import { Button, Dialog, DialogActions, DialogTitle } from '@mui/material';
 
-export default function AlertItemDelete({ title, open, handleClose }) {
+export default function AlertItemExist({ title, open, handleClose }) {
     return (
         <Dialog
             open={true}
@@ -15,11 +15,11 @@ export default function AlertItemDelete({ title, open, handleClose }) {
         >
             {open && (
                 <>
-                    <DialogTitle id="item-delete-title">Are you sure you want to delete this item?</DialogTitle>
+                    <DialogTitle id="item-delete-title">Already Exist</DialogTitle>
                     <DialogActions sx={{ mr: 2 }}>
-                        <Button onClick={() => handleClose(false)} color="error">
-                            Cancel
-                        </Button>
+                        {/* <Button onClick={() => handleClose(false)} color="error">
+                            OK
+                        </Button> */}
                         <Button variant="contained" size="small" onClick={() => handleClose(true)}>
                             OK
                         </Button>
@@ -30,7 +30,7 @@ export default function AlertItemDelete({ title, open, handleClose }) {
     );
 }
 
-AlertItemDelete.propTypes = {
+AlertItemExist.propTypes = {
     open: PropTypes.bool,
     handleClose: PropTypes.func,
     title: PropTypes.string

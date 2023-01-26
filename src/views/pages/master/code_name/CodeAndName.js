@@ -21,7 +21,9 @@ import {
     Switch,
     Snackbar,
     Alert,
-    DialogActions
+    DialogActions,
+    TablePagination,
+    TableFooter
 } from '@mui/material';
 
 import AddBoxIcon from '@mui/icons-material/AddBox';
@@ -33,17 +35,12 @@ import Grid from '@mui/material/Grid';
 import TableContainer from '@mui/material/TableContainer';
 import Paper from '@mui/material/Paper';
 import * as yup from 'yup';
-import {
-    getAllCodeAndNameDetails,
-    getCodeAndNameDataByCode,
-    getCodeAndNameDataByType,
-    saveCodeAndNameData,
-    updateCodeAndNameData
-} from 'store/actions/masterActions/CodeAndNameAction';
+import { getCodeAndNameDataByType, saveCodeAndNameData, updateCodeAndNameData } from 'store/actions/masterActions/CodeAndNameAction';
 import CreatedUpdatedUserDetailsWithTableFormat from '../userTimeDetails/CreatedUpdatedUserDetailsWithTableFormat';
 import { openSnackbar } from 'messages/snackbar';
 import AlertItemDelete from 'messages/AlertItemDelete';
 import { useRef } from 'react';
+import AlertItemExist from 'messages/AlertItemExist';
 
 const Transition = forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -63,15 +60,28 @@ function CodeAndName({ open, handleClose, mode, ccode }) {
         //     }
         // ]
     };
+    const pages = [5, 10, 25];
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(pages[page]);
+    // const TablePagination = () => <TablePagination component="div" page={page} rowsPerPageOptions={pages} rowsPerPage={rowsPerPage} />;
+    const handleChangePage = (event, newPage) => {
+        setPage(newPage);
+    };
 
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
+    };
+    // const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
     const [initialValues, setInitial] = useState(initialValues1);
     const [openModal, setOpenModal] = useState(false);
+    const [existOpenModal, setExistOpenModal] = useState(false);
     const [loadValues, setLoadValues] = useState({
         codeType: '',
         code: '',
         name: '',
         newStatus: true,
-        codeAndNameDetails: [{ category: '', code: '', name: '', status: true }]
+        codeAndNameDetails: [{ category: '', code: '', name: '', status: true, codeAndNameId: '' }]
     });
     yup.addMethod(yup.array, 'uniqueCode', function (message) {
         return this.test('uniqueCode', message, function (list) {
@@ -116,111 +126,83 @@ function CodeAndName({ open, handleClose, mode, ccode }) {
     const codeToUpdate = useSelector((state) => state.codeAndNameReducer.codeToUpdate);
     const duplicateCode = useSelector((state) => state.codeAndNameReducer.duplicateCode);
     const detailsType = useSelector((state) => state.codeAndNameReducer.detailsType);
-    const [openToast, setHandleToast] = useState(false);
-    const [initialData, setInitialData] = useState(null);
-    const [tableBodyData, setTableBodyData] = useState(false);
-    const prevCountRef = useRef();
 
-    const [tempData, setTempData] = useState({
-        codeType: '',
-        code: '',
-        name: '',
-        newStatus: true,
-        codeAndNameDetails: [{ category: '', code: '', name: '', status: true }]
-    });
+    // const [tempData, setTempData] = useState({
+    //     codeType: '',
+    //     code: '',
+    //     name: '',
+    //     newStatus: true,
+    //     codeAndNameDetails: [{ category: '', code: '', name: '', status: true }]
+    // });
     const dispatch = useDispatch();
 
     const [clusterTypeData, setClsuterTypeData] = useState(null);
     const [categoryType, setCategoryType] = useState(null);
 
     const handleModalClose = (status) => {
-        // setLoadValues(loadValues);
         setOpenModal(false);
 
         if (status) {
             dispatch(getCodeAndNameDataByType(categoryType));
-
-            // setLoadValues(tempData);
-        } else {
-            // alert('new');
-            // setLoadValues(detailsType);
+        }
+    };
+    const handleExistModalClose = (status) => {
+        if (status) {
+            setExistOpenModal(false);
         }
     };
 
-    // useEffect(() => {
-    //     if (mode === 'VIEW_UPDATE' || mode === 'VIEW') {
-    //         dispatch(getCodeAndNameDataByCode(ccode));
-    //     }
-    // }, [mode]);
-
     useEffect(() => {
         if (categoryType !== null) {
-            if (detailsType.length != 0) {
-                console.log('detailsType.length:' + detailsType.codeAndNameDetails.length);
-                console.log(loadValues.codeAndNameDetails[0].codeType);
-                if (
-                    loadValues.codeAndNameDetails[0].codeType != '' &&
-                    loadValues.codeAndNameDetails[0].codeType != undefined &&
-                    loadValues.codeAndNameDetails[0].codeType != null
-                ) {
-                    if (detailsType.codeAndNameDetails.length != loadValues.codeAndNameDetails.length) {
-                        setOpenModal(true);
-                    } else {
-                        dispatch(getCodeAndNameDataByType(categoryType));
-                    }
-                } else {
-                    if (detailsType.codeAndNameDetails.length != loadValues.codeAndNameDetails.length) {
-                        setOpenModal(true);
-                    } else {
-                        dispatch(getCodeAndNameDataByType(categoryType));
-                    }
-                }
-            } else {
-                if (categoryType !== null) {
-                    dispatch(getCodeAndNameDataByType(categoryType));
-                }
-            }
+            loadValues.codeAndNameDetails?.map((s) =>
+                s.category === ''
+                    ? dispatch(getCodeAndNameDataByType(categoryType))
+                    : detailsType.codeAndNameDetails.length != loadValues.codeAndNameDetails.length
+                    ? setOpenModal(true)
+                    : dispatch(getCodeAndNameDataByType(categoryType))
+            );
+            //     if (
+            //         loadValues.codeAndNameDetails[0].codeType != '' &&
+            //         loadValues.codeAndNameDetails[0].codeType != undefined &&
+            //         loadValues.codeAndNameDetails[0].codeType != null
+            //     ) {
+            //         // if (detailsType.codeAndNameDetails.length != loadValues.codeAndNameDetails.length) {
+            //         //     setOpenModal(false);
+            //         // } else {
+            //         dispatch(getCodeAndNameDataByType(categoryType));
+            //         // }
+            //     } else {
+            //         if (detailsType.codeAndNameDetails.length != loadValues.codeAndNameDetails.length) {
+            //             console.log('codetypedata:' + loadValues.codeAndNameDetails);
+            //             // alert('ccccc');
+            //             setOpenModal(true);
+            //         } else {
+            //             dispatch(getCodeAndNameDataByType(categoryType));
+            //         }
+            //     }
+            // } else {
+            //     if (categoryType !== null) {
+            //         dispatch(getCodeAndNameDataByType(categoryType));
+            // }
         }
     }, [categoryType]);
 
     useEffect(() => {
         if (categoryType !== null) {
-            console.log(detailsType);
             if (detailsType !== null && detailsType.length != 0) {
-                // prevCountRef.current = detailsType;
-                // console.log(initialData);
-                // // tempData.codeAndNameDetails?.map((s) => console.log('type:' + s.code));
-                // console.log('loadVa:' + loadValues.codeAndNameDetails.length);
                 setLoadValues(detailsType);
             }
-            // setLoadValues(detailsType);
-            // alert(detailsType);
-            // setTableBodyData(true);
-            // loadValues.length == 0 ? setLoadValues(detailsType) : setOpenModal(true);
         }
     }, [detailsType]);
 
-    // dispatch(getCodeAndNameDataByCode(ccode));
-
-    // useEffect(() => {
-    //     if ((mode === 'VIEW_UPDATE' && codeToUpdate != null) || (mode === 'VIEW' && codeToUpdate != null)) {
-    //         setLoadValues(codeToUpdate);
-    //     }
-    // }, [codeToUpdate]);
     const handleSubmitForm = async (data) => {
-        console.log(data);
         if (mode === 'INSERT') {
-            console.log(data);
             dispatch(saveCodeAndNameData(data));
         } else if (mode === 'VIEW_UPDATE') {
             dispatch(updateCodeAndNameData(data));
         }
         handleClose();
     };
-
-    // function loadCodeAndNameDetails(value) {
-    //     console.log(value);
-    // }
 
     const loadCodeAndNameDetails = (event) => {
         const selectedType = event.currentTarget.dataset.value;
@@ -229,25 +211,7 @@ function CodeAndName({ open, handleClose, mode, ccode }) {
         setCategoryType(selectedType);
     };
 
-    // useEffect(() => {
-    //     setCategoryType(initialValues.codeType);
-    // }, []);
-
-    // const handleSubmit = async (values, { resetForm }) => {
-    //     try {
-
-    //         // console.log(res)
-    //         resetForm();
-    //     }
-    //     catch (err) {
-    //         console.log(err);
-    //         setErr(err.message);
-    //     }
-    // }
-
-    const handleSubmit = async (values, { resetForm }) => {
-        // alert(values.codeType);
-
+    const handleSubmit = async (values) => {
         const initialValuesNew = {
             codeType: values.codeType,
             // code: '',
@@ -258,23 +222,28 @@ function CodeAndName({ open, handleClose, mode, ccode }) {
                     category: values.codeType,
                     code: values.code,
                     name: values.name,
-                    status: values.newStatus
+                    status: values.newStatus,
+                    codeAndNameId: ''
                 }
             ]
         };
 
         loadValues.codeAndNameDetails?.map((s) =>
-            s.code === values.code && s.name === values.name && s.category == values.codeType
-                ? ''
-                : s.code === '' && s.name === ''
-                ? setTempData(initialValuesNew)
-                : s.category !== values.codeType
-                ? (setOpenModal(true), setInitialData(loadValues), setTempData(initialValuesNew), (initialValuesNew = loadValues))
-                : initialValuesNew.codeAndNameDetails.push(s)
+            s.code === values.code && s.category == values.codeType ? setExistOpenModal(true) : initialValuesNew.codeAndNameDetails.push(s)
         );
 
+        // console.log('length:' + loadValues.codeAndNameDetails?.length);
+        // loadValues.codeAndNameDetails?.map((s) =>
+        //     s.code === values.code && s.name === values.name && s.category == values.codeType
+        //         ? ''
+        //         : s.code === '' && s.name === ''
+        //         ? setTempData(initialValuesNew)
+        //         : s.category !== values.codeType
+        //         ? (setOpenModal(true), setInitialData(loadValues), setTempData(initialValuesNew), (initialValuesNew = loadValues))
+        //         : initialValuesNew.codeAndNameDetails.push(s)
+        // );
+
         setLoadValues(initialValuesNew);
-        resetForm();
     };
 
     return (
@@ -313,10 +282,11 @@ function CodeAndName({ open, handleClose, mode, ccode }) {
                                             <Formik
                                                 enableReinitialize={true}
                                                 initialValues={initialValues1 || loadValues}
-                                                onSubmit={handleSubmit}
-                                                // onSubmit={(values, e) => {
-                                                //     handleSubmitFormToTable(values);
-                                                // }}
+                                                // onSubmit={handleSubmit}
+                                                onSubmit={(values, { resetForm }) => {
+                                                    handleSubmit(values);
+                                                    resetForm('');
+                                                }}
                                                 validationSchema={validationSchema1}
                                             >
                                                 {({ values, handleChange, setFieldValue, errors, handleBlur, touched, resetForm }) => {
@@ -439,7 +409,7 @@ function CodeAndName({ open, handleClose, mode, ccode }) {
                                                                                 value={values.newStatus}
                                                                                 control={<Switch color="success" />}
                                                                                 label="Status"
-                                                                                checked={true}
+                                                                                checked={values.newStatus}
                                                                                 // disabled={mode == 'VIEW'}
                                                                             />
                                                                         </FormGroup>
@@ -474,7 +444,11 @@ function CodeAndName({ open, handleClose, mode, ccode }) {
                                             //     alert(values);
                                             //     handleSubmitForm(values);
                                             // }}
-                                            onSubmit={handleSubmitForm}
+                                            onSubmit={(values, resetForm) => {
+                                                handleSubmitForm(values);
+                                                resetForm('');
+                                            }}
+                                            // onSubmit={handleSubmitForm}
                                             validationSchema={validationSchema}
                                         >
                                             {({ values, handleChange, setFieldValue, errors, handleBlur, touched, resetForm }) => {
@@ -516,7 +490,14 @@ function CodeAndName({ open, handleClose, mode, ccode }) {
                                                                             </TableHead>
                                                                             {/* {tableBodyData ? ( */}
                                                                             <TableBody>
-                                                                                {values.codeAndNameDetails.map((record, idx) => {
+                                                                                {(rowsPerPage > 0
+                                                                                    ? values.codeAndNameDetails.slice(
+                                                                                          page * rowsPerPage,
+                                                                                          page * rowsPerPage + rowsPerPage
+                                                                                      )
+                                                                                    : values.codeAndNameDetails
+                                                                                ).map((record, idx) => {
+                                                                                    // {values.codeAndNameDetails.map((record, idx) => {
                                                                                     return (
                                                                                         <TableRow key={idx} hover>
                                                                                             <TableCell>{idx + 1}</TableCell>
@@ -532,9 +513,6 @@ function CodeAndName({ open, handleClose, mode, ccode }) {
                                                                                                     disabled
                                                                                                     //   type="number"
                                                                                                     variant="outlined"
-                                                                                                    // placeholder="code"
-                                                                                                    // validate={checkDuplicateCodeForCodeAndName}
-
                                                                                                     name={`codeAndNameDetails.${idx}.category`}
                                                                                                     value={
                                                                                                         values.codeAndNameDetails[idx] &&
@@ -687,28 +665,89 @@ function CodeAndName({ open, handleClose, mode, ccode }) {
                                                                                                             values.codeAndNameDetails[idx]
                                                                                                                 .status
                                                                                                         }
-                                                                                                        // disabled
+                                                                                                        disabled
                                                                                                         // disabled={mode == 'VIEW'}
                                                                                                     />
                                                                                                 </FormGroup>
                                                                                             </TableCell>
 
                                                                                             <TableCell>
-                                                                                                <IconButton
-                                                                                                    aria-label="delete"
-                                                                                                    onClick={() => {
-                                                                                                        remove(idx);
-                                                                                                    }}
-                                                                                                >
-                                                                                                    <HighlightOffIcon />
-                                                                                                </IconButton>
+                                                                                                {(values.codeAndNameDetails[idx] &&
+                                                                                                    values.codeAndNameDetails[idx]
+                                                                                                        .codeAndNameId) === '' ? (
+                                                                                                    <IconButton
+                                                                                                        aria-label="delete"
+                                                                                                        onClick={() => {
+                                                                                                            remove(idx);
+                                                                                                        }}
+                                                                                                    >
+                                                                                                        <HighlightOffIcon />
+                                                                                                    </IconButton>
+                                                                                                ) : null}
+                                                                                                {/* {`values.codeAndNameDetails[idx]
+                                                                                                    .codeAndNameId` === '' ? (
+                                                                                                    <IconButton
+                                                                                                        aria-label="delete"
+                                                                                                        onClick={() => {
+                                                                                                            remove(idx);
+                                                                                                        }}
+                                                                                                    >
+                                                                                                        <HighlightOffIcon />
+                                                                                                    </IconButton>
+                                                                                                ) : null} */}
                                                                                             </TableCell>
                                                                                         </TableRow>
                                                                                     );
                                                                                 })}
+                                                                                {/* {emptyRows > 0 && (
+                                                                                    <TableRow style={{ height: 53 * emptyRows }}>
+                                                                                        <TableCell colSpan={6} />
+                                                                                    </TableRow>
+                                                                                )} */}
                                                                             </TableBody>
+                                                                            <TableFooter>
+                                                                                <TableRow>
+                                                                                    <TablePagination
+                                                                                        rowsPerPageOptions={[
+                                                                                            5, 10, 25
+                                                                                            // { label: 'All', value: -1 }
+                                                                                        ]}
+                                                                                        count={values.codeAndNameDetails.length}
+                                                                                        rowsPerPage={rowsPerPage}
+                                                                                        page={page}
+                                                                                        SelectProps={{
+                                                                                            inputProps: {
+                                                                                                'aria-label': 'rows per page'
+                                                                                            },
+                                                                                            native: true
+                                                                                        }}
+                                                                                        onPageChange={handleChangePage}
+                                                                                        onRowsPerPageChange={handleChangeRowsPerPage}
+                                                                                        //   ActionsComponent={TablePaginationActions}
+                                                                                    />
+                                                                                </TableRow>
+                                                                            </TableFooter>
                                                                             {/* ) : null} */}
                                                                         </Table>
+                                                                        {/* <TablePagination
+                                                                            component="div"
+                                                                            page={page}
+                                                                            rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
+                                                                            rowsPerPage={rowsPerPage}
+                                                                            SelectProps={{
+                                                                                inputProps: {
+                                                                                  'aria-label': 'rows per page',
+                                                                                },
+                                                                                native: true,
+                                                                              }}
+                                                                            // rowsPerPageOptions={[5, 10, 25]}
+                                                                            // component="div"
+                                                                            count={values.codeAndNameDetails.length}
+                                                                            // rowsPerPage={rowsPerPage}
+                                                                            // page={page}
+                                                                            onChangePage={handleChangePage}
+                                                                            onChangeRowsPerPage={handleChangeRowsPerPage}
+                                                                        /> */}
                                                                     </TableContainer>
                                                                 </Paper>
                                                             )}
@@ -729,6 +768,16 @@ function CodeAndName({ open, handleClose, mode, ccode }) {
                                                                         title="dev"
                                                                         open={openModal}
                                                                         handleClose={handleModalClose}
+                                                                    />
+                                                                ) : null}
+                                                            </Grid>
+
+                                                            <Grid item>
+                                                                {existOpenModal ? (
+                                                                    <AlertItemExist
+                                                                        title="dev"
+                                                                        open={existOpenModal}
+                                                                        handleClose={handleExistModalClose}
                                                                     />
                                                                 ) : null}
                                                             </Grid>

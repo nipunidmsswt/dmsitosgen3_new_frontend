@@ -9,13 +9,22 @@ import {
     FAILED_GET_ALL_OPERATOR_DATA,
     FAILED_GET_CODE_NAME_DATA_BY_CODE,
     FAILED_GET_CODE_NAME_DATA_BY_TYPE,
+    FAILED_GET_DATA_TO_TABLE_VIEW,
+    FAILED_GET_EXISITING_MARKETCODE_FOR_CLUSTER,
+    FAILED_GET_EXISITING_OPERATOR_CODE_FOR_MARKET,
     FAILED_SAVE_CLUSTER_MARKET_MAPPING_DATA,
+    FAILED_SAVE_MARKET_OPERATOR_MAPPING_DATA,
     SUCCESS_ALL_CLUSTER_TYPE_DATA,
     SUCCESS_ALL_CODE_AND_NAME_DATA,
     SUCCESS_CODE_LAST_MODIFIED_DATE,
     SUCCESS_GET_ALL_OPERATOR_DATA,
     SUCCESS_GET_CODE_NAME_DATA_BY_CODE,
     SUCCESS_GET_CODE_NAME_DATA_BY_TYPE,
+    SUCCESS_GET_DATA_TO_TABLE_VIEW,
+    SUCCESS_GET_EXISITING_MARKETCODE_FOR_CLUSTER,
+    SUCCESS_GET_EXISITING_OPERATOR_CODE_FOR_MARKET,
+    SUCCESS_SAVE_CLUSTER_MARKET_MAPPING_DATA,
+    SUCCESS_SAVE_MARKET_OPERATOR_MAPPING_DATA,
     SUCESS_SAVE_CLUSTER_MARKET_MAPPING_DATA,
     UPDATE_FAILED_CODE_AND_NAME_DATA,
     UPDATE_SUCCESS_CODE_AND_NAME_DATA
@@ -39,16 +48,30 @@ export function* saveCodeAndNameDataHandler(action) {
 }
 
 export function* saveClusterAndMarketMappingDataSaga(action) {
-    action.data.path = `${process.env.REACT_APP_OPERATOR_URL}/clusterMarketMapping/`;
+    action.data.path = `${process.env.REACT_APP_OPERATOR_URL}/codeAndName/clusterMarketMapping/`;
     let responseData = [];
     try {
         responseData = yield call(create, action.data);
         yield put({
-            type: SUCESS_SAVE_CLUSTER_MARKET_MAPPING_DATA,
+            type: SUCCESS_SAVE_CLUSTER_MARKET_MAPPING_DATA,
             data: responseData.data
         });
     } catch (e) {
         yield put({ type: FAILED_SAVE_CLUSTER_MARKET_MAPPING_DATA, data: responseData.data });
+    }
+}
+
+export function* saveOperatorAndMarketMappingDataSaga(action) {
+    action.data.path = `${process.env.REACT_APP_OPERATOR_URL}/codeAndName/marketOperatorMapping/`;
+    let responseData = [];
+    try {
+        responseData = yield call(create, action.data);
+        yield put({
+            type: SUCCESS_SAVE_MARKET_OPERATOR_MAPPING_DATA,
+            data: responseData.data
+        });
+    } catch (e) {
+        yield put({ type: FAILED_SAVE_MARKET_OPERATOR_MAPPING_DATA, data: responseData.data });
     }
 }
 
@@ -90,6 +113,32 @@ export function* getCodeAndNameByCodeSaga(action) {
         yield put({ type: SUCCESS_GET_CODE_NAME_DATA_BY_CODE, data: responseData.data });
     } catch (e) {
         yield put({ type: FAILED_GET_CODE_NAME_DATA_BY_CODE, data: responseData.data });
+    }
+}
+
+export function* getExisitngMarketCodesForCluster(action) {
+    let responseData = [];
+    try {
+        responseData = yield call(
+            getById,
+            `${process.env.REACT_APP_OPERATOR_URL}/codeAndName/allMarketForCluster/${action.data.clusterId}`
+        );
+        yield put({ type: SUCCESS_GET_EXISITING_MARKETCODE_FOR_CLUSTER, data: responseData.data });
+    } catch (e) {
+        yield put({ type: FAILED_GET_EXISITING_MARKETCODE_FOR_CLUSTER, data: responseData.data });
+    }
+}
+
+export function* getExisitngOperatorCodesForMarketSaga(action) {
+    let responseData = [];
+    try {
+        responseData = yield call(
+            getById,
+            `${process.env.REACT_APP_OPERATOR_URL}/codeAndName/allOperatorForMarket/${action.data.marketId}`
+        );
+        yield put({ type: SUCCESS_GET_EXISITING_OPERATOR_CODE_FOR_MARKET, data: responseData.data });
+    } catch (e) {
+        yield put({ type: FAILED_GET_EXISITING_OPERATOR_CODE_FOR_MARKET, data: responseData.data });
     }
 }
 
@@ -164,5 +213,19 @@ export function* checkCodeLatestModifiedDateSaga() {
     } catch (e) {
         console.log('Error:' + e);
         yield put({ type: FAILED_CODE_LAST_MODIFIED_DATE, data: '' });
+    }
+}
+
+export function* getExisitngDataToTableSaga(action) {
+    let responseData = [];
+    try {
+        responseData = yield call(
+            getById,
+            `${process.env.REACT_APP_OPERATOR_URL}/codeAndName/allMarketAndOperatorForCluster/${action.data.clusterId}`
+        );
+        console.log(responseData.data);
+        yield put({ type: SUCCESS_GET_DATA_TO_TABLE_VIEW, data: responseData.data });
+    } catch (e) {
+        yield put({ type: FAILED_GET_DATA_TO_TABLE_VIEW, data: responseData.data });
     }
 }
