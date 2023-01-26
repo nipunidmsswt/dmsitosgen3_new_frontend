@@ -65,6 +65,7 @@ function DepartmentDesignation({ open, handleClose, mode, code, type }) {
             (mode === 'VIEW_UPDATE' && departmentDesignationToUpdate != null) ||
             (mode === 'VIEW' && departmentDesignationToUpdate != null)
         ) {
+            console.log(departmentDesignationToUpdate);
             setLoadValues(departmentDesignationToUpdate);
         }
     }, [departmentDesignationToUpdate]);
@@ -100,10 +101,10 @@ function DepartmentDesignation({ open, handleClose, mode, code, type }) {
                         <Formik
                             maxWidth
                             enableReinitialize={true}
-                            initialValues={{ ...initialValues }}
+                            initialValues={loadValues || initialValues}
                             onSubmit={(values, resetForm) => {
                                 handleSubmitForm(values);
-                                resetForm('');
+                                // resetForm('');
                             }}
                             validationSchema={validationSchema}
                         >

@@ -151,7 +151,12 @@ function ExchangeRateTypes({ open, handleClose, mode, code }) {
             yup.object().shape({
                 // tax: yup.object().typeError("Required field"),
                 fromDate: yup.date().required('Required field'),
-                rate: yup.string().required('Required field')
+                rate: yup
+                    .number()
+                    .test('maxDigitsAfterDecimal', 'number field must have 4 digits after decimal or less', (number) =>
+                        Number.isInteger(number * 10 ** 4)
+                    ),
+                toDate: yup.date().required('Required field').min(yup.ref('fromDate'), "End date can't be before start date")
             })
         )
     });
@@ -168,7 +173,7 @@ function ExchangeRateTypes({ open, handleClose, mode, code }) {
             for (let [key, value] of Object.entries(currencies.currencies)) {
                 array.push({ name: key, value: value });
             }
-
+            console.log(array);
             setCurrecyListArray(array);
         }
     }, [currencies]);
@@ -252,6 +257,9 @@ function ExchangeRateTypes({ open, handleClose, mode, code }) {
                                                                             select
                                                                             name="exchangeType"
                                                                             label="Exchnage Type"
+                                                                            InputLabelProps={{
+                                                                                shrink: true
+                                                                            }}
                                                                             onChange={handleChange}
                                                                             onBlur={handleBlur}
                                                                             value={values.exchangeType}
@@ -287,6 +295,10 @@ function ExchangeRateTypes({ open, handleClose, mode, code }) {
                                                                             id="demo-simple-select"
                                                                             name="baseCurrencyCode"
                                                                             label="Base Currency Code"
+                                                                            InputLabelProps={{
+                                                                                shrink: true
+                                                                            }}
+                                                                            defaultValue="LKR-"
                                                                             value={values.baseCurrencyCode}
                                                                             onChange={handleChange}
                                                                             menuprops={{
@@ -348,6 +360,9 @@ function ExchangeRateTypes({ open, handleClose, mode, code }) {
                                                                                 }
                                                                             }}
                                                                             select
+                                                                            InputLabelProps={{
+                                                                                shrink: true
+                                                                            }}
                                                                             id="demo-simple-select"
                                                                             name="currencyISOCode"
                                                                             value={values.currencyISOCode}

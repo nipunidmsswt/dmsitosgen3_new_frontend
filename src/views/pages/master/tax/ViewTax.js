@@ -17,18 +17,18 @@ const ViewTax = () => {
             title: 'Tax Code',
             field: 'taxCode',
             filterPlaceholder: 'Tax Code',
-            align: 'center'
+            align: 'left'
         },
         {
             title: 'Tax Description',
             field: 'taxDescription',
             filterPlaceholder: 'Tax Description',
-            align: 'center'
+            align: 'left'
         },
         {
             title: 'Percentage %',
             field: 'percentage',
-            align: 'center',
+            align: 'right',
             grouping: false,
             filterPlaceholder: 'Percentage'
         },
@@ -211,7 +211,8 @@ const ViewTax = () => {
                                             background: '-ms-linear-gradient(top, #0790E8, #3180e6)',
                                             background: '-webkit-linear-gradient(top, #0790E8, #3180e6)',
                                             textAlign: 'center',
-                                            color: '#FFF'
+                                            color: '#FFF',
+                                            textAlign: 'center'
                                         },
                                         rowStyle: {
                                             whiteSpace: 'nowrap',

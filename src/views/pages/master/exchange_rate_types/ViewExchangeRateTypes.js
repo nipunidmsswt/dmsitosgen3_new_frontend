@@ -23,18 +23,18 @@ function ViewExchangeRateTypes() {
             title: 'Exchange Type',
             field: 'exchangeType',
             filterPlaceholder: 'filter',
-            align: 'center'
+            align: 'left'
         },
         {
             title: 'Base Currency Code',
             field: 'baseCurrencyCode',
             filterPlaceholder: 'filter',
-            align: 'center'
+            align: 'left'
         },
         {
             title: 'Currency ISO Code',
             field: 'currencyISOCode',
-            align: 'center',
+            align: 'left',
             grouping: false,
             filterPlaceholder: 'filter'
         },
@@ -196,7 +196,7 @@ function ViewExchangeRateTypes() {
                                             background: '-moz-linear-gradient(top, #0790E8, #3180e6)',
                                             background: '-ms-linear-gradient(top, #0790E8, #3180e6)',
                                             background: '-webkit-linear-gradient(top, #0790E8, #3180e6)',
-                                            // textAlign: 'center',
+                                            textAlign: 'center',
                                             color: '#FFF'
                                         },
                                         rowStyle: {

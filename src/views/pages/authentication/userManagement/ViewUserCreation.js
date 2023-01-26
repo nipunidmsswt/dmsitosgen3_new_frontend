@@ -23,34 +23,34 @@ function ViewUserCreation() {
     const columns = [
         {
             title: 'User Name',
-            field: 'code',
+            field: 'userName',
             filterPlaceholder: 'filter',
-            align: 'center'
+            align: 'left'
         },
         {
             title: 'First Name',
-            field: 'name',
+            field: 'firstName',
             filterPlaceholder: 'filter',
-            align: 'center'
+            align: 'left'
         },
         {
             title: 'Last Name',
-            field: 'province',
-            align: 'center',
+            field: 'lastName',
+            align: 'left',
             grouping: false,
             filterPlaceholder: 'filter'
         },
         {
             title: 'NIC',
-            field: 'geoName',
-            align: 'center',
+            field: 'nic',
+            align: 'left',
             grouping: false,
             filterPlaceholder: 'filter'
         },
         {
             title: 'Email',
-            field: 'geoName',
-            align: 'center',
+            field: 'email',
+            align: 'left',
             grouping: false,
             filterPlaceholder: 'filter'
         },
@@ -81,6 +81,7 @@ function ViewUserCreation() {
     const dispatch = useDispatch();
     const error = useSelector((state) => state.userReducer.errorMsg);
     const users = useSelector((state) => state.userReducer.users);
+    console.log(users);
     const user = useSelector((state) => state.userReducer.user);
     const lastModifiedDate = useSelector((state) => state.userReducer.lastModifiedDateTime);
 
@@ -89,8 +90,12 @@ function ViewUserCreation() {
     }, [lastModifiedDate]);
 
     useEffect(() => {
-        if (users?.payload?.length > 0) {
-            // setTableData(users?.payload[0]);
+        console.log('users payload');
+        console.log(users);
+        if (users?.length > 0) {
+            console.log('users payload');
+            console.log(users);
+            setTableData(users);
         }
     }, [users]);
 
@@ -106,7 +111,8 @@ function ViewUserCreation() {
         if (user) {
             console.log('sucessToast');
             setHandleToast(true);
-            // dispatch(getAlluserDetails());
+            dispatch(getAllUserDetails());
+            dispatch(getLatestModifiedUserDetails());
         }
     }, [user]);
 
@@ -120,13 +126,13 @@ function ViewUserCreation() {
         console.log(data);
         if (type === 'VIEW_UPDATE') {
             setMode(type);
-            setUserCode(data.code);
+            setUserCode(data.userId);
         } else if (type === 'INSERT') {
             setUserCode('');
             setMode(type);
         } else {
             setMode(type);
-            setUserCode(data.code);
+            setUserCode(data.userId);
         }
         setOpen(true);
     };
@@ -201,7 +207,8 @@ function ViewUserCreation() {
                                             background: '-ms-linear-gradient(top, #0790E8, #3180e6)',
                                             background: '-webkit-linear-gradient(top, #0790E8, #3180e6)',
                                             // textAlign: 'center',
-                                            color: '#FFF'
+                                            color: '#FFF',
+                                            textAlign: 'center'
                                         },
                                         rowStyle: {
                                             whiteSpace: 'nowrap',
@@ -212,7 +219,11 @@ function ViewUserCreation() {
                                     }}
                                 />
 
-                                {open ? <User open={open} handleClose={handleClose} userCode={userCode} mode={mode} /> : ''}
+                                {open ? (
+                                    <User open={open} handleClose={handleClose} userCode={userCode} mode={mode} component="user_creation" />
+                                ) : (
+                                    ''
+                                )}
                                 {openToast ? <SuccessMsg openToast={openToast} handleToast={handleToast} mode={mode} /> : null}
                                 {openErrorToast ? (
                                     <ErrorMsg openToast={openErrorToast} handleToast={setOpenErrorToast} mode={mode} />

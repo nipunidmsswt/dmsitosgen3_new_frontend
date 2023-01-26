@@ -29,13 +29,13 @@ function ViewDepartmentDesignation() {
             title: 'Type',
             field: 'type',
             filterPlaceholder: 'filter',
-            align: 'center'
+            align: 'left'
         },
         {
             title: 'Description',
             field: 'description',
             filterPlaceholder: 'filter',
-            align: 'center'
+            align: 'left'
         },
         {
             title: 'Status',
@@ -77,7 +77,9 @@ function ViewDepartmentDesignation() {
     const lastModifiedDate = useSelector((state) => state.departmentDesignationReducer.lastModifiedDateTime);
 
     useEffect(() => {
+        console.log(departmentDesignationList);
         if (departmentDesignationList?.payload?.length > 0) {
+            console.log(departmentDesignationList);
             setTableData(departmentDesignationList?.payload[0]);
         }
     }, [departmentDesignationList]);
@@ -218,7 +220,8 @@ function ViewDepartmentDesignation() {
                                             background: '-ms-linear-gradient(top, #0790E8, #3180e6)',
                                             background: '-webkit-linear-gradient(top, #0790E8, #3180e6)',
                                             textAlign: 'center',
-                                            color: '#FFF'
+                                            color: '#FFF',
+                                            textAlign: 'center'
                                         },
                                         rowStyle: {
                                             whiteSpace: 'nowrap',

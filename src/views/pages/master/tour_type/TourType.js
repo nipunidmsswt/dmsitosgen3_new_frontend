@@ -237,6 +237,7 @@ function TourType({ open, mode, handleClose, tourTypeCode }) {
                                                         height: 30
                                                     }
                                                 }}
+                                                disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
                                                 error={props.errors.name && props.touched.name}
                                                 helperText={<ErrorMessage name="name" value={formValues.name} />}
                                                 values={props.values.name}
