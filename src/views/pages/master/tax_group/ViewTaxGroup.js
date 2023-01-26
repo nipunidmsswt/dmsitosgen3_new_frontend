@@ -26,18 +26,18 @@ function ViewTaxGroup() {
             title: 'Tax Group Type',
             field: 'taxGroupType',
             filterPlaceholder: 'Tax Group Type',
-            align: 'center'
+            align: 'left'
         },
         {
             title: 'Tax Group Code',
             field: 'taxGroupCode',
             filterPlaceholder: 'Tax Group Code',
-            align: 'center'
+            align: 'left'
         },
         {
             title: 'Description',
             field: 'description',
-            align: 'center',
+            align: 'left',
             grouping: false,
             filterPlaceholder: 'Description'
         },

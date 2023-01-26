@@ -25,7 +25,7 @@ function ViewSeason() {
             title: 'Main Season',
             field: 'mainSeason',
             filterPlaceholder: 'filter',
-            align: 'center'
+            align: 'left'
         },
 
         {

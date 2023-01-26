@@ -382,7 +382,8 @@ import {
     UPDATE_USER_DATA,
     CHECK_USER_LOGIN_CREDENTIALS,
     FORGOT_PASSWORD_CREDENTIALS,
-    RESET_PASSWORD_CREDENTIALS
+    RESET_PASSWORD_CREDENTIALS,
+    GET_PROFILE_DATA_BY_ID
 } from 'store/constant/authentication/UserConstant';
 import {
     checkDupicateUserSaga,
@@ -395,7 +396,8 @@ import {
     updateUserSaga,
     userLoginSaga,
     forgotPasswordSaga,
-    resetPasswordSaga
+    resetPasswordSaga,
+    getProfileDataByIdSaga
 } from './authenticationSaga/UserSaga';
 
 import {
@@ -426,7 +428,8 @@ import {
     GET_COMPANY_PROFILE_BY_ID,
     UPDATE_COMPANY_PROFILE,
     CHECK_COMPANY_PROFILE_CODE_DUPLICATE,
-    GET_COMPANY_PROFILE_LAST_MODIFIED_DATE_TIME
+    GET_COMPANY_PROFILE_LAST_MODIFIED_DATE_TIME,
+    GET_AVAILABLE_LICENSE_COUNT
 } from '../constant/master/CompanyProfilrConstant';
 
 import {
@@ -435,7 +438,8 @@ import {
     checkDupicateCompanyProfileSaga,
     updateCompanyProfileSaga,
     getCompanyProfileByIdSaga,
-    checkLatestCompanyPrfileModifiedDateSaga
+    checkLatestCompanyPrfileModifiedDateSaga,
+    avaliableLicenseCountSaga
 } from '../saga/mastersaga/CompanyProfileSaga';
 
 export function* wacherSaga() {
@@ -661,6 +665,8 @@ export function* wacherSaga() {
     yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_USER, checkLatestUserModifiedDateSaga);
     yield takeLatest(GET_ACTIVE_USERS, getAllActiveUsers);
     yield takeLatest(GET_ALL_USER_ROLES, getAllRolesSaga);
+    yield takeLatest(GET_PROFILE_DATA_BY_ID, getProfileDataByIdSaga);
+
     //company profile
     yield takeLatest(SAVE_COMPANY_PROFILE, saveCompanyProfileSaga);
     yield takeLatest(GET_COMPANY_PROFILE_BY_ID, getCompanyProfileByIdSaga);
@@ -668,6 +674,7 @@ export function* wacherSaga() {
     yield takeLatest(UPDATE_COMPANY_PROFILE, updateCompanyProfileSaga);
     yield takeLatest(CHECK_COMPANY_PROFILE_CODE_DUPLICATE, checkDupicateCompanyProfileSaga);
     yield takeLatest(GET_COMPANY_PROFILE_LAST_MODIFIED_DATE_TIME, checkLatestCompanyPrfileModifiedDateSaga);
+    yield takeLatest(GET_AVAILABLE_LICENSE_COUNT, avaliableLicenseCountSaga);
 
     //designation / department
     yield takeLatest(SAVE_DEPARTMENT_DESIGNATION, saveDepartMentDesignationSaga);

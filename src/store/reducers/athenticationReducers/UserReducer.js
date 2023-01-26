@@ -19,7 +19,9 @@ import {
     SUCCESS_RESET_PASSWORD_CREDENTIALS,
     FAILED_RESET_PASSWORD_CREDENTIALS,
     SUCCESS_GET_ALL_USER_ROLES,
-    FAILED_GET_ALL_USER_ROLES
+    FAILED_GET_ALL_USER_ROLES,
+    SUCCESS_GET_PROFILE_DATA_BY_ID,
+    FAILED_GET_PROFILE_DATA_BY_ID
 } from 'store/constant/authentication/UserConstant';
 
 const initialState = {
@@ -33,7 +35,8 @@ const initialState = {
     loggedUserData: null,
     forgotPasswordData: null,
     resetPasswordData: null,
-    userRole: []
+    userRole: [],
+    profileToUpdate: null
 };
 
 export const userReducer = (state = initialState, action) => {
@@ -57,14 +60,14 @@ export const userReducer = (state = initialState, action) => {
         case SUCCESS_GET_USER_DATA_BY_ID:
             console.warn('SUCCESS_GET_USER_DATA_BY_ID', action.payload);
             console.log(data.payload[0]);
-            return { ...state, UserToUpdate: data.payload[0] };
+            return { ...state, userToUpdate: data.payload[0] };
 
         case FAILED_GET_USER_DATA_BY_ID:
             console.warn('FAILED_GET_USER_DATA_BY_ID', action);
             console.log(data);
             return {
                 ...state,
-                UserToUpdate: null,
+                userToUpdate: null,
                 errorMsg: data ? data.errorMessages : 'netwok error'
             };
 
@@ -87,13 +90,13 @@ export const userReducer = (state = initialState, action) => {
             console.warn('SUCCESS_USER_LIST_DATA', action);
 
             console.log(data);
-            return { ...state, Users: data };
+            return { ...state, users: data.payload[0] };
 
         case FAILED_USER_LIST_DATA:
             console.warn('FAILED_USER_LIST_DATA', action);
 
             console.log(data);
-            return { ...state, Users: data };
+            return { ...state, users: data };
 
         case USER_DUPLICATE:
             return { ...state, duplicateLoction: data };
@@ -143,6 +146,21 @@ export const userReducer = (state = initialState, action) => {
         case FAILED_GET_ALL_USER_ROLES:
             console.warn('FAILED_ALL_USER_ROLES', action);
             return { ...state, userRole: data.payload[0] };
+
+        case SUCCESS_GET_PROFILE_DATA_BY_ID:
+            console.warn('SUCCESS_GET_PROFILE_DATA_BY_ID', action.payload);
+            console.log(data.payload[0]);
+            return { ...state, profileToUpdate: data.payload[0] };
+
+        case FAILED_GET_PROFILE_DATA_BY_ID:
+            console.warn('FAILED_GET_PROFILE_DATA_BY_ID', action);
+            console.log(data);
+            return {
+                ...state,
+                profileToUpdate: null,
+                errorMsg: data ? data.errorMessages : 'netwok error'
+            };
+
         default:
             return state;
     }

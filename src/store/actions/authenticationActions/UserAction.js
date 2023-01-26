@@ -9,7 +9,8 @@ import {
     CHECK_USER_LOGIN_CREDENTIALS,
     FORGOT_PASSWORD_CREDENTIALS,
     RESET_PASSWORD_CREDENTIALS,
-    GET_ALL_USER_ROLES
+    GET_ALL_USER_ROLES,
+    GET_PROFILE_DATA_BY_ID
 } from 'store/constant/authentication/UserConstant';
 
 //user creation
@@ -32,6 +33,14 @@ export const getUserDataById = (id) => {
     console.log('getUserDataById  called', id);
     return {
         type: GET_USER_DATA_BY_ID,
+        data: { id }
+    };
+};
+
+export const getProfileData = (id) => {
+    console.log('getUserDataById  called', id);
+    return {
+        type: GET_PROFILE_DATA_BY_ID,
         data: { id }
     };
 };

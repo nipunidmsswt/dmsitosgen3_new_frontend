@@ -9,7 +9,9 @@ import {
     UPDATE_SUCCESS_COMPANY_PROFILE,
     SUCCESS_COMPANY_PROFILE_LIST_DATA,
     FAILED_COMPANY_PROFILE_LIST_DATA,
-    COMPANY_PROFILE_CODE_DUPLICATE
+    COMPANY_PROFILE_CODE_DUPLICATE,
+    SUCCESS_AVAILABLE_LICENSE_COUNT,
+    FAILED_AVAILABLE_LICENSE_COUNT
 } from '../../constant/master/CompanyProfilrConstant';
 
 const initialState = {
@@ -18,7 +20,8 @@ const initialState = {
     companyProfileToUpdate: null,
     errorMsg: null,
     duplicatecompanyProfileGroup: null,
-    lastModifiedDateTime: null
+    lastModifiedDateTime: null,
+    availableLicenseCount: null
 };
 
 export const companyProfileReducer = (state = initialState, action) => {
@@ -69,6 +72,12 @@ export const companyProfileReducer = (state = initialState, action) => {
 
         case COMPANY_PROFILE_CODE_DUPLICATE:
             return { ...state, duplicatecompanyProfileGroup: data };
+
+        case SUCCESS_AVAILABLE_LICENSE_COUNT:
+            return { ...state, availableLicenseCount: data.payload[0] };
+
+        case FAILED_AVAILABLE_LICENSE_COUNT:
+            return { ...state, availableLicenseCount: null };
 
         default:
             return state;

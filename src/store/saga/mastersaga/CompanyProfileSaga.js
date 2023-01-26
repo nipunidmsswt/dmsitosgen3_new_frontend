@@ -11,7 +11,9 @@ import {
     UPDATE_SUCCESS_COMPANY_PROFILE,
     SUCCESS_COMPANY_PROFILE_LIST_DATA,
     FAILED_COMPANY_PROFILE_LIST_DATA,
-    COMPANY_PROFILE_CODE_DUPLICATE
+    COMPANY_PROFILE_CODE_DUPLICATE,
+    SUCCESS_AVAILABLE_LICENSE_COUNT,
+    FAILED_AVAILABLE_LICENSE_COUNT
 } from '../../constant/master/CompanyProfilrConstant';
 
 //exchange rate type saga
@@ -53,14 +55,16 @@ export function* saveCompanyProfileSaga(action) {
                 };
                 requestOptions.path = `${process.env.REACT_APP_COMPANY_INFO_URL}/companyImg/`;
                 responseData2 = yield call(createWithUpload, requestOptions);
+                console.log(responseData2);
+                if (responseData2.status == 201 || responseData2.status == 200) {
+                    console.log('responseData2');
+                    yield put({ type: ADD_SUCCESS_COMPANY_PROFILE, data: responseData.data });
+                } else {
+                    yield put({ type: ADD_FAILED_COMPANY_PROFILE, data: 'error' });
+                }
+            } else {
+                yield put({ type: ADD_SUCCESS_COMPANY_PROFILE, data: responseData.data });
             }
-        }
-        console.log(responseData2);
-        if (responseData2.status == 201 || responseData2.status == 200) {
-            console.log('responseData2');
-            yield put({ type: ADD_SUCCESS_COMPANY_PROFILE, data: responseData.data });
-        } else {
-            yield put({ type: ADD_FAILED_COMPANY_PROFILE, data: 'error' });
         }
     } catch (e) {
         yield put({
@@ -139,5 +143,20 @@ export function* checkLatestCompanyPrfileModifiedDateSaga() {
     } catch (e) {
         console.log('Error:' + e);
         yield put({ type: FAILED_COMPANY_PROFILE_LAST_MODIFIED_DATE, data: '' });
+    }
+}
+
+export function* avaliableLicenseCountSaga(action) {
+    let responseData = [];
+    try {
+        responseData = yield call(get, `${process.env.REACT_APP_COMPANY_INFO_URL}/availableLicenceCount/${action.data.companyProfileId}`);
+        console.log('response data last:' + responseData);
+        yield put({
+            type: SUCCESS_AVAILABLE_LICENSE_COUNT,
+            data: responseData.data
+        });
+    } catch (e) {
+        console.log('Error:' + e);
+        yield put({ type: FAILED_AVAILABLE_LICENSE_COUNT, data: '' });
     }
 }

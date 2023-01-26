@@ -26,32 +26,32 @@ function ViewCompanyProfile() {
             title: 'Company ID',
             field: 'companyId',
             filterPlaceholder: 'filter',
-            align: 'center'
+            align: 'left'
         },
         {
             title: 'Name',
             field: 'companyName',
             filterPlaceholder: 'filter',
-            align: 'center'
+            align: 'left'
         },
         {
             title: 'Email',
             field: 'email',
-            align: 'center',
+            align: 'left',
             grouping: false,
             filterPlaceholder: 'filter'
         },
         {
             title: 'Website',
             field: 'website',
-            align: 'center',
+            align: 'left',
             grouping: false,
             filterPlaceholder: 'filter'
         },
         {
             title: 'Tax Registration',
             field: 'taxRegistration',
-            align: 'center',
+            align: 'right',
             grouping: false,
             filterPlaceholder: 'filter'
         },
@@ -225,7 +225,8 @@ function ViewCompanyProfile() {
                                             background: '-ms-linear-gradient(top, #0790E8, #3180e6)',
                                             background: '-webkit-linear-gradient(top, #0790E8, #3180e6)',
                                             textAlign: 'center',
-                                            color: '#FFF'
+                                            color: '#FFF',
+                                            textAlign: 'center'
                                         },
                                         rowStyle: {
                                             whiteSpace: 'nowrap',

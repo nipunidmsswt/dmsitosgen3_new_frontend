@@ -218,6 +218,7 @@ function Product({ open, mode, handleClose, rowProductCode }) {
                                                         height: 30
                                                     }
                                                 }}
+                                                disabled={mode != 'INSERT'}
                                                 error={props.errors.productName && props.touched.productName}
                                                 helperText={<ErrorMessage name="productName" value={formValues.productName} />}
                                                 required

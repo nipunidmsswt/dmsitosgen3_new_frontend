@@ -1,7 +1,5 @@
 import { useEffect, forwardRef, useState, Fragment, useRef } from 'react';
-import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import { useDispatch, useSelector } from 'react-redux';
-
 import {
     Dialog,
     Slide,
@@ -11,43 +9,38 @@ import {
     TextField,
     DialogTitle,
     FormGroup,
-    Checkbox,
     Button,
     Typography,
     MenuItem,
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableRow,
     Autocomplete,
     Switch
 } from '@mui/material';
 
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
-
-import { Formik, Form, FieldArray, useFormikContext } from 'formik';
+import { Formik, Form, useFormikContext } from 'formik';
 import Grid from '@mui/material/Grid';
 import * as yup from 'yup';
-
-import provinceDistricts from 'srilankan-provinces-districts';
-import { getAllLocationDetails, getLocationDataById } from 'store/actions/masterActions/LocationAction';
-import { Close } from '@mui/icons-material';
-
-import { getAllRolesData, getUserDataById, saveUserData, updateUserData } from 'store/actions/authenticationActions/UserAction';
+import {
+    getAllRolesData,
+    getUserDataById,
+    saveUserData,
+    updateUserData,
+    getProfileData
+} from 'store/actions/authenticationActions/UserAction';
 import CreatedUpdatedUserDetailsWithTableFormat from 'views/pages/master/userTimeDetails/CreatedUpdatedUserDetailsWithTableFormat';
 import { getAllActiveMarketData } from 'store/actions/masterActions/operatorActions/MarketAction';
 import { getAllClusterData } from 'store/actions/masterActions/CodeAndNameAction';
-import { getAllCompanyProfileData } from 'store/actions/masterActions/CompanyProfileAction';
+import { getAllCompanyProfileData, getAvailableLicenseCount } from 'store/actions/masterActions/CompanyProfileAction';
 import { getAllDepartmentData, getAllDesignationData } from 'store/actions/masterActions/DepartmentDesignationAction';
 
 const Transition = forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
 
-function User({ open, handleClose, mode, userCode }) {
+function User({ open, handleClose, mode, userCode, component }) {
     const initialValues = {
+        disablePassowrdField: true,
         company: null,
         title: '',
         firstName: '',
@@ -63,21 +56,20 @@ function User({ open, handleClose, mode, userCode }) {
         market: null,
         roleId: null,
         userName: '',
-        password: ''
+        password: '',
+        availableLicenceCount: '',
+        allocatedLicenceCount: ''
         // files: undefined,
         // previewImages: [],
         // progressInfos: [],
         // message: []
     };
-
-    const [provinceList, setProvnceList] = useState([]);
-    const [districtList, setDistricList] = useState([]);
     const [loadValues, setLoadValues] = useState('');
-    const [disableDistrict, setDisableDistrict] = useState(true);
     const [previewImages, setPreviewImages] = useState([]);
     const [updatePreviewImages, setupdatePreviewImages] = useState([]);
-    const ref = useRef(null);
     const marketListData = useSelector((state) => state.marketReducer.marketActiveList);
+
+    const formikRef = useRef();
 
     // yup.addMethod(yup.string, 'checkDuplicateLocationCode', function (message) {
     //     return this.test('checkDuplicateLocationCode', 'Duplicate Tax group', async function validateValue(value) {
@@ -100,6 +92,7 @@ function User({ open, handleClose, mode, userCode }) {
 
     const validationSchema = yup.object().shape({
         // company: yup.string().required('Required field'),
+        disablePassowrdField: yup.boolean(),
         company: yup.object().typeError('Required field'),
         title: yup.string().required('Required field'),
         firstName: yup.string().required('Required field'),
@@ -119,15 +112,82 @@ function User({ open, handleClose, mode, userCode }) {
         // market: yup.object().typeError('Required field'),
         roleId: yup.object().typeError('Required field'),
         userName: yup.string().required('Requied field'),
-        password: yup.string().required('Requied field')
+        // password: yup.string().required('Requied field').min(8, 'Password is too short - should be 8 chars minimum.')
+        // .lowercase(1, 'password must contain at least 1 lower case letter')
+        // .minUppercase(1, 'password must contain at least 1 upper case letter')
+        // .minNumbers(1, 'password must contain at least 1 number')
+        // .minSymbols(1, 'password must contain at least 1 special character')
+
+        // password: yup.string().when('disablePassowrdField', {
+        //     is: true,
+        //     then: yup
+        //         .string()
+        //         .required('Field is required')
+        //         .min(8, 'Must be 8 characters or more')
+        //         .matches(/[a-z]+/, 'One lowercase character')
+        //         .matches(/[A-Z]+/, 'One uppercase character')
+        //         .matches(/[@$!%*#?&]+/, 'One special character')
+        //         .matches(/\d+/, 'One number')
+        // })
+
+        password: yup.string().required('Required field')
+        // .min(8, 'Must be 8 characters or more')
+        // .matches(/[a-z]+/, 'One lowercase character')
+        // .matches(/[A-Z]+/, 'One uppercase character')
+        // .matches(/[@$!%*#?&]+/, 'One special character')
+        // .matches(/\d+/, 'One number')
+        // .test('isValidPass1', 'can not include first name', (value, context) => {
+        //     console.log(typeof value);
+        //     console.log(formikRef.current.values.firstName);
+        //     if (value !== '' && formikRef.current.values.firstName !== '') {
+        //         console.log(value.includes(formikRef.current.values.firstName));
+        //         return !value.includes(formikRef.current.values.firstName);
+        //     }
+
+        //     return true;
+        // })
+        // .test('isValidPass2', 'can not include last name', (value, context) => {
+        //     console.log(typeof value);
+        //     console.log(formikRef.current.values.lastName);
+        //     if (value !== '' && formikRef.current.values.lastName !== '') {
+        //         console.log(value.includes(formikRef.current.values.lastName));
+        //         return !value.includes(formikRef.current.values.lastName);
+        //     }
+
+        //     return true;
+        // })
+        // .test('isValidPass3', 'can not include email', (value, context) => {
+        //     console.log(typeof value);
+        //     console.log(formikRef.current.values.email);
+        //     if (value !== '' && formikRef.current.values.email !== '') {
+        //         console.log(value.includes(formikRef.current.values.email));
+        //         return !value.includes(formikRef.current.values.email);
+        //     }
+
+        //     return true;
+        // })
+        // .test('isValidPass3', 'can not include userName', (value, context) => {
+        //     console.log(typeof value);
+        //     console.log(formikRef.current.values.userName);
+        //     if (value !== '' && formikRef.current.values.userName !== '') {
+        //         console.log(value.includes(formikRef.current.values.userName));
+        //         return !value.includes(formikRef.current.values.userName);
+        //     }
+
+        //     return true;
+        // })
     });
 
     //get data from reducers
     const duplicateUser = useSelector((state) => state.userReducer.duplicateUser);
     const userToUpdate = useSelector((state) => state.userReducer.userToUpdate);
+    const profileToUpdate = useSelector((state) => state.userReducer.profileToUpdate);
     const [marketListOptions, setMarketListOptions] = useState([]);
     const clusterListData = useSelector((state) => state.codeAndNameReducer.cluterTypesDetails);
+    console.log(clusterListData);
     const companyProfile = useSelector((state) => state.companyProfileReducer.companyProfileList);
+    const availableLicenseCount = useSelector((state) => state.companyProfileReducer.availableLicenseCount);
+
     const [clusterListOptions, setClusterListOptions] = useState([]);
     const [departmentListOptions, setDepartmentListOptions] = useState([]);
     const [designationListOptions, setDesignationListOptions] = useState([]);
@@ -172,6 +232,7 @@ function User({ open, handleClose, mode, userCode }) {
         }
     ];
     useEffect(() => {
+        console.log(clusterListData);
         if (clusterListData != null) {
             setClusterListOptions(clusterListData);
         }
@@ -182,6 +243,27 @@ function User({ open, handleClose, mode, userCode }) {
             setDepartmentListOptions(departmentActiveList);
         }
     }, [departmentActiveList]);
+
+    useEffect(() => {
+        console.log(userToUpdate);
+        if ((mode === 'VIEW_UPDATE' && userToUpdate != null) || (mode === 'VIEW' && userToUpdate != null)) {
+            console.log(userToUpdate);
+            setLoadValues(userToUpdate);
+            // setFieldValue('disablePassowrdField', false);
+            formikRef.current.setFieldValue('disablePassowrdField', false);
+        }
+    }, [userToUpdate]);
+
+    useEffect(() => {
+        console.log(profileToUpdate);
+        if ((mode === 'VIEW_UPDATE' && profileToUpdate != null) || (mode === 'VIEW' && profileToUpdate != null)) {
+            console.log(profileToUpdate);
+
+            // setFieldValue('disablePassowrdField', false);
+            setLoadValues(profileToUpdate);
+            formikRef.current.setFieldValue('disablePassowrdField', false);
+        }
+    }, [profileToUpdate]);
 
     useEffect(() => {
         if (roleIdList != null) {
@@ -196,12 +278,14 @@ function User({ open, handleClose, mode, userCode }) {
     }, [designationActiveList]);
 
     useEffect(() => {
-        if (mode === 'VIEW_UPDATE' || mode === 'VIEW') {
+        if ((mode === 'VIEW_UPDATE' && component === 'user_creation') || (mode === 'VIEW' && component === 'user_creation')) {
             console.log(userCode);
-            setDisableDistrict(false);
+
             dispatch(getUserDataById(userCode));
 
             // setTitleListOptions(ti)
+        } else if ((mode === 'VIEW_UPDATE' && component === 'user_profile') || (mode === 'VIEW' && component === 'user_profile')) {
+            dispatch(getProfileData(userCode));
         }
     }, [mode]);
 
@@ -212,39 +296,25 @@ function User({ open, handleClose, mode, userCode }) {
     useEffect(() => {
         if (companyProfile?.payload?.length > 0) {
             setCompanyListOptions(companyProfile?.payload[0]);
+            console.log(companyProfile?.payload[0][0]);
+            dispatch(getAvailableLicenseCount(companyProfile?.payload[0][0].id));
         }
     }, [companyProfile]);
 
-    // useEffect(() => {
-    //     console.log(userToUpdate);
-
-    //     if (
-    //         (mode === 'VIEW_UPDATE' && userToUpdate?.LocationDetails != null) ||
-    //         (mode === 'VIEW' && locationToUpdate?.LocationDetails != null)
-    //     ) {
-    //         console.log(locationToUpdate.LocationDetails);
-
-    //         if (locationToUpdate?.LocationDetails.province) {
-    //             handleDistricts(locationToUpdate?.LocationDetails.province);
-    //         }
-    //         setLoadValues(locationToUpdate?.LocationDetails);
-    //         // images.push(URL.createObjectURL(event.target.files[i]));
-    //         let images = [];
-
-    //         setupdatePreviewImages(locationToUpdate?.LocationDetails.docPath);
-    //     }
-    // }, [locationToUpdate]);
     const handleSubmitForm = (data) => {
-        alert('save');
         console.log(data);
         if (mode === 'INSERT') {
             console.log(data);
-            dispatch(saveUserData(data));
+            // dispatch(saveUserData(data));
         } else if (mode === 'VIEW_UPDATE') {
-            // console.log("yes click");
-            dispatch(updateUserData(data));
+            // dispatch(updateUserData(data));
         }
-        handleClose();
+        // handleClose();
+    };
+
+    const loadAvalibleLicenseCount = (data, setFieldValue) => {
+        setFieldValue('availableLicenceCount', data.availableLicenceCount);
+        setFieldValue('allocatedLicenceCount', data.allocatedLicenceCount);
     };
 
     useEffect(() => {
@@ -255,40 +325,7 @@ function User({ open, handleClose, mode, userCode }) {
         dispatch(getAllDepartmentData());
         dispatch(getAllDesignationData());
         dispatch(getAllRolesData());
-
-        // console.log('provinces');
-        // let provinces = provinceDistricts.getProvinces();
-
-        // let provinceArray = [];
-        // for (let province in provinces) {
-        //     provinceArray.push({ name: provinces[province] });
-        // }
-        // console.log(provinceArray);
-        // setProvnceList(provinceArray);
-        // console.log(provinces);
     }, []);
-
-    // const handleDistricts = (data) => {
-    //     let districts = provinceDistricts.getDistricts(data);
-    //     console.log(districts);
-
-    //     let districtArray = [];
-    //     for (let i in districts) {
-    //         districtArray.push({ name: districts[i] });
-    //     }
-
-    //     setDistricList(districtArray);
-    // };
-    // const showImages = (event) => {
-    //     let images = [];
-    //     console.log(event);
-    //     for (let i = 0; i < event.target.files.length; i++) {
-    //         // console.log(event.target.files[i])
-    //         images.push(URL.createObjectURL(event.target.files[i]));
-    //     }
-
-    //     setPreviewImages(images);
-    // };
 
     return (
         <div>
@@ -296,8 +333,10 @@ function User({ open, handleClose, mode, userCode }) {
                 <DialogTitle>
                     <Box display="flex" alignItems="center" className="dialog-title">
                         <Box flexGrow={1}>
-                            {mode === 'INSERT' ? 'Add' : ''} {mode === 'VIEW_UPDATE' ? 'Update' : ''} {mode === 'VIEW' ? 'View' : ''}
-                            User Creation
+                            {mode === 'INSERT' && component === 'user_creation' ? 'Add User Creation' : ''}
+                            {mode === 'VIEW_UPDATE' && component === 'user_creation' ? 'Update User Creation' : ''}
+                            {mode === 'VIEW' && component === 'user_creation' ? 'View User Creation' : ''}
+                            {component === 'user_profile' ? 'My Profile' : ''}
                         </Box>
                         <Box>
                             <IconButton onClick={handleClose}>
@@ -314,7 +353,7 @@ function User({ open, handleClose, mode, userCode }) {
                                     <Grid item lg={12} md={12} xs={12}>
                                         <>
                                             <Formik
-                                                innerRef={ref}
+                                                innerRef={formikRef}
                                                 enableReinitialize={true}
                                                 initialValues={loadValues || initialValues}
                                                 onSubmit={(values) => {
@@ -327,7 +366,7 @@ function User({ open, handleClose, mode, userCode }) {
                                                         <Form>
                                                             <div style={{ marginTop: '6px', margin: '10px' }}>
                                                                 <Grid display="flex" gap="10px" style={{ marginTop: '20px' }}>
-                                                                    <Grid item sm={4}>
+                                                                    {/* <Grid item sm={4}>
                                                                         <FormGroup>
                                                                             <FormControlLabel
                                                                                 name="status"
@@ -340,17 +379,17 @@ function User({ open, handleClose, mode, userCode }) {
                                                                                 // disabled={mode == 'VIEW'}
                                                                             />
                                                                         </FormGroup>
-                                                                    </Grid>
-                                                                    <Grid item sm={4}>
-                                                                        {/* <Typography variant="" component="p">
-                                                                            5 Licenses Used Out Of 10
-                                                                        </Typography> */}
-                                                                    </Grid>
-                                                                    <Grid item sm={4}>
+                                                                    </Grid> */}
+                                                                    {/* <Grid item sm={4}>
                                                                         <Typography variant="" component="p">
                                                                             5 Licenses Used Out Of 10
                                                                         </Typography>
-                                                                    </Grid>
+                                                                    </Grid> */}
+                                                                    {/* <Grid item sm={4}>
+                                                                        <Typography variant="" component="p">
+                                                                            5 Licenses Used Out Of 10
+                                                                        </Typography>
+                                                                    </Grid> */}
                                                                 </Grid>
                                                                 <Grid gap="10px" display="flex" style={{ marginTop: '10px' }}>
                                                                     {/* <Grid item>
@@ -382,6 +421,7 @@ function User({ open, handleClose, mode, userCode }) {
                                                                             onChange={(_, value) => {
                                                                                 console.log(value);
                                                                                 setFieldValue(`company`, value);
+                                                                                loadAvalibleLicenseCount(value, setFieldValue);
                                                                             }}
                                                                             options={companyListOptions}
                                                                             getOptionLabel={(option) => `${option.companyName}`}
@@ -415,7 +455,7 @@ function User({ open, handleClose, mode, userCode }) {
                                                                     <Grid item>
                                                                         <TextField
                                                                             sx={{
-                                                                                width: { sm: 200, md: 250 },
+                                                                                width: { sm: 100, md: 100 },
                                                                                 '& .MuiInputBase-root': {
                                                                                     height: 40
                                                                                 }
@@ -425,6 +465,9 @@ function User({ open, handleClose, mode, userCode }) {
                                                                             label="Title"
                                                                             onChange={handleChange}
                                                                             onBlur={handleBlur}
+                                                                            InputLabelProps={{
+                                                                                shrink: true
+                                                                            }}
                                                                             value={values.title}
                                                                             error={Boolean(touched.title && errors.title)}
                                                                             helperText={touched.title && errors.title ? errors.title : ''}
@@ -455,33 +498,44 @@ function User({ open, handleClose, mode, userCode }) {
                                                                             </MenuItem>
                                                                         </TextField>
                                                                     </Grid>
-                                                                    {/* <Grid item>
+                                                                    <Grid item>
                                                                         <TextField
                                                                             sx={{
-                                                                                width: { sm: 200, md: 200 },
+                                                                                width: { sm: 150 },
                                                                                 '& .MuiInputBase-root': {
                                                                                     height: 40
                                                                                 }
                                                                             }}
-                                                                            id="outlined-required"
-                                                                            label="First Name"
-                                                                            name="shortDescription"
-                                                                            onChange={handleChange}
+                                                                            label="Available LicenceCount"
+                                                                            name="availableLicenceCount"
                                                                             InputLabelProps={{
                                                                                 shrink: true
                                                                             }}
-                                                                            // onBlur={handleBlur}
-                                                                            // value={values.shortDescription}
-                                                                            // error={Boolean(
-                                                                            //     touched.shortDescription && errors.shortDescription
-                                                                            // )}
-                                                                            // helperText={
-                                                                            //     touched.shortDescription && errors.shortDescription
-                                                                            //         ? errors.shortDescription
-                                                                            //         : ''
-                                                                            // }
-                                                                        />
-                                                                    </Grid> */}
+                                                                            disabled={true}
+                                                                            onChange={handleChange}
+                                                                            onBlur={handleBlur}
+                                                                            value={values.availableLicenceCount}
+                                                                        ></TextField>
+                                                                    </Grid>
+                                                                    <Grid item>
+                                                                        <TextField
+                                                                            sx={{
+                                                                                width: { sm: 150 },
+                                                                                '& .MuiInputBase-root': {
+                                                                                    height: 40
+                                                                                }
+                                                                            }}
+                                                                            label="Alocated LicenceCount"
+                                                                            name="allocatedLicenceCount"
+                                                                            InputLabelProps={{
+                                                                                shrink: true
+                                                                            }}
+                                                                            disabled={true}
+                                                                            onChange={handleChange}
+                                                                            onBlur={handleBlur}
+                                                                            value={values.allocatedLicenceCount}
+                                                                        ></TextField>
+                                                                    </Grid>
                                                                 </Grid>
 
                                                                 <Grid gap="10px" display="flex" style={{ marginTop: '10px' }}>
@@ -713,7 +767,7 @@ function User({ open, handleClose, mode, userCode }) {
                                                                                 console.log(value);
                                                                                 setFieldValue(`cluster`, value);
                                                                             }}
-                                                                            options={clusterListOptions.codeAndNameDetails}
+                                                                            options={clusterListOptions}
                                                                             getOptionLabel={(option) => `${option.code} - ${option.name}`}
                                                                             // isOptionEqualToValue={(
                                                                             //     option,
@@ -767,7 +821,7 @@ function User({ open, handleClose, mode, userCode }) {
                                                                                     {...params}
                                                                                     label="Market"
                                                                                     sx={{
-                                                                                        width: { sm: 200, md: 620 },
+                                                                                        width: { sm: 620, md: 620 },
                                                                                         '& .MuiInputBase-root': {
                                                                                             height: 40
                                                                                         }
@@ -790,7 +844,7 @@ function User({ open, handleClose, mode, userCode }) {
                                                                 </Grid>
 
                                                                 <Grid gap="10px" display="flex" style={{ marginTop: '10px' }}>
-                                                                    <Grid item xs={6} sm={4}>
+                                                                    {/* <Grid item xs={6} sm={4}>
                                                                         <Autocomplete
                                                                             value={values.roleId}
                                                                             name="roleId"
@@ -824,7 +878,7 @@ function User({ open, handleClose, mode, userCode }) {
                                                                                 />
                                                                             )}
                                                                         />
-                                                                    </Grid>
+                                                                    </Grid> */}
                                                                     <Grid item>
                                                                         {' '}
                                                                         <TextField
@@ -848,7 +902,7 @@ function User({ open, handleClose, mode, userCode }) {
                                                                             }
                                                                         ></TextField>
                                                                     </Grid>
-                                                                    <Grid item>
+                                                                    <Grid item display={component === 'user_creation' ? 'flex' : 'none'}>
                                                                         {' '}
                                                                         <TextField
                                                                             sx={{
@@ -870,6 +924,22 @@ function User({ open, handleClose, mode, userCode }) {
                                                                                 touched.password && errors.password ? errors.password : ''
                                                                             }
                                                                         ></TextField>
+                                                                    </Grid>
+                                                                </Grid>
+                                                                <Grid gap="10px" display="flex" style={{ marginTop: '10px' }}>
+                                                                    <Grid item sm={4}>
+                                                                        <FormGroup>
+                                                                            <FormControlLabel
+                                                                                name="status"
+                                                                                disabled={mode == 'VIEW'}
+                                                                                onChange={handleChange}
+                                                                                value={values.status}
+                                                                                control={<Switch color="success" />}
+                                                                                label="Status"
+                                                                                checked={values.status}
+                                                                                // disabled={mode == 'VIEW'}
+                                                                            />
+                                                                        </FormGroup>
                                                                     </Grid>
                                                                 </Grid>
                                                             </div>
