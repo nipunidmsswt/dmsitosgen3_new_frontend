@@ -1,12 +1,12 @@
 import {
+    SAVE_GUIDE_CLASS_DATA,
     CHECK_GUIDE_CLASS_CODE_DUPLICATE,
     GET_ALL_ACTIVE_GUIDE_CLASS_DATA,
     GET_ALL_GUIDE_CLASS_DATA,
     GET_GUIDE_CLASS_DETAILS_BY_CODE,
     GET_GUIDE_CLASS_LAST_MODIFIED_DATE_TIME,
-    SAVE_GUIDE_CLASS_DATA,
     UPDATE_GUIDE_CLASS_DATA
-} from '../../../constant/master/GuideClassConstant';
+} from 'store/constant/master/GuideClassConstant';
 
 export const saveGuideClassData = (data) => {
     console.log('saveManagerData action s called', data);

@@ -480,7 +480,7 @@ function CodeAndName({ open, handleClose, mode, ccode }) {
                                                                         <Table stickyHeader size="small">
                                                                             <TableHead alignItems="center">
                                                                                 <TableRow>
-                                                                                    <TableCell>Sequence</TableCell>
+                                                                                    {/* <TableCell>Sequence</TableCell> */}
                                                                                     <TableCell>Category</TableCell>
                                                                                     <TableCell>Code </TableCell>
                                                                                     <TableCell>Description</TableCell>
@@ -500,7 +500,7 @@ function CodeAndName({ open, handleClose, mode, ccode }) {
                                                                                     // {values.codeAndNameDetails.map((record, idx) => {
                                                                                     return (
                                                                                         <TableRow key={idx} hover>
-                                                                                            <TableCell>{idx + 1}</TableCell>
+                                                                                            {/* <TableCell>{idx + 1}</TableCell> */}
 
                                                                                             <TableCell>
                                                                                                 <TextField

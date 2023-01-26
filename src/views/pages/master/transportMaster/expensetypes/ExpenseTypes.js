@@ -376,7 +376,7 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                         const expenseTypeDetails = {
                             fromDate: item.fromDate,
                             toDate: item.toDate,
-                            // currencyList: item.currencyList,
+                            currencyList: item.currencyList,
 
                             tax: taxDes,
                             expenseRate: item.expenseRate,
