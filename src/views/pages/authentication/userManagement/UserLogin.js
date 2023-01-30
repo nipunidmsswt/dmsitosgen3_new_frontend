@@ -45,6 +45,7 @@ export default function Login() {
         username: '',
         password: ''
     };
+    const delay = 5;
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -54,7 +55,8 @@ export default function Login() {
     const [openErrorToast, setOpenErrorToast] = useState(false);
     const [errMsg, setErrorMsg] = useState('');
     const [openToast, setHandleToast] = useState(false);
-
+    const [imgeUrl, setUrls] = [];
+    const [show, setShow] = useState(false);
     const validationSchema = yup.object().shape({
         username: yup.string().required('Requied field'),
         password: yup.string().required('Requied field')
@@ -68,7 +70,9 @@ export default function Login() {
 
     useEffect(() => {
         console.log(loggedUserData);
+
         if (loggedUserData !== null) {
+            localStorage.setItem('userData', JSON.stringify(loggedUserData.user));
             navigate('/dashboard/default');
         }
     }, [loggedUserData]);
@@ -92,6 +96,19 @@ export default function Login() {
         dispatch(userLogin(data));
         // navigate('/dashboard/default');
     };
+
+    const MINUTE_MS = 10000;
+
+    // useEffect(() => {
+    //     const urlsss = ["https://images.unsplash.com/photo-1674428431800-399f847e5322?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=387&q=80"],
+
+    //     const interval = setInterval(() => {
+    //         console.log('Logs every minute');
+    //         setUrls;
+    //     }, MINUTE_MS);
+
+    //     return () => clearInterval(interval); // This represents the unmount function, in which you need to clear your interval to prevent memory leaks.
+    // }, []);
 
     return (
         <ThemeProvider theme={theme}>
@@ -184,7 +201,7 @@ export default function Login() {
                                                 error={Boolean(touched.password && errors.password)}
                                                 helperText={touched.password && errors.password ? errors.password : ''}
                                             />
-                                            <FormControlLabel control={<Checkbox value="remember" color="primary" />} label="Remember me" />
+
                                             <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
                                                 Sign In
                                             </Button>
@@ -193,11 +210,6 @@ export default function Login() {
                                                 <Grid item xs>
                                                     <Link href="/iTos3/pages/forgotpassword" variant="body2">
                                                         Forgot password?
-                                                    </Link>
-                                                </Grid>
-                                                <Grid item>
-                                                    <Link href="#" variant="body2">
-                                                        {"Don't have an account? Sign Up"}
                                                     </Link>
                                                 </Grid>
                                             </Grid>

@@ -3,14 +3,12 @@ import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     Dialog,
-    Slide,
     FormControlLabel,
     Box,
     DialogContent,
     TextField,
     DialogTitle,
     FormGroup,
-    Checkbox,
     Button,
     Typography,
     DialogActions,
@@ -19,14 +17,15 @@ import {
     TableCell,
     TableHead,
     TableRow,
-    DialogContentText
+    DialogContentText,
+    Switch
 } from '@mui/material';
 
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 
-import { Formik, Form, FieldArray, useFormikContext } from 'formik';
+import { Formik, Form, FieldArray } from 'formik';
 import Grid from '@mui/material/Grid';
 import TableContainer from '@mui/material/TableContainer';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -161,7 +160,7 @@ function Season({ open, handleClose, mode, code }) {
         const y = new Date(data.seasonDetails[data.seasonDetails.length - 1].toDate).toISOString().split('T')[0];
         console.log(x);
         console.log(y);
-        if (x < y) {
+        if (x < y || x > y) {
             console.log('yuiy');
             setOpenDialogBox(true);
         } else {
@@ -174,8 +173,6 @@ function Season({ open, handleClose, mode, code }) {
             handleClose();
         }
     };
-
-    useEffect(() => {}, []);
 
     const handleCancel = () => {
         setLoadValues(initialValues);
@@ -342,24 +339,23 @@ function Season({ open, handleClose, mode, code }) {
                                                                             //   marginBottom: "10px",
                                                                         }}
                                                                     >
-                                                                        <Typography
+                                                                        {/* <Typography
                                                                             variant=""
                                                                             component="p"
                                                                             style={{ marginRight: '10px' }}
                                                                         >
                                                                             Active
-                                                                        </Typography>
+                                                                        </Typography> */}
 
                                                                         <FormGroup>
                                                                             <FormControlLabel
-                                                                                control={
-                                                                                    <Checkbox
-                                                                                        name="status"
-                                                                                        onChange={handleChange}
-                                                                                        checked={values.status}
-                                                                                        value={values.status}
-                                                                                    />
-                                                                                }
+                                                                                name="status"
+                                                                                control={<Switch />}
+                                                                                label="Status"
+                                                                                disabled={mode == 'VIEW'}
+                                                                                onChange={handleChange}
+                                                                                checked={values.status}
+                                                                                value={values.status}
                                                                             />
                                                                         </FormGroup>
                                                                     </Grid>
@@ -421,7 +417,7 @@ function Season({ open, handleClose, mode, code }) {
                                                                             <Table stickyHeader size="small">
                                                                                 <TableHead>
                                                                                     <TableRow>
-                                                                                        <TableCell>Sub Season</TableCell>
+                                                                                        <TableCell>Rate Period</TableCell>
                                                                                         {/* <TableCell>Special Offer Season</TableCell> */}
                                                                                         {/* <TableCell>Free</TableCell> */}
                                                                                         <TableCell>From Date</TableCell>
@@ -704,7 +700,7 @@ function Season({ open, handleClose, mode, code }) {
                                                                                                 </TableCell>
                                                                                                 <TableCell>
                                                                                                     <FormGroup>
-                                                                                                        <FormControlLabel
+                                                                                                        {/* <FormControlLabel
                                                                                                             control={
                                                                                                                 <Checkbox
                                                                                                                     name={`seasonDetails.${idx}.status`}
@@ -727,7 +723,29 @@ function Season({ open, handleClose, mode, code }) {
                                                                                                                     }
                                                                                                                 />
                                                                                                             }
-                                                                                                        />
+                                                                                                        /> */}
+                                                                                                        <FormGroup>
+                                                                                                            <FormControlLabel
+                                                                                                                name={`seasonDetails.${idx}.status`}
+                                                                                                                control={<Switch />}
+                                                                                                                label="Status"
+                                                                                                                disabled={mode == 'VIEW'}
+                                                                                                                onChange={handleChange}
+                                                                                                                checked={
+                                                                                                                    values.seasonDetails[
+                                                                                                                        idx
+                                                                                                                    ].status
+                                                                                                                }
+                                                                                                                value={
+                                                                                                                    values.seasonDetails[
+                                                                                                                        idx
+                                                                                                                    ] &&
+                                                                                                                    values.seasonDetails[
+                                                                                                                        idx
+                                                                                                                    ].status
+                                                                                                                }
+                                                                                                            />
+                                                                                                        </FormGroup>
                                                                                                     </FormGroup>
                                                                                                 </TableCell>
                                                                                                 <TableCell>

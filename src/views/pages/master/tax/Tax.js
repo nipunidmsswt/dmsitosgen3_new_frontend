@@ -86,10 +86,13 @@ function Tax({ open, handleClose, mode, rowTaxCode }) {
         taxCode: yup.string().required('Required field').checkDuplicateTax('Duplicate Code'),
         taxDescription: yup.string().required('Required field'),
         fromDate: yup.date().required('Required field'),
-        toDate: yup.date().when('status', {
-            is: false && mode === 'VIEW_UPDATE',
-            then: yup.date().required('Field is required')
-        })
+        toDate: yup
+            .date()
+            .min(yup.ref('fromDate'), "End date can't be before start date")
+            .when('status', {
+                is: false && mode === 'VIEW_UPDATE',
+                then: yup.date().required('Field is required')
+            })
     });
 
     const handleSubmitForm = (data) => {
@@ -159,243 +162,220 @@ function Tax({ open, handleClose, mode, rowTaxCode }) {
                             {({ values, handleChange, setFieldValue, errors, handleBlur, touched, resetForm }) => {
                                 return (
                                     <Form>
-                                        <DialogContent>
-                                            <div>
-                                                <Grid
-                                                    container
-                                                    direction="column"
-                                                    gap={'15px'}
-                                                    justifyContent="center"
-                                                    alignContent="center"
-                                                >
-                                                    <Grid item>
-                                                        <Typography variant="subtitle1" component="h2">
-                                                            Tax Code
-                                                        </Typography>
-                                                    </Grid>
-
-                                                    <Grid item>
-                                                        <TextField
-                                                            disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
-                                                            // label={taxCode}
-                                                            // label="Tax Code"
-                                                            sx={{
-                                                                width: { sm: 200, md: 300 },
-                                                                '& .MuiInputBase-root': {
-                                                                    height: 40
-                                                                }
-                                                            }}
-                                                            type="text"
-                                                            variant="outlined"
-                                                            InputLabelProps={{
-                                                                shrink: true
-                                                            }}
-                                                            // className="txt"
-                                                            id="taxCode"
-                                                            name="taxCode"
-                                                            onChange={handleChange}
-                                                            onBlur={handleBlur}
-                                                            value={values.taxCode}
-                                                            error={Boolean(touched.taxCode && errors.taxCode)}
-                                                            helperText={touched.taxCode && errors.taxCode ? errors.taxCode : ''}
-                                                        />
-                                                    </Grid>
-
-                                                    <Grid item>
-                                                        <Typography variant="subtitle1" component="h2">
-                                                            Tax Description
-                                                        </Typography>
-                                                    </Grid>
-
-                                                    <Grid item>
-                                                        <TextField
-                                                            disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
-                                                            // label="Tax Description"
-                                                            sx={{
-                                                                width: { sm: 200, md: 300 },
-                                                                '& .MuiInputBase-root': {
-                                                                    height: 40
-                                                                }
-                                                            }}
-                                                            // label={taxDescription}
-                                                            className="required"
-                                                            InputLabelProps={{
-                                                                shrink: true
-                                                            }}
-                                                            type="text"
-                                                            variant="outlined"
-                                                            id="taxDescription"
-                                                            name="taxDescription"
-                                                            onChange={handleChange}
-                                                            onBlur={handleBlur}
-                                                            value={values.taxDescription}
-                                                            error={Boolean(touched.taxDescription && errors.taxDescription)}
-                                                            helperText={
-                                                                touched.taxDescription && errors.taxDescription ? errors.taxDescription : ''
+                                        <Box sx={{ width: '100%' }}>
+                                            <Grid container rowSpacing={2} style={{ marginTop: '2px' }}>
+                                                <Grid item xs={6}>
+                                                    {/* <TextField
+                                                        sx={{
+                                                            width: { xs: 100, sm: 200 },
+                                                            '& .MuiInputBase-root': {
+                                                                height: 40
                                                             }
-                                                        />
-                                                    </Grid>
-
-                                                    <Grid item>
-                                                        <Typography variant="subtitle1" component="h2">
-                                                            Percentage
-                                                        </Typography>
-                                                    </Grid>
-
-                                                    <Grid item>
-                                                        <TextField
-                                                            disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
-                                                            // label={percentage}
-                                                            // label="Percentage"
-                                                            sx={{
-                                                                width: { sm: 200, md: 300 },
-                                                                '& .MuiInputBase-root': {
-                                                                    height: 40
-                                                                }
-                                                            }}
-                                                            InputLabelProps={{
-                                                                shrink: true
-                                                            }}
-                                                            id="percentage"
-                                                            name="percentage"
-                                                            type="number"
-                                                            onChange={handleChange}
-                                                            onBlur={handleBlur}
-                                                            value={values.percentage}
-                                                            error={Boolean(touched.percentage && errors.percentage)}
-                                                            helperText={touched.percentage && errors.percentage ? errors.percentage : ''}
-                                                        />
-                                                    </Grid>
-
-                                                    <Grid item>
-                                                        <Typography variant="subtitle1" component="h2">
-                                                            From Date
-                                                        </Typography>
-                                                    </Grid>
-
-                                                    <Grid item>
-                                                        <LocalizationProvider
-                                                            dateAdapter={AdapterDayjs}
-                                                            // adapterLocale={locale}
-                                                        >
-                                                            <DatePicker
-                                                                disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
-                                                                onChange={(value) => {
-                                                                    setFieldValue(`fromDate`, value);
-                                                                }}
-                                                                inputFormat="DD/MM/YYYY"
-                                                                value={values.fromDate}
-                                                                renderInput={(params) => (
-                                                                    <TextField
-                                                                        {...params}
-                                                                        sx={{
-                                                                            width: { sm: 200, md: 300 },
-                                                                            '& .MuiInputBase-root': {
-                                                                                height: 40
-                                                                            }
-                                                                        }}
-                                                                        InputLabelProps={{
-                                                                            shrink: true
-                                                                        }}
-                                                                        // label="From Date"
-                                                                        variant="outlined"
-                                                                        name="fromDate"
-                                                                        onBlur={handleBlur}
-                                                                        error={Boolean(touched.fromDate && errors.fromDate)}
-                                                                        helperText={
-                                                                            touched.fromDate && errors.fromDate ? errors.fromDate : ''
-                                                                        }
-                                                                    />
-                                                                )}
-                                                            />
-                                                        </LocalizationProvider>
-                                                    </Grid>
-                                                    <Grid item>
-                                                        <Typography variant="subtitle1" component="h2">
-                                                            To Date
-                                                        </Typography>
-                                                    </Grid>
-
-                                                    <Grid item>
-                                                        <LocalizationProvider
-                                                            dateAdapter={AdapterDayjs}
-                                                            // adapterLocale={locale}
-                                                        >
-                                                            <DatePicker
-                                                                disabled={mode == 'VIEW'}
-                                                                onChange={(value) => {
-                                                                    setFieldValue(`toDate`, value);
-                                                                }}
-                                                                inputFormat="DD/MM/YYYY"
-                                                                value={values.toDate}
-                                                                renderInput={(params) => (
-                                                                    <TextField
-                                                                        {...params}
-                                                                        sx={{
-                                                                            width: { sm: 200, md: 300 },
-                                                                            '& .MuiInputBase-root': {
-                                                                                height: 40
-                                                                            }
-                                                                        }}
-                                                                        InputLabelProps={{
-                                                                            shrink: true
-                                                                        }}
-                                                                        // label="To Date"
-                                                                        variant="outlined"
-                                                                        name="toDate"
-                                                                        onBlur={handleBlur}
-                                                                        error={Boolean(touched.toDate && errors.toDate)}
-                                                                        helperText={touched.toDate && errors.toDate ? errors.toDate : ''}
-                                                                    />
-                                                                )}
-                                                            />
-                                                        </LocalizationProvider>
-                                                    </Grid>
-                                                    <Grid item>
-                                                        <FormGroup>
-                                                            <FormControlLabel
-                                                                name="status"
-                                                                control={<Switch />}
-                                                                label="Status"
-                                                                disabled={mode == 'VIEW'}
-                                                                onChange={handleChange}
-                                                                checked={values.status}
-                                                                value={values.status}
-                                                            />
-                                                        </FormGroup>
-                                                    </Grid>
-                                                    {mode === 'VIEW' ? (
-                                                        <Grid container item xs={6} direction="column">
-                                                            <CreatedUpdatedUserDetails formValues={values} />
-                                                        </Grid>
-                                                    ) : null}
+                                                        }}
+                                                        InputLabelProps={{
+                                                            shrink: true
+                                                        }}
+                                                        disabled={mode == 'VIEW_UPDATE'}
+                                                        label="Company Name"
+                                                        name="companyName"
+                                                        onChange={handleChange}
+                                                        onBlur={handleBlur}
+                                                        value={values.companyName}
+                                                        error={Boolean(touched.companyName && errors.companyName)}
+                                                        helperText={touched.companyName && errors.companyName ? errors.companyName : ''}
+                                                    ></TextField> */}
+                                                    <TextField
+                                                        disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                        // label={taxCode}
+                                                        label="Tax Code"
+                                                        InputLabelProps={{
+                                                            shrink: true
+                                                        }}
+                                                        sx={{
+                                                            width: { xs: 150, sm: 250 },
+                                                            '& .MuiInputBase-root': {
+                                                                height: 40
+                                                            }
+                                                        }}
+                                                        type="text"
+                                                        variant="outlined"
+                                                        // className="txt"
+                                                        id="taxCode"
+                                                        name="taxCode"
+                                                        onChange={handleChange}
+                                                        onBlur={handleBlur}
+                                                        value={values.taxCode}
+                                                        error={Boolean(touched.taxCode && errors.taxCode)}
+                                                        helperText={touched.taxCode && errors.taxCode ? errors.taxCode : ''}
+                                                    />
                                                 </Grid>
-                                            </div>
-                                        </DialogContent>
-                                        <DialogActions>
-                                            <Button
-                                                variant="contained"
-                                                type="submit"
-                                                style={{
-                                                    display: mode == 'VIEW' ? 'none' : 'block'
-                                                }}
-                                                className="btnSave"
-                                            >
-                                                {mode === 'INSERT' ? 'SAVE' : 'UPDATE'}
-                                            </Button>
-                                            <Button
-                                                variant="outlined"
-                                                type="reset"
-                                                style={{
-                                                    //   backgroundColor: '#B22222',
-                                                    display: mode == 'VIEW' ? 'none' : 'block'
-                                                }}
-                                                // onClick={clearForm}
-                                                onClick={(e) => resetForm()}
-                                            >
-                                                CLEAR
-                                            </Button>
-                                        </DialogActions>
+                                                <Grid item xs={6}>
+                                                    <TextField
+                                                        disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                        label="Tax Description"
+                                                        sx={{
+                                                            width: { xs: 150, sm: 250 },
+                                                            '& .MuiInputBase-root': {
+                                                                height: 40
+                                                            }
+                                                        }}
+                                                        // label={taxDescription}
+                                                        InputLabelProps={{
+                                                            shrink: true
+                                                        }}
+                                                        className="required"
+                                                        type="text"
+                                                        variant="outlined"
+                                                        id="taxDescription"
+                                                        name="taxDescription"
+                                                        onChange={handleChange}
+                                                        onBlur={handleBlur}
+                                                        value={values.taxDescription}
+                                                        error={Boolean(touched.taxDescription && errors.taxDescription)}
+                                                        helperText={
+                                                            touched.taxDescription && errors.taxDescription ? errors.taxDescription : ''
+                                                        }
+                                                    />
+                                                </Grid>
+                                                <Grid item xs={6}>
+                                                    <TextField
+                                                        disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                        // label={percentage}
+                                                        label="Percentage (%)"
+                                                        sx={{
+                                                            width: { xs: 150, sm: 250 },
+                                                            '& .MuiInputBase-root': {
+                                                                height: 40
+                                                            }
+                                                        }}
+                                                        InputLabelProps={{
+                                                            shrink: true
+                                                        }}
+                                                        id="percentage"
+                                                        name="percentage"
+                                                        type="number"
+                                                        onChange={handleChange}
+                                                        onBlur={handleBlur}
+                                                        value={values.percentage}
+                                                        error={Boolean(touched.percentage && errors.percentage)}
+                                                        helperText={touched.percentage && errors.percentage ? errors.percentage : ''}
+                                                    />
+                                                </Grid>
+                                                <Grid item xs={6}>
+                                                    <LocalizationProvider
+                                                        dateAdapter={AdapterDayjs}
+                                                        // adapterLocale={locale}
+                                                    >
+                                                        <DatePicker
+                                                            disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                            onChange={(value) => {
+                                                                setFieldValue(`fromDate`, value);
+                                                            }}
+                                                            inputFormat="DD/MM/YYYY"
+                                                            value={values.fromDate}
+                                                            renderInput={(params) => (
+                                                                <TextField
+                                                                    {...params}
+                                                                    sx={{
+                                                                        width: { xs: 150, sm: 250 },
+                                                                        '& .MuiInputBase-root': {
+                                                                            height: 40
+                                                                        }
+                                                                    }}
+                                                                    InputLabelProps={{
+                                                                        shrink: true
+                                                                    }}
+                                                                    label="From Date"
+                                                                    variant="outlined"
+                                                                    name="fromDate"
+                                                                    onBlur={handleBlur}
+                                                                    error={Boolean(touched.fromDate && errors.fromDate)}
+                                                                    helperText={touched.fromDate && errors.fromDate ? errors.fromDate : ''}
+                                                                />
+                                                            )}
+                                                        />
+                                                    </LocalizationProvider>
+                                                </Grid>
+                                                <Grid item xs={6}>
+                                                    <LocalizationProvider
+                                                        dateAdapter={AdapterDayjs}
+                                                        // adapterLocale={locale}
+                                                    >
+                                                        <DatePicker
+                                                            disabled={mode == 'VIEW'}
+                                                            onChange={(value) => {
+                                                                setFieldValue(`toDate`, value);
+                                                            }}
+                                                            inputFormat="DD/MM/YYYY"
+                                                            value={values.toDate}
+                                                            renderInput={(params) => (
+                                                                <TextField
+                                                                    {...params}
+                                                                    sx={{
+                                                                        width: { xs: 150, sm: 250 },
+                                                                        '& .MuiInputBase-root': {
+                                                                            height: 40
+                                                                        }
+                                                                    }}
+                                                                    InputLabelProps={{
+                                                                        shrink: true
+                                                                    }}
+                                                                    label="To Date"
+                                                                    variant="outlined"
+                                                                    name="toDate"
+                                                                    onBlur={handleBlur}
+                                                                    error={Boolean(touched.toDate && errors.toDate)}
+                                                                    helperText={touched.toDate && errors.toDate ? errors.toDate : ''}
+                                                                />
+                                                            )}
+                                                        />
+                                                    </LocalizationProvider>
+                                                </Grid>
+                                                <Grid item xs={6}>
+                                                    <FormGroup>
+                                                        <FormControlLabel
+                                                            name="status"
+                                                            control={<Switch />}
+                                                            label="Status"
+                                                            disabled={mode == 'VIEW'}
+                                                            onChange={handleChange}
+                                                            checked={values.status}
+                                                            value={values.status}
+                                                        />
+                                                    </FormGroup>
+                                                </Grid>
+                                            </Grid>
+                                        </Box>
+                                        <Box display="flex" flexDirection="row-reverse" style={{ marginTop: '20px' }}>
+                                            {mode != 'VIEW' ? (
+                                                <Button
+                                                    variant="outlined"
+                                                    type="button"
+                                                    style={{
+                                                        // backgroundColor: '#B22222',
+                                                        marginLeft: '10px'
+                                                    }}
+                                                    onClick={(e) => resetForm()}
+                                                >
+                                                    CLEAR
+                                                </Button>
+                                            ) : (
+                                                ''
+                                            )}
+
+                                            {mode != 'VIEW' ? (
+                                                <Button className="btnSave" variant="contained" type="submit">
+                                                    {mode === 'INSERT' ? 'SAVE' : 'UPDATE'}
+                                                </Button>
+                                            ) : (
+                                                ''
+                                            )}
+                                        </Box>
+                                        <Box>
+                                            <Grid item>
+                                                {mode === 'VIEW' ? <CreatedUpdatedUserDetailsWithTableFormat formValues={values} /> : null}
+                                            </Grid>
+                                        </Box>
                                     </Form>
                                 );
                             }}

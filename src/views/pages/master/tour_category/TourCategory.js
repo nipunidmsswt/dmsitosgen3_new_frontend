@@ -273,7 +273,8 @@ function TourCategory({ open, handleClose, mode, rowTourCategoryCode }) {
                                     <TextField
                                         disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
                                         // autoFocus
-                                        label={tourCode}
+                                        // label={tourCode}
+                                        label="Tour Code"
                                         InputLabelProps={{
                                             shrink: true
                                         }}
@@ -307,8 +308,7 @@ function TourCategory({ open, handleClose, mode, rowTourCategoryCode }) {
                                 </Grid> */}
                                 <Grid item>
                                     <TextField
-                                        disabled={mode == 'VIEW'}
-                                        label={tourDescription}
+                                        // label={tourDescription}
                                         InputLabelProps={{
                                             shrink: true
                                         }}
@@ -318,6 +318,8 @@ function TourCategory({ open, handleClose, mode, rowTourCategoryCode }) {
                                                 height: 40
                                             }
                                         }}
+                                        disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                        label="Description"
                                         id="name"
                                         name="name"
                                         type="text"

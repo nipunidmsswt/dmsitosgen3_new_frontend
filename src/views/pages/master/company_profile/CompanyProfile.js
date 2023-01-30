@@ -166,6 +166,8 @@ function CompanyProfile({ open, handleClose, mode, code }) {
 
     const [loadValues, setLoadValues] = useState(null);
     const [previewImages, setPreviewImages] = useState([]);
+    const [updatePreviewImages, setupdatePreviewImages] = useState([]);
+
     yup.addMethod(yup.string, 'checkDuplicateCompanyName', function (message) {
         return this.test('checkDuplicateCompanyName', message, async function validateValue(value) {
             if (mode === 'INSERT') {
@@ -187,17 +189,13 @@ function CompanyProfile({ open, handleClose, mode, code }) {
     const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
 
     const validationSchema = yup.object().shape({
-        // companyName: yup.string().required('Required field').checkDuplicateCompanyName('Duplicate Code'),
-        // companyId: yup.string().required('Required field'),
-        // version: yup.string().required('Required field'),
-        // address: yup.string().required('Required field'),
-        // email: yup.string().required('Required field').email(),
-        // fax: yup.string().required('Required field'),
-        // phone: yup.string().required('Required field').matches(phoneRegExp, 'Phone number is not valid'),
-        // website: yup.string().required('Required field'),
-        // fax: yup.string().required('Required field'),
-        // website: yup.string().required('Required field'),
-        // allocatedLicenceCount: yup.string().required('Required field')
+        companyName: yup.string().required('Required field').checkDuplicateCompanyName('Duplicate Code'),
+        version: yup.string().required('Required field'),
+        address: yup.string().required('Required field'),
+        email: yup.string().required('Required field').email(),
+        phone: yup.string().required('Required field').matches(phoneRegExp, 'Phone number is not valid'),
+        website: yup.string().required('Required field'),
+        allocatedLicenceCount: yup.number().required('Required field').positive('Must be greater than zero')
     });
 
     //get data from reducers
@@ -216,6 +214,7 @@ function CompanyProfile({ open, handleClose, mode, code }) {
     useEffect(() => {
         if ((mode === 'VIEW_UPDATE' && companyProfileToUpdate != null) || (mode === 'VIEW' && companyProfileToUpdate != null)) {
             setLoadValues(companyProfileToUpdate);
+            setupdatePreviewImages([companyProfileToUpdate.docPath]);
         }
     }, [companyProfileToUpdate]);
 
@@ -294,6 +293,7 @@ function CompanyProfile({ open, handleClose, mode, code }) {
         }
 
         setPreviewImages(images);
+        setupdatePreviewImages([]);
     };
 
     return (
@@ -342,7 +342,10 @@ function CompanyProfile({ open, handleClose, mode, code }) {
                                                         disabled={mode == 'VIEW_UPDATE'}
                                                         label="Company Name"
                                                         name="companyName"
-                                                        onChange={handleChange}
+                                                        onChange={(e) => {
+                                                            console.log(e.target.value);
+                                                            setFieldValue('companyName', e.target.value);
+                                                        }}
                                                         onBlur={handleBlur}
                                                         value={values.companyName}
                                                         error={Boolean(touched.companyName && errors.companyName)}
@@ -360,6 +363,7 @@ function CompanyProfile({ open, handleClose, mode, code }) {
                                                         InputLabelProps={{
                                                             shrink: true
                                                         }}
+                                                        disabled={true}
                                                         label="Company Id"
                                                         name="companyId"
                                                         onChange={handleChange}
@@ -527,6 +531,7 @@ function CompanyProfile({ open, handleClose, mode, code }) {
                                                                 height: 40
                                                             }
                                                         }}
+                                                        disabled={true}
                                                         label="Available LicenceCount"
                                                         name="availableLicenceCount"
                                                         InputLabelProps={{
@@ -547,7 +552,10 @@ function CompanyProfile({ open, handleClose, mode, code }) {
                                                         }}
                                                         label="Allocated Licence Count"
                                                         name="allocatedLicenceCount"
-                                                        onChange={handleChange}
+                                                        onChange={(e) => {
+                                                            setFieldValue('availableLicenceCount', e.target.value);
+                                                            setFieldValue(`allocatedLicenceCount`, e.target.value);
+                                                        }}
                                                         onBlur={handleBlur}
                                                         InputLabelProps={{
                                                             shrink: true
@@ -612,6 +620,27 @@ function CompanyProfile({ open, handleClose, mode, code }) {
                                                                             />
                                                                         </IconButton>
                                                                     </div>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    )}
+                                                    {updatePreviewImages && (
+                                                        <div>
+                                                            {updatePreviewImages.map((img, i) => {
+                                                                return (
+                                                                    <img
+                                                                        width="100"
+                                                                        height="100"
+                                                                        style={{
+                                                                            marginRight: '10px',
+                                                                            marginTop: '10px'
+                                                                        }}
+                                                                        src={`data:image/;base64,${img}`}
+                                                                        className="preview"
+                                                                        // src={img}
+                                                                        alt={'image-' + i}
+                                                                        key={i}
+                                                                    />
                                                                 );
                                                             })}
                                                         </div>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Visibility from '@mui/icons-material/Visibility';
@@ -48,6 +48,7 @@ export default function ResetPassword() {
 
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const formikRef = useRef();
 
     const resetPasswordData = useSelector((state) => state.userReducer.resetPasswordData);
     const error = useSelector((state) => state.userReducer.errorMsg);
@@ -59,7 +60,25 @@ export default function ResetPassword() {
     const validationSchema = yup.object().shape({
         username: yup.string().required('Requied field'),
         temPassword: yup.string().required('Requied field'),
-        newPassword: yup.string().required('Requied field'),
+        newPassword: yup
+            .string()
+            .required('Requied field')
+            .min(8, 'Must be 8 characters or more')
+            .matches(/[a-z]+/, 'One lowercase character')
+            .matches(/[A-Z]+/, 'One uppercase character')
+            .matches(/[@$!%*#?&]+/, 'One special character')
+            .matches(/\d+/, 'One number')
+            .test('isValidPass1', 'can not include userName', (value, context) => {
+                console.log(typeof value);
+                console.log(formikRef.current.values.username);
+                if (value !== '' && formikRef.current.values.username !== '') {
+                    console.log(value.includes(formikRef.current.values.username));
+                    return !value.includes(formikRef.current.values.username);
+                }
+
+                return true;
+            }),
+
         reEnteredNewPassword: yup.string().oneOf([yup.ref('newPassword'), null], 'Passwords must match')
     });
 
@@ -116,6 +135,7 @@ export default function ResetPassword() {
                 />
                 <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
                     <Formik
+                        innerRef={formikRef}
                         initialValues={initialValues}
                         onSubmit={(values) => {
                             console.log('hi');
@@ -158,7 +178,7 @@ export default function ResetPassword() {
                                             />
 
                                             <TextField
-                                                label="Temporary Password"
+                                                label="Temporary Code"
                                                 name="temPassword"
                                                 margin="normal"
                                                 fullWidth

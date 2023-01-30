@@ -21,7 +21,9 @@ import {
     SUCCESS_FORGOT_PASSWORD_CREDENTIALS,
     FAILED_FORGOT_PASSWORD_CREDENTIALS,
     SUCCESS_RESET_PASSWORD_CREDENTIALS,
-    FAILED_RESET_PASSWORD_CREDENTIALS
+    FAILED_RESET_PASSWORD_CREDENTIALS,
+    SUCCESS_GET_PROFILE_DATA_BY_ID,
+    FAILED_GET_PROFILE_DATA_BY_ID
 } from 'store/constant/authentication/UserConstant';
 import { create, getById, updateWithUpload, get, createWithUpload } from '../../../apis/Apis';
 
@@ -46,12 +48,27 @@ export function* getUserByIdSaga(action) {
 
     let responseData = [];
     try {
-        responseData = yield call(getById, `${process.env.REACT_APP_USER_MANAGEMENT_URL}/User/${action.data.id}`);
+        responseData = yield call(getById, `${process.env.REACT_APP_GATEWAY_SERVICE_URL}/userProfile/${action.data.id}`);
         console.log(responseData);
         yield put({ type: SUCCESS_GET_USER_DATA_BY_ID, data: responseData.data });
     } catch (e) {
         console.log(e);
         yield put({ type: FAILED_GET_USER_DATA_BY_ID, data: responseData.data });
+    }
+}
+
+export function* getProfileDataByIdSaga(action) {
+    console.log('getProfileDataByIdSaga  saga');
+    console.log(action);
+
+    let responseData = [];
+    try {
+        responseData = yield call(getById, `${process.env.REACT_APP_GATEWAY_SERVICE_URL}/userProfile/${action.data.id}`);
+        console.log(responseData);
+        yield put({ type: SUCCESS_GET_PROFILE_DATA_BY_ID, data: responseData.data });
+    } catch (e) {
+        console.log(e);
+        yield put({ type: FAILED_GET_PROFILE_DATA_BY_ID, data: responseData.data });
     }
 }
 
@@ -74,7 +91,7 @@ export function* getAllUserSaga() {
     let responseData = [];
 
     try {
-        responseData = yield call(get, process.env.REACT_APP_USER_MANAGEMENT_URL + '/User/');
+        responseData = yield call(get, process.env.REACT_APP_USER_MANAGEMENT_URL + '/users');
         console.log(responseData.data.payload);
         yield put({ type: SUCCESS_USER_LIST_DATA, data: responseData.data });
     } catch (e) {
@@ -101,7 +118,7 @@ export function* checkDupicateUserSaga(action) {
 export function* checkLatestUserModifiedDateSaga() {
     let responseData = [];
     try {
-        responseData = yield call(get, `${process.env.REACT_APP_USER_MANAGEMENT_URL}/User/lastModifiedTime`);
+        responseData = yield call(get, `${process.env.REACT_APP_USER_MANAGEMENT_URL}/lastModifiedTime`);
         console.log('response data last:' + responseData);
         yield put({ type: SUCCESS_LAST_MODIFIED_DATE_USER, data: responseData.data });
     } catch (e) {
@@ -179,7 +196,7 @@ export function* forgotPasswordSaga(action) {
     }
 }
 
-//forgot password
+//reset password
 
 export function* resetPasswordSaga(action) {
     action.data.path = `${process.env.REACT_APP_USER_MANAGEMENT_URL}/user/resetpwd`;

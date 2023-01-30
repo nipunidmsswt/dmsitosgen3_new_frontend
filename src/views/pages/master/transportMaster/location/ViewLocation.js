@@ -24,25 +24,25 @@ function ViewLocation() {
             title: 'Code',
             field: 'code',
             filterPlaceholder: 'filter',
-            align: 'center'
+            align: 'left'
         },
         {
             title: 'Name',
             field: 'name',
             filterPlaceholder: 'filter',
-            align: 'center'
+            align: 'left'
         },
         {
             title: 'Province',
             field: 'province',
-            align: 'center',
+            align: 'left',
             grouping: false,
             filterPlaceholder: 'filter'
         },
         {
             title: 'Geo Name',
             field: 'geoName',
-            align: 'center',
+            align: 'left',
             grouping: false,
             filterPlaceholder: 'filter'
         },
@@ -192,7 +192,7 @@ function ViewLocation() {
                                             background: '-moz-linear-gradient(top, #0790E8, #3180e6)',
                                             background: '-ms-linear-gradient(top, #0790E8, #3180e6)',
                                             background: '-webkit-linear-gradient(top, #0790E8, #3180e6)',
-                                            // textAlign: 'center',
+                                            textAlign: 'center',
                                             color: '#FFF'
                                         },
                                         rowStyle: {

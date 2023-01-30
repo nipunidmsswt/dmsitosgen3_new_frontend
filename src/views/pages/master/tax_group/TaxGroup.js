@@ -3,22 +3,22 @@ import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     Dialog,
-    Slide,
+    Switch,
     FormControlLabel,
     Box,
     DialogContent,
     TextField,
     DialogTitle,
     FormGroup,
-    Checkbox,
+    DialogContentText,
     Button,
-    Typography,
     MenuItem,
     Table,
     TableBody,
     TableCell,
     TableHead,
-    TableRow
+    TableRow,
+    DialogActions
 } from '@mui/material';
 
 import AddBoxIcon from '@mui/icons-material/AddBox';
@@ -39,6 +39,7 @@ import Paper from '@mui/material/Paper';
 import * as yup from 'yup';
 import { getAllTaxData } from '../../../../store/actions/masterActions/TaxActions/TaxAction';
 import CreatedUpdatedUserDetailsWithTableFormat from '../userTimeDetails/CreatedUpdatedUserDetailsWithTableFormat';
+import { array } from 'prop-types';
 
 function TaxGroup({ open, handleClose, mode, taxGroupCode }) {
     const initialValues = {
@@ -58,6 +59,7 @@ function TaxGroup({ open, handleClose, mode, taxGroupCode }) {
 
     const [taxListOptions, setTaxListOptions] = useState([]);
     const [loadValues, setLoadValues] = useState(null);
+    const [openDialogBox, setOpenDialogBox] = useState(false);
 
     yup.addMethod(yup.array, 'uniqueTaxOrder', function (message) {
         return this.test('uniqueTaxOrder', message, function (list) {
@@ -125,7 +127,7 @@ function TaxGroup({ open, handleClose, mode, taxGroupCode }) {
             .of(
                 yup.object().shape({
                     tax: yup.object().typeError('Required field'),
-                    taxOrder: yup.string()
+                    taxOrder: yup.number().positive('Must be greater than zero')
                     // onOriginal: yup.string().required('Required field')
                 })
             )
@@ -163,15 +165,37 @@ function TaxGroup({ open, handleClose, mode, taxGroupCode }) {
         }
     }, [taxGroupToUpdate]);
 
+    const checkValidArray = (arry) => {
+        arry.sort();
+        let n = arry.length;
+
+        for (var i = 1; i < n; i++) {
+            if (arry[i] != arry[i - 1] + 1) {
+                return false;
+            }
+        }
+        return true;
+    };
     const handleSubmitForm = (data) => {
         console.log(data);
-        if (mode === 'INSERT') {
-            dispatch(saveTaxGroupData(data));
-        } else if (mode === 'VIEW_UPDATE') {
-            console.log('yes click');
-            dispatch(updateTaxGroupData(data));
+        let arry = [];
+        data.taxGroupDetails.map((data) => {
+            arry.push(data.taxOrder);
+        });
+        const result = checkValidArray(arry);
+        console.log(result);
+        if (result === true) {
+            setOpenDialogBox(false);
+            if (mode === 'INSERT') {
+                dispatch(saveTaxGroupData(data));
+            } else if (mode === 'VIEW_UPDATE') {
+                console.log('yes click');
+                dispatch(updateTaxGroupData(data));
+            }
+            handleClose();
+        } else {
+            setOpenDialogBox(true);
         }
-        handleClose();
     };
 
     useEffect(() => {
@@ -229,6 +253,9 @@ function TaxGroup({ open, handleClose, mode, taxGroupCode }) {
                                                                             }}
                                                                             id="standard-select-currency"
                                                                             select
+                                                                            InputLabelProps={{
+                                                                                shrink: true
+                                                                            }}
                                                                             label="Tax Group Type"
                                                                             name="taxGroupType"
                                                                             onChange={handleChange}
@@ -262,6 +289,9 @@ function TaxGroup({ open, handleClose, mode, taxGroupCode }) {
                                                                             type="text"
                                                                             variant="outlined"
                                                                             name="taxGroupCode"
+                                                                            InputLabelProps={{
+                                                                                shrink: true
+                                                                            }}
                                                                             value={values.taxGroupCode}
                                                                             onChange={handleChange}
                                                                             onBlur={handleBlur}
@@ -282,6 +312,9 @@ function TaxGroup({ open, handleClose, mode, taxGroupCode }) {
                                                                                     height: 40
                                                                                 }
                                                                             }}
+                                                                            InputLabelProps={{
+                                                                                shrink: true
+                                                                            }}
                                                                             id="outlined-required"
                                                                             label="description"
                                                                             name="description"
@@ -298,20 +331,15 @@ function TaxGroup({ open, handleClose, mode, taxGroupCode }) {
                                                                     </Grid>
                                                                 </Grid>
 
-                                                                <Typography variant="" component="p">
-                                                                    Active
-                                                                </Typography>
                                                                 <FormGroup>
                                                                     <FormControlLabel
-                                                                        control={
-                                                                            <Checkbox
-                                                                                disabled={mode == 'VIEW'}
-                                                                                name="status"
-                                                                                onChange={handleChange}
-                                                                                checked={values.status}
-                                                                                value={values.status}
-                                                                            />
-                                                                        }
+                                                                        name="status"
+                                                                        control={<Switch />}
+                                                                        label="Status"
+                                                                        disabled={mode == 'VIEW'}
+                                                                        onChange={handleChange}
+                                                                        checked={values.status}
+                                                                        value={values.status}
                                                                     />
                                                                 </FormGroup>
                                                             </div>
@@ -566,32 +594,21 @@ function TaxGroup({ open, handleClose, mode, taxGroupCode }) {
                                                                                                 <TableCell>
                                                                                                     <FormGroup>
                                                                                                         <FormControlLabel
-                                                                                                            control={
-                                                                                                                <Checkbox
-                                                                                                                    disabled={
-                                                                                                                        mode ==
-                                                                                                                            'VIEW_UPDATE' ||
-                                                                                                                        mode == 'VIEW'
-                                                                                                                    }
-                                                                                                                    name={`taxGroupDetails.${idx}.status`}
-                                                                                                                    onChange={handleChange}
-                                                                                                                    checked={
-                                                                                                                        values
-                                                                                                                            .taxGroupDetails[
-                                                                                                                            idx
-                                                                                                                        ].status
-                                                                                                                    }
-                                                                                                                    value={
-                                                                                                                        values
-                                                                                                                            .taxGroupDetails[
-                                                                                                                            idx
-                                                                                                                        ] &&
-                                                                                                                        values
-                                                                                                                            .taxGroupDetails[
-                                                                                                                            idx
-                                                                                                                        ].status
-                                                                                                                    }
-                                                                                                                />
+                                                                                                            name={`taxGroupDetails.${idx}.status`}
+                                                                                                            control={<Switch />}
+                                                                                                            label="Status"
+                                                                                                            disabled={mode == 'VIEW'}
+                                                                                                            onChange={handleChange}
+                                                                                                            checked={
+                                                                                                                values.taxGroupDetails[idx]
+                                                                                                                    .status
+                                                                                                            }
+                                                                                                            value={
+                                                                                                                values.taxGroupDetails[
+                                                                                                                    idx
+                                                                                                                ] &&
+                                                                                                                values.taxGroupDetails[idx]
+                                                                                                                    .status
                                                                                                             }
                                                                                                         />
                                                                                                     </FormGroup>
@@ -620,7 +637,37 @@ function TaxGroup({ open, handleClose, mode, taxGroupCode }) {
                                                                     </Paper>
                                                                 )}
                                                             </FieldArray>
-
+                                                            {openDialogBox ? (
+                                                                <Dialog
+                                                                    open={open}
+                                                                    onClose={handleClose}
+                                                                    aria-labelledby="alert-dialog-title"
+                                                                    aria-describedby="alert-dialog-description"
+                                                                >
+                                                                    <DialogTitle id="alert-dialog-title" style={{ color: 'red' }}>
+                                                                        {'Error Msg'}
+                                                                    </DialogTitle>
+                                                                    <DialogContent>
+                                                                        <DialogContentText id="alert-dialog-description">
+                                                                            Tax order should be consecutive
+                                                                        </DialogContentText>
+                                                                    </DialogContent>
+                                                                    <DialogActions>
+                                                                        {/* <Button onClick={handleClose}>Disagree</Button> */}
+                                                                        <Button
+                                                                            className="btnSave"
+                                                                            type="button"
+                                                                            onClick={() => {
+                                                                                setOpenDialogBox(false);
+                                                                            }}
+                                                                        >
+                                                                            OK
+                                                                        </Button>
+                                                                    </DialogActions>
+                                                                </Dialog>
+                                                            ) : (
+                                                                ''
+                                                            )}
                                                             <Box display="flex" flexDirection="row-reverse" style={{ marginTop: '20px' }}>
                                                                 {mode != 'VIEW' ? (
                                                                     <Button

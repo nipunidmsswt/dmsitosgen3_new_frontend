@@ -4,7 +4,8 @@ import {
     GET_COMPANY_PROFILE_BY_ID,
     UPDATE_COMPANY_PROFILE,
     CHECK_COMPANY_PROFILE_CODE_DUPLICATE,
-    GET_COMPANY_PROFILE_LAST_MODIFIED_DATE_TIME
+    GET_COMPANY_PROFILE_LAST_MODIFIED_DATE_TIME,
+    GET_AVAILABLE_LICENSE_COUNT
 } from '../../constant/master/CompanyProfilrConstant';
 
 export const saveCompanyProfileData = (data) => {
@@ -44,5 +45,12 @@ export const checkDuplicateCompanyProfileCode = (CompanyProfileCode) => {
     return {
         type: CHECK_COMPANY_PROFILE_CODE_DUPLICATE,
         data: { CompanyProfileCode }
+    };
+};
+
+export const getAvailableLicenseCount = (companyProfileId) => {
+    return {
+        type: GET_AVAILABLE_LICENSE_COUNT,
+        data: { companyProfileId }
     };
 };
