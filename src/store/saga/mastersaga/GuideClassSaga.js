@@ -18,9 +18,11 @@ import {
 } from '../../constant/master/GuideClassConstant';
 
 export function* getAllGuideClassDataSaga() {
+    console.log('guide class');
     let responseData = [];
     try {
-        responseData = yield call(get, `${process.env.REACT_APP_OPERATOR_URL}/guideClass/`);
+        responseData = yield call(get, `${process.env.REACT_APP_TOUR_URL}/guideClass/`);
+        console.log(responseData);
         yield put({ type: SUCCESS_GET_ALL_GUIDE_CLASS_DATA, data: responseData.data });
     } catch (e) {
         yield put({ type: FAILED_GET_ALL_GUIDE_CLASS_DATA, data: responseData.data });
@@ -31,7 +33,7 @@ export function* getGuideClassLatestModifiedDateSaga() {
     console.log('latest date');
     let responseData = [];
     try {
-        responseData = yield call(get, `${process.env.REACT_APP_OPERATOR_URL}/guideClass/lastModifiedTime`);
+        responseData = yield call(get, `${process.env.REACT_APP_TOUR_URL}/guideClass/lastModifiedTime`);
         yield put({
             type: SUCCESS_GET_GUIDE_CLASS_LAST_MODIFIED_DATE_TIME,
             data: responseData.data
@@ -44,7 +46,7 @@ export function* getGuideClassLatestModifiedDateSaga() {
 
 export function* saveGuideClassDataHandler(action) {
     console.log('action.data:' + action.data);
-    action.data.path = `${process.env.REACT_APP_OPERATOR_URL}/guideClass/`;
+    action.data.path = `${process.env.REACT_APP_TOUR_URL}/guideClass/`;
     let responseData = [];
     try {
         responseData = yield call(create, action.data);
@@ -57,7 +59,7 @@ export function* saveGuideClassDataHandler(action) {
 export function* getGuideClassDetailsByCodeSaga(action) {
     let responseData = [];
     try {
-        responseData = yield call(getById, `${process.env.REACT_APP_OPERATOR_URL}/guideClass/${action.data.id}`);
+        responseData = yield call(getById, `${process.env.REACT_APP_TOUR_URL}/guideClass/${action.data.id}`);
         console.log('response data:' + responseData);
         yield put({ type: SUCCESS_GET_GUIDE_CLASS_DETAILS_BY_CODE, data: responseData.data });
     } catch (e) {
@@ -66,7 +68,7 @@ export function* getGuideClassDetailsByCodeSaga(action) {
 }
 
 export function* updateGuideClassDataSaga(action) {
-    action.data.path = `${process.env.REACT_APP_OPERATOR_URL}/guideClass/${action.data.code}`;
+    action.data.path = `${process.env.REACT_APP_TOUR_URL}/guideClass/${action.data.guideCode}`;
     let responseData = [];
     try {
         responseData = yield call(update, action.data);
@@ -81,7 +83,7 @@ export function* updateGuideClassDataSaga(action) {
 export function* checkGuideClassDupicateCodeSaga(action) {
     let responseData = [];
     try {
-        responseData = yield call(getById, `${process.env.REACT_APP_OPERATOR_URL}/guideClass/codeDuplicate/${action.data}`);
+        responseData = yield call(getById, `${process.env.REACT_APP_TOUR_URL}/guideClass/codeDuplicate/${action.data}`);
         console.log(responseData);
         yield put({ type: GUIDE_CLASS_CODE_DUPLICATE, data: responseData.data });
     } catch (e) {
@@ -93,7 +95,7 @@ export function* checkGuideClassDupicateCodeSaga(action) {
 export function* getAllActiveGuideClassDataSaga() {
     let responseData = [];
     try {
-        responseData = yield call(get, `${process.env.REACT_APP_OPERATOR_URL}/guideClass/active`);
+        responseData = yield call(get, `${process.env.REACT_APP_TOUR_URL}/guideClass/active`);
         yield put({ type: SUCCESS_GET_ALL_ACTIVE_GUIDE_CLASS_DATA, data: responseData.data });
     } catch (e) {
         yield put({ type: FAILED_GET_ALL_ACTIVE_GUIDE_CLASS_DATA, data: responseData.data });

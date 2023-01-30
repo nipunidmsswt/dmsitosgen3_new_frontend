@@ -10,10 +10,12 @@ import { useSelector, useDispatch } from 'react-redux';
 import { getAllLocationDetails, getLatestModifiedLocationDetails } from 'store/actions/masterActions/LocationAction';
 import Grid from '@mui/material/Grid';
 import MainCard from 'ui-component/cards/MainCard';
+import { getAllGuideClassData } from 'store/actions/masterActions/GuideClassAction';
+import { FormControlLabel, FormGroup, Switch } from '@mui/material';
 
 function ViewGuideClass() {
     const [open, setOpen] = useState(false);
-    const [locationCode, setLocationCode] = useState('');
+    const [guideCode, setGuideCode] = useState('');
     const [mode, setMode] = useState('INSERT');
     const [openToast, setHandleToast] = useState(false);
     const [openErrorToast, setOpenErrorToast] = useState(false);
@@ -22,30 +24,16 @@ function ViewGuideClass() {
 
     const columns = [
         {
-            title: 'Code',
-            field: 'code',
+            title: 'Guide Code',
+            field: 'guideCode',
             filterPlaceholder: 'filter',
             align: 'center'
         },
         {
             title: 'Description',
-            field: 'name',
+            field: 'description',
             filterPlaceholder: 'filter',
             align: 'center'
-        },
-        {
-            title: 'From Date',
-            field: 'province',
-            align: 'center',
-            grouping: false,
-            filterPlaceholder: 'filter'
-        },
-        {
-            title: 'To Date',
-            field: 'geoName',
-            align: 'center',
-            grouping: false,
-            filterPlaceholder: 'filter'
         },
 
         {
@@ -57,24 +45,31 @@ function ViewGuideClass() {
             render: (rowData) => (
                 <div
                     style={{
-                        color: rowData.status === true ? '#008000aa' : '#f90000aa',
-                        fontWeight: 'bold',
-                        // background: rowData.status === true ? "#008000aa" : "#f90000aa",
-                        borderRadius: '4px',
-                        paddingLeft: 5,
-                        paddingRight: 5
+                        alignItems: 'center',
+                        align: 'center',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center'
                     }}
                 >
-                    {rowData.status === true ? 'Active' : 'Inactive'}
+                    {rowData.status === true ? (
+                        <FormGroup>
+                            <FormControlLabel control={<Switch color="success" size="small" />} checked={true} />
+                        </FormGroup>
+                    ) : (
+                        <FormGroup>
+                            <FormControlLabel control={<Switch color="error" size="small" />} checked={false} />
+                        </FormGroup>
+                    )}
                 </div>
             )
         }
     ];
 
     const dispatch = useDispatch();
-    const error = useSelector((state) => state.locationReducer.errorMsg);
-    const locations = useSelector((state) => state.locationReducer.locations);
-    const location = useSelector((state) => state.locationReducer.location);
+    const error = useSelector((state) => state.guideClassReducer.errorMsg);
+    const guideClass = useSelector((state) => state.guideClassReducer.guideClass);
+    const guideClassList = useSelector((state) => state.guideClassReducer.guideClassList);
     const lastModifiedDate = useSelector((state) => state.locationReducer.lastModifiedDateTime);
 
     useEffect(() => {
@@ -82,44 +77,39 @@ function ViewGuideClass() {
     }, [lastModifiedDate]);
 
     useEffect(() => {
-        if (locations?.payload?.length > 0) {
-            setTableData(locations?.payload[0]);
+        if (guideClassList?.length > 0) {
+            setTableData(guideClassList);
         }
-    }, [locations]);
+    }, [guideClassList]);
 
     useEffect(() => {
-        console.log(error);
         if (error != null) {
-            console.log('failed Toast');
             setOpenErrorToast(true);
         }
     }, [error]);
 
     useEffect(() => {
-        if (location) {
-            console.log('sucessToast');
+        if (guideClass) {
             setHandleToast(true);
-            // dispatch(getAllLocationDetails());
+            dispatch(getAllGuideClassData());
         }
-    }, [location]);
+    }, [guideClass]);
 
     useEffect(() => {
-        // dispatch(getAllLocationDetails());
+        dispatch(getAllGuideClassData());
         dispatch(getLatestModifiedLocationDetails());
     }, []);
 
     const handleClickOpen = (type, data) => {
-        console.log(type);
-        console.log(data);
         if (type === 'VIEW_UPDATE') {
             setMode(type);
-            setLocationCode(data.code);
+            setGuideCode(data.guideCode);
         } else if (type === 'INSERT') {
-            setLocationCode('');
+            setGuideCode('');
             setMode(type);
         } else {
             setMode(type);
-            setLocationCode(data.code);
+            setGuideCode(data.guideCode);
         }
         setOpen(true);
     };
@@ -205,7 +195,7 @@ function ViewGuideClass() {
                                     }}
                                 />
 
-                                {open ? <GuideClass open={open} handleClose={handleClose} locationCode={locationCode} mode={mode} /> : ''}
+                                {open ? <GuideClass open={open} handleClose={handleClose} guideCode={guideCode} mode={mode} /> : ''}
                                 {openToast ? <SuccessMsg openToast={openToast} handleToast={handleToast} mode={mode} /> : null}
                                 {openErrorToast ? (
                                     <ErrorMsg openToast={openErrorToast} handleToast={setOpenErrorToast} mode={mode} />

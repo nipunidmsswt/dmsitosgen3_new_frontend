@@ -116,10 +116,6 @@ function ViewMarketGroup() {
                             groupType: item.groupType,
                             code: item.code,
                             description: item.description,
-                            // marketCode: item.marketGroupDetails[0].market.code,
-                            // mobileN:item.managerAdditionalDetails[0].officeTelNumber,
-                            // codeAndNameDetail:item.codeAndNameDetail.name,
-                            // fax: item.managerAdditionalDetails[0].fax1,
                             status: item.status
                         };
                         dataArray.push(initialValues);

@@ -65,7 +65,8 @@ export const guideClassReducer = (state = initialState, action) => {
             };
 
         case SUCCESS_GET_ALL_GUIDE_CLASS_DATA:
-            return { ...state, guideClassList: data };
+            console.log(data.payload[0]);
+            return { ...state, guideClassList: data.payload[0] };
 
         case FAILED_GET_ALL_GUIDE_CLASS_DATA:
             return { ...state, guideClassList: data };
