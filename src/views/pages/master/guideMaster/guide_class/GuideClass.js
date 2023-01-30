@@ -40,14 +40,14 @@ import {
     updateExpenseTypesData
 } from 'store/actions/masterActions/ExpenseTypeAction';
 import CreatedUpdatedUserDetailsWithTableFormat from '../../userTimeDetails/CreatedUpdatedUserDetailsWithTableFormat';
-import { saveGuideClassData } from 'store/actions/masterActions/GuideClassAction';
+import { getGuideClassDetailsByCode, saveGuideClassData, updateGuideClassData } from 'store/actions/masterActions/GuideClassAction';
 const Transition = forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
 
-function GuideClass({ open, handleClose, mode, code }) {
+function GuideClass({ open, handleClose, mode, guideCode }) {
     const initialValues = {
-        code: '',
+        guideCode: '',
         description: '',
         status: true,
         guideClassDetails: [
@@ -121,335 +121,107 @@ function GuideClass({ open, handleClose, mode, code }) {
             return true;
         });
     });
+    yup.addMethod(yup.array, 'uniqueStatus', function (message) {
+        return this.test('uniqueStatus', message, function (list) {
+            const mapper = (x) => {
+                return x.status;
+            };
+            const set = [...new Set(list.map(mapper))];
+            const isUnique = list.length === set.length;
+            if (isUnique) {
+                return true;
+            }
+
+            const idx = list.findIndex((l, i) => mapper(l) !== set[i]);
+            return this.createError({
+                path: `guideClassDetails[${idx}].status`,
+                message: message
+            });
+        });
+    });
 
     const validationSchema = yup.object().shape({
-        code: yup.string().required('Required field').checkDuplicatecode('ggg'),
+        guideCode: yup.string().required('Required field'),
         description: yup.string().required('Required field'),
         guideClassDetails: yup.array().of(
             yup.object().shape({
                 tax: yup.object().typeError('Required field'),
                 fromDate: yup.date().required('Required field'),
-                toDate: yup.date().required('Required field'),
+                toDate: yup.date().min(yup.ref('fromDate'), "End date can't be before start date"),
                 currencyList: yup.object().typeError('Required field'),
-                perDayRate: yup.string().required('Required field')
+                perDayRate: yup.number().required('Required field').positive('entry should be greater than 0')
+                // status: yup.bool().oneOf(status, 'The profession you chose does not exist')
+                // status: yup.bool().when('status', {
+                //     is: true,
+                //     then: yup.bool().oneOf([true], '').required('Required field')
+                // }) // status: yup.boolean().when('status', {
+                //     is: true,
+                //     then: 'error'
+                // })
+                // status: yup.boolean().when('status', {
+                //     is: true && mode === 'VIEW_UPDATE',
+                //     // then: yup.date().required('Field is required')
+                // })
+                // perDayRate: yup
+                //     .number()
+                //     .transform((_, value) => {
+                //         if (value.includes('.')) {
+                //             return null;
+                //         }
+                //         return +value.replace(/,/, '.');
+                //     })
+                //     .positive()
             })
         )
+        // .uniqueStatus('Already Existing Active Record.')
     });
 
-    const expenseTypeToUpdate = useSelector((state) => state.expenseTypesReducer.expenseTypeToUpdate);
+    const guideClassToUpdate = useSelector((state) => state.guideClassReducer.guideClassToUpdate);
 
     const dispatch = useDispatch();
     const [taxIdValues, setTaxIdValues] = useState(null);
     const [taxValues, setTaxValues] = useState(null);
 
-    // useEffect(() => {
-    //     if (currencies.length != 0) {
-    //         let array = [];
-
-    //         for (let [key, value] of Object.entries(currencies.currencies)) {
-    //             array.push({ name: key, value: value });
-    //         }
-
-    //         setCurrecyListArray(array);
-    //     }
-    // }, [currencies]);
     useEffect(() => {
         if (mode === 'VIEW_UPDATE' || mode === 'VIEW') {
-            dispatch(getExpenseTypesById(code));
+            dispatch(getGuideClassDetailsByCode(guideCode));
         }
     }, [mode]);
 
-    const taxToUpdate = useSelector((state) => state.taxReducer.taxToUpdate);
-    const taxToEdit = useSelector((state) => state.taxReducer.taxToEdit);
-    console.log(taxToEdit);
-
-    // useEffect(() => {
-    //     if ((mode === 'VIEW_UPDATE' && taxToEdit != null) || (mode === 'VIEW' && taxToEdit != null)) {
-    //         console.log('tax to edit:' + taxToEdit.taxCode);
-    //         setTaxValues(taxToEdit);
-    //     }
-    // }, [taxToEdit != null]);
-
-    // useEffect(() => {
-    //     (async () => {
-    //         if ((mode === 'VIEW_UPDATE' && taxToEdit != null) || (mode === 'VIEW' && taxToEdit != null)) {
-    //             console.log('taxToEdit:' + taxToEdit);
-    //             setTaxValues(taxToEdit);
-    //         }
-    //     })();
-    // }, [taxToEdit]);
-
-    // useEffect(() => {
-    //     async function fetchData() {
-    //         try {
-    //             const response = await fetch(`https://www.reddit.com/r/${subreddit}.json`);
-    //             const json = await response.json();
-    //             setPosts(json.data.children.map((it) => it.data));
-    //         } catch (e) {
-    //             console.error(e);
-    //         }
-    //     }
-    //     fetchData();
-    // }, [expenseTypeToUpdate]);
-
-    const [taxData, setData] = useState(null);
-    // async function getData(userId) {
-    //     console.log(userId);
-    //     // const realData1 = null;
-    //     const data = await axios
-    //         .get(`${process.env.REACT_APP_FINANCE_URL}/taxDetails/${userId}`)
-    //         .then((result) => {
-    //             console.log(result.json);
-    //             console.log(result.data.payload[0]);
-    //             const realData1 = result.data.payload[0];
-    //             return realData1;
-    //         })
-    //         .catch((e) => {
-    //             console.error(e);
-    //         });
-    //     console.log(data);
-
-    //     // // const realData = data.data.payload[0];
-    //     // // setData(realData);
-    //     return data;
-    // }
-
-    // useEffect(() => {
-    //     console.log(taxData);
-
-    //     //   return () => {
-    //     //     second
-    //     //   }
-    // }, [taxData]);
-
-    async function getData(userId) {
-        const data = await getTaxDetails(userId);
-        const value = data.data.payload[0];
-        console.log(value);
-        return value;
-    }
-
-    // const getTaxDetails = async (userId) => {
-    //     const response = axios.get(`${process.env.REACT_APP_FINANCE_URL}/taxDetails/${userId}`);
-    //     return response;
-    // };
-    // // getTaxDetails(item.tax);
-    // async function getTaxDetailsn(value) {
-    //     try {
-    //         await dispatch(getTaxDataByUniqueId(value));
-    //         console.log(taxToEdit);
-    //         // if (duplicateCode != null && duplicateCode.errorMessages.length != 0) {
-    //         //     return false;
-    //         // } else {
-    //         //     return true;
-    //         // }
-    //     } catch (error) {}
-    //     return taxToEdit;
-    // }
-
     useEffect(() => {
-        // fetchData();
-        // declare the data fetching function
-        // const fetchData = () => {
-        if (expenseTypeToUpdate != null) {
+        if (guideClassToUpdate != null) {
             const dataArray = [];
-            if ((mode === 'VIEW_UPDATE' && expenseTypeToUpdate != null) || (mode === 'VIEW' && expenseTypeToUpdate != null)) {
-                console.log(expenseTypeToUpdate.guideClassDetails.length);
-                if (expenseTypeToUpdate.guideClassDetails.length > 0) {
-                    expenseTypeToUpdate.guideClassDetails.map((item) => {
-                        console.log(item.tax);
-
-                        const taxDe = getTaxDetailsn(item.tax);
-                        console.log(taxDe);
-                        // setTaxIdValues(item.Tax);
-                        // console.log('inside');
-                        // dispatch(getTaxDataByUniqueId(item.tax));
-
-                        // dispatch(addUser(values))
-                        // .then(data=>{
-                        //     console.log(data)
-                        // })
-                        // const getList = async () => {
-                        //     console.log('fetch:' + item.tax);
-                        //     //await has no effect
-                        //     await dispatch(getTaxDataByUniqueId(item.tax));
-                        //     console.log(taxValues);
-                        // };
-                        // getList();
-                        // const fetchData = async () => {
-                        //     try {
-                        //         const list = await dispatch(getTaxDataByUniqueId(item.tax));
-                        //         // if (list) {
-                        //         console.log('data567:' + list); //
-                        //         console.log('return90:' + taxToEdit.taxCode);
-                        //         const guideClassDetails = {
-                        //             fromDate: item.fromDate,
-                        //             toDate: item.toDate,
-                        //             // currencyList: item.currencyList,
-
-                        //             // tax: taxToEdit,
-                        //             expenseRate: item.expenseRate,
-                        //             rateWithoutTax: '',
-                        //             rateWithTax: '',
-                        //             status: item.status
-                        //         };
-                        //         dataArray.push(guideClassDetails);
-                        //         console.log(guideClassDetails);
-                        //         // }
-
-                        //         //
-                        //         // });
-
-                        //         // const json = await response.json();
-                        //         // setPosts(json.data.children.map((it) => it.data));
-                        //     } catch (e) {
-                        //         console.error(e);
-                        //     }
-                        // };
-                        // fetchData();
-                        const data = getData(item.tax);
-                        // // setData(getData(item.tax));
-                        console.log(data);
-                        const taxDes = data;
-                        // console.log(taxDes);
-                        // let allPromises = null;
-                        // allPromises == data;
-                        // console.log(allPromises);
-                        // async () => {
-                        //     const value = dispatch(getTaxDataByUniqueId(item.tax)).then;
-                        //     if (value) {
-                        //         // setTaxIdValues(...taxToEdit);
-                        //         console.log('dfdfdfdf');
-                        //     }
-                        // };
-                        // axios.get(`${process.env.REACT_APP_FINANCE_URL}/taxDetails/${item.tax}`).then(() => {
-                        //     // dispatch(functionToDispatch())
-                        //     console.log('dfdfdfdf' + taxToEdit);
-                        // });
-
-                        // here i'm using the location from the first function
-                        // await getInfo(location);
-                        // })();
-                        // const fetchData = async () => {
-                        //     const data = await fetch('https://yourapi.com');
-                        //   }
-                        // console.log(taxData);
-
+            if ((mode === 'VIEW_UPDATE' && guideClassToUpdate != null) || (mode === 'VIEW' && guideClassToUpdate != null)) {
+                if (guideClassToUpdate.guideClassDetails.length > 0) {
+                    guideClassToUpdate.guideClassDetails.map((item) => {
                         const guideClassDetails = {
                             fromDate: item.fromDate,
                             toDate: item.toDate,
-                            // currencyList: item.currencyList,
-
-                            tax: taxDes,
+                            currencyList: item.currencyList,
+                            tax: item.tax,
                             perDayRate: item.perDayRate,
-                            rateWithoutTax: '',
-                            rateWithTax: '',
+                            rateWithÓutTax: item.rateWithÓutTax,
+                            rateWithTax: item.rateWithTax,
                             status: item.status
                         };
                         dataArray.push(guideClassDetails);
                     });
 
                     const saveValues = {
-                        code: expenseTypeToUpdate.code,
-                        description: expenseTypeToUpdate.description,
-                        status: expenseTypeToUpdate.status,
+                        guideCode: guideClassToUpdate.guideCode,
+                        description: guideClassToUpdate.description,
+                        status: guideClassToUpdate.status,
                         guideClassDetails: dataArray
-
-                        // guideClassDetails: [
-                        //     {
-                        //         fromDate: item.fromDate,
-                        //         toDate: item.toDate,
-                        //         currencyList: item.currencyList.currencyListId,
-                        //         tax: item.tax.taxId,
-                        //         expenseRate: item.expenseRate,
-                        //         rateWithoutTax: '',
-                        //         rateWithTax: '',
-                        //         status:item.status,
-                        //     }
-                        // ]
                     };
-                    console.log(saveValues);
                     setLoadValues(saveValues);
                 }
-                // dispatch(saveExpenseTypesData(saveValues));
             }
         }
-        // };
-
-        // call the function
-        // getList()
-        // make sure to catch any error
-        // .catch(console.error);
-    }, [expenseTypeToUpdate]);
-
-    // useEffect(() => {
-    //     console.log(taxIdValues);
-    //     const value = dispatch(getTaxDataByUniqueId(taxIdValues));
-
-    //     return () => {
-    //         console.log(taxToEdit);
-    //     };
-    // }, [taxIdValues]);
-
-    // useEffect(() => {
-    //     console.log(expenseTypeToUpdate);
-    //     const dataArray = [];
-    //     if ((mode === 'VIEW_UPDATE' && expenseTypeToUpdate != null) || (mode === 'VIEW' && expenseTypeToUpdate != null)) {
-    //         if (expenseTypeToUpdate.guideClassDetails.length > 0) {
-    //             expenseTypeToUpdate.guideClassDetails.map((item) => {
-    //                 dispatch(await getTaxDataByUniqueId(item.tax));
-    //                 const fetchData = async () => {
-    //                     const data = await fetch('https://yourapi.com');
-    //                   }
-    //                 console.log(taxToEdit);
-    //                 const guideClassDetails = {
-    //                     fromDate: item.fromDate,
-    //                     toDate: item.toDate,
-    //                     currencyList: item.currencyList,
-
-    //                     tax: taxToEdit,
-    //                     expenseRate: item.expenseRate,
-    //                     rateWithoutTax: '',
-    //                     rateWithTax: '',
-    //                     status: item.status
-    //                 };
-    //                 dataArray.push(guideClassDetails);
-    //             });
-
-    //             const saveValues = {
-    //                 code: expenseTypeToUpdate.code,
-    //                 description: expenseTypeToUpdate.description,
-    //                 status: expenseTypeToUpdate.status,
-    //                 guideClassDetails: dataArray
-
-    //                 // guideClassDetails: [
-    //                 //     {
-    //                 //         fromDate: item.fromDate,
-    //                 //         toDate: item.toDate,
-    //                 //         currencyList: item.currencyList.currencyListId,
-    //                 //         tax: item.tax.taxId,
-    //                 //         expenseRate: item.expenseRate,
-    //                 //         rateWithoutTax: '',
-    //                 //         rateWithTax: '',
-    //                 //         status:item.status,
-    //                 //     }
-    //                 // ]
-    //             };
-    //             console.log(saveValues);
-    //             setLoadValues(saveValues);
-    //         }
-    //         // dispatch(saveExpenseTypesData(saveValues));
-    //     }
-    //     // di
-    // }, [expenseTypeToUpdate]);
+    }, [guideClassToUpdate]);
 
     const handleSubmitForm = (data) => {
-        console.log(data);
         if (mode === 'INSERT') {
             const dataArray = [];
-
-            console.log(data.guideClassDetails.length);
-            console.log(data.guideClassDetails.size);
             if (data.guideClassDetails.length > 0) {
                 data.guideClassDetails.map((item) => {
                     const guideClassDetails = {
@@ -457,43 +229,24 @@ function GuideClass({ open, handleClose, mode, code }) {
                         toDate: item.toDate,
                         currencyList: item.currencyList.currencyListId,
                         tax: item.tax.taxId,
-                        perdayRate: item.perDayRate,
-                        rateWithoutTax: '',
-                        rateWithTax: '',
+                        perDayRate: item.perDayRate == null ? 0.0 : item.perDayRate,
+                        rateWithÓutTax: item.perDayRate,
+                        rateWithTax: item.perDayRate,
                         status: item.status
                     };
                     dataArray.push(guideClassDetails);
                 });
 
                 const saveValues = {
-                    code: data.code,
+                    guideCode: data.guideCode,
                     description: data.description,
                     status: data.status,
                     guideClassDetails: dataArray
-
-                    // guideClassDetails: [
-                    //     {
-                    //         fromDate: item.fromDate,
-                    //         toDate: item.toDate,
-                    //         currencyList: item.currencyList.currencyListId,
-                    //         tax: item.tax.taxId,
-                    //         expenseRate: item.expenseRate,
-                    //         rateWithoutTax: '',
-                    //         rateWithTax: '',
-                    //         status:item.status,
-                    //     }
-                    // ]
                 };
-                console.log(saveValues);
                 dispatch(saveGuideClassData(saveValues));
             }
-            // dispatch(saveExpenseTypesData(data));
-            // setTableData(dataArray);
         } else if (mode === 'VIEW_UPDATE') {
             const dataArray = [];
-
-            console.log(data.guideClassDetails.length);
-            console.log(data.guideClassDetails.size);
             if (data.guideClassDetails.length > 0) {
                 data.guideClassDetails.map((item) => {
                     const guideClassDetails = {
@@ -501,35 +254,21 @@ function GuideClass({ open, handleClose, mode, code }) {
                         toDate: item.toDate,
                         currencyList: item.currencyList.currencyListId,
                         tax: item.tax.taxId,
-                        expenseRate: item.expenseRate,
-                        rateWithoutTax: '',
-                        rateWithTax: '',
+                        perDayRate: item.perDayRate == null ? 0.0 : item.perDayRate,
+                        rateWithÓutTax: item.perDayRate,
+                        rateWithTax: item.perDayRate,
                         status: item.status
                     };
                     dataArray.push(guideClassDetails);
                 });
 
                 const saveValues = {
-                    code: data.code,
+                    guideCode: data.guideCode,
                     description: data.description,
                     status: data.status,
                     guideClassDetails: dataArray
-
-                    // guideClassDetails: [
-                    //     {
-                    //         fromDate: item.fromDate,
-                    //         toDate: item.toDate,
-                    //         currencyList: item.currencyList.currencyListId,
-                    //         tax: item.tax.taxId,
-                    //         expenseRate: item.expenseRate,
-                    //         rateWithoutTax: '',
-                    //         rateWithTax: '',
-                    //         status:item.status,
-                    //     }
-                    // ]
                 };
-                console.log(saveValues);
-                dispatch(updateExpenseTypesData(saveValues));
+                dispatch(updateGuideClassData(saveValues));
             }
         }
         handleClose();
@@ -551,7 +290,6 @@ function GuideClass({ open, handleClose, mode, code }) {
     }, []);
 
     useEffect(() => {
-        console.log(currencyListData);
         if (currencyListData != null) {
             setCurrencyListOptions(currencyListData);
         }
@@ -617,14 +355,16 @@ function GuideClass({ open, handleClose, mode, code }) {
                                                                         InputLabelProps={{
                                                                             shrink: true
                                                                         }}
-                                                                        name="code"
+                                                                        name="guideCode"
                                                                         disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
-                                                                        label="Code"
+                                                                        label="Guide Code"
                                                                         onChange={handleChange}
                                                                         onBlur={handleBlur}
-                                                                        value={values.code}
-                                                                        error={Boolean(touched.code && errors.code)}
-                                                                        helperText={touched.code && errors.code ? errors.code : ''}
+                                                                        value={values.guideCode}
+                                                                        error={Boolean(touched.guideCode && errors.guideCode)}
+                                                                        helperText={
+                                                                            touched.guideCode && errors.guideCode ? errors.guideCode : ''
+                                                                        }
                                                                     ></TextField>
                                                                 </Grid>
                                                                 <Grid item>
@@ -685,7 +425,7 @@ function GuideClass({ open, handleClose, mode, code }) {
                                                                                         toDate: '',
                                                                                         currency: '',
                                                                                         tax: null,
-                                                                                        expenseRate: '',
+                                                                                        perDayRate: '',
                                                                                         rateWithoutTax: '',
                                                                                         rateWithTax: '',
                                                                                         status: true
@@ -708,7 +448,7 @@ function GuideClass({ open, handleClose, mode, code }) {
                                                                                     <TableCell>Currency</TableCell>
                                                                                     <TableCell>Tax Code</TableCell>
                                                                                     <TableCell>Tax %</TableCell>
-                                                                                    <TableCell>Expense Rate</TableCell>
+                                                                                    <TableCell>Per Day Rate</TableCell>
                                                                                     <TableCell>Rate Without Tax</TableCell>
                                                                                     <TableCell>Rate With Tax</TableCell>
                                                                                     <TableCell>Status</TableCell>
@@ -899,19 +639,15 @@ function GuideClass({ open, handleClose, mode, code }) {
 
                                                                                             <TableCell>
                                                                                                 <Autocomplete
-                                                                                                    // value={
-                                                                                                    //     values.guideClassDetails[idx]
-                                                                                                    //         ? values.guideClassDetails[idx]
-                                                                                                    //               .currencyList
-                                                                                                    //         : null
-                                                                                                    // }
+                                                                                                    value={
+                                                                                                        values.guideClassDetails[idx]
+                                                                                                            ? values.guideClassDetails[idx]
+                                                                                                                  .currencyList
+                                                                                                            : null
+                                                                                                    }
                                                                                                     name={`guideClassDetails.${idx}.currencyList`}
                                                                                                     onChange={(_, value) => {
                                                                                                         console.log(value.currencyListId);
-                                                                                                        setFieldValue(
-                                                                                                            `guideClassDetails.${idx}.currencyList`,
-                                                                                                            value
-                                                                                                        );
                                                                                                         setFieldValue(
                                                                                                             `guideClassDetails.${idx}.currencyList`,
                                                                                                             value
@@ -996,13 +732,8 @@ function GuideClass({ open, handleClose, mode, code }) {
                                                                                                                   .tax
                                                                                                             : null
                                                                                                     }
-                                                                                                    // disabled={
-                                                                                                    //     mode == 'VIEW_UPDATE' ||
-                                                                                                    //     mode == 'VIEW'
-                                                                                                    // }
                                                                                                     name={`guideClassDetails.${idx}.tax`}
                                                                                                     onChange={(_, value) => {
-                                                                                                        console.log(value);
                                                                                                         setFieldValue(
                                                                                                             `guideClassDetails.${idx}.tax`,
                                                                                                             value
@@ -1028,6 +759,10 @@ function GuideClass({ open, handleClose, mode, code }) {
                                                                                                             placeholder="--Select a Tax Code --"
                                                                                                             variant="outlined"
                                                                                                             name={`guideClassDetails.${idx}.tax`}
+                                                                                                            disabled={
+                                                                                                                mode == 'VIEW_UPDATE' ||
+                                                                                                                mode == 'VIEW'
+                                                                                                            }
                                                                                                             onBlur={handleBlur}
                                                                                                             helperText={
                                                                                                                 touched.guideClassDetails &&
@@ -1101,11 +836,11 @@ function GuideClass({ open, handleClose, mode, code }) {
                                                                                                         mode == 'VIEW'
                                                                                                     }
                                                                                                     placeholder="0"
-                                                                                                    name={`guideClassDetails.${idx}.expenseRate`}
+                                                                                                    name={`guideClassDetails.${idx}.perDayRate`}
                                                                                                     value={
                                                                                                         values.guideClassDetails[idx] &&
                                                                                                         values.guideClassDetails[idx]
-                                                                                                            .expenseRate
+                                                                                                            .perDayRate
                                                                                                     }
                                                                                                     onChange={handleChange}
                                                                                                     // onChange={(e) =>
@@ -1118,90 +853,45 @@ function GuideClass({ open, handleClose, mode, code }) {
                                                                                                                 idx
                                                                                                             ] &&
                                                                                                             touched.guideClassDetails[idx]
-                                                                                                                .expenseRate &&
+                                                                                                                .perDayRate &&
                                                                                                             errors.guideClassDetails &&
                                                                                                             errors.guideClassDetails[idx] &&
                                                                                                             errors.guideClassDetails[idx]
-                                                                                                                .expenseRate
+                                                                                                                .perDayRate
                                                                                                     )}
                                                                                                     helperText={
                                                                                                         touched.guideClassDetails &&
                                                                                                         touched.guideClassDetails[idx] &&
                                                                                                         touched.guideClassDetails[idx]
-                                                                                                            .expenseRate &&
+                                                                                                            .perDayRate &&
                                                                                                         errors.guideClassDetails &&
                                                                                                         errors.guideClassDetails[idx] &&
                                                                                                         errors.guideClassDetails[idx]
-                                                                                                            .expenseRate
+                                                                                                            .perDayRate
                                                                                                             ? errors.guideClassDetails[idx]
-                                                                                                                  .expenseRate
+                                                                                                                  .perDayRate
                                                                                                             : ''
                                                                                                     }
                                                                                                 />
                                                                                             </TableCell>
                                                                                             <TableCell>
                                                                                                 {values.guideClassDetails[idx] &&
-                                                                                                values.guideClassDetails[idx].expenseRate
+                                                                                                values.guideClassDetails[idx].perDayRate
                                                                                                     ? values.guideClassDetails[idx]
-                                                                                                          .expenseRate
+                                                                                                          .perDayRate
                                                                                                     : 0}
                                                                                             </TableCell>
                                                                                             <TableCell>
                                                                                                 {values.guideClassDetails[idx] &&
-                                                                                                values.guideClassDetails[idx].expenseRate
+                                                                                                values.guideClassDetails[idx].perDayRate
                                                                                                     ? values.guideClassDetails[idx]
-                                                                                                          .expenseRate *
+                                                                                                          .perDayRate *
                                                                                                           (values.guideClassDetails[idx].tax
                                                                                                               .percentage /
                                                                                                               100) +
                                                                                                       values.guideClassDetails[idx]
-                                                                                                          .expenseRate
+                                                                                                          .perDayRate
                                                                                                     : 0}
-                                                                                                {/* <TextField
-                                                                                                    sx={{
-                                                                                                        width: { sm: 200 },
-                                                                                                        '& .MuiInputBase-root': {
-                                                                                                            height: 40
-                                                                                                        }
-                                                                                                    }}
-                                                                                                    // label="Additional Price"
-                                                                                                    type="number"
-                                                                                                    variant="outlined"
-                                                                                                    placeholder="0"
-                                                                                                    // name={`guideClassDetails.${idx}.expenseRate`}
-                                                                                                    // value={
-                                                                                                    //     values.guideClassDetails[idx] &&
-                                                                                                    //     values.guideClassDetails[idx].expenseRate
-                                                                                                    // }
-                                                                                                    onChange={handleChange}
-                                                                                                    onBlur={handleBlur}
-                                                                                                    // error={Boolean(
-                                                                                                    //     touched.guideClassDetails &&
-                                                                                                    //         touched.guideClassDetails[
-                                                                                                    //             idx
-                                                                                                    //         ] &&
-                                                                                                    //         touched.guideClassDetails[idx]
-                                                                                                    //             .rate &&
-                                                                                                    //         errors.guideClassDetails &&
-                                                                                                    //         errors.guideClassDetails[
-                                                                                                    //             idx
-                                                                                                    //         ] &&
-                                                                                                    //         errors.guideClassDetails[idx]
-                                                                                                    //             .rate
-                                                                                                    // )}
-                                                                                                    // helperText={
-                                                                                                    //     touched.guideClassDetails &&
-                                                                                                    //     touched.guideClassDetails[idx] &&
-                                                                                                    //     touched.guideClassDetails[idx]
-                                                                                                    //         .rate &&
-                                                                                                    //     errors.guideClassDetails &&
-                                                                                                    //     errors.guideClassDetails[idx] &&
-                                                                                                    //     errors.guideClassDetails[idx].rate
-                                                                                                    //         ? errors.guideClassDetails[idx]
-                                                                                                    //               .rate
-                                                                                                    //         : ''
-                                                                                                    // }
-                                                                                                /> */}
                                                                                             </TableCell>
 
                                                                                             <TableCell>
@@ -1209,8 +899,44 @@ function GuideClass({ open, handleClose, mode, code }) {
                                                                                                     <FormControlLabel
                                                                                                         name={`guideClassDetails.${idx}.status`}
                                                                                                         onChange={handleChange}
-                                                                                                        // value={formValues.status}
+                                                                                                        value={
+                                                                                                            values.guideClassDetails[idx] &&
+                                                                                                            values.guideClassDetails[idx]
+                                                                                                                .status
+                                                                                                        }
                                                                                                         control={<Switch color="success" />}
+                                                                                                        error={Boolean(
+                                                                                                            touched.guideClassDetails &&
+                                                                                                                touched.guideClassDetails[
+                                                                                                                    idx
+                                                                                                                ] &&
+                                                                                                                touched.guideClassDetails[
+                                                                                                                    idx
+                                                                                                                ].status &&
+                                                                                                                errors.guideClassDetails &&
+                                                                                                                errors.guideClassDetails[
+                                                                                                                    idx
+                                                                                                                ] &&
+                                                                                                                errors.guideClassDetails[
+                                                                                                                    idx
+                                                                                                                ].status
+                                                                                                        )}
+                                                                                                        helperText={
+                                                                                                            touched.guideClassDetails &&
+                                                                                                            touched.guideClassDetails[
+                                                                                                                idx
+                                                                                                            ] &&
+                                                                                                            touched.guideClassDetails[idx]
+                                                                                                                .status &&
+                                                                                                            errors.guideClassDetails &&
+                                                                                                            errors.guideClassDetails[idx] &&
+                                                                                                            errors.guideClassDetails[idx]
+                                                                                                                .status
+                                                                                                                ? errors.guideClassDetails[
+                                                                                                                      idx
+                                                                                                                  ].status
+                                                                                                                : ''
+                                                                                                        }
                                                                                                         // label="Status"
                                                                                                         checked={
                                                                                                             values.guideClassDetails[idx] &&

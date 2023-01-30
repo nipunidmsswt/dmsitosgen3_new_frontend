@@ -103,12 +103,6 @@ function ViewCodeAndName() {
     const dataToTableView = useSelector((state) => state.codeAndNameReducer.dataToTableView);
 
     const columns = [
-        // {
-        //     title: 'Cluster',
-        //     field: 'cluster',
-        //     filterPlaceholder: 'filter',
-        //     align: 'center'
-        // },
         {
             title: 'Market',
             field: 'marketList',
@@ -125,10 +119,7 @@ function ViewCodeAndName() {
 
     useEffect(() => {
         console.log(dataToTableView);
-        // if (dataToTableView?.length > 0) {
-        // const dataArray = [];
         setTableData(dataToTableView);
-        // }
     }, [dataToTableView]);
 
     useEffect(() => {
@@ -234,11 +225,9 @@ function ViewCodeAndName() {
 
     const handleSubmitForm = async (data) => {
         if (mode === 'INSERT') {
-            console.log('data:' + data);
             dispatch(saveClusterAndMarketMappingData(data));
-        } else if (mode === 'VIEW_UPDATE') {
-            // dispatch(updateCodeAndNameData(data));
         }
+
         handleClose();
     };
 
