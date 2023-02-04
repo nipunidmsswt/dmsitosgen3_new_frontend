@@ -48,7 +48,7 @@ function DepartmentDesignation({ open, handleClose, mode, code, type }) {
         status: yup.boolean()
     });
 
-    //get data from reducers
+    //get data from reducers...
     const departmentDesignationToUpdate = useSelector((state) => state.departmentDesignationReducer.departmentDesignationToUpdate);
     const duplicateDepartmentDesignation = useSelector((state) => state.departmentDesignationReducer.duplicateDepartmentDesignation);
 
@@ -65,13 +65,11 @@ function DepartmentDesignation({ open, handleClose, mode, code, type }) {
             (mode === 'VIEW_UPDATE' && departmentDesignationToUpdate != null) ||
             (mode === 'VIEW' && departmentDesignationToUpdate != null)
         ) {
-            console.log(departmentDesignationToUpdate);
             setLoadValues(departmentDesignationToUpdate);
         }
     }, [departmentDesignationToUpdate]);
 
     const handleSubmitForm = (data) => {
-        console.log(data);
         if (mode === 'INSERT') {
             dispatch(saveDepartmentDesignationData(data));
         } else if (mode === 'VIEW_UPDATE') {

@@ -29,6 +29,7 @@ import * as yup from 'yup';
 import { Box } from '@mui/system';
 import { getAllActiveMarketData } from 'store/actions/masterActions/operatorActions/MarketAction';
 import { makeStyles } from '@material-ui/core/styles';
+import Agent from './Agent';
 const useStyles = makeStyles({
     content: {
         justifyContent: 'center'
@@ -77,7 +78,10 @@ function ViewCodeAndName() {
     });
 
     const [open, setOpen] = useState(false);
+    const [openAgent, setAgentOpen] = useState(false);
     const [ccode, setCode] = useState('');
+    const [operatorCode, setOperatorCode] = useState('');
+    const [marketCode, setMarketCode] = useState('');
     const [mode, setMode] = useState('INSERT');
     const [openToast, setHandleToast] = useState(false);
     const [openErrorToast, setOpenErrorToast] = useState(false);
@@ -89,7 +93,6 @@ function ViewCodeAndName() {
     const dispatch = useDispatch();
     const error = useSelector((state) => state.codeAndNameReducer.errorMsg);
 
-    // const codeAndNameListData = useSelector((state) => state.codeAndNameReducer.codeAndNameList);
     const codeAndNameData = useSelector((state) => state.codeAndNameReducer.codeAndName);
     const clusterMarketMappingData = useSelector((state) => state.codeAndNameReducer.clusterMarketMappingData);
     const clusterListData = useSelector((state) => state.codeAndNameReducer.cluterTypesDetails);
@@ -101,6 +104,16 @@ function ViewCodeAndName() {
     const marketOperatorMappingData = useSelector((state) => state.codeAndNameReducer.marketOperatorMappingData);
 
     const dataToTableView = useSelector((state) => state.codeAndNameReducer.dataToTableView);
+    const agentData = useSelector((state) => state.agentReducer.agent);
+    console.log(agentData);
+    const handleClickOpenAgentForm = (code, marketCode) => {
+        console.log('market Code:' + marketCode);
+        setOperatorCode(code);
+        setMode('INSERT');
+        setAgentOpen(true);
+        setMarketCode(marketCode);
+        // setType('');
+    };
 
     const columns = [
         {
@@ -113,12 +126,42 @@ function ViewCodeAndName() {
             title: 'Operator',
             field: 'operatorList',
             filterPlaceholder: 'filter',
-            align: 'left'
+            align: 'left',
+
+            render: (rowData) => (
+                console.log(rowData.operatorList),
+                (
+                    <div
+                        style={{
+                            alignItems: 'center',
+                            align: 'center',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center'
+                        }}
+                    >
+                        <div>
+                            {rowData.operatorList?.split(',').map((type) => (
+                                <Button
+                                    variant="outlined"
+                                    type="button"
+                                    style={{
+                                        // backgroundColor: '#B22222',
+                                        marginLeft: '10px'
+                                    }}
+                                    onClick={(e) => handleClickOpenAgentForm(type, rowData.marketList)}
+                                >
+                                    {type}
+                                </Button>
+                            ))}
+                        </div>
+                    </div>
+                )
+            )
         }
     ];
 
     useEffect(() => {
-        console.log(dataToTableView);
         setTableData(dataToTableView);
     }, [dataToTableView]);
 
@@ -126,19 +169,11 @@ function ViewCodeAndName() {
         // if (marketMappingWithCluster?.payload?.length > 0) {
 
         setMarketListOptions(marketMappingWithCluster);
-
-        // const dataArray = [];
-        // setTableData(codeAndNameListData?.payload[0][0].codeAndNameDetails);
-        // }
     }, [marketMappingWithCluster]);
 
     useEffect(() => {
         if (operatorMappingWithMarket?.length > 0) {
-            console.log(operatorMappingWithMarket);
             setOperatorListOptions(operatorMappingWithMarket);
-
-            // const dataArray = [];
-            // setTableData(codeAndNameListData?.payload[0][0].codeAndNameDetails);
         }
     }, [operatorMappingWithMarket]);
 
@@ -151,6 +186,13 @@ function ViewCodeAndName() {
         } else {
         }
     }, [codeAndNameData]);
+
+    useEffect(() => {
+        if (agentData != null) {
+            setHandleToast(true);
+        } else {
+        }
+    }, [agentData]);
 
     useEffect(() => {
         if (clusterMarketMappingData != null) {
@@ -239,6 +281,7 @@ function ViewCodeAndName() {
 
     const handleClose = () => {
         setOpen(false);
+        setAgentOpen(false);
         dispatch(getAllClusterData());
         dispatch(getAllActiveMarketData());
         dispatch(getAllActiveOperatorData());
@@ -765,7 +808,17 @@ function ViewCodeAndName() {
                                         </Grid>
                                     </AccordionDetails>
                                 </Accordion>
-
+                                {openAgent ? (
+                                    <Agent
+                                        open={openAgent}
+                                        handleClose={handleClose}
+                                        operatorCode={operatorCode}
+                                        marketCode={marketCode}
+                                        // mode={mode}
+                                    />
+                                ) : (
+                                    ''
+                                )}
                                 {open ? <CodeAndName open={open} handleClose={handleClose} ccode={ccode} mode={mode} /> : ''}
                                 {openToast ? <SuccessMsg openToast={openToast} handleToast={handleToast} mode={mode} /> : null}
                                 {openErrorToast ? (
