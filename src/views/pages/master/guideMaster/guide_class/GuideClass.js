@@ -59,14 +59,27 @@ function GuideClass({ open, handleClose, mode, guideCode }) {
                 perDayRate: '',
                 rateWithoutTax: '',
                 rateWithTax: '',
-                status: true
+                status: false
             }
         ]
     };
 
+    const [existOpenModal, setExistOpenModal] = useState(false);
+
     const [loadValues, setLoadValues] = useState(null);
     const [currencyListArray, setCurrecyListArray] = useState([]);
     const ref = useRef(null);
+    const [appearing, setAppearing] = useState(false);
+
+    // const handleChangeStatus = (event) => {
+    //     console.log(event.target.checked);
+    //     // this.setState({ checked: event.target.checked });
+    // };
+    const handleExistModalClose = (status) => {
+        if (status) {
+            setExistOpenModal(false);
+        }
+    };
 
     // yup.addMethod(yup.array, "uniqueTaxOrder", function (message) {
     //   return this.test("uniqueTaxOrder", message, function (list) {
@@ -127,12 +140,22 @@ function GuideClass({ open, handleClose, mode, guideCode }) {
                 return x.status;
             };
             const set = [...new Set(list.map(mapper))];
-            const isUnique = list.length === set.length;
-            if (isUnique) {
-                return true;
-            }
+            console.log(list.map(mapper));
+
+            // const isUnique = list !== set;
+            // if (isUnique) {
+            //     return true;
+            // }
+            // console.log('list length:' + list[0]);
+            // if(list[0]==true){
+
+            // }
+            // const isUnique = list.length === new Set(list.map(mapper)).size;
+            // console.log('isUn:' + new Set(list.map(mapper)).size);
 
             const idx = list.findIndex((l, i) => mapper(l) !== set[i]);
+            // console.log('idx:' + set[i]);
+
             return this.createError({
                 path: `guideClassDetails[${idx}].status`,
                 message: message
@@ -149,7 +172,20 @@ function GuideClass({ open, handleClose, mode, guideCode }) {
                 fromDate: yup.date().required('Required field'),
                 toDate: yup.date().min(yup.ref('fromDate'), "End date can't be before start date"),
                 currencyList: yup.object().typeError('Required field'),
-                perDayRate: yup.number().required('Required field').positive('entry should be greater than 0')
+                perDayRate: yup.number().required('Required field').positive('entry should be greater than 0'),
+                status: yup.boolean()
+                // status: yup.bool().when('appearing', {
+                //     is: true,s
+                //     then: yup.bool().oneOf([false], 'You need to accept the terms and conditions')
+                // })
+                // status: yup.bool().test({
+                //     name: 'one-true',
+                //     message: 'Required',
+                //     test: (val) => !every(val, ['value', false])
+                // })
+                // status: yup.bool().oneOf([true], 'You need to accept the terms and conditions')
+                // .test('unique', 'Only unique values allowed.', (value) => (console.log(value) ? value === new Set(value) : true))
+
                 // status: yup.bool().oneOf(status, 'The profession you chose does not exist')
                 // status: yup.bool().when('status', {
                 //     is: true,
@@ -175,6 +211,14 @@ function GuideClass({ open, handleClose, mode, guideCode }) {
         )
         // .uniqueStatus('Already Existing Active Record.')
     });
+
+    // const  checkStatus()=>{
+
+    // }
+    let checkStatus = function (value) {
+        initialValues.guideClassDetails?.map((s) => console.log(s.status));
+        // console.log('value:' + value);
+    };
 
     const guideClassToUpdate = useSelector((state) => state.guideClassReducer.guideClassToUpdate);
 
@@ -428,7 +472,7 @@ function GuideClass({ open, handleClose, mode, guideCode }) {
                                                                                         perDayRate: '',
                                                                                         rateWithoutTax: '',
                                                                                         rateWithTax: '',
-                                                                                        status: true
+                                                                                        status: false
                                                                                     });
                                                                                 }}
                                                                             >
@@ -898,7 +942,7 @@ function GuideClass({ open, handleClose, mode, guideCode }) {
                                                                                                 <FormGroup>
                                                                                                     <FormControlLabel
                                                                                                         name={`guideClassDetails.${idx}.status`}
-                                                                                                        onChange={handleChange}
+                                                                                                        // onChange={handleChangeStatus}
                                                                                                         value={
                                                                                                             values.guideClassDetails[idx] &&
                                                                                                             values.guideClassDetails[idx]
@@ -937,6 +981,29 @@ function GuideClass({ open, handleClose, mode, guideCode }) {
                                                                                                                   ].status
                                                                                                                 : ''
                                                                                                         }
+                                                                                                        onChange={(_, value) => {
+                                                                                                            checkStatus();
+                                                                                                            // console.log(value.currencyListId);
+                                                                                                            // setAppearing(value);
+                                                                                                            setFieldValue(
+                                                                                                                `guideClassDetails.${idx}.status`,
+                                                                                                                value
+                                                                                                            );
+                                                                                                            console.log(
+                                                                                                                values.guideClassDetails
+                                                                                                            );
+
+                                                                                                            // s.code ===
+                                                                                                            //     values.code &&
+                                                                                                            // s.category ==
+                                                                                                            //     values.codeType
+                                                                                                            //     ? setExistOpenModal(
+                                                                                                            //           true
+                                                                                                            //       )
+                                                                                                            //     : initialValuesNew.codeAndNameDetails.push(
+                                                                                                            //           s
+                                                                                                            //       )
+                                                                                                        }}
                                                                                                         // label="Status"
                                                                                                         checked={
                                                                                                             values.guideClassDetails[idx] &&
@@ -945,6 +1012,19 @@ function GuideClass({ open, handleClose, mode, guideCode }) {
                                                                                                         }
                                                                                                         disabled={mode == 'VIEW'}
                                                                                                     />
+                                                                                                    {errors.guideClassDetails &&
+                                                                                                        errors.guideClassDetails[idx] &&
+                                                                                                        errors.guideClassDetails[idx]
+                                                                                                            .status && (
+                                                                                                            <p>
+                                                                                                                {
+                                                                                                                    errors
+                                                                                                                        .guideClassDetails[
+                                                                                                                        idx
+                                                                                                                    ].status
+                                                                                                                }
+                                                                                                            </p>
+                                                                                                        )}
                                                                                                 </FormGroup>
                                                                                             </TableCell>
                                                                                             <TableCell>
@@ -975,6 +1055,15 @@ function GuideClass({ open, handleClose, mode, guideCode }) {
                                                                 ) : null}
                                                             </Grid>
                                                         </Box>
+                                                        <Grid item>
+                                                            {existOpenModal ? (
+                                                                <AlertItemExist
+                                                                    title="dev"
+                                                                    open={existOpenModal}
+                                                                    handleClose={handleExistModalClose}
+                                                                />
+                                                            ) : null}
+                                                        </Grid>
                                                         <Box display="flex" flexDirection="row-reverse" style={{ marginTop: '20px' }}>
                                                             {mode != 'VIEW' ? (
                                                                 <Button
