@@ -21,7 +21,9 @@ import {
     SUCCESS_GET_ALL_USER_ROLES,
     FAILED_GET_ALL_USER_ROLES,
     SUCCESS_GET_PROFILE_DATA_BY_ID,
-    FAILED_GET_PROFILE_DATA_BY_ID
+    FAILED_GET_PROFILE_DATA_BY_ID,
+    SUCCESS_UPDATE_MY_PROFILE,
+    FAILED_UPDATE_MY_PROFILE
 } from 'store/constant/authentication/UserConstant';
 
 const initialState = {
@@ -36,7 +38,8 @@ const initialState = {
     forgotPasswordData: null,
     resetPasswordData: null,
     userRole: [],
-    profileToUpdate: null
+    profileToUpdate: null,
+    myProfileUpdate: null
 };
 
 export const userReducer = (state = initialState, action) => {
@@ -160,7 +163,19 @@ export const userReducer = (state = initialState, action) => {
                 profileToUpdate: null,
                 errorMsg: data ? data.errorMessages : 'netwok error'
             };
+        case SUCCESS_UPDATE_MY_PROFILE:
+            console.warn('SUCCESS_UPDATE_MY_PROFILE', action.payload);
+            console.log(data.payload[0]);
+            return { ...state, myProfileUpdate: data.payload[0] };
 
+        case FAILED_UPDATE_MY_PROFILE:
+            console.warn('FAILED_UPDATE_MY_PROFILE', action);
+            console.log(data);
+            return {
+                ...state,
+                myProfileUpdate: null,
+                errorMsg: data ? data.errorMessages : 'netwok error'
+            };
         default:
             return state;
     }

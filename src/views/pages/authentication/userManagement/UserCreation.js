@@ -26,7 +26,8 @@ import {
     getUserDataById,
     saveUserData,
     updateUserData,
-    getProfileData
+    getProfileData,
+    updateMyProfile
 } from 'store/actions/authenticationActions/UserAction';
 import CreatedUpdatedUserDetailsWithTableFormat from 'views/pages/master/userTimeDetails/CreatedUpdatedUserDetailsWithTableFormat';
 import { getAllActiveMarketData } from 'store/actions/masterActions/operatorActions/MarketAction';
@@ -53,7 +54,7 @@ function User({ open, handleClose, mode, userCode, component }) {
         designation: null,
         department: null,
         cluster: null,
-        market: null,
+        market: [],
         roleId: null,
         userName: '',
         password: '',
@@ -67,7 +68,6 @@ function User({ open, handleClose, mode, userCode, component }) {
     const [loadValues, setLoadValues] = useState('');
     const [previewImages, setPreviewImages] = useState([]);
     const [updatePreviewImages, setupdatePreviewImages] = useState([]);
-    const marketListData = useSelector((state) => state.marketReducer.marketActiveList);
 
     const formikRef = useRef();
 
@@ -91,12 +91,10 @@ function User({ open, handleClose, mode, userCode, component }) {
     const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
 
     const validationSchema = yup.object().shape({
-        // company: yup.string().required('Required field'),
         disablePassowrdField: yup.boolean(),
         company: yup.object().typeError('Required field'),
-        title: yup.string().required('Required field'),
+        // title: yup.string().required('Required field'),
         firstName: yup.string().required('Required field'),
-        // // status: true,
         lastName: yup.string().required('Required field'),
         nic: yup.string().required('Required field'),
         email: yup.string().email().required('Required field'),
@@ -109,72 +107,13 @@ function User({ open, handleClose, mode, userCode, component }) {
         designation: yup.object().typeError('Required field'),
         department: yup.object().typeError('Required field'),
         cluster: yup.object().typeError('Required field'),
-        // market: yup.object().typeError('Required field'),
-        roleId: yup.object().typeError('Required field'),
         userName: yup.string().required('Requied field'),
-        // password: yup.string().required('Requied field').min(8, 'Password is too short - should be 8 chars minimum.')
-        // .lowercase(1, 'password must contain at least 1 lower case letter')
-        // .minUppercase(1, 'password must contain at least 1 upper case letter')
-        // .minNumbers(1, 'password must contain at least 1 number')
-        // .minSymbols(1, 'password must contain at least 1 special character')
+        roleId: yup.object().typeError('Required field'),
+        market: yup.object().typeError('Required field')
 
         // password: yup.string().when('disablePassowrdField', {
-        //     is: true,
-        //     then: yup
-        //         .string()
-        //         .required('Field is required')
-        //         .min(8, 'Must be 8 characters or more')
-        //         .matches(/[a-z]+/, 'One lowercase character')
-        //         .matches(/[A-Z]+/, 'One uppercase character')
-        //         .matches(/[@$!%*#?&]+/, 'One special character')
-        //         .matches(/\d+/, 'One number')
-        // })
-
-        password: yup.string().required('Required field')
-        // .min(8, 'Must be 8 characters or more')
-        // .matches(/[a-z]+/, 'One lowercase character')
-        // .matches(/[A-Z]+/, 'One uppercase character')
-        // .matches(/[@$!%*#?&]+/, 'One special character')
-        // .matches(/\d+/, 'One number')
-        // .test('isValidPass1', 'can not include first name', (value, context) => {
-        //     console.log(typeof value);
-        //     console.log(formikRef.current.values.firstName);
-        //     if (value !== '' && formikRef.current.values.firstName !== '') {
-        //         console.log(value.includes(formikRef.current.values.firstName));
-        //         return !value.includes(formikRef.current.values.firstName);
-        //     }
-
-        //     return true;
-        // })
-        // .test('isValidPass2', 'can not include last name', (value, context) => {
-        //     console.log(typeof value);
-        //     console.log(formikRef.current.values.lastName);
-        //     if (value !== '' && formikRef.current.values.lastName !== '') {
-        //         console.log(value.includes(formikRef.current.values.lastName));
-        //         return !value.includes(formikRef.current.values.lastName);
-        //     }
-
-        //     return true;
-        // })
-        // .test('isValidPass3', 'can not include email', (value, context) => {
-        //     console.log(typeof value);
-        //     console.log(formikRef.current.values.email);
-        //     if (value !== '' && formikRef.current.values.email !== '') {
-        //         console.log(value.includes(formikRef.current.values.email));
-        //         return !value.includes(formikRef.current.values.email);
-        //     }
-
-        //     return true;
-        // })
-        // .test('isValidPass3', 'can not include userName', (value, context) => {
-        //     console.log(typeof value);
-        //     console.log(formikRef.current.values.userName);
-        //     if (value !== '' && formikRef.current.values.userName !== '') {
-        //         console.log(value.includes(formikRef.current.values.userName));
-        //         return !value.includes(formikRef.current.values.userName);
-        //     }
-
-        //     return true;
+        //     is: true && mode === 'INSERT' && component === 'user_creation',
+        //     then: yup.string().required('Field is required')
         // })
     });
 
@@ -184,10 +123,9 @@ function User({ open, handleClose, mode, userCode, component }) {
     const profileToUpdate = useSelector((state) => state.userReducer.profileToUpdate);
     const [marketListOptions, setMarketListOptions] = useState([]);
     const clusterListData = useSelector((state) => state.codeAndNameReducer.cluterTypesDetails);
-    console.log(clusterListData);
     const companyProfile = useSelector((state) => state.companyProfileReducer.companyProfileList);
     const availableLicenseCount = useSelector((state) => state.companyProfileReducer.availableLicenseCount);
-
+    const marketListData = useSelector((state) => state.marketReducer.marketActiveList);
     const [clusterListOptions, setClusterListOptions] = useState([]);
     const [departmentListOptions, setDepartmentListOptions] = useState([]);
     const [designationListOptions, setDesignationListOptions] = useState([]);
@@ -195,44 +133,37 @@ function User({ open, handleClose, mode, userCode, component }) {
     const [titleListOptions, setTitleListOptions] = useState([]);
     const [companyListOptions, setCompanyListOptions] = useState([]);
     const [userRoleListOptions, setuserRoleListOptions] = useState([]);
-    const dispatch = useDispatch();
     const [inputMarketValue, setMarketInputValue] = useState(initialValues.market);
     const departmentActiveList = useSelector((state) => state.departmentDesignationReducer.departmentActiveList);
     const designationActiveList = useSelector((state) => state.departmentDesignationReducer.designationActiveList);
     const roleIdList = useSelector((state) => state.userReducer.userRole);
+    const myProfileUpdate = useSelector((state) => state.userReducer.myProfileUpdate);
 
+    const dispatch = useDispatch();
     const titleItems = [
         {
-            // id: 1,
             title: 'Mr.'
         },
         {
-            // id: 2,
             title: 'Mrs.'
         },
         {
-            // id: 3,
             title: 'Miss.'
         },
         {
-            // id: 4,
             title: 'Ms.'
         },
         {
-            // id: 5,
             title: 'Prof.'
         },
         {
-            // id: 6,
             title: 'Dr.'
         },
         {
-            // id: 7,
             title: 'Ven.'
         }
     ];
     useEffect(() => {
-        console.log(clusterListData);
         if (clusterListData != null) {
             setClusterListOptions(clusterListData);
         }
@@ -245,28 +176,32 @@ function User({ open, handleClose, mode, userCode, component }) {
     }, [departmentActiveList]);
 
     useEffect(() => {
-        console.log(userToUpdate);
         if ((mode === 'VIEW_UPDATE' && userToUpdate != null) || (mode === 'VIEW' && userToUpdate != null)) {
+            userToUpdate.disablePassowrdField = false;
+            userToUpdate.availableLicenceCount = userToUpdate.company.availableLicenceCount;
+            userToUpdate.allocatedLicenceCount = userToUpdate.company.allocatedLicenceCount;
             console.log(userToUpdate);
+            userToUpdate.roleId = userToUpdate.role;
             setLoadValues(userToUpdate);
-            // setFieldValue('disablePassowrdField', false);
-            formikRef.current.setFieldValue('disablePassowrdField', false);
+            // formikRef.current.setFieldValue('disablePassowrdField', false);
         }
     }, [userToUpdate]);
 
     useEffect(() => {
-        console.log(profileToUpdate);
         if ((mode === 'VIEW_UPDATE' && profileToUpdate != null) || (mode === 'VIEW' && profileToUpdate != null)) {
-            console.log(profileToUpdate);
-
+            profileToUpdate.disablePassowrdField = false;
+            profileToUpdate.availableLicenceCount = profileToUpdate.company.availableLicenceCount;
+            profileToUpdate.allocatedLicenceCount = profileToUpdate.company.allocatedLicenceCount;
             // setFieldValue('disablePassowrdField', false);
             setLoadValues(profileToUpdate);
-            formikRef.current.setFieldValue('disablePassowrdField', false);
+            // formikRef.current.setFieldValue('disablePassowrdField', false);
         }
     }, [profileToUpdate]);
 
     useEffect(() => {
+        console.log(roleIdList);
         if (roleIdList != null) {
+            console.log(roleIdList);
             setuserRoleListOptions(roleIdList);
         }
     }, [roleIdList]);
@@ -279,8 +214,6 @@ function User({ open, handleClose, mode, userCode, component }) {
 
     useEffect(() => {
         if ((mode === 'VIEW_UPDATE' && component === 'user_creation') || (mode === 'VIEW' && component === 'user_creation')) {
-            console.log(userCode);
-
             dispatch(getUserDataById(userCode));
 
             // setTitleListOptions(ti)
@@ -296,20 +229,26 @@ function User({ open, handleClose, mode, userCode, component }) {
     useEffect(() => {
         if (companyProfile?.payload?.length > 0) {
             setCompanyListOptions(companyProfile?.payload[0]);
-            console.log(companyProfile?.payload[0][0]);
+
             dispatch(getAvailableLicenseCount(companyProfile?.payload[0][0].id));
         }
     }, [companyProfile]);
 
     const handleSubmitForm = (data) => {
         console.log(data);
-        if (mode === 'INSERT') {
-            console.log(data);
-            // dispatch(saveUserData(data));
-        } else if (mode === 'VIEW_UPDATE') {
-            // dispatch(updateUserData(data));
+        if (component === 'user_creation') {
+            if (mode === 'INSERT') {
+                console.log(data);
+                dispatch(saveUserData(data));
+            } else if (mode === 'VIEW_UPDATE') {
+                dispatch(updateUserData(data));
+            }
+        } else if (component === 'user_profile') {
+            console.log('user_profile');
+            dispatch(updateMyProfile(data));
         }
-        // handleClose();
+
+        handleClose();
     };
 
     const loadAvalibleLicenseCount = (data, setFieldValue) => {
@@ -554,6 +493,11 @@ function User({ open, handleClose, mode, userCode, component }) {
                                                                             InputLabelProps={{
                                                                                 shrink: true
                                                                             }}
+                                                                            disabled={
+                                                                                component === 'user_creation' && mode === 'INSERT'
+                                                                                    ? false
+                                                                                    : true
+                                                                            }
                                                                             onBlur={handleBlur}
                                                                             value={values.firstName}
                                                                             error={Boolean(touched.firstName && errors.firstName)}
@@ -580,6 +524,11 @@ function User({ open, handleClose, mode, userCode, component }) {
                                                                             InputLabelProps={{
                                                                                 shrink: true
                                                                             }}
+                                                                            disabled={
+                                                                                component === 'user_creation' && mode === 'INSERT'
+                                                                                    ? false
+                                                                                    : true
+                                                                            }
                                                                             onBlur={handleBlur}
                                                                             value={values.middleName}
                                                                             error={Boolean(touched.middleName && errors.middleName)}
@@ -606,6 +555,11 @@ function User({ open, handleClose, mode, userCode, component }) {
                                                                             InputLabelProps={{
                                                                                 shrink: true
                                                                             }}
+                                                                            disabled={
+                                                                                component === 'user_creation' && mode === 'INSERT'
+                                                                                    ? false
+                                                                                    : true
+                                                                            }
                                                                             value={values.lastName}
                                                                             error={Boolean(touched.lastName && errors.lastName)}
                                                                             helperText={
@@ -626,6 +580,11 @@ function User({ open, handleClose, mode, userCode, component }) {
                                                                             id="outlined-required"
                                                                             label="NIC"
                                                                             name="nic"
+                                                                            disabled={
+                                                                                component === 'user_creation' && mode === 'INSERT'
+                                                                                    ? false
+                                                                                    : true
+                                                                            }
                                                                             onChange={handleChange}
                                                                             onBlur={handleBlur}
                                                                             InputLabelProps={{
@@ -648,6 +607,11 @@ function User({ open, handleClose, mode, userCode, component }) {
                                                                             label="Email"
                                                                             type="email"
                                                                             name="email"
+                                                                            disabled={
+                                                                                component === 'user_creation' && mode === 'INSERT'
+                                                                                    ? false
+                                                                                    : true
+                                                                            }
                                                                             onChange={handleChange}
                                                                             onBlur={handleBlur}
                                                                             InputLabelProps={{
@@ -675,10 +639,10 @@ function User({ open, handleClose, mode, userCode, component }) {
                                                                             onChange={handleChange}
                                                                             onBlur={handleBlur}
                                                                             value={values.mobile}
-                                                                            // error={Boolean(touched.mobile && errors.mobile)}
-                                                                            // helperText={
-                                                                            //     touched.mobile && errors.mobile ? errors.mobile : ''
-                                                                            // }
+                                                                            error={Boolean(touched.mobile && errors.mobile)}
+                                                                            helperText={
+                                                                                touched.mobile && errors.mobile ? errors.mobile : ''
+                                                                            }
                                                                         ></TextField>
                                                                     </Grid>
                                                                 </Grid>
@@ -688,9 +652,9 @@ function User({ open, handleClose, mode, userCode, component }) {
                                                                             value={values.designation}
                                                                             name="designation"
                                                                             onChange={(_, value) => {
-                                                                                console.log(value);
                                                                                 setFieldValue(`designation`, value);
                                                                             }}
+                                                                            disabled={component === 'user_profile' ? true : false}
                                                                             options={designationListOptions}
                                                                             getOptionLabel={(option) => `${option.description}`}
                                                                             isOptionEqualToValue={(option, value) => option.id === value.id}
@@ -727,9 +691,9 @@ function User({ open, handleClose, mode, userCode, component }) {
                                                                             value={values.department}
                                                                             name="department"
                                                                             onChange={(_, value) => {
-                                                                                console.log(value);
                                                                                 setFieldValue(`department`, value);
                                                                             }}
+                                                                            disabled={component === 'user_profile' ? true : false}
                                                                             options={departmentListOptions}
                                                                             getOptionLabel={(option) => `${option.description}`}
                                                                             isOptionEqualToValue={(option, value) => option.id === value.id}
@@ -764,9 +728,9 @@ function User({ open, handleClose, mode, userCode, component }) {
                                                                             value={values.cluster}
                                                                             name="cluster"
                                                                             onChange={(_, value) => {
-                                                                                console.log(value);
                                                                                 setFieldValue(`cluster`, value);
                                                                             }}
+                                                                            disabled={component === 'user_profile' ? true : false}
                                                                             options={clusterListOptions}
                                                                             getOptionLabel={(option) => `${option.code} - ${option.name}`}
                                                                             // isOptionEqualToValue={(
@@ -803,14 +767,16 @@ function User({ open, handleClose, mode, userCode, component }) {
                                                                 <Grid gap="10px" display="flex" style={{ marginTop: '10px' }}>
                                                                     <Grid>
                                                                         <Autocomplete
+                                                                            value={values.market}
+                                                                            multiple
                                                                             fullWidth
-                                                                            multiple={true}
                                                                             name="market"
                                                                             onChange={(_, value) => {
                                                                                 // console.log(value);
                                                                                 // setMarketInputValue(value.code);
                                                                                 setFieldValue(`market`, value);
                                                                             }}
+                                                                            disabled={component === 'user_profile' ? true : false}
                                                                             options={marketListOptions}
                                                                             getOptionLabel={(option) => `${option.code} - (${option.name})`}
                                                                             isOptionEqualToValue={(option, value) =>
@@ -844,21 +810,23 @@ function User({ open, handleClose, mode, userCode, component }) {
                                                                 </Grid>
 
                                                                 <Grid gap="10px" display="flex" style={{ marginTop: '10px' }}>
-                                                                    {/* <Grid item xs={6} sm={4}>
+                                                                    <Grid item xs={6} sm={4}>
                                                                         <Autocomplete
                                                                             value={values.roleId}
                                                                             name="roleId"
                                                                             onChange={(_, value) => {
-                                                                                console.log(value);
                                                                                 setFieldValue(`roleId`, value);
                                                                             }}
+                                                                            // disabled={component === 'user_profile' ? true : false}
                                                                             options={userRoleListOptions}
                                                                             getOptionLabel={(option) => `${option.name}`}
-                                                                            isOptionEqualToValue={(option, value) => option.id === value.id}
+                                                                            isOptionEqualToValue={(option, value) =>
+                                                                                option.roleId === value.roleId
+                                                                            }
                                                                             renderInput={(params) => (
                                                                                 <TextField
                                                                                     {...params}
-                                                                                    label="User Role"
+                                                                                    label="Role"
                                                                                     sx={{
                                                                                         width: { sm: 200, md: 200 },
                                                                                         '& .MuiInputBase-root': {
@@ -878,7 +846,8 @@ function User({ open, handleClose, mode, userCode, component }) {
                                                                                 />
                                                                             )}
                                                                         />
-                                                                    </Grid> */}
+                                                                    </Grid>
+
                                                                     <Grid item>
                                                                         {' '}
                                                                         <TextField
@@ -900,9 +869,21 @@ function User({ open, handleClose, mode, userCode, component }) {
                                                                             helperText={
                                                                                 touched.userName && errors.userName ? errors.userName : ''
                                                                             }
+                                                                            disabled={
+                                                                                component === 'user_creation' && mode === 'INSERT'
+                                                                                    ? false
+                                                                                    : true
+                                                                            }
                                                                         ></TextField>
                                                                     </Grid>
-                                                                    <Grid item display={component === 'user_creation' ? 'flex' : 'none'}>
+                                                                    <Grid
+                                                                        item
+                                                                        display={
+                                                                            component === 'user_creation' && mode === 'INSERT'
+                                                                                ? 'flex'
+                                                                                : 'none'
+                                                                        }
+                                                                    >
                                                                         {' '}
                                                                         <TextField
                                                                             sx={{
@@ -931,13 +912,16 @@ function User({ open, handleClose, mode, userCode, component }) {
                                                                         <FormGroup>
                                                                             <FormControlLabel
                                                                                 name="status"
-                                                                                disabled={mode == 'VIEW'}
+                                                                                disabled={
+                                                                                    mode == 'VIEW' || component === 'user_profile'
+                                                                                        ? true
+                                                                                        : false
+                                                                                }
                                                                                 onChange={handleChange}
                                                                                 value={values.status}
                                                                                 control={<Switch color="success" />}
                                                                                 label="Status"
                                                                                 checked={values.status}
-                                                                                // disabled={mode == 'VIEW'}
                                                                             />
                                                                         </FormGroup>
                                                                     </Grid>

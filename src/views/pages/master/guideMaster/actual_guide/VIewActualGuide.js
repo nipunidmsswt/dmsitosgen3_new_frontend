@@ -1,19 +1,19 @@
-import { useEffect, useState, forwardRef } from 'react';
+import { useEffect, useState } from 'react';
 import MaterialTable from 'material-table';
-
-import SuccessMsg from 'messages/SuccessMsg';
-import ErrorMsg from 'messages/ErrorMsg';
 import tableIcons from 'utils/MaterialTableIcons';
-import { gridSpacing } from 'store/constant';
+import ActualGuide from './ActualGuide';
+import SuccessMsg from '../../../../../messages/SuccessMsg';
+import ErrorMsg from '../../../../../messages/ErrorMsg';
 import { useSelector, useDispatch } from 'react-redux';
+import { getAllActualGuideData, getLatestModifiedDetails } from '../../../../../store/actions/masterActions/ActualGuideAction';
 import Grid from '@mui/material/Grid';
 import MainCard from 'ui-component/cards/MainCard';
-import { getAllUserDetails, getLatestModifiedUserDetails } from 'store/actions/authenticationActions/UserAction';
-import User from './UserCreation';
+import { gridSpacing } from 'store/constant';
+import { FormControlLabel, FormGroup, Switch } from '@mui/material';
 
-function ViewUserCreation() {
+function VIewActualGuide() {
     const [open, setOpen] = useState(false);
-    const [userCode, setUserCode] = useState('');
+    const [code, setCode] = useState('');
     const [mode, setMode] = useState('INSERT');
     const [openToast, setHandleToast] = useState(false);
     const [openErrorToast, setOpenErrorToast] = useState(false);
@@ -22,82 +22,84 @@ function ViewUserCreation() {
 
     const columns = [
         {
-            title: 'User Name',
-            field: 'userName',
+            title: 'Code',
+            field: 'code',
             filterPlaceholder: 'filter',
             align: 'left'
         },
         {
-            title: 'First Name',
-            field: 'firstName',
+            title: 'Initial',
+            field: 'initials',
             filterPlaceholder: 'filter',
             align: 'left'
         },
         {
-            title: 'Last Name',
-            field: 'lastName',
+            title: 'Surname',
+            field: 'surName',
             align: 'left',
             grouping: false,
             filterPlaceholder: 'filter'
         },
         {
-            title: 'NIC',
-            field: 'nic',
+            title: 'Mobile No.',
+            field: 'mobileNo',
             align: 'left',
             grouping: false,
             filterPlaceholder: 'filter'
         },
         {
-            title: 'Email',
-            field: 'email',
-            align: 'left',
+            title: 'License',
+            field: 'licenseNo',
+            align: 'right',
             grouping: false,
             filterPlaceholder: 'filter'
         },
-
         {
-            title: 'Active',
+            title: 'Status',
             field: 'status',
-            filterPlaceholder: 'True || False',
             align: 'center',
-            emptyValue: () => <em>null</em>,
+            lookup: {
+                true: 'Active',
+                false: 'Inactive'
+            },
             render: (rowData) => (
                 <div
                     style={{
-                        color: rowData.status === true ? '#008000aa' : '#f90000aa',
-                        fontWeight: 'bold',
-                        // background: rowData.status === true ? "#008000aa" : "#f90000aa",
-                        borderRadius: '4px',
-                        paddingLeft: 5,
-                        paddingRight: 5
+                        alignItems: 'center',
+                        align: 'center',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center'
                     }}
                 >
-                    {rowData.status === true ? 'Active' : 'Inactive'}
+                    {rowData.status === true ? (
+                        <FormGroup>
+                            <FormControlLabel control={<Switch color="success" size="small" />} checked={true} />
+                        </FormGroup>
+                    ) : (
+                        <FormGroup>
+                            <FormControlLabel control={<Switch color="error" size="small" />} checked={false} />
+                        </FormGroup>
+                    )}
                 </div>
             )
         }
     ];
 
     const dispatch = useDispatch();
-    const error = useSelector((state) => state.userReducer.errorMsg);
-    const users = useSelector((state) => state.userReducer.users);
-    const user = useSelector((state) => state.userReducer.user);
-    const lastModifiedDate = useSelector((state) => state.userReducer.lastModifiedDateTime);
-    const myProfileUpdate = useSelector((state) => state.userReducer.myProfileUpdate);
+    const error = useSelector((state) => state.taxReducer.errorMsg);
+
+    const actualGuideList = useSelector((state) => state.actualGuideReducer.actualGuideList);
+    const companyProfileData = useSelector((state) => state.companyProfileReducer.companyProfile);
+    const lastModifiedDate = useSelector((state) => state.actualGuideReducer.lastModifiedDateTime);
+    const actualGuide = useSelector((state) => state.actualGuideReducer.actualGuide);
 
     useEffect(() => {
-        setLastModifiedTimeDate(lastModifiedDate);
-    }, [lastModifiedDate]);
-
-    useEffect(() => {
-        console.log('users payload');
-        console.log(users);
-        if (users?.length > 0) {
-            console.log('users payload');
-            console.log(users);
-            setTableData(users);
+        console.log(actualGuideList);
+        if (actualGuideList?.length > 0) {
+            setTableData(actualGuideList);
         }
-    }, [users]);
+    }, [actualGuideList]);
 
     useEffect(() => {
         console.log(error);
@@ -108,41 +110,47 @@ function ViewUserCreation() {
     }, [error]);
 
     useEffect(() => {
-        if (myProfileUpdate) {
-            console.log('myProfileUpdate');
-            // dispatch(getProfileData(userCode));
-            setMode('VIEW_UPDATE');
-            setHandleToast(myProfileUpdate);
-            // dispatch(getAllUserDetails());
-            // dispatch(getLatestModifiedUserDetails());
-        }
-    }, [myProfileUpdate]);
+        console.log(actualGuide);
 
-    useEffect(() => {
-        if (user) {
+        if (actualGuide) {
             setHandleToast(true);
-            dispatch(getAllUserDetails());
-            dispatch(getLatestModifiedUserDetails());
+            dispatch(getAllActualGuideData());
+            dispatch(getLatestModifiedDetails());
         }
-    }, [user]);
+    }, [actualGuide]);
 
     useEffect(() => {
-        dispatch(getAllUserDetails());
-        dispatch(getLatestModifiedUserDetails());
+        dispatch(getAllActualGuideData());
+        dispatch(getLatestModifiedDetails());
     }, []);
+
+    useEffect(() => {
+        setLastModifiedTimeDate(
+            lastModifiedDate === null
+                ? ''
+                : new Date(lastModifiedDate).toLocaleString('en-GB', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: '2-digit',
+                      hour: 'numeric',
+                      minute: 'numeric',
+                      hour12: true
+                  })
+        );
+    }, [lastModifiedDate]);
 
     const handleClickOpen = (type, data) => {
         console.log(type);
         console.log(data);
         if (type === 'VIEW_UPDATE') {
             setMode(type);
-            setUserCode(data.userId);
+            setCode(data.id);
         } else if (type === 'INSERT') {
-            setUserCode('');
+            setCode('');
             setMode(type);
         } else {
             setMode(type);
-            setUserCode(data.userId);
+            setCode(data.id);
         }
         setOpen(true);
     };
@@ -159,7 +167,7 @@ function ViewUserCreation() {
     };
     return (
         <div>
-            <MainCard title="User">
+            <MainCard title="Company Profile Setup">
                 <div style={{ textAlign: 'right' }}> Last Modified Date : {lastModifiedTimeDate}</div>
                 <br />
                 <Grid container spacing={gridSpacing}>
@@ -209,31 +217,29 @@ function ViewUserCreation() {
 
                                         headerStyle: {
                                             whiteSpace: 'nowrap',
-                                            height: 20,
-                                            maxHeight: 20,
+                                            height: 30,
+                                            maxHeight: 30,
                                             padding: 2,
                                             fontSize: '14px',
-                                            background: '-moz-linear-gradient(top, #0790E8, #3180e6)',
+                                            backgroundColor: '#2196F3',
                                             background: '-ms-linear-gradient(top, #0790E8, #3180e6)',
                                             background: '-webkit-linear-gradient(top, #0790E8, #3180e6)',
-                                            // textAlign: 'center',
+                                            textAlign: 'center',
                                             color: '#FFF',
                                             textAlign: 'center'
                                         },
                                         rowStyle: {
                                             whiteSpace: 'nowrap',
                                             height: 20,
+                                            align: 'left',
+                                            // maxHeight: 20,
                                             fontSize: '13px',
                                             padding: 0
                                         }
                                     }}
                                 />
 
-                                {open ? (
-                                    <User open={open} handleClose={handleClose} userCode={userCode} mode={mode} component="user_creation" />
-                                ) : (
-                                    ''
-                                )}
+                                {open ? <ActualGuide open={open} handleClose={handleClose} id={code} mode={mode} /> : ''}
                                 {openToast ? <SuccessMsg openToast={openToast} handleToast={handleToast} mode={mode} /> : null}
                                 {openErrorToast ? (
                                     <ErrorMsg openToast={openErrorToast} handleToast={setOpenErrorToast} mode={mode} />
@@ -248,4 +254,4 @@ function ViewUserCreation() {
     );
 }
 
-export default ViewUserCreation;
+export default VIewActualGuide;

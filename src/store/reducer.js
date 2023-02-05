@@ -28,6 +28,7 @@ import { guideClassReducer } from './reducers/masterReducer/GuideClassReducer';
 import { userReducer } from './reducers/athenticationReducers/UserReducer';
 import { companyProfileReducer } from './reducers/masterReducer/CompanyProfileReducer';
 import { departmentDesignationReducer } from './reducers/masterReducer/DepartmentDesignationReducer';
+import { actualGuideReducer } from './reducers/masterReducer/ActualGuideReducer';
 // ==============================|| COMBINE REDUCER ||============================== //
 
 const reducer = combineReducers({
@@ -60,7 +61,8 @@ const reducer = combineReducers({
     guideClassReducer,
     userReducer,
     companyProfileReducer,
-    departmentDesignationReducer
+    departmentDesignationReducer,
+    actualGuideReducer
 });
 
 export default reducer;

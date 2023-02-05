@@ -10,7 +10,8 @@ import {
     FORGOT_PASSWORD_CREDENTIALS,
     RESET_PASSWORD_CREDENTIALS,
     GET_ALL_USER_ROLES,
-    GET_PROFILE_DATA_BY_ID
+    GET_PROFILE_DATA_BY_ID,
+    UPDATE_MY_PROFILE
 } from 'store/constant/authentication/UserConstant';
 
 //user creation
@@ -102,6 +103,15 @@ export const resetPassword = (data) => {
     console.log('resetPassword', data);
     return {
         type: RESET_PASSWORD_CREDENTIALS,
+        data
+    };
+};
+
+//profile update
+export const updateMyProfile = (data) => {
+    console.log('updateMyProfile action s called', data);
+    return {
+        type: UPDATE_MY_PROFILE,
         data
     };
 };

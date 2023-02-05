@@ -392,7 +392,8 @@ import {
     CHECK_USER_LOGIN_CREDENTIALS,
     FORGOT_PASSWORD_CREDENTIALS,
     RESET_PASSWORD_CREDENTIALS,
-    GET_PROFILE_DATA_BY_ID
+    GET_PROFILE_DATA_BY_ID,
+    UPDATE_MY_PROFILE
 } from 'store/constant/authentication/UserConstant';
 import {
     checkDupicateUserSaga,
@@ -406,7 +407,8 @@ import {
     userLoginSaga,
     forgotPasswordSaga,
     resetPasswordSaga,
-    getProfileDataByIdSaga
+    getProfileDataByIdSaga,
+    updateMyProfileData
 } from './authenticationSaga/UserSaga';
 
 import {
@@ -450,6 +452,25 @@ import {
     checkLatestCompanyPrfileModifiedDateSaga,
     avaliableLicenseCountSaga
 } from '../saga/mastersaga/CompanyProfileSaga';
+
+import {
+    CHECK_ACTUAL_GUIDE_CODE_DUPLICATE,
+    GET_ACTUAL_GUIDE_DETAILS_BY_ID,
+    GET_ALL_ACTUAL_GUIDE_DATA,
+    SAVE_ACTUAL_GUIDE_DATA,
+    UPDATE_ACTUAL_GUIDE_DATA,
+    GET_ACTUAL_GUIDE_LAST_MODIFIED_DATE_TIME
+} from 'store/constant/master/ActualGuideConstant';
+
+import {
+    saveActualGuideDataHandler,
+    getAllActiveActualGuideDataSaga,
+    updateActualGuideDataSaga,
+    getActualGuideDetailsByIdeSaga,
+    getAllActualGuideDataSaga,
+    getActualGuideLatestModifiedDateSaga,
+    checkActualGuideDupicateCodeSaga
+} from '../saga/mastersaga/ActualGuideSaga';
 
 export function* wacherSaga() {
     // tax setup
@@ -706,4 +727,15 @@ export function* wacherSaga() {
 
     //reset password
     yield takeLatest(RESET_PASSWORD_CREDENTIALS, resetPasswordSaga);
+
+    //my profile
+    yield takeLatest(UPDATE_MY_PROFILE, updateMyProfileData);
+
+    //actual guide
+    yield takeLatest(SAVE_ACTUAL_GUIDE_DATA, saveActualGuideDataHandler);
+    yield takeLatest(GET_ACTUAL_GUIDE_DETAILS_BY_ID, getActualGuideDetailsByIdeSaga);
+    yield takeLatest(GET_ALL_ACTUAL_GUIDE_DATA, getAllActualGuideDataSaga);
+    yield takeLatest(UPDATE_ACTUAL_GUIDE_DATA, updateActualGuideDataSaga);
+    yield takeLatest(CHECK_ACTUAL_GUIDE_CODE_DUPLICATE, checkActualGuideDupicateCodeSaga);
+    yield takeLatest(GET_ACTUAL_GUIDE_LAST_MODIFIED_DATE_TIME, getActualGuideLatestModifiedDateSaga);
 }
