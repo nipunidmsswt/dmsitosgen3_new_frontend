@@ -126,14 +126,6 @@ function CodeAndName({ open, handleClose, mode, ccode }) {
     const codeToUpdate = useSelector((state) => state.codeAndNameReducer.codeToUpdate);
     const duplicateCode = useSelector((state) => state.codeAndNameReducer.duplicateCode);
     const detailsType = useSelector((state) => state.codeAndNameReducer.detailsType);
-
-    // const [tempData, setTempData] = useState({
-    //     codeType: '',
-    //     code: '',
-    //     name: '',
-    //     newStatus: true,
-    //     codeAndNameDetails: [{ category: '', code: '', name: '', status: true }]
-    // });
     const dispatch = useDispatch();
 
     const [clusterTypeData, setClsuterTypeData] = useState(null);
@@ -161,29 +153,6 @@ function CodeAndName({ open, handleClose, mode, ccode }) {
                     ? setOpenModal(true)
                     : dispatch(getCodeAndNameDataByType(categoryType))
             );
-            //     if (
-            //         loadValues.codeAndNameDetails[0].codeType != '' &&
-            //         loadValues.codeAndNameDetails[0].codeType != undefined &&
-            //         loadValues.codeAndNameDetails[0].codeType != null
-            //     ) {
-            //         // if (detailsType.codeAndNameDetails.length != loadValues.codeAndNameDetails.length) {
-            //         //     setOpenModal(false);
-            //         // } else {
-            //         dispatch(getCodeAndNameDataByType(categoryType));
-            //         // }
-            //     } else {
-            //         if (detailsType.codeAndNameDetails.length != loadValues.codeAndNameDetails.length) {
-            //             console.log('codetypedata:' + loadValues.codeAndNameDetails);
-            //             // alert('ccccc');
-            //             setOpenModal(true);
-            //         } else {
-            //             dispatch(getCodeAndNameDataByType(categoryType));
-            //         }
-            //     }
-            // } else {
-            //     if (categoryType !== null) {
-            //         dispatch(getCodeAndNameDataByType(categoryType));
-            // }
         }
     }, [categoryType]);
 
@@ -214,9 +183,6 @@ function CodeAndName({ open, handleClose, mode, ccode }) {
     const handleSubmit = async (values) => {
         const initialValuesNew = {
             codeType: values.codeType,
-            // code: '',
-            // name: '',
-            // newStatus: true,
             codeAndNameDetails: [
                 {
                     category: values.codeType,
@@ -231,17 +197,6 @@ function CodeAndName({ open, handleClose, mode, ccode }) {
         loadValues.codeAndNameDetails?.map((s) =>
             s.code === values.code && s.category == values.codeType ? setExistOpenModal(true) : initialValuesNew.codeAndNameDetails.push(s)
         );
-
-        // console.log('length:' + loadValues.codeAndNameDetails?.length);
-        // loadValues.codeAndNameDetails?.map((s) =>
-        //     s.code === values.code && s.name === values.name && s.category == values.codeType
-        //         ? ''
-        //         : s.code === '' && s.name === ''
-        //         ? setTempData(initialValuesNew)
-        //         : s.category !== values.codeType
-        //         ? (setOpenModal(true), setInitialData(loadValues), setTempData(initialValuesNew), (initialValuesNew = loadValues))
-        //         : initialValuesNew.codeAndNameDetails.push(s)
-        // );
 
         setLoadValues(initialValuesNew);
     };
@@ -684,17 +639,6 @@ function CodeAndName({ open, handleClose, mode, ccode }) {
                                                                                                         <HighlightOffIcon />
                                                                                                     </IconButton>
                                                                                                 ) : null}
-                                                                                                {/* {`values.codeAndNameDetails[idx]
-                                                                                                    .codeAndNameId` === '' ? (
-                                                                                                    <IconButton
-                                                                                                        aria-label="delete"
-                                                                                                        onClick={() => {
-                                                                                                            remove(idx);
-                                                                                                        }}
-                                                                                                    >
-                                                                                                        <HighlightOffIcon />
-                                                                                                    </IconButton>
-                                                                                                ) : null} */}
                                                                                             </TableCell>
                                                                                         </TableRow>
                                                                                     );
@@ -729,25 +673,6 @@ function CodeAndName({ open, handleClose, mode, ccode }) {
                                                                             </TableFooter>
                                                                             {/* ) : null} */}
                                                                         </Table>
-                                                                        {/* <TablePagination
-                                                                            component="div"
-                                                                            page={page}
-                                                                            rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
-                                                                            rowsPerPage={rowsPerPage}
-                                                                            SelectProps={{
-                                                                                inputProps: {
-                                                                                  'aria-label': 'rows per page',
-                                                                                },
-                                                                                native: true,
-                                                                              }}
-                                                                            // rowsPerPageOptions={[5, 10, 25]}
-                                                                            // component="div"
-                                                                            count={values.codeAndNameDetails.length}
-                                                                            // rowsPerPage={rowsPerPage}
-                                                                            // page={page}
-                                                                            onChangePage={handleChangePage}
-                                                                            onChangeRowsPerPage={handleChangeRowsPerPage}
-                                                                        /> */}
                                                                     </TableContainer>
                                                                 </Paper>
                                                             )}

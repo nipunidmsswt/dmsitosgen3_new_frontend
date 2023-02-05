@@ -29,6 +29,7 @@ import { userReducer } from './reducers/athenticationReducers/UserReducer';
 import { companyProfileReducer } from './reducers/masterReducer/CompanyProfileReducer';
 import { departmentDesignationReducer } from './reducers/masterReducer/DepartmentDesignationReducer';
 import { actualGuideReducer } from './reducers/masterReducer/ActualGuideReducer';
+import { agentReducer } from './reducers/masterReducer/AgentReducer';
 // ==============================|| COMBINE REDUCER ||============================== //
 
 const reducer = combineReducers({
@@ -62,7 +63,8 @@ const reducer = combineReducers({
     userReducer,
     companyProfileReducer,
     departmentDesignationReducer,
-    actualGuideReducer
+    actualGuideReducer,
+    agentReducer
 });
 
 export default reducer;

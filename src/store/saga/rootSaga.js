@@ -452,6 +452,24 @@ import {
     checkLatestCompanyPrfileModifiedDateSaga,
     avaliableLicenseCountSaga
 } from '../saga/mastersaga/CompanyProfileSaga';
+import {
+    CHECK_AGENT_CODE_DUPLICATE,
+    GET_AGENT_DETAILS_BY_CODE,
+    GET_AGENT_LAST_MODIFIED_DATE_TIME,
+    GET_ALL_ACTIVE_AGENT_DATA,
+    GET_ALL_AGENT_DATA,
+    SAVE_AGENT_DATA,
+    UPDATE_AGENT_DATA
+} from 'store/constant/master/AgentConstant';
+import {
+    checkAgentDupicateCodeSaga,
+    getAgentDetailsByCodeSaga,
+    getAgentLatestModifiedDateSaga,
+    getAllActiveAgentDataSaga,
+    getAllAgentDataSaga,
+    saveAgentDataHandler,
+    updateAgentDataSaga
+} from './mastersaga/AgentSaga';
 
 import {
     CHECK_ACTUAL_GUIDE_CODE_DUPLICATE,
@@ -566,13 +584,13 @@ export function* wacherSaga() {
 
     // //Manager
 
-    yield takeLatest(SAVE_MANAGER_DATA, saveManagerDataHandler);
-    yield takeLatest(GET_ALL_MANAGER_DATA, getAllManagerDataSaga);
-    yield takeLatest(GET_MANAGER_DETAILS_BY_CODE, getManagerDetailsByCodeSaga);
-    yield takeLatest(GET_MANAGER_LAST_MODIFIED_DATE_TIME, getManagerLatestModifiedDateSaga);
-    yield takeLatest(CHECK_MANAGER_CODE_DUPLICATE, checkManagerDupicateCodeSaga);
-    yield takeLatest(UPDATE_MANAGER_DATA, updateManagerDataSaga);
-    yield takeLatest(GET_ALL_ACTIVE_MANAGER_DATA, getAllActiveManagerDataSaga);
+    yield takeLatest(SAVE_AGENT_DATA, saveAgentDataHandler);
+    yield takeLatest(GET_ALL_AGENT_DATA, getAllAgentDataSaga);
+    yield takeLatest(GET_AGENT_DETAILS_BY_CODE, getAgentDetailsByCodeSaga);
+    yield takeLatest(GET_AGENT_LAST_MODIFIED_DATE_TIME, getAgentLatestModifiedDateSaga);
+    yield takeLatest(CHECK_AGENT_CODE_DUPLICATE, checkAgentDupicateCodeSaga);
+    yield takeLatest(UPDATE_AGENT_DATA, updateAgentDataSaga);
+    yield takeLatest(GET_ALL_ACTIVE_AGENT_DATA, getAllActiveAgentDataSaga);
 
     // //Market
 
@@ -738,4 +756,12 @@ export function* wacherSaga() {
     yield takeLatest(UPDATE_ACTUAL_GUIDE_DATA, updateActualGuideDataSaga);
     yield takeLatest(CHECK_ACTUAL_GUIDE_CODE_DUPLICATE, checkActualGuideDupicateCodeSaga);
     yield takeLatest(GET_ACTUAL_GUIDE_LAST_MODIFIED_DATE_TIME, getActualGuideLatestModifiedDateSaga);
+    //agent
+    yield takeLatest(SAVE_MANAGER_DATA, saveManagerDataHandler);
+    yield takeLatest(GET_ALL_MANAGER_DATA, getAllManagerDataSaga);
+    yield takeLatest(GET_MANAGER_DETAILS_BY_CODE, getManagerDetailsByCodeSaga);
+    yield takeLatest(GET_MANAGER_LAST_MODIFIED_DATE_TIME, getManagerLatestModifiedDateSaga);
+    yield takeLatest(CHECK_MANAGER_CODE_DUPLICATE, checkManagerDupicateCodeSaga);
+    yield takeLatest(UPDATE_MANAGER_DATA, updateManagerDataSaga);
+    yield takeLatest(GET_ALL_ACTIVE_MANAGER_DATA, getAllActiveManagerDataSaga);
 }
