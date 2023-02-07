@@ -40,7 +40,12 @@ import {
     updateExpenseTypesData
 } from 'store/actions/masterActions/ExpenseTypeAction';
 import CreatedUpdatedUserDetailsWithTableFormat from '../../userTimeDetails/CreatedUpdatedUserDetailsWithTableFormat';
-import { getGuideClassDetailsByCode, saveGuideClassData, updateGuideClassData } from 'store/actions/masterActions/GuideClassAction';
+import {
+    getGuideClassDetailsByCode,
+    saveGuideClassData,
+    updateGuideClassData,
+    checkDuplicateGuideClasssCode
+} from 'store/actions/masterActions/GuideClassAction';
 const Transition = forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
@@ -120,10 +125,10 @@ function GuideClass({ open, handleClose, mode, guideCode }) {
     // });
 
     yup.addMethod(yup.string, 'checkDuplicatecode', function (message) {
-        return this.test('checkDuplicatecode', 'Duplicate Expense Code', async function validateValue(value) {
+        return this.test('checkDuplicatecode', 'Duplicate Code', async function validateValue(value) {
             try {
                 console.log(value);
-                dispatch(checkDuplicateExpenseRateCode(value));
+                dispatch(checkDuplicateGuideClasssCode(value));
                 console.log(duplicateCode);
                 if (duplicateCode != null && duplicateCode.errorMessages.length != 0) {
                     return false;
@@ -164,7 +169,7 @@ function GuideClass({ open, handleClose, mode, guideCode }) {
     });
 
     const validationSchema = yup.object().shape({
-        guideCode: yup.string().required('Required field'),
+        guideCode: yup.string().required('Required field').checkDuplicatecode('Duplicate Code'),
         description: yup.string().required('Required field'),
         guideClassDetails: yup.array().of(
             yup.object().shape({
@@ -324,7 +329,7 @@ function GuideClass({ open, handleClose, mode, guideCode }) {
 
     const taxListData = useSelector((state) => state.taxReducer.taxes);
     const currencyListData = useSelector((state) => state.expenseTypesReducer.currencyList);
-    const duplicateCode = useSelector((state) => state.expenseTypesReducer.duplicateExpenseType);
+    const duplicateCode = useSelector((state) => state.guideClassReducer.duplicateCode);
     const [taxListOptions, setTaxListOptions] = useState([]);
     const [currencyListOptions, setCurrencyListOptions] = useState([]);
 

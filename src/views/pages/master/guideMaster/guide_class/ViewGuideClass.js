@@ -7,10 +7,9 @@ import ErrorMsg from 'messages/ErrorMsg';
 import tableIcons from 'utils/MaterialTableIcons';
 import { gridSpacing } from 'store/constant';
 import { useSelector, useDispatch } from 'react-redux';
-import { getAllLocationDetails, getLatestModifiedLocationDetails } from 'store/actions/masterActions/LocationAction';
 import Grid from '@mui/material/Grid';
 import MainCard from 'ui-component/cards/MainCard';
-import { getAllGuideClassData } from 'store/actions/masterActions/GuideClassAction';
+import { getAllGuideClassData, getLatestModifiedDetails } from 'store/actions/masterActions/GuideClassAction';
 import { FormControlLabel, FormGroup, Switch } from '@mui/material';
 
 function ViewGuideClass() {
@@ -70,7 +69,7 @@ function ViewGuideClass() {
     const error = useSelector((state) => state.guideClassReducer.errorMsg);
     const guideClass = useSelector((state) => state.guideClassReducer.guideClass);
     const guideClassList = useSelector((state) => state.guideClassReducer.guideClassList);
-    const lastModifiedDate = useSelector((state) => state.locationReducer.lastModifiedDateTime);
+    const lastModifiedDate = useSelector((state) => state.guideClassReducer.lastModifiedDateTime);
 
     useEffect(() => {
         setLastModifiedTimeDate(lastModifiedDate);
@@ -92,12 +91,13 @@ function ViewGuideClass() {
         if (guideClass) {
             setHandleToast(true);
             dispatch(getAllGuideClassData());
+            dispatch(getLatestModifiedDetails());
         }
     }, [guideClass]);
 
     useEffect(() => {
         dispatch(getAllGuideClassData());
-        dispatch(getLatestModifiedLocationDetails());
+        dispatch(getLatestModifiedDetails());
     }, []);
 
     const handleClickOpen = (type, data) => {

@@ -40,7 +40,7 @@ import {
     getActualGuideDetailsById,
     checkDuplicateActualGuideCode
 } from 'store/actions/masterActions/ActualGuideAction';
-
+var languages = require('language-list')();
 function ActualGuide({ open, handleClose, mode, id }) {
     const initialValues = {
         code: '',
@@ -60,6 +60,7 @@ function ActualGuide({ open, handleClose, mode, id }) {
             {
                 guideClass: null,
                 description: '',
+                lang: null,
                 language: '',
                 name: '',
                 status: true,
@@ -71,6 +72,8 @@ function ActualGuide({ open, handleClose, mode, id }) {
     const [loadValues, setLoadValues] = useState(null);
     const [openDialogBox, setOpenDialogBox] = useState(false);
     const [activeGuideListData, setActiveGuideList] = useState([]);
+
+    console.log(languages.getData());
 
     //get data from reducers
     const duplicateCode = useSelector((state) => state.actualGuideReducer.duplicateCode);
@@ -137,6 +140,11 @@ function ActualGuide({ open, handleClose, mode, id }) {
             });
             console.log('actualGuideToUpdate');
             console.log(actualGuideToUpdate);
+            actualGuideToUpdate.actualGuideSkills.map((data) => {
+                console.log('actualGuideToUpdate 1');
+                data.lang = { language: data.language };
+            });
+            console.log(actualGuideToUpdate);
             setLoadValues(actualGuideToUpdate);
         }
     }, [actualGuideToUpdate]);
@@ -195,7 +203,7 @@ function ActualGuide({ open, handleClose, mode, id }) {
                                                         InputLabelProps={{
                                                             shrink: true
                                                         }}
-                                                        disabled={mode == 'VIEW_UPDATE'}
+                                                        disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
                                                         label="Code"
                                                         name="code"
                                                         onChange={handleChange}
@@ -219,7 +227,7 @@ function ActualGuide({ open, handleClose, mode, id }) {
                                                         // disabled={true}
                                                         label="Initials"
                                                         name="initials"
-                                                        disabled={mode == 'VIEW_UPDATE'}
+                                                        disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
                                                         onChange={handleChange}
                                                         onBlur={handleBlur}
                                                         value={values.initials}
@@ -241,7 +249,7 @@ function ActualGuide({ open, handleClose, mode, id }) {
                                                         }}
                                                         label="Surname"
                                                         name="surName"
-                                                        disabled={mode == 'VIEW_UPDATE'}
+                                                        disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
                                                         onChange={handleChange}
                                                         onBlur={handleBlur}
                                                         value={values.surName}
@@ -260,7 +268,7 @@ function ActualGuide({ open, handleClose, mode, id }) {
                                                         InputLabelProps={{
                                                             shrink: true
                                                         }}
-                                                        disabled={mode == 'VIEW_UPDATE'}
+                                                        disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
                                                         label="Short Name"
                                                         name="shortName"
                                                         onChange={handleChange}
@@ -283,7 +291,7 @@ function ActualGuide({ open, handleClose, mode, id }) {
                                                         InputLabelProps={{
                                                             shrink: true
                                                         }}
-                                                        disabled={mode == 'VIEW_UPDATE'}
+                                                        disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
                                                         onChange={handleChange}
                                                         onBlur={handleBlur}
                                                         value={values.nic}
@@ -299,6 +307,7 @@ function ActualGuide({ open, handleClose, mode, id }) {
                                                                 height: 40
                                                             }
                                                         }}
+                                                        disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
                                                         label="Address"
                                                         name="address"
                                                         InputLabelProps={{
@@ -324,7 +333,7 @@ function ActualGuide({ open, handleClose, mode, id }) {
                                                         InputLabelProps={{
                                                             shrink: true
                                                         }}
-                                                        disabled={mode == 'VIEW_UPDATE'}
+                                                        disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
                                                         onChange={handleChange}
                                                         onBlur={handleBlur}
                                                         value={values.phone}
@@ -345,7 +354,7 @@ function ActualGuide({ open, handleClose, mode, id }) {
                                                         }}
                                                         label="Fax"
                                                         name="fax"
-                                                        disabled={mode == 'VIEW_UPDATE'}
+                                                        disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
                                                         onChange={handleChange}
                                                         onBlur={handleBlur}
                                                         value={values.fax}
@@ -367,6 +376,7 @@ function ActualGuide({ open, handleClose, mode, id }) {
                                                         InputLabelProps={{
                                                             shrink: true
                                                         }}
+                                                        disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
                                                         onChange={handleChange}
                                                         onBlur={handleBlur}
                                                         value={values.mobileNo}
@@ -387,7 +397,7 @@ function ActualGuide({ open, handleClose, mode, id }) {
                                                         InputLabelProps={{
                                                             shrink: true
                                                         }}
-                                                        disabled={mode == 'VIEW_UPDATE'}
+                                                        disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
                                                         onChange={handleChange}
                                                         onBlur={handleBlur}
                                                         value={values.licenseNo}
@@ -401,6 +411,7 @@ function ActualGuide({ open, handleClose, mode, id }) {
                                                         // adapterLocale={locale}
                                                     >
                                                         <DatePicker
+                                                            disabled={mode == 'VIEW'}
                                                             onChange={(value) => {
                                                                 setFieldValue(`licenseExpireDate`, value);
                                                             }}
@@ -476,13 +487,21 @@ function ActualGuide({ open, handleClose, mode, id }) {
                                                                     aria-label="delete"
                                                                     disabled={mode == 'VIEW'}
                                                                     onClick={() => {
+                                                                        let value = false;
+                                                                        // if(mode === "VIEW_UPDATE"){
+                                                                        //         value = false
+                                                                        // }else if(mode === "INSERT" ){
+
+                                                                        // }
                                                                         push({
                                                                             guideClass: null,
                                                                             description: '',
-                                                                            language: '',
+                                                                            lang: null,
                                                                             Name: '',
                                                                             status: true,
-                                                                            enableRow: mode === 'VIEW_UPDATE' ? false : true
+                                                                            language: '',
+                                                                            enableRow:
+                                                                                mode === 'VIEW_UPDATE' || mode === 'INSERT' ? false : true
                                                                         });
                                                                     }}
                                                                 >
@@ -543,7 +562,6 @@ function ActualGuide({ open, handleClose, mode, id }) {
                                                                                                         height: 40
                                                                                                     }
                                                                                                 }}
-                                                                                                placeholder="--Select a Tax Code --"
                                                                                                 variant="outlined"
                                                                                                 name={`actualGuideSkills.${idx}.guideClass`}
                                                                                                 onBlur={handleBlur}
@@ -617,44 +635,68 @@ function ActualGuide({ open, handleClose, mode, id }) {
                                                                                 </TableCell>
 
                                                                                 <TableCell>
-                                                                                    <TextField
-                                                                                        // label="description"
+                                                                                    <Autocomplete
                                                                                         disabled={
                                                                                             values.actualGuideSkills[idx].enableRow ||
                                                                                             mode == 'VIEW'
                                                                                         }
-                                                                                        sx={{
-                                                                                            width: { sm: 200 },
-                                                                                            '& .MuiInputBase-root': {
-                                                                                                height: 40
-                                                                                            }
-                                                                                        }}
-                                                                                        variant="outlined"
-                                                                                        name={`actualGuideSkills.${idx}.language`}
                                                                                         value={
-                                                                                            values.actualGuideSkills[idx] &&
-                                                                                            values.actualGuideSkills[idx].language
+                                                                                            values.actualGuideSkills[idx]
+                                                                                                ? values.actualGuideSkills[idx].lang
+                                                                                                : null
                                                                                         }
-                                                                                        onChange={handleChange}
-                                                                                        onBlur={handleBlur}
-                                                                                        error={Boolean(
-                                                                                            touched.actualGuideSkills &&
-                                                                                                touched.actualGuideSkills[idx] &&
-                                                                                                touched.actualGuideSkills[idx].language &&
-                                                                                                errors.actualGuideSkills &&
-                                                                                                errors.actualGuideSkills[idx] &&
-                                                                                                errors.actualGuideSkills[idx].language
+                                                                                        name={`actualGuideSkills.${idx}.lang`}
+                                                                                        onChange={(_, value) => {
+                                                                                            console.log(value);
+                                                                                            setFieldValue(
+                                                                                                `actualGuideSkills.${idx}.lang`,
+                                                                                                value
+                                                                                            );
+                                                                                            setFieldValue(
+                                                                                                `actualGuideSkills.${idx}.language`,
+                                                                                                value.language
+                                                                                            );
+                                                                                        }}
+                                                                                        options={languages.getData()}
+                                                                                        getOptionLabel={(option) => `${option.language}`}
+                                                                                        isOptionEqualToValue={(option, value) =>
+                                                                                            option.language === value.language
+                                                                                        }
+                                                                                        renderInput={(params) => (
+                                                                                            <TextField
+                                                                                                {...params}
+                                                                                                // label="tax"
+
+                                                                                                sx={{
+                                                                                                    width: { sm: 200 },
+                                                                                                    '& .MuiInputBase-root': {
+                                                                                                        height: 40
+                                                                                                    }
+                                                                                                }}
+                                                                                                variant="outlined"
+                                                                                                name={`actualGuideSkills.${idx}.lang`}
+                                                                                                onBlur={handleBlur}
+                                                                                                helperText={
+                                                                                                    touched.actualGuideSkills &&
+                                                                                                    touched.actualGuideSkills[idx] &&
+                                                                                                    touched.actualGuideSkills[idx].lang &&
+                                                                                                    errors.actualGuideSkills &&
+                                                                                                    errors.actualGuideSkills[idx] &&
+                                                                                                    errors.actualGuideSkills[idx].lang
+                                                                                                        ? errors.actualGuideSkills[idx].lang
+                                                                                                        : ''
+                                                                                                }
+                                                                                                error={Boolean(
+                                                                                                    touched.actualGuideSkills &&
+                                                                                                        touched.actualGuideSkills[idx] &&
+                                                                                                        touched.actualGuideSkills[idx]
+                                                                                                            .lang &&
+                                                                                                        errors.actualGuideSkills &&
+                                                                                                        errors.actualGuideSkills[idx] &&
+                                                                                                        errors.actualGuideSkills[idx].lang
+                                                                                                )}
+                                                                                            />
                                                                                         )}
-                                                                                        helperText={
-                                                                                            touched.actualGuideSkills &&
-                                                                                            touched.actualGuideSkills[idx] &&
-                                                                                            touched.actualGuideSkills[idx].language &&
-                                                                                            errors.actualGuideSkills &&
-                                                                                            errors.actualGuideSkills[idx] &&
-                                                                                            errors.actualGuideSkills[idx].language
-                                                                                                ? errors.actualGuideSkills[idx].language
-                                                                                                : ''
-                                                                                        }
                                                                                     />
                                                                                 </TableCell>
 

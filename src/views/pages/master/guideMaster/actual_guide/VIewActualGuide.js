@@ -167,7 +167,7 @@ function VIewActualGuide() {
     };
     return (
         <div>
-            <MainCard title="Company Profile Setup">
+            <MainCard title="Actual Guide Setup">
                 <div style={{ textAlign: 'right' }}> Last Modified Date : {lastModifiedTimeDate}</div>
                 <br />
                 <Grid container spacing={gridSpacing}>
