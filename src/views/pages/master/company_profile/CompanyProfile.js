@@ -1,16 +1,16 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     Dialog,
     FormControlLabel,
     Box,
-    Paper,
+    DialogActions,
     DialogContent,
     TextField,
     DialogTitle,
     FormGroup,
     Button,
-    MenuItem,
+    DialogContentText,
     Switch
 } from '@mui/material';
 // material-ui
@@ -167,6 +167,10 @@ function CompanyProfile({ open, handleClose, mode, code }) {
     const [loadValues, setLoadValues] = useState(null);
     const [previewImages, setPreviewImages] = useState([]);
     const [updatePreviewImages, setupdatePreviewImages] = useState([]);
+    const [savedAlllocatedLicesnce, setSavedAllocateLicense] = useState();
+    const [savedAvalableLicesnce, setSavedAvalableLicesnce] = useState();
+    const [openDialogBox, setOpenDialogBox] = useState(false);
+    const ref = useRef(null);
 
     yup.addMethod(yup.string, 'checkDuplicateCompanyName', function (message) {
         return this.test('checkDuplicateCompanyName', message, async function validateValue(value) {
@@ -213,6 +217,8 @@ function CompanyProfile({ open, handleClose, mode, code }) {
 
     useEffect(() => {
         if ((mode === 'VIEW_UPDATE' && companyProfileToUpdate != null) || (mode === 'VIEW' && companyProfileToUpdate != null)) {
+            setSavedAllocateLicense(companyProfileToUpdate.allocatedLicenceCount);
+            setSavedAvalableLicesnce(companyProfileToUpdate.availableLicenceCount);
             setLoadValues(companyProfileToUpdate);
             setupdatePreviewImages([companyProfileToUpdate.docPath]);
         }
@@ -315,6 +321,7 @@ function CompanyProfile({ open, handleClose, mode, code }) {
                 <>
                     <DialogContent>
                         <Formik
+                            innerRef={ref}
                             maxWidth
                             enableReinitialize={true}
                             initialValues={loadValues || initialValues}
@@ -553,8 +560,41 @@ function CompanyProfile({ open, handleClose, mode, code }) {
                                                         label="Allocated Licence Count"
                                                         name="allocatedLicenceCount"
                                                         onChange={(e) => {
-                                                            setFieldValue('availableLicenceCount', e.target.value);
                                                             setFieldValue(`allocatedLicenceCount`, e.target.value);
+
+                                                            if (mode === 'INSERT') {
+                                                                setFieldValue('availableLicenceCount', e.target.value);
+                                                            } else if (mode === 'VIEW_UPDATE') {
+                                                                console.log('ewrw');
+                                                                console.log(e.target.value);
+                                                                console.log(savedAlllocatedLicesnce);
+                                                                console.log(ref.current.values.availableLicenceCount);
+
+                                                                if (e.target.value == 0) {
+                                                                    setFieldValue('availableLicenceCount', 0);
+                                                                } else if (e.target.value >= savedAlllocatedLicesnce) {
+                                                                    let result =
+                                                                        e.target.value - savedAlllocatedLicesnce + savedAvalableLicesnce;
+                                                                    console.log('result 1');
+                                                                    console.log(result);
+                                                                    setFieldValue('availableLicenceCount', result);
+                                                                } else if (e.target.value < savedAlllocatedLicesnce) {
+                                                                    let diff = savedAlllocatedLicesnce - e.target.value;
+                                                                    if (diff <= e.target.value) {
+                                                                        // console.log('result 2');
+                                                                        setFieldValue(
+                                                                            'availableLicenceCount',
+                                                                            savedAvalableLicesnce - diff
+                                                                        );
+                                                                    } else {
+                                                                        console.log('result 3');
+                                                                        setOpenDialogBox(true);
+                                                                        // setFieldValue('allocatedLicenceCount', savedAlllocatedLicesnce);
+                                                                        // setFieldValue('availableLicenceCount', savedAvalableLicesnce);
+                                                                        // setFieldValue('availableLicenceCount', e.target.value);
+                                                                    }
+                                                                }
+                                                            }
                                                         }}
                                                         onBlur={handleBlur}
                                                         InputLabelProps={{
@@ -718,6 +758,37 @@ function CompanyProfile({ open, handleClose, mode, code }) {
                                                 </Grid> */}
                                             </Grid>
                                         </Box>
+                                        {openDialogBox ? (
+                                            <Dialog
+                                                open={open}
+                                                onClose={handleClose}
+                                                aria-labelledby="alert-dialog-title"
+                                                aria-describedby="alert-dialog-description"
+                                            >
+                                                <DialogTitle id="alert-dialog-title" style={{ color: 'red' }}>
+                                                    {'Error Msg'}
+                                                </DialogTitle>
+                                                <DialogContent>
+                                                    <DialogContentText id="alert-dialog-description">
+                                                        Users are assigned to this company more than allocated license count
+                                                    </DialogContentText>
+                                                </DialogContent>
+                                                <DialogActions>
+                                                    {/* <Button onClick={handleClose}>Disagree</Button> */}
+                                                    <Button
+                                                        className="btnSave"
+                                                        type="button"
+                                                        onClick={() => {
+                                                            setOpenDialogBox(false);
+                                                        }}
+                                                    >
+                                                        OK
+                                                    </Button>
+                                                </DialogActions>
+                                            </Dialog>
+                                        ) : (
+                                            ''
+                                        )}
                                         <Box display="flex" flexDirection="row-reverse" style={{ marginTop: '20px' }}>
                                             {mode != 'VIEW' ? (
                                                 <Button

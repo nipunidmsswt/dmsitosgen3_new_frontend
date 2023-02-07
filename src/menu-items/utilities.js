@@ -323,6 +323,13 @@ const utilities = {
                             breadcrumbs: false
                             // icon: "bi bi-journal-code",
                             // path: "/master/codeAndName",
+                        },
+                        {
+                            id: 'actual-guide',
+                            title: 'Actual Guide',
+                            type: 'item',
+                            url: '/master/actualguide',
+                            breadcrumbs: false
                         }
                     ]
                 },

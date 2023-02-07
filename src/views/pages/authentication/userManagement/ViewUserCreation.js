@@ -81,9 +81,9 @@ function ViewUserCreation() {
     const dispatch = useDispatch();
     const error = useSelector((state) => state.userReducer.errorMsg);
     const users = useSelector((state) => state.userReducer.users);
-    console.log(users);
     const user = useSelector((state) => state.userReducer.user);
     const lastModifiedDate = useSelector((state) => state.userReducer.lastModifiedDateTime);
+    const myProfileUpdate = useSelector((state) => state.userReducer.myProfileUpdate);
 
     useEffect(() => {
         setLastModifiedTimeDate(lastModifiedDate);
@@ -108,8 +108,18 @@ function ViewUserCreation() {
     }, [error]);
 
     useEffect(() => {
+        if (myProfileUpdate) {
+            console.log('myProfileUpdate');
+            // dispatch(getProfileData(userCode));
+            setMode('VIEW_UPDATE');
+            setHandleToast(myProfileUpdate);
+            // dispatch(getAllUserDetails());
+            // dispatch(getLatestModifiedUserDetails());
+        }
+    }, [myProfileUpdate]);
+
+    useEffect(() => {
         if (user) {
-            console.log('sucessToast');
             setHandleToast(true);
             dispatch(getAllUserDetails());
             dispatch(getLatestModifiedUserDetails());

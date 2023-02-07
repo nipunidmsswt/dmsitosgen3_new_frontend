@@ -1,20 +1,19 @@
-import { useEffect, useState, forwardRef } from 'react';
+import { useEffect, useState } from 'react';
 import MaterialTable from 'material-table';
-
-import GuideClass from './GuideClass';
-import SuccessMsg from 'messages/SuccessMsg';
-import ErrorMsg from 'messages/ErrorMsg';
 import tableIcons from 'utils/MaterialTableIcons';
-import { gridSpacing } from 'store/constant';
+import ActualGuide from './ActualGuide';
+import SuccessMsg from '../../../../../messages/SuccessMsg';
+import ErrorMsg from '../../../../../messages/ErrorMsg';
 import { useSelector, useDispatch } from 'react-redux';
+import { getAllActualGuideData, getLatestModifiedDetails } from '../../../../../store/actions/masterActions/ActualGuideAction';
 import Grid from '@mui/material/Grid';
 import MainCard from 'ui-component/cards/MainCard';
-import { getAllGuideClassData, getLatestModifiedDetails } from 'store/actions/masterActions/GuideClassAction';
+import { gridSpacing } from 'store/constant';
 import { FormControlLabel, FormGroup, Switch } from '@mui/material';
 
-function ViewGuideClass() {
+function VIewActualGuide() {
     const [open, setOpen] = useState(false);
-    const [guideCode, setGuideCode] = useState('');
+    const [code, setCode] = useState('');
     const [mode, setMode] = useState('INSERT');
     const [openToast, setHandleToast] = useState(false);
     const [openErrorToast, setOpenErrorToast] = useState(false);
@@ -23,24 +22,46 @@ function ViewGuideClass() {
 
     const columns = [
         {
-            title: 'Guide Code',
-            field: 'guideCode',
+            title: 'Code',
+            field: 'code',
             filterPlaceholder: 'filter',
-            align: 'center'
+            align: 'left'
         },
         {
-            title: 'Description',
-            field: 'description',
+            title: 'Initial',
+            field: 'initials',
             filterPlaceholder: 'filter',
-            align: 'center'
+            align: 'left'
         },
-
         {
-            title: 'Active',
+            title: 'Surname',
+            field: 'surName',
+            align: 'left',
+            grouping: false,
+            filterPlaceholder: 'filter'
+        },
+        {
+            title: 'Mobile No.',
+            field: 'mobileNo',
+            align: 'left',
+            grouping: false,
+            filterPlaceholder: 'filter'
+        },
+        {
+            title: 'License',
+            field: 'licenseNo',
+            align: 'right',
+            grouping: false,
+            filterPlaceholder: 'filter'
+        },
+        {
+            title: 'Status',
             field: 'status',
-            filterPlaceholder: 'True || False',
             align: 'center',
-            emptyValue: () => <em>null</em>,
+            lookup: {
+                true: 'Active',
+                false: 'Inactive'
+            },
             render: (rowData) => (
                 <div
                     style={{
@@ -66,50 +87,70 @@ function ViewGuideClass() {
     ];
 
     const dispatch = useDispatch();
-    const error = useSelector((state) => state.guideClassReducer.errorMsg);
-    const guideClass = useSelector((state) => state.guideClassReducer.guideClass);
-    const guideClassList = useSelector((state) => state.guideClassReducer.guideClassList);
-    const lastModifiedDate = useSelector((state) => state.guideClassReducer.lastModifiedDateTime);
+    const error = useSelector((state) => state.taxReducer.errorMsg);
+
+    const actualGuideList = useSelector((state) => state.actualGuideReducer.actualGuideList);
+    const companyProfileData = useSelector((state) => state.companyProfileReducer.companyProfile);
+    const lastModifiedDate = useSelector((state) => state.actualGuideReducer.lastModifiedDateTime);
+    const actualGuide = useSelector((state) => state.actualGuideReducer.actualGuide);
 
     useEffect(() => {
-        setLastModifiedTimeDate(lastModifiedDate);
-    }, [lastModifiedDate]);
-
-    useEffect(() => {
-        if (guideClassList?.length > 0) {
-            setTableData(guideClassList);
+        console.log(actualGuideList);
+        if (actualGuideList?.length > 0) {
+            setTableData(actualGuideList);
         }
-    }, [guideClassList]);
+    }, [actualGuideList]);
 
     useEffect(() => {
+        console.log(error);
         if (error != null) {
+            console.log('failed Toast');
             setOpenErrorToast(true);
         }
     }, [error]);
 
     useEffect(() => {
-        if (guideClass) {
+        console.log(actualGuide);
+
+        if (actualGuide) {
             setHandleToast(true);
-            dispatch(getAllGuideClassData());
+            dispatch(getAllActualGuideData());
             dispatch(getLatestModifiedDetails());
         }
-    }, [guideClass]);
+    }, [actualGuide]);
 
     useEffect(() => {
-        dispatch(getAllGuideClassData());
+        dispatch(getAllActualGuideData());
         dispatch(getLatestModifiedDetails());
     }, []);
 
+    useEffect(() => {
+        setLastModifiedTimeDate(
+            lastModifiedDate === null
+                ? ''
+                : new Date(lastModifiedDate).toLocaleString('en-GB', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: '2-digit',
+                      hour: 'numeric',
+                      minute: 'numeric',
+                      hour12: true
+                  })
+        );
+    }, [lastModifiedDate]);
+
     const handleClickOpen = (type, data) => {
+        console.log(type);
+        console.log(data);
         if (type === 'VIEW_UPDATE') {
             setMode(type);
-            setGuideCode(data.guideCode);
+            setCode(data.id);
         } else if (type === 'INSERT') {
-            setGuideCode('');
+            setCode('');
             setMode(type);
         } else {
             setMode(type);
-            setGuideCode(data.guideCode);
+            setCode(data.id);
         }
         setOpen(true);
     };
@@ -126,7 +167,7 @@ function ViewGuideClass() {
     };
     return (
         <div>
-            <MainCard title="Guide Class">
+            <MainCard title="Actual Guide Setup">
                 <div style={{ textAlign: 'right' }}> Last Modified Date : {lastModifiedTimeDate}</div>
                 <br />
                 <Grid container spacing={gridSpacing}>
@@ -150,7 +191,7 @@ function ViewGuideClass() {
                                         }),
                                         (rowData) => ({
                                             icon: tableIcons.VisibilityIcon,
-                                            tooltip: 'Edit',
+                                            tooltip: 'View',
                                             onClick: () => handleClickOpen('VIEW', rowData)
                                         })
                                     ]}
@@ -176,26 +217,29 @@ function ViewGuideClass() {
 
                                         headerStyle: {
                                             whiteSpace: 'nowrap',
-                                            height: 20,
-                                            maxHeight: 20,
+                                            height: 30,
+                                            maxHeight: 30,
                                             padding: 2,
                                             fontSize: '14px',
-                                            background: '-moz-linear-gradient(top, #0790E8, #3180e6)',
+                                            backgroundColor: '#2196F3',
                                             background: '-ms-linear-gradient(top, #0790E8, #3180e6)',
                                             background: '-webkit-linear-gradient(top, #0790E8, #3180e6)',
-                                            // textAlign: 'center',
-                                            color: '#FFF'
+                                            textAlign: 'center',
+                                            color: '#FFF',
+                                            textAlign: 'center'
                                         },
                                         rowStyle: {
                                             whiteSpace: 'nowrap',
                                             height: 20,
+                                            align: 'left',
+                                            // maxHeight: 20,
                                             fontSize: '13px',
                                             padding: 0
                                         }
                                     }}
                                 />
 
-                                {open ? <GuideClass open={open} handleClose={handleClose} guideCode={guideCode} mode={mode} /> : ''}
+                                {open ? <ActualGuide open={open} handleClose={handleClose} id={code} mode={mode} /> : ''}
                                 {openToast ? <SuccessMsg openToast={openToast} handleToast={handleToast} mode={mode} /> : null}
                                 {openErrorToast ? (
                                     <ErrorMsg openToast={openErrorToast} handleToast={setOpenErrorToast} mode={mode} />
@@ -210,4 +254,4 @@ function ViewGuideClass() {
     );
 }
 
-export default ViewGuideClass;
+export default VIewActualGuide;

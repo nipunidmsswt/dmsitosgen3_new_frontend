@@ -23,9 +23,11 @@ import {
     SUCCESS_RESET_PASSWORD_CREDENTIALS,
     FAILED_RESET_PASSWORD_CREDENTIALS,
     SUCCESS_GET_PROFILE_DATA_BY_ID,
-    FAILED_GET_PROFILE_DATA_BY_ID
+    FAILED_GET_PROFILE_DATA_BY_ID,
+    FAILED_UPDATE_MY_PROFILE,
+    SUCCESS_UPDATE_MY_PROFILE
 } from 'store/constant/authentication/UserConstant';
-import { create, getById, updateWithUpload, get, createWithUpload } from '../../../apis/Apis';
+import { create, getById, updateWithUpload, get, createWithUpload, update } from '../../../apis/Apis';
 
 //User creation saga
 
@@ -75,10 +77,10 @@ export function* getProfileDataByIdSaga(action) {
 export function* updateUserSaga(action) {
     console.log('updateTaxSaga tax saga');
     console.log(action);
-    action.data.path = `${process.env.REACT_APP_USER_MANAGEMENT_URL}/User/`;
+    action.data.path = `${process.env.REACT_APP_USER_MANAGEMENT_URL}/userByAdmin/`;
     let responseData = [];
     try {
-        responseData = yield call(updateWithUpload, action.data);
+        responseData = yield call(update, action.data);
         console.log(responseData);
         yield put({ type: UPDATE_SUCCESS_USER_DATA, data: responseData.data });
     } catch (e) {
@@ -211,6 +213,26 @@ export function* resetPasswordSaga(action) {
     } catch (e) {
         yield put({
             type: FAILED_RESET_PASSWORD_CREDENTIALS,
+            data: e.response.data.errorMessages
+        });
+    }
+}
+
+//update my profile
+export function* updateMyProfileData(action) {
+    action.data.path = `${process.env.REACT_APP_USER_MANAGEMENT_URL}/user`;
+    let responseData = [];
+    try {
+        responseData = yield call(update, action.data);
+
+        yield put({
+            type: SUCCESS_UPDATE_MY_PROFILE,
+            data: responseData.data
+        });
+    } catch (e) {
+        console.log(e);
+        yield put({
+            type: FAILED_UPDATE_MY_PROFILE,
             data: e.response.data.errorMessages
         });
     }

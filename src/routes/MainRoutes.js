@@ -29,6 +29,7 @@ import ViewCompanyProfile from 'views/pages/master/company_profile/ViewCompanyPr
 import ViewDepartmentDesignation from 'views/pages/master/department_designation/ViewDepartmentDesignation';
 import ViewUserCreation from 'views/pages/authentication/userManagement/ViewUserCreation';
 import ViewActivitySupplement from 'views/pages/master/activity_supplement/ViewActivitySupplement';
+import VIewActualGuide from 'views/pages/master/guideMaster/actual_guide/VIewActualGuide';
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
 
@@ -214,6 +215,10 @@ const MainRoutes = {
                 {
                     path: 'designationdepartmentview',
                     element: <ViewDepartmentDesignation />
+                },
+                {
+                    path: 'actualguide',
+                    element: <VIewActualGuide />
                 }
             ]
         }
