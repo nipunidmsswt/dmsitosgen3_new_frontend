@@ -321,6 +321,9 @@ const MarketGroup = ({ open, handleClose, mode, marketGroupCode }) => {
                                                                             name="groupType"
                                                                             onChange={handleChange}
                                                                             onBlur={handleBlur}
+                                                                            InputLabelProps={{
+                                                                                shrink: true
+                                                                            }}
                                                                             value={values.groupType}
                                                                             // onClick={handleClick}
                                                                             onClick={(values) => {
@@ -354,6 +357,9 @@ const MarketGroup = ({ open, handleClose, mode, marketGroupCode }) => {
                                                                             disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
                                                                             type="text"
                                                                             variant="outlined"
+                                                                            InputLabelProps={{
+                                                                                shrink: true
+                                                                            }}
                                                                             name="code"
                                                                             value={values.code}
                                                                             onChange={handleChange}
@@ -378,6 +384,9 @@ const MarketGroup = ({ open, handleClose, mode, marketGroupCode }) => {
                                                                             name="description"
                                                                             disabled={mode == 'VIEW'}
                                                                             onChange={handleChange}
+                                                                            InputLabelProps={{
+                                                                                shrink: true
+                                                                            }}
                                                                             onBlur={handleBlur}
                                                                             value={values.description}
                                                                             error={Boolean(touched.description && errors.description)}

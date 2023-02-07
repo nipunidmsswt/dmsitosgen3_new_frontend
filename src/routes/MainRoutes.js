@@ -28,6 +28,7 @@ import ViewTransportRates from 'views/pages/master/transportMaster/transportRate
 import ViewCompanyProfile from 'views/pages/master/company_profile/ViewCompanyProfile';
 import ViewDepartmentDesignation from 'views/pages/master/department_designation/ViewDepartmentDesignation';
 import ViewUserCreation from 'views/pages/authentication/userManagement/ViewUserCreation';
+import ViewActivitySupplement from 'views/pages/master/activity_supplement/ViewActivitySupplement';
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
 
@@ -151,8 +152,8 @@ const MainRoutes = {
                     element: <ViewMarketGroup />
                 },
                 {
-                    path: 'operatorentryview',
-                    element: <ViewOperatorEntry />
+                    path: 'activitysupplementview',
+                    element: <ViewActivitySupplement />
                 },
                 {
                     path: 'seasonview',

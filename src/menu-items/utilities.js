@@ -110,25 +110,25 @@ const utilities = {
                             breadcrumbs: false
                             // icon: "bi bi-journal-code",
                             // path: "/master/codeAndName",
-                        },
-                        {
-                            id: 'operator-entry',
-                            title: 'Operator Entry',
-                            type: 'item',
-                            url: '/master/operatorentryview',
-                            breadcrumbs: false
-                            // icon: "bi bi-journal-code",
-                            // path: "/master/codeAndName",
-                        },
-                        {
-                            id: 'Color',
-                            title: 'Color',
-                            type: 'item',
-                            url: '/utils/util-color',
-                            breadcrumbs: false
-                            // icon: "bi bi-journal-code",
-                            // path: "/master/codeAndName",
                         }
+                        // {
+                        //     id: 'operator-entry',
+                        //     title: 'Operator Entry',
+                        //     type: 'item',
+                        //     url: '/master/operatorentryview',
+                        //     breadcrumbs: false
+                        //     // icon: "bi bi-journal-code",
+                        //     // path: "/master/codeAndName",
+                        // },
+                        // {
+                        //     id: 'Color',
+                        //     title: 'Color',
+                        //     type: 'item',
+                        //     url: '/utils/util-color',
+                        //     breadcrumbs: false
+                        //     // icon: "bi bi-journal-code",
+                        //     // path: "/master/codeAndName",
+                        // }
                         //   {
                         //     title: "Manager",
                         //     icon: "bi bi-file-earmark-person",
@@ -248,17 +248,17 @@ const utilities = {
                             breadcrumbs: false
                             // icon: "bi bi-journal-code",
                             // path: "/master/codeAndName",
-                        },
-
-                        {
-                            id: 'Color',
-                            title: 'Color',
-                            type: 'item',
-                            url: '/utils/util-color',
-                            breadcrumbs: false
-                            // icon: "bi bi-journal-code",
-                            // path: "/master/codeAndName",
                         }
+
+                        // {
+                        //     id: 'Color',
+                        //     title: 'Color',
+                        //     type: 'item',
+                        //     url: '/utils/util-color',
+                        //     breadcrumbs: false
+                        //     // icon: "bi bi-journal-code",
+                        //     // path: "/master/codeAndName",
+                        // }
                         //   {
                         //     title: "Manager",
                         //     icon: "bi bi-file-earmark-person",
@@ -325,6 +325,13 @@ const utilities = {
                             // path: "/master/codeAndName",
                         }
                     ]
+                },
+                {
+                    id: 'activitysupplement-id',
+                    title: 'Activity / Supplement',
+                    type: 'item',
+                    url: '/master/activitysupplementview',
+                    breadcrumbs: false
                 }
             ]
         }
