@@ -1,6 +1,14 @@
 import axios from 'axios';
 
 // axios.defaults.baseURL = "http://localhost:8082/api/v1";
+const token = JSON.parse(localStorage.getItem('token'));
+
+const config = {
+    headers: {
+        Authorization: `Bearer ${token}`
+    }
+};
+// export const get = async (url) => axios.get(url, config);
 
 export const get = async (url) => axios.get(url);
 
