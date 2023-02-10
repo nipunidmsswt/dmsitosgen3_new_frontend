@@ -14,7 +14,7 @@ import {
     TextField,
     DialogTitle,
     FormGroup,
-    Checkbox,
+    Switch,
     Button,
     Typography,
     Grid
@@ -335,16 +335,16 @@ function TourCategory({ open, handleClose, mode, rowTourCategoryCode }) {
                                         <Typography variant="subtitle1" component="h2">
                                             Active
                                         </Typography>
+
                                         <FormGroup>
                                             <FormControlLabel
-                                                control={
-                                                    <Checkbox
-                                                        name="status"
-                                                        onChange={handleInputChange}
-                                                        value={formValues.status}
-                                                        checked={formValues.status}
-                                                    />
-                                                }
+                                                name="status"
+                                                control={<Switch />}
+                                                label="Status"
+                                                disabled={mode == 'VIEW'}
+                                                onChange={handleInputChange}
+                                                value={formValues.status}
+                                                checked={formValues.status}
                                             />
                                         </FormGroup>
                                     </Grid>

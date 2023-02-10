@@ -1,4 +1,4 @@
-import { useEffect, forwardRef, useState, Fragment, useRef } from 'react';
+import { useEffect, forwardRef, useState, useRef } from 'react';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -13,31 +13,20 @@ import {
     FormGroup,
     Checkbox,
     Button,
-    Typography,
-    MenuItem,
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableRow
+    MenuItem
 } from '@mui/material';
 
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import { saveLocationData, updateLocationData } from 'store/actions/masterActions/LocationAction';
 
-import { Formik, Form, FieldArray, useFormikContext } from 'formik';
+import { Formik, Form } from 'formik';
 import Grid from '@mui/material/Grid';
 import * as yup from 'yup';
 
 import provinceDistricts from 'srilankan-provinces-districts';
-import { getAllLocationDetails, getLocationDataById } from 'store/actions/masterActions/LocationAction';
-import { Close } from '@mui/icons-material';
+import { getLocationDataById } from 'store/actions/masterActions/LocationAction';
 import CreatedUpdatedUserDetailsWithTableFormat from '../../userTimeDetails/CreatedUpdatedUserDetailsWithTableFormat';
-
-const Transition = forwardRef(function Transition(props, ref) {
-    return <Slide direction="up" ref={ref} {...props} />;
-});
 
 function Location({ open, handleClose, mode, locationCode }) {
     const initialValues = {
@@ -61,7 +50,7 @@ function Location({ open, handleClose, mode, locationCode }) {
     const [loadValues, setLoadValues] = useState('');
     const [disableDistrict, setDisableDistrict] = useState(true);
     const [previewImages, setPreviewImages] = useState([]);
-    const [updatePreviewImages, setupdatePreviewImages] = useState([]);
+
     const ref = useRef(null);
 
     yup.addMethod(yup.string, 'checkDuplicateLocationCode', function (message) {
@@ -115,77 +104,31 @@ function Location({ open, handleClose, mode, locationCode }) {
             if (locationToUpdate?.LocationDetails.province) {
                 handleDistricts(locationToUpdate?.LocationDetails.province);
             }
-            setLoadValues(locationToUpdate?.LocationDetails);
-            // images.push(URL.createObjectURL(event.target.files[i]));
-            let images = [];
 
-            setupdatePreviewImages(locationToUpdate?.LocationDetails.docPath);
+            let images = [];
+            const contentType = 'image/png';
+            // const byteCharacters = atob(locationToUpdate.docPath);
+            // const byteNumbers = new Array(byteCharacters.length);
+            // for (let i = 0; i < byteCharacters.length; i++) {
+            //     byteNumbers[i] = byteCharacters.charCodeAt(i);
+            // }
+            // const byteArray = new Uint8Array(byteNumbers);
+            // const blob1 = new Blob([byteArray], { type: contentType });
+            // images.push(URL.createObjectURL(blob1));
+            // let fileData = new File([blob1], 'name');
+            // locationToUpdate.files = [fileData];
+            // setPreviewImages([images]);
+            setLoadValues(locationToUpdate?.LocationDetails);
         }
     }, [locationToUpdate]);
 
     const handleSubmitForm = (data) => {
-        console.log(loadValues);
         console.log(data);
-        let formData = new FormData();
-        // console.log(data.files);
 
-        if (data.files != undefined) {
-            for (let i = 0; i < data.files.length; i++) {
-                formData.append(`files`, data.files[i]);
-            }
-        }
-
-        // if (mode === "VIEW_UPDATE") {
-        //   console.log(loadValues.locationImgs);
-
-        //   for (let i = 0; i < loadValues.locationImgs.length; i++) {
-        //     console.log(loadValues.locationImgs[i].imageOriginalName);
-        //     // const arr = JSON.parse(data.files.locationImgs[i]);
-        //     loadValues.locationImgs[i].name =
-        //       loadValues.locationImgs[i].imageOriginalName;
-        //     delete loadValues.locationImgs[i].imageOriginalName;
-        //     // formData.append(`files`, data.files.locationImgs[i]);
-        //   }
-        // }
-
-        console.log(loadValues.locationImgs);
-        // if (loadValues.locationImgs.length !== 0) {
-        //   for (let i = 0; i < loadValues.locationImgs.length; i++) {
-        //     let output = "",
-        //       input = JSON.stringify(loadValues.locationImgs[i]); // convert the json to string.
-        //     // loop over the string and convert each charater to binary string.
-        //     for (i = 0; i < input.length; i++) {
-        //       output += input[i].charCodeAt(0).toString(2) + " ";
-        //     }
-        //     output.trimEnd();
-
-        //       formData.append(`files`, output);
-        //   }
-        // }
-        // delete data.files;
-        // delete data.previewImages;
-        // delete data.progressInfos;
-        // delete data.message
-        for (let [key, val] of Object.entries(data)) {
-            console.log(val);
-            formData.append(key, val);
-        }
-        // formData.append("location", JSON.stringify(data));
         if (mode === 'INSERT') {
-            const requestOptions = {
-                method: 'POST',
-                body: formData
-            };
-
-            dispatch(saveLocationData(requestOptions));
+            dispatch(saveLocationData(data));
         } else if (mode === 'VIEW_UPDATE') {
-            console.log('yes click');
-            const requestOptions = {
-                method: 'PUT',
-                body: formData
-            };
-
-            dispatch(updateLocationData(requestOptions));
+            dispatch(updateLocationData(data));
         }
         handleClose();
     };
@@ -224,6 +167,11 @@ function Location({ open, handleClose, mode, locationCode }) {
 
         setPreviewImages(images);
     };
+
+    function deleteHandler(image) {
+        setPreviewImages(previewImages.filter((e) => e !== image));
+        URL.revokeObjectURL(image);
+    }
 
     return (
         <div>
@@ -531,9 +479,12 @@ function Location({ open, handleClose, mode, locationCode }) {
                                                                                                 className="preview"
                                                                                                 src={img}
                                                                                                 alt={'image-' + i}
-                                                                                                key={i}
+                                                                                                key={i + 'ke'}
                                                                                             />
-                                                                                            <IconButton aria-label="add an alarm">
+                                                                                            <IconButton
+                                                                                                aria-label="add an alarm"
+                                                                                                onClick={() => deleteHandler(img)}
+                                                                                            >
                                                                                                 <HighlightOffIcon
                                                                                                     key={i}
                                                                                                     style={{
@@ -542,34 +493,10 @@ function Location({ open, handleClose, mode, locationCode }) {
                                                                                                         right: 0,
                                                                                                         width: '25px',
                                                                                                         height: '25px'
-                                                                                                        // marginRight: "10px",
                                                                                                     }}
-                                                                                                    // src="https://png.pngtree.com/png-vector/20190603/ourmid/pngtree-icon-close-button-png-image_1357822.jpg"
                                                                                                 />
                                                                                             </IconButton>
                                                                                         </div>
-                                                                                    );
-                                                                                })}
-                                                                            </div>
-                                                                        )}
-
-                                                                        {updatePreviewImages && (
-                                                                            <div>
-                                                                                {updatePreviewImages.map((img, i) => {
-                                                                                    return (
-                                                                                        <img
-                                                                                            width="100"
-                                                                                            height="100"
-                                                                                            style={{
-                                                                                                marginRight: '10px',
-                                                                                                marginTop: '10px'
-                                                                                            }}
-                                                                                            src={`data:image/;base64,${img}`}
-                                                                                            className="preview"
-                                                                                            // src={img}
-                                                                                            alt={'image-' + i}
-                                                                                            key={i}
-                                                                                        />
                                                                                     );
                                                                                 })}
                                                                             </div>

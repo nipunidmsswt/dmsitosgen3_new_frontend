@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     Dialog,
@@ -13,8 +13,7 @@ import {
     DialogContentText,
     Switch
 } from '@mui/material';
-// material-ui
-import { alpha, styled } from '@mui/material/styles';
+
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import {
@@ -24,125 +23,11 @@ import {
     checkDuplicateCompanyProfileCode
 } from '../../../../store/actions/masterActions/CompanyProfileAction';
 
-import { Formik, Form, ErrorMessage } from 'formik';
+import { Formik, Form } from 'formik';
 import Grid from '@mui/material/Grid';
 import * as yup from 'yup';
 import CreatedUpdatedUserDetailsWithTableFormat from '../userTimeDetails/CreatedUpdatedUserDetailsWithTableFormat';
-import { useDropzone } from 'react-dropzone';
-import AddRoundedIcon from '@mui/icons-material/AddRounded';
-import { isString } from 'lodash';
-import CancelIcon from '@mui/icons-material/Cancel';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
-
-// const DropZoneStyle = styled('div')(({ theme }) => ({
-//     // width: 64,
-//     // height: 64,
-//     // fontSize: 24,
-//     // display: 'flex',
-//     // cursor: 'pointer',
-//     // alignItems: 'center',
-//     // justifyContent: 'center',
-//     // margin: theme.spacing(0.5),
-//     // borderRadius: theme.shape.borderRadius,
-//     // '&:hover': { opacity: 0.72 }
-// }));
-
-const styleIT = {
-    width: 64,
-    height: 64,
-    fontSize: 24,
-    display: 'flex',
-    cursor: 'pointer',
-    alignItems: 'center',
-    justifyContent: 'center',
-    // margin: theme.spacing(0.5),
-    // borderRadius: theme.shape.borderRadius,
-    '&:hover': { opacity: 0.72 }
-};
-
-const thumbsContainer = {
-    display: 'flex',
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginTop: 16
-};
-
-const thumb = {
-    display: 'inline-flex',
-    borderRadius: 2,
-    border: '1px solid #000',
-    marginBottom: 8,
-    marginRight: 8,
-    width: 100,
-    height: 100,
-    padding: 4,
-    boxSizing: 'border-box'
-};
-
-const thumbInner = {
-    display: 'flex',
-    minWidth: 0,
-    overflow: 'hidden'
-};
-
-const img = {
-    display: 'block',
-    width: 'auto',
-    height: '100%'
-};
-
-function Previews(props) {
-    const [files, setFiles] = useState([]);
-    const { getRootProps, getInputProps } = useDropzone({
-        accept: 'image/*',
-        onDrop: (acceptedFiles) => {
-            acceptedFiles.map((file, index) => {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    acceptedFiles[index].base64 = event.target.result;
-                };
-                reader.onerror = (error) => {
-                    // Handle error here
-                };
-                reader.readAsDataURL(file);
-            });
-
-            props.setFieldValue('files', [...props.files, ...acceptedFiles]);
-            setFiles(
-                acceptedFiles.map((file) =>
-                    Object.assign(file, {
-                        preview: URL.createObjectURL(file)
-                    })
-                )
-            );
-        }
-    });
-
-    const thumbs = files.map((file) => (
-        <div style={thumb} key={file.name}>
-            <div style={thumbInner}>
-                <img src={file.preview} style={img} alt="img" />
-            </div>
-        </div>
-    ));
-
-    useEffect(
-        () => () => {
-            files.forEach((file) => URL.revokeObjectURL(file.preview));
-        },
-        [files]
-    );
-
-    return (
-        <section className="container">
-            <div {...getRootProps()} style={{ border: '1px solid #000', padding: '1rem' }}>
-                <input {...getInputProps()} />
-                <p>Drag 'n' drop some files here, or click to select files</p>
-            </div>
-            <aside style={thumbsContainer}>{thumbs}</aside>
-        </section>
-    );
-}
 
 function CompanyProfile({ open, handleClose, mode, code }) {
     const initialValues = {
@@ -164,13 +49,16 @@ function CompanyProfile({ open, handleClose, mode, code }) {
         docPath: ''
     };
 
+    //get data from reducers
     const [loadValues, setLoadValues] = useState(null);
     const [previewImages, setPreviewImages] = useState([]);
-    const [updatePreviewImages, setupdatePreviewImages] = useState([]);
     const [savedAlllocatedLicesnce, setSavedAllocateLicense] = useState();
     const [savedAvalableLicesnce, setSavedAvalableLicesnce] = useState();
     const [openDialogBox, setOpenDialogBox] = useState(false);
-    const ref = useRef(null);
+    const duplicatecompanyProfileGroup = useSelector((state) => state.companyProfileReducer.duplicatecompanyProfileGroup);
+    const companyProfileToUpdate = useSelector((state) => state.companyProfileReducer.companyProfileToUpdate);
+
+    const dispatch = useDispatch();
 
     yup.addMethod(yup.string, 'checkDuplicateCompanyName', function (message) {
         return this.test('checkDuplicateCompanyName', message, async function validateValue(value) {
@@ -190,6 +78,18 @@ function CompanyProfile({ open, handleClose, mode, code }) {
             return true;
         });
     });
+
+    function numberOfFiles(files) {
+        let valid = true;
+        console.log(previewImages.length);
+        console.log(previewImages);
+        if (previewImages.length > 1) {
+            valid = false;
+        }
+        console.log(valid);
+        return valid;
+    }
+
     const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
 
     const validationSchema = yup.object().shape({
@@ -200,14 +100,20 @@ function CompanyProfile({ open, handleClose, mode, code }) {
         phone: yup.string().required('Required field').matches(phoneRegExp, 'Phone number is not valid'),
         website: yup.string().required('Required field'),
         allocatedLicenceCount: yup.number().required('Required field').positive('Must be greater than zero')
+        // files: yup
+        //     .mixed()
+        //     .test('fileSize', 'The file is too large', (value) => {
+        //         if (!value.length) return true; // attachment is optional
+        //         return value[0].size <= 2000000;
+        //     })
+        //     .test('type', 'Only the following formats are accepted: .jpeg, .jpg, .png', (value) => {
+        //         return value && (value[0].type === 'image/jpeg' || value[0].type === 'image/jpg' || value[0].type === 'image/png');
+        //     })
+        // .test('is-num-files', 'NUMBER_OF_FILES', numberOfFiles)
+        // .test('type', 'Only the following formats are accepted: .jpeg, .jpg, .png', (value) => {
+        //     return value && (value[0].type === 'image/jpeg' || value[0].type === 'image/jpg' || value[0].type === 'image/png');
+        // })
     });
-
-    //get data from reducers
-    const duplicatecompanyProfileGroup = useSelector((state) => state.companyProfileReducer.duplicatecompanyProfileGroup);
-    console.log(duplicatecompanyProfileGroup);
-    const companyProfileToUpdate = useSelector((state) => state.companyProfileReducer.companyProfileToUpdate);
-
-    const dispatch = useDispatch();
 
     useEffect(() => {
         if (mode === 'VIEW_UPDATE' || mode === 'VIEW') {
@@ -219,14 +125,24 @@ function CompanyProfile({ open, handleClose, mode, code }) {
         if ((mode === 'VIEW_UPDATE' && companyProfileToUpdate != null) || (mode === 'VIEW' && companyProfileToUpdate != null)) {
             setSavedAllocateLicense(companyProfileToUpdate.allocatedLicenceCount);
             setSavedAvalableLicesnce(companyProfileToUpdate.availableLicenceCount);
+            let images = [];
+            const contentType = 'image/png';
+            const byteCharacters = atob(companyProfileToUpdate.docPath);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            const blob1 = new Blob([byteArray], { type: contentType });
+            images.push(URL.createObjectURL(blob1));
+            let fileData = new File([blob1], 'name');
+            companyProfileToUpdate.files = [fileData];
             setLoadValues(companyProfileToUpdate);
-            setupdatePreviewImages([companyProfileToUpdate.docPath]);
+            setPreviewImages([images]);
         }
     }, [companyProfileToUpdate]);
 
     const handleSubmitForm = (data) => {
-        console.log(data);
-        console.log(files);
         if (mode === 'INSERT') {
             dispatch(saveCompanyProfileData(data));
         } else if (mode === 'VIEW_UPDATE') {
@@ -235,72 +151,19 @@ function CompanyProfile({ open, handleClose, mode, code }) {
         handleClose();
     };
 
-    const [files, setFiles] = useState([]);
-
-    const handleRemove = (file) => {
-        const filteredItems = files.filter((_file) => _file !== file);
-        setFiles(filteredItems);
-    };
-
-    // function preview2(props) {
-    //     const handleDrop = useCallback(
-    //         (acceptedFiles) => {
-    //             setFiles(
-    //                 acceptedFiles.map((file) => {
-    //                     const reader = new FileReader();
-
-    //                     reader.onabort = () => console.log('file reading was aborted');
-    //                     reader.onerror = () => console.log('file reading has failed');
-    //                     reader.onload = () => {
-    //                         const binaryStr = reader.result;
-    //                         console.log(binaryStr);
-    //                     };
-    //                     reader.readAsArrayBuffer(file);
-
-    //                     console.log(reader);
-    //                     return Object.assign(file, {
-    //                         preview: URL.createObjectURL(file)
-    //                     });
-    //                 })
-    //             );
-    //             props.setFieldValue(
-    //                 'files',
-    //                 acceptedFiles.map((file) => {
-    //                     const reader = new FileReader();
-
-    //                     reader.onabort = () => console.log('file reading was aborted');
-    //                     reader.onerror = () => console.log('file reading has failed');
-    //                     reader.onload = () => {
-    //                         const binaryStr = reader.result;
-    //                         console.log(binaryStr);
-    //                     };
-    //                     reader.readAsArrayBuffer(file);
-
-    //                     console.log(reader);
-    //                     return Object.assign(file, {
-    //                         preview: URL.createObjectURL(file)
-    //                     });
-    //                 })
-    //             );
-    //         },
-    //         [setFiles]
-    //     );
-
-    //     const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    //         onDrop: handleDrop
-    //     });
-    // }
     const showImages = (event) => {
         let images = [];
         console.log(event);
         for (let i = 0; i < event.target.files.length; i++) {
-            // console.log(event.target.files[i])
             images.push(URL.createObjectURL(event.target.files[i]));
         }
-
         setPreviewImages(images);
-        setupdatePreviewImages([]);
     };
+
+    function deleteHandler(image) {
+        setPreviewImages(previewImages.filter((e) => e !== image));
+        URL.revokeObjectURL(image);
+    }
 
     return (
         <div>
@@ -321,7 +184,6 @@ function CompanyProfile({ open, handleClose, mode, code }) {
                 <>
                     <DialogContent>
                         <Formik
-                            innerRef={ref}
                             maxWidth
                             enableReinitialize={true}
                             initialValues={loadValues || initialValues}
@@ -565,23 +427,16 @@ function CompanyProfile({ open, handleClose, mode, code }) {
                                                             if (mode === 'INSERT') {
                                                                 setFieldValue('availableLicenceCount', e.target.value);
                                                             } else if (mode === 'VIEW_UPDATE') {
-                                                                console.log('ewrw');
-                                                                console.log(e.target.value);
-                                                                console.log(savedAlllocatedLicesnce);
-                                                                console.log(ref.current.values.availableLicenceCount);
-
                                                                 if (e.target.value == 0) {
                                                                     setFieldValue('availableLicenceCount', 0);
                                                                 } else if (e.target.value >= savedAlllocatedLicesnce) {
                                                                     let result =
                                                                         e.target.value - savedAlllocatedLicesnce + savedAvalableLicesnce;
-                                                                    console.log('result 1');
-                                                                    console.log(result);
+
                                                                     setFieldValue('availableLicenceCount', result);
                                                                 } else if (e.target.value < savedAlllocatedLicesnce) {
                                                                     let diff = savedAlllocatedLicesnce - e.target.value;
                                                                     if (diff <= e.target.value) {
-                                                                        // console.log('result 2');
                                                                         setFieldValue(
                                                                             'availableLicenceCount',
                                                                             savedAvalableLicesnce - diff
@@ -589,9 +444,6 @@ function CompanyProfile({ open, handleClose, mode, code }) {
                                                                     } else {
                                                                         console.log('result 3');
                                                                         setOpenDialogBox(true);
-                                                                        // setFieldValue('allocatedLicenceCount', savedAlllocatedLicesnce);
-                                                                        // setFieldValue('availableLicenceCount', savedAvalableLicesnce);
-                                                                        // setFieldValue('availableLicenceCount', e.target.value);
                                                                     }
                                                                 }
                                                             }
@@ -622,7 +474,10 @@ function CompanyProfile({ open, handleClose, mode, code }) {
                                                             handleChange;
                                                             setFieldValue('files', event.currentTarget.files);
                                                         }}
+                                                        error={Boolean(errors.files)}
+                                                        helperText={errors.files ? errors.files : ''}
                                                     />
+                                                    {errors.files}
                                                     {previewImages && (
                                                         <div>
                                                             {previewImages.map((img, i) => {
@@ -645,7 +500,10 @@ function CompanyProfile({ open, handleClose, mode, code }) {
                                                                             alt={'image-' + i}
                                                                             key={i + 'ke'}
                                                                         />
-                                                                        <IconButton aria-label="add an alarm">
+                                                                        <IconButton
+                                                                            aria-label="add an alarm"
+                                                                            onClick={() => deleteHandler(img)}
+                                                                        >
                                                                             <HighlightOffIcon
                                                                                 key={i}
                                                                                 style={{
@@ -664,27 +522,65 @@ function CompanyProfile({ open, handleClose, mode, code }) {
                                                             })}
                                                         </div>
                                                     )}
-                                                    {updatePreviewImages && (
+                                                    {/* {updatePreviewImages && (
                                                         <div>
                                                             {updatePreviewImages.map((img, i) => {
                                                                 return (
-                                                                    <img
-                                                                        width="100"
-                                                                        height="100"
+                                                                    // <img
+                                                                    //     width="100"
+                                                                    //     height="100"
+                                                                    //     style={{
+                                                                    //         marginRight: '10px',
+                                                                    //         marginTop: '10px'
+                                                                    //     }}
+                                                                    //     src={`data:image/;base64,${img}`}
+                                                                    //     className="preview"
+                                                                    //     // src={img}
+                                                                    //     alt={'image-' + i}
+                                                                    //     key={i}
+                                                                    // />
+                                                                    <div
                                                                         style={{
-                                                                            marginRight: '10px',
-                                                                            marginTop: '10px'
+                                                                            display: 'inline-block',
+                                                                            position: 'relative'
                                                                         }}
-                                                                        src={`data:image/;base64,${img}`}
-                                                                        className="preview"
-                                                                        // src={img}
-                                                                        alt={'image-' + i}
-                                                                        key={i}
-                                                                    />
+                                                                    >
+                                                                        <img
+                                                                            width="100"
+                                                                            height="100"
+                                                                            style={{
+                                                                                marginRight: '10px',
+                                                                                marginTop: '10px'
+                                                                            }}
+                                                                            className="preview"
+                                                                            src={img}
+                                                                            // src={`data:image/;base64,${img}`}
+                                                                            // src={URL.createObjectURL(`data:image/;base64,${img}`)}
+                                                                            alt={'image-' + i}
+                                                                            key={i + 'ke'}
+                                                                        />
+                                                                        <IconButton
+                                                                            aria-label="add an alarm"
+                                                                            onClick={() => deleteHandler(img)}
+                                                                        >
+                                                                            <HighlightOffIcon
+                                                                                key={i}
+                                                                                style={{
+                                                                                    position: 'absolute',
+                                                                                    top: -100,
+                                                                                    right: 0,
+                                                                                    width: '25px',
+                                                                                    height: '25px'
+                                                                                    // marginRight: "10px",
+                                                                                }}
+                                                                                // src="https://png.pngtree.com/png-vector/20190603/ourmid/pngtree-icon-close-button-png-image_1357822.jpg"
+                                                                            />
+                                                                        </IconButton>
+                                                                    </div>
                                                                 );
                                                             })}
                                                         </div>
-                                                    )}
+                                                    )} */}
                                                 </Grid>
                                                 {/* <Grid item xs={12}>
                                                     <Previews setFieldValue={setFieldValue} files={values.files} />
