@@ -110,25 +110,25 @@ const utilities = {
                             breadcrumbs: false
                             // icon: "bi bi-journal-code",
                             // path: "/master/codeAndName",
-                        },
-                        {
-                            id: 'operator-entry',
-                            title: 'Operator Entry',
-                            type: 'item',
-                            url: '/master/operatorentryview',
-                            breadcrumbs: false
-                            // icon: "bi bi-journal-code",
-                            // path: "/master/codeAndName",
-                        },
-                        {
-                            id: 'Color',
-                            title: 'Color',
-                            type: 'item',
-                            url: '/utils/util-color',
-                            breadcrumbs: false
-                            // icon: "bi bi-journal-code",
-                            // path: "/master/codeAndName",
                         }
+                        // {
+                        //     id: 'operator-entry',
+                        //     title: 'Operator Entry',
+                        //     type: 'item',
+                        //     url: '/master/operatorentryview',
+                        //     breadcrumbs: false
+                        //     // icon: "bi bi-journal-code",
+                        //     // path: "/master/codeAndName",
+                        // },
+                        // {
+                        //     id: 'Color',
+                        //     title: 'Color',
+                        //     type: 'item',
+                        //     url: '/utils/util-color',
+                        //     breadcrumbs: false
+                        //     // icon: "bi bi-journal-code",
+                        //     // path: "/master/codeAndName",
+                        // }
                         //   {
                         //     title: "Manager",
                         //     icon: "bi bi-file-earmark-person",
@@ -213,10 +213,19 @@ const utilities = {
                             // path: "/master/codeAndName",
                         },
                         {
-                            id: 'hotelbasis',
-                            title: 'Hotel Basis',
+                            id: 'managing-company',
+                            title: 'Managing Compnay',
                             type: 'item',
-                            url: '/master/hotelbasis',
+                            url: '/master/managingCompanyview',
+                            breadcrumbs: false
+                            // icon: "bi bi-journal-code",
+                            // path: "/master/codeAndName",
+                        },
+                        {
+                            id: 'hotel-facility',
+                            title: 'Hotel Facility',
+                            type: 'item',
+                            url: '/master/hotelFacilityview',
                             breadcrumbs: false
                             // icon: "bi bi-journal-code",
                             // path: "/master/codeAndName",
@@ -230,6 +239,17 @@ const utilities = {
                             // icon: "bi bi-journal-code",
                             // path: "/master/codeAndName",
                         },
+
+                        {
+                            id: 'hotelbasis',
+                            title: 'Hotel Basis',
+                            type: 'item',
+                            url: '/master/hotelbasis',
+                            breadcrumbs: false
+                            // icon: "bi bi-journal-code",
+                            // path: "/master/codeAndName",
+                        },
+
                         {
                             id: 'facility-count',
                             title: 'Facility Count',
@@ -241,24 +261,24 @@ const utilities = {
                         },
 
                         {
-                            id: 'hotel-facility',
-                            title: 'Hotel Facility',
+                            id: 'hotel-main-master',
+                            title: 'Hotel Main Details',
                             type: 'item',
-                            url: '/master/hotelFacilityview',
-                            breadcrumbs: false
-                            // icon: "bi bi-journal-code",
-                            // path: "/master/codeAndName",
-                        },
-
-                        {
-                            id: 'Color',
-                            title: 'Color',
-                            type: 'item',
-                            url: '/utils/util-color',
+                            url: '/master/hotelview',
                             breadcrumbs: false
                             // icon: "bi bi-journal-code",
                             // path: "/master/codeAndName",
                         }
+
+                        // {
+                        //     id: 'Color',
+                        //     title: 'Color',
+                        //     type: 'item',
+                        //     url: '/utils/util-color',
+                        //     breadcrumbs: false
+                        //     // icon: "bi bi-journal-code",
+                        //     // path: "/master/codeAndName",
+                        // }
                         //   {
                         //     title: "Manager",
                         //     icon: "bi bi-file-earmark-person",
@@ -332,6 +352,13 @@ const utilities = {
                             breadcrumbs: false
                         }
                     ]
+                },
+                {
+                    id: 'activitysupplement-id',
+                    title: 'Activity / Supplement',
+                    type: 'item',
+                    url: '/master/activitysupplementview',
+                    breadcrumbs: false
                 }
             ]
         }

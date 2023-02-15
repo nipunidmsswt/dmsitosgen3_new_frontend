@@ -28,7 +28,10 @@ import ViewTransportRates from 'views/pages/master/transportMaster/transportRate
 import ViewCompanyProfile from 'views/pages/master/company_profile/ViewCompanyProfile';
 import ViewDepartmentDesignation from 'views/pages/master/department_designation/ViewDepartmentDesignation';
 import ViewUserCreation from 'views/pages/authentication/userManagement/ViewUserCreation';
+import ViewActivitySupplement from 'views/pages/master/activity_supplement/ViewActivitySupplement';
 import VIewActualGuide from 'views/pages/master/guideMaster/actual_guide/VIewActualGuide';
+import ViewHotelMaster from 'views/pages/master/hotelMaster/hotelMaster/ViewHotelMaster';
+import ViewManagingComapany from 'views/pages/master/managing_company/ViewManagingCompnay';
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
 
@@ -152,8 +155,8 @@ const MainRoutes = {
                     element: <ViewMarketGroup />
                 },
                 {
-                    path: 'operatorentryview',
-                    element: <ViewOperatorEntry />
+                    path: 'activitysupplementview',
+                    element: <ViewActivitySupplement />
                 },
                 {
                     path: 'seasonview',
@@ -218,6 +221,14 @@ const MainRoutes = {
                 {
                     path: 'actualguide',
                     element: <VIewActualGuide />
+                },
+                {
+                    path: 'hotelview',
+                    element: <ViewHotelMaster />
+                },
+                {
+                    path: 'managingCompanyview',
+                    element: <ViewManagingComapany />
                 }
             ]
         }

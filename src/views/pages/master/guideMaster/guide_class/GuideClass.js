@@ -71,7 +71,7 @@ function GuideClass({ open, handleClose, mode, guideCode }) {
 
     const [existOpenModal, setExistOpenModal] = useState(false);
 
-    const [loadValues, setLoadValues] = useState(null);
+    const [loadValues, setLoadValues] = useState(initialValues);
     const [currencyListArray, setCurrecyListArray] = useState([]);
     const ref = useRef(null);
     const [appearing, setAppearing] = useState(false);
@@ -278,10 +278,12 @@ function GuideClass({ open, handleClose, mode, guideCode }) {
     // const  checkStatus()=>{
 
     // }
-    let checkStatus = function (value) {
-        initialValues.guideClassDetails?.map((s) => console.log(s.status));
-        // console.log('value:' + value);
-    };
+    // let checkStatus = function (value) {
+    //     console.log(value);
+    //     console.log(loadValues.guideClassDetails);
+    //     loadValues.guideClassDetails?.map((s) => (s.status == true ? alert('true') : ''));
+    //     // console.log('value:' + value);
+    // };
 
     const guideClassToUpdate = useSelector((state) => state.guideClassReducer.guideClassToUpdate);
 
@@ -329,29 +331,31 @@ function GuideClass({ open, handleClose, mode, guideCode }) {
     const handleSubmitForm = (data) => {
         console.log(data);
         if (mode === 'INSERT') {
-            // const dataArray = [];
-            // if (data.guideClassDetails.length > 0) {
-            //     data.guideClassDetails.map((item) => {
-            //         const guideClassDetails = {
-            //             fromDate: item.fromDate,
-            //             toDate: item.toDate,
-            //             currencyList: item.currencyList.currencyListId,
-            //             tax: item.tax.taxId,
-            //             perDayRate: item.perDayRate == null ? 0.0 : item.perDayRate,
-            //             rateWithÓutTax: item.perDayRate,
-            //             rateWithTax: item.perDayRate,
-            //             status: item.status
-            //         };
-            //         dataArray.push(guideClassDetails);
-            //     });
-            //     const saveValues = {
-            //         guideCode: data.guideCode,
-            //         description: data.description,
-            //         status: data.status,
-            //         guideClassDetails: dataArray
-            //     };
-            //     dispatch(saveGuideClassData(saveValues));
-            // }
+            const dataArray = [];
+            if (data.guideClassDetails.length > 0) {
+                data.guideClassDetails.map((item) => {
+                    const guideClassDetails = {
+                        fromDate: item.fromDate,
+                        toDate: item.toDate,
+                        currencyList: item.currencyList.currencyListId,
+                        tax: item.tax.taxId,
+                        perDayRate: item.perDayRate == null ? 0.0 : item.perDayRate,
+                        rateWithÓutTax: item.perDayRate,
+                        rateWithTax: item.perDayRate,
+                        status: item.status
+                    };
+                    dataArray.push(guideClassDetails);
+                });
+
+                const saveValues = {
+                    guideCode: data.guideCode,
+                    description: data.description,
+                    status: data.status,
+                    guideClassDetails: dataArray
+                };
+                console.log(saveValues);
+                dispatch(saveGuideClassData(saveValues));
+            }
         } else if (mode === 'VIEW_UPDATE') {
             const dataArray = [];
             if (data.guideClassDetails.length > 0) {
@@ -440,7 +444,7 @@ function GuideClass({ open, handleClose, mode, guideCode }) {
                                         <Formik
                                             innerRef={ref}
                                             enableReinitialize={true}
-                                            initialValues={loadValues || initialValues}
+                                            initialValues={loadValues}
                                             onSubmit={(values) => {
                                                 handleSubmitForm(values);
                                             }}
@@ -581,10 +585,10 @@ function GuideClass({ open, handleClose, mode, guideCode }) {
                                                                                                                 value
                                                                                                             );
                                                                                                         }}
-                                                                                                        disabled={
-                                                                                                            mode == 'VIEW_UPDATE' ||
-                                                                                                            mode == 'VIEW'
-                                                                                                        }
+                                                                                                        // disabled={
+                                                                                                        //     mode == 'VIEW_UPDATE' ||
+                                                                                                        //     mode == 'VIEW'
+                                                                                                        // }
                                                                                                         inputFormat="DD/MM/YYYY"
                                                                                                         value={
                                                                                                             values.guideClassDetails[idx] &&
@@ -668,10 +672,10 @@ function GuideClass({ open, handleClose, mode, guideCode }) {
                                                                                                                 value
                                                                                                             );
                                                                                                         }}
-                                                                                                        disabled={
-                                                                                                            mode == 'VIEW_UPDATE' ||
-                                                                                                            mode == 'VIEW'
-                                                                                                        }
+                                                                                                        // disabled={
+                                                                                                        //     mode == 'VIEW_UPDATE' ||
+                                                                                                        //     mode == 'VIEW'
+                                                                                                        // }
                                                                                                         inputFormat="DD/MM/YYYY"
                                                                                                         value={
                                                                                                             values.guideClassDetails[idx] &&
@@ -760,10 +764,10 @@ function GuideClass({ open, handleClose, mode, guideCode }) {
                                                                                                             value
                                                                                                         );
                                                                                                     }}
-                                                                                                    disabled={
-                                                                                                        mode == 'VIEW_UPDATE' ||
-                                                                                                        mode == 'VIEW'
-                                                                                                    }
+                                                                                                    // disabled={
+                                                                                                    //     mode == 'VIEW_UPDATE' ||
+                                                                                                    //     mode == 'VIEW'
+                                                                                                    // }
                                                                                                     options={currencyListOptions}
                                                                                                     getOptionLabel={(option) =>
                                                                                                         `${option.currencyCode} - ${option.currencyDescription}`
@@ -866,10 +870,10 @@ function GuideClass({ open, handleClose, mode, guideCode }) {
                                                                                                             placeholder="--Select a Tax Code --"
                                                                                                             variant="outlined"
                                                                                                             name={`guideClassDetails.${idx}.tax`}
-                                                                                                            disabled={
-                                                                                                                mode == 'VIEW_UPDATE' ||
-                                                                                                                mode == 'VIEW'
-                                                                                                            }
+                                                                                                            // disabled={
+                                                                                                            //     mode == 'VIEW_UPDATE' ||
+                                                                                                            //     mode == 'VIEW'
+                                                                                                            // }
                                                                                                             onBlur={handleBlur}
                                                                                                             helperText={
                                                                                                                 touched.guideClassDetails &&
@@ -938,10 +942,10 @@ function GuideClass({ open, handleClose, mode, guideCode }) {
                                                                                                     // label="Additional Price"
                                                                                                     type="number"
                                                                                                     variant="outlined"
-                                                                                                    disabled={
-                                                                                                        mode == 'VIEW_UPDATE' ||
-                                                                                                        mode == 'VIEW'
-                                                                                                    }
+                                                                                                    // disabled={
+                                                                                                    //     mode == 'VIEW_UPDATE' ||
+                                                                                                    //     mode == 'VIEW'
+                                                                                                    // }
                                                                                                     placeholder="0"
                                                                                                     name={`guideClassDetails.${idx}.perDayRate`}
                                                                                                     value={
@@ -1011,7 +1015,7 @@ function GuideClass({ open, handleClose, mode, guideCode }) {
                                                                                                             values.guideClassDetails[idx]
                                                                                                                 .status
                                                                                                         }
-                                                                                                        control={<Switch color="success" />}
+                                                                                                        control={<Switch />}
                                                                                                         error={Boolean(
                                                                                                             touched.guideClassDetails &&
                                                                                                                 touched.guideClassDetails[
@@ -1046,15 +1050,16 @@ function GuideClass({ open, handleClose, mode, guideCode }) {
                                                                                                         }
                                                                                                         onChange={(_, value) => {
                                                                                                             // checkStatus();
+                                                                                                            // checkStatus(value);
                                                                                                             // console.log(value.currencyListId);
                                                                                                             // setAppearing(value);
                                                                                                             setFieldValue(
                                                                                                                 `guideClassDetails.${idx}.status`,
                                                                                                                 value
                                                                                                             );
-                                                                                                            console.log(
-                                                                                                                values.guideClassDetails
-                                                                                                            );
+                                                                                                            // console.log(
+                                                                                                            //     values.guideClassDetails
+                                                                                                            // );
 
                                                                                                             // s.code ===
                                                                                                             //     values.code &&
@@ -1075,7 +1080,7 @@ function GuideClass({ open, handleClose, mode, guideCode }) {
                                                                                                         }
                                                                                                         disabled={mode == 'VIEW'}
                                                                                                     />
-                                                                                                    {errors.guideClassDetails &&
+                                                                                                    {/* {errors.guideClassDetails &&
                                                                                                         errors.guideClassDetails[idx] &&
                                                                                                         errors.guideClassDetails[idx]
                                                                                                             .status && (
@@ -1092,7 +1097,7 @@ function GuideClass({ open, handleClose, mode, guideCode }) {
                                                                                                                     ].status
                                                                                                                 }
                                                                                                             </p>
-                                                                                                        )}
+                                                                                                        )} */}
                                                                                                 </FormGroup>
                                                                                             </TableCell>
                                                                                             <TableCell>

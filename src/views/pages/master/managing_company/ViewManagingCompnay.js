@@ -1,124 +1,43 @@
-import React from 'react';
+import { useEffect, useState } from 'react';
 import MaterialTable from 'material-table';
 import tableIcons from 'utils/MaterialTableIcons';
-import { gridSpacing } from 'store/constant';
-import SuccessMsg from 'messages/SuccessMsg';
-import ErrorMsg from 'messages/ErrorMsg';
-import { useEffect, useState } from 'react';
-import { styled } from '@mui/material/styles';
-import { Typography, TextField, Switch, FormGroup, FormControlLabel } from '@mui/material';
-import Box from '@mui/material/Box';
-import Paper from '@mui/material/Paper';
+import ManagingCompany from './ManagingCompany';
+import SuccessMsg from '../../../../messages/SuccessMsg';
+import ErrorMsg from '../../../../messages/ErrorMsg';
+import { useSelector, useDispatch } from 'react-redux';
+import {
+    getLatestModifiedManagingCompanyDetails,
+    getAllManagingCompanyDetails
+} from '../../../../store/actions/masterActions/ManagingComapanyAction';
 import Grid from '@mui/material/Grid';
-import { useDispatch, useSelector } from 'react-redux';
-import HotelChildrenFacilities from './RoomCategory';
-import { getAllRoomCategoryData, getRoomCategoryLatestModifiedDetails } from 'store/actions/masterActions/RoomCategoryAction';
 import MainCard from 'ui-component/cards/MainCard';
+import { gridSpacing } from 'store/constant';
+import { FormControlLabel, FormGroup, Switch } from '@mui/material';
 
-function ViewRoomCategory() {
+function ViewManagingComapany() {
     const [open, setOpen] = useState(false);
-    const [rowHotelChildrenFacilityCode, setHotelChildrenFacilityCode] = useState('');
+    const [roomCreationCode, setRoomCreationCode] = useState('');
     const [mode, setMode] = useState('INSERT');
     const [openToast, setHandleToast] = useState(false);
     const [openErrorToast, setOpenErrorToast] = useState(false);
-    const [lastModifiedTimeDate, setLastModifiedTimeDate] = useState(null);
-    const error = useSelector((state) => state.productDataReducer.errorMsg);
-    const hotelChildrenFacilityListData = useSelector((state) => state.roomCategoryReducer.hotelChildrenFacilityList);
     const [tableData, setTableData] = useState([]);
-    const lastModifiedDate = useSelector((state) => state.roomCategoryReducer.lastModifiedDateTime);
-
-    const hotelChildrenFacilityData = useSelector((state) => state.roomCategoryReducer.hotelChildrenFacility);
-    const dispatch = useDispatch();
-
-    const handleClickOpen = (type, data) => {
-        if (type === 'VIEW_UPDATE' || type === 'VIEW') {
-            setMode(type);
-            setHotelChildrenFacilityCode(data.code);
-        } else {
-            setHotelChildrenFacilityCode('');
-            setMode(type);
-        }
-
-        setOpen(true);
-    };
-
-    useEffect(() => {
-        setLastModifiedTimeDate(
-            lastModifiedDate === null
-                ? ''
-                : new Date(lastModifiedDate).toLocaleString('en-GB', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: '2-digit',
-                      hour: 'numeric',
-                      minute: 'numeric',
-                      hour12: true
-                  })
-        );
-    }, [lastModifiedDate]);
-
-    useEffect(() => {
-        dispatch(getAllRoomCategoryData());
-        dispatch(getRoomCategoryLatestModifiedDetails());
-    }, []);
-
-    useEffect(() => {
-        if (hotelChildrenFacilityListData?.payload?.length > 0) {
-            setTableData(hotelChildrenFacilityListData?.payload[0]);
-        }
-    }, [hotelChildrenFacilityListData]);
-
-    useEffect(() => {
-        console.log(error);
-        if (error != null) {
-            setOpenErrorToast(true);
-        }
-    }, [error]);
-
-    useEffect(() => {
-        if (hotelChildrenFacilityData) {
-            setHandleToast(true);
-            dispatch(getAllRoomCategoryData());
-            dispatch(getRoomCategoryLatestModifiedDetails());
-        }
-    }, [hotelChildrenFacilityData]);
-
-    const handleClose = () => {
-        setOpen(false);
-    };
-
-    const handleToast = () => {
-        setHandleToast(false);
-    };
-
+    const [lastModifiedTimeDate, setLastModifiedTimeDate] = useState(null);
     const columns = [
         {
-            title: ' Code',
+            title: 'Code',
             field: 'code',
-            align: 'center',
-            cellStyle: {
-                minWidth: 200,
-                maxWidth: 200,
-                align: 'center'
-            },
-            headerStyle: { textAlign: 'center' },
-            filterPlaceholder: 'filter'
+            filterPlaceholder: 'filter',
+            align: 'center'
         },
         {
-            title: 'Description',
-            field: 'roomDescription',
+            title: 'Name',
+            field: 'name',
             filterPlaceholder: 'filter',
-            cellStyle: {
-                minWidth: 200,
-                maxWidth: 200,
-                align: 'center'
-            },
-            headerStyle: { textAlign: 'center' },
             align: 'center'
         },
 
         {
-            title: 'Status',
+            title: 'Active',
             field: 'status',
             filterPlaceholder: 'True || False',
             align: 'center',
@@ -139,16 +58,81 @@ function ViewRoomCategory() {
                         </FormGroup>
                     ) : (
                         <FormGroup>
-                            <FormControlLabel control={<Switch color="error" size="small" />} checked={false} />
+                            <FormControlLabel control={<Switch size="small" />} checked={false} />
                         </FormGroup>
                     )}
                 </div>
             )
         }
     ];
+
+    const dispatch = useDispatch();
+    const error = useSelector((state) => state.ManagingCompanyReducer.errorMsg);
+
+    const managingCompanies = useSelector((state) => state.ManagingCompanyReducer.managingCompanies);
+    const managingCompany = useSelector((state) => state.ManagingCompanyReducer.managingCompany);
+    console.log(managingCompany);
+
+    const lastModifiedDate = useSelector((state) => state.ManagingCompanyReducer.lastModifiedDateTime);
+    useEffect(() => {
+        if (managingCompanies?.payload?.length > 0) {
+            setTableData(managingCompanies?.payload[0]);
+        }
+    }, [managingCompanies]);
+
+    useEffect(() => {
+        console.log(error);
+        if (error != null) {
+            console.log('failed Toast');
+            setOpenErrorToast(true);
+        }
+    }, [error]);
+
+    useEffect(() => {
+        // setLastModifiedTimeDate(dateFormator(lastModifiedDate));
+        setLastModifiedTimeDate(lastModifiedDate);
+    }, [lastModifiedDate]);
+
+    useEffect(() => {
+        console.log(managingCompany);
+        if (managingCompany) {
+            console.log('sucessToast');
+            setHandleToast(true);
+            dispatch(getAllManagingCompanyDetails());
+        }
+    }, [managingCompany]);
+
+    useEffect(() => {
+        dispatch(getLatestModifiedManagingCompanyDetails());
+        dispatch(getAllManagingCompanyDetails());
+    }, []);
+
+    const handleClickOpen = (type, data) => {
+        console.log(type);
+        console.log(data);
+        if (type === 'VIEW_UPDATE' || type === 'VIEW') {
+            setMode(type);
+            setRoomCreationCode(data.code);
+        } else if (type === 'INSERT') {
+            setRoomCreationCode('');
+            setMode(type);
+        }
+        setOpen(true);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+    };
+
+    const handleToast = () => {
+        setHandleToast(false);
+    };
+    const handleErrorToast = () => {
+        setOpenErrorToast(false);
+    };
     return (
-        <div>
-            <MainCard title="Room Category">
+        <div className="App">
+            <MainCard title="Managing Company">
                 <div style={{ textAlign: 'right' }}> Last Modified Date : {lastModifiedTimeDate}</div>
                 <br />
                 <Grid container spacing={gridSpacing}>
@@ -161,26 +145,22 @@ function ViewRoomCategory() {
                                     actions={[
                                         {
                                             icon: tableIcons.Add,
-                                            tooltip: 'Add New',
+                                            tooltip: 'Add Tax',
                                             isFreeAction: true,
                                             onClick: () => handleClickOpen('INSERT', null)
                                         },
                                         (rowData) => ({
                                             icon: tableIcons.Edit,
-                                            filtering: true,
-                                            tooltip: 'Edit',
-                                            // iconProps: { color: "primary" },
+                                            tooltip: 'Edit Tax',
                                             onClick: () => handleClickOpen('VIEW_UPDATE', rowData)
                                         }),
                                         (rowData) => ({
                                             icon: tableIcons.VisibilityIcon,
-                                            tooltip: 'View',
-                                            // iconProps: { color: "action" },
+                                            tooltip: 'Edit Tax',
                                             onClick: () => handleClickOpen('VIEW', rowData)
                                         })
                                     ]}
                                     options={{
-                                        // title:<ModifiedElement/>,
                                         padding: 'dense',
                                         showTitle: false,
                                         sorting: true,
@@ -194,13 +174,10 @@ function ViewRoomCategory() {
                                         pageSize: 5,
                                         paginationType: 'stepped',
                                         showFirstLastPageButtons: false,
-                                        // paginationPosition: "both",
                                         exportButton: true,
                                         exportAllData: true,
-                                        exportFileName: 'Children Facilities Table Data',
+                                        exportFileName: 'TableData',
                                         actionsColumnIndex: -1,
-
-                                        // grouping: true,
                                         columnsButton: true,
 
                                         headerStyle: {
@@ -212,29 +189,19 @@ function ViewRoomCategory() {
                                             background: '-moz-linear-gradient(top, #0790E8, #3180e6)',
                                             background: '-ms-linear-gradient(top, #0790E8, #3180e6)',
                                             background: '-webkit-linear-gradient(top, #0790E8, #3180e6)',
-                                            // textAlign: 'center',
+                                            textAlign: 'center',
                                             color: '#FFF'
                                         },
                                         rowStyle: {
                                             whiteSpace: 'nowrap',
                                             height: 20,
                                             fontSize: '13px',
-                                            padding: 0,
-                                            align: 'center'
+                                            padding: 0
                                         }
                                     }}
                                 />
 
-                                {open ? (
-                                    <HotelChildrenFacilities
-                                        open={open}
-                                        handleClose={handleClose}
-                                        mode={mode}
-                                        rowHotelChildrenFacilityCode={rowHotelChildrenFacilityCode}
-                                    />
-                                ) : (
-                                    ''
-                                )}
+                                {open ? <ManagingCompany open={open} handleClose={handleClose} code={roomCreationCode} mode={mode} /> : ''}
                                 {openToast ? <SuccessMsg openToast={openToast} handleToast={handleToast} mode={mode} /> : null}
                                 {openErrorToast ? (
                                     <ErrorMsg openToast={openErrorToast} handleToast={setOpenErrorToast} mode={mode} />
@@ -249,4 +216,4 @@ function ViewRoomCategory() {
     );
 }
 
-export default ViewRoomCategory;
+export default ViewManagingComapany;

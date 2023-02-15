@@ -186,11 +186,13 @@ import {
     getManagingCompanyByIdSaga,
     updateManagingCompanySaga,
     checkDupicateManagingCompanyCodeSaga,
-    checkLatestManagingCompanyModifiedDateSaga
+    checkLatestManagingCompanyModifiedDateSaga,
+    getAllActiveManagingCompanySaga
 } from './mastersaga/ManagingCompanySaga';
 
 import {
     CHECK_MANAGING_COMAPANY_DUPLICATE,
+    GET_ALL_ACTIVE_MANAGING_COMAPANY_DATA,
     GET_ALL_MANAGING_COMAPANY_DATA,
     GET_LAST_MODIFIED_DATE_TIME_MANAGING_COMAPANY,
     GET_MANAGING_COMAPANY_DATA_BY_ID,
@@ -489,6 +491,24 @@ import {
     getActualGuideLatestModifiedDateSaga,
     checkActualGuideDupicateCodeSaga
 } from '../saga/mastersaga/ActualGuideSaga';
+import {
+    CHECK_ACTIVITY_SUPPLIMENT_CODE_DUPLICATE,
+    GET_ACTIVITY_SUPPLIMENT_DETAILS_BY_CODE,
+    GET_ACTIVITY_SUPPLIMENT_LAST_MODIFIED_DATE_TIME,
+    GET_ALL_ACTIVE_ACTIVITY_SUPPLIMENT_DATA,
+    GET_ALL_ACTIVITY_SUPPLIMENT_DATA,
+    SAVE_ACTIVITY_SUPPLIMENT_DATA,
+    UPDATE_ACTIVITY_SUPPLIMENT_DATA
+} from 'store/constant/master/Activity_SupplimentConstant';
+import {
+    checkActivity_SupplimentDupicateCodeSaga,
+    getActivity_SupplimentDetailsByCodeSaga,
+    getActivity_SupplimentLatestModifiedDateSaga,
+    getAllActiveActivity_SupplimentDataSaga,
+    getAllActivity_SupplimentDataSaga,
+    saveActivity_SupplimentDataHandler,
+    updateActivity_SupplimentDataSaga
+} from './mastersaga/Activity_SupplimentSage';
 
 export function* wacherSaga() {
     // tax setup
@@ -582,7 +602,7 @@ export function* wacherSaga() {
     // yield takeLatest(CHECK_ROOM_RECREATION_DUPLICATE, checkDupicateRoomRecreationCodeSaga);
     // yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_ROOM_RECREATION, checkLatestRoomCreationModifiedDateSaga);
 
-    // //Manager
+    //Agent
 
     yield takeLatest(SAVE_AGENT_DATA, saveAgentDataHandler);
     yield takeLatest(GET_ALL_AGENT_DATA, getAllAgentDataSaga);
@@ -635,7 +655,7 @@ export function* wacherSaga() {
     yield takeLatest(UPDATE_MANAGING_COMAPANY_DATA, updateManagingCompanySaga);
     yield takeLatest(CHECK_MANAGING_COMAPANY_DUPLICATE, checkDupicateManagingCompanyCodeSaga);
     yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_MANAGING_COMAPANY, checkLatestManagingCompanyModifiedDateSaga);
-
+    yield takeLatest(GET_ALL_ACTIVE_MANAGING_COMAPANY_DATA, getAllActiveManagingCompanySaga);
     // //owner setup
     yield takeLatest(SAVE_OWNER_DATA, saveOwner);
     yield takeLatest(GET_ALL_OWNER_DATA, getAllOwnerSaga);
@@ -756,7 +776,8 @@ export function* wacherSaga() {
     yield takeLatest(UPDATE_ACTUAL_GUIDE_DATA, updateActualGuideDataSaga);
     yield takeLatest(CHECK_ACTUAL_GUIDE_CODE_DUPLICATE, checkActualGuideDupicateCodeSaga);
     yield takeLatest(GET_ACTUAL_GUIDE_LAST_MODIFIED_DATE_TIME, getActualGuideLatestModifiedDateSaga);
-    //agent
+
+    //manager
     yield takeLatest(SAVE_MANAGER_DATA, saveManagerDataHandler);
     yield takeLatest(GET_ALL_MANAGER_DATA, getAllManagerDataSaga);
     yield takeLatest(GET_MANAGER_DETAILS_BY_CODE, getManagerDetailsByCodeSaga);
@@ -764,4 +785,13 @@ export function* wacherSaga() {
     yield takeLatest(CHECK_MANAGER_CODE_DUPLICATE, checkManagerDupicateCodeSaga);
     yield takeLatest(UPDATE_MANAGER_DATA, updateManagerDataSaga);
     yield takeLatest(GET_ALL_ACTIVE_MANAGER_DATA, getAllActiveManagerDataSaga);
+
+    // activity/suppliment
+    yield takeLatest(SAVE_ACTIVITY_SUPPLIMENT_DATA, saveActivity_SupplimentDataHandler);
+    yield takeLatest(GET_ALL_ACTIVITY_SUPPLIMENT_DATA, getAllActivity_SupplimentDataSaga);
+    yield takeLatest(GET_ACTIVITY_SUPPLIMENT_DETAILS_BY_CODE, getActivity_SupplimentDetailsByCodeSaga);
+    yield takeLatest(GET_ACTIVITY_SUPPLIMENT_LAST_MODIFIED_DATE_TIME, getActivity_SupplimentLatestModifiedDateSaga);
+    yield takeLatest(CHECK_ACTIVITY_SUPPLIMENT_CODE_DUPLICATE, checkActivity_SupplimentDupicateCodeSaga);
+    yield takeLatest(UPDATE_ACTIVITY_SUPPLIMENT_DATA, updateActivity_SupplimentDataSaga);
+    yield takeLatest(GET_ALL_ACTIVE_ACTIVITY_SUPPLIMENT_DATA, getAllActiveActivity_SupplimentDataSaga);
 }
