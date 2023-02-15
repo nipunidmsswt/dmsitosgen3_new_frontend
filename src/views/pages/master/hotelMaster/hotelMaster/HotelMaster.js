@@ -18,7 +18,8 @@ import {
     Switch,
     Autocomplete,
     Button,
-    MenuItem
+    MenuItem,
+    Divider
 } from '@mui/material';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -45,6 +46,12 @@ import PreviewIcon from '@mui/icons-material/Preview';
 import { getAllActiveManagingCompanyDetails } from 'store/actions/masterActions/ManagingComapanyAction';
 import AlertItemExist from 'messages/AlertItemExist';
 import ManagingCompany from '../../managing_company/ManagingCompany';
+import {
+    getAllActiveChildrenFacilitiesData,
+    getAllActiveFacilitiesOfferedData,
+    getAllActiveRecreationData,
+    getAllActiveServiceOfferedData
+} from 'store/actions/masterActions/HotelFacilityAction';
 const Transition = forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
@@ -104,10 +111,25 @@ function HotelMaster({ open, handleClose, mode, activitySupplimentId }) {
     const [activeManagingCompanyList, setActiveManagingCompanyList] = useState([]);
     const [previewImages, setPreviewImages] = useState([]);
     const [updatePreviewImages, setupdatePreviewImages] = useState([]);
-    // const handleChangeStatus = (event) => {
-    //     console.log(event.target.checked);
-    //     // this.setState({ checked: event.target.checked });
-    // };
+
+    const [activeReCreationList, setActiveRecreationList] = useState([]);
+    const [activeFacilityOfferedListData, setActiveFacilityOfferedListData] = useState([]);
+    const [activeChildrenFacilityListData, setActiveChildrenFacilityListData] = useState([]);
+    const [activeServiceOfferedListData, setActiveServiceOfferedListData] = useState([]);
+
+    const activeRoomRecreationList = useSelector((state) => state.hotelFacilityReducer.activeRoomRecreationList);
+    const activeFacilityOfferedList = useSelector((state) => state.hotelFacilityReducer.activeFacilityOfferedList);
+    const activeChildrenFacilitiesList = useSelector((state) => state.hotelFacilityReducer.activeChildrenFacilitiesList);
+    const activeServiceOfferedList = useSelector((state) => state.hotelFacilityReducer.activeServiceOfferedList);
+
+    useEffect(() => {
+        dispatch(getActiveLocations());
+        dispatch(getAllActiveManagingCompanyDetails());
+        dispatch(getAllActiveRecreationData());
+        dispatch(getAllActiveFacilitiesOfferedData());
+        dispatch(getAllActiveChildrenFacilitiesData());
+        dispatch(getAllActiveServiceOfferedData());
+    }, []);
     const handleExistModalClose = (status) => {
         if (status) {
             setExistOpenModal(false);
@@ -116,6 +138,38 @@ function HotelMaster({ open, handleClose, mode, activitySupplimentId }) {
     useEffect(() => {
         setActiveLocationList(activeLocations);
     }, [activeLocations]);
+
+    useEffect(() => {
+        console.log(activeRoomRecreationList);
+        // if (activeRoomRecreationList?.length > 0) {
+        setActiveRecreationList(activeRoomRecreationList);
+        // }
+        // setActiveLocationList(activeLocations);
+    }, [activeRoomRecreationList]);
+
+    useEffect(() => {
+        console.log(activeServiceOfferedList);
+        // if (activeRoomRecreationList?.length > 0) {
+        setActiveServiceOfferedListData(activeServiceOfferedList);
+        // }
+        // setActiveLocationList(activeLocations);
+    }, [activeServiceOfferedList]);
+
+    useEffect(() => {
+        console.log(activeChildrenFacilitiesList);
+        // if (activeRoomRecreationList?.length > 0) {
+        setActiveChildrenFacilityListData(activeChildrenFacilitiesList);
+        // }
+        // setActiveLocationList(activeLocations);
+    }, [activeChildrenFacilitiesList]);
+
+    useEffect(() => {
+        console.log(activeFacilityOfferedList);
+        // if (activeRoomRecreationList?.length > 0) {
+        setActiveFacilityOfferedListData(activeFacilityOfferedList);
+        // }
+        // setActiveLocationList(activeLocations);
+    }, [activeFacilityOfferedList]);
 
     useEffect(() => {
         if (activeManagingCompanies?.payload?.length > 0) {
@@ -242,11 +296,11 @@ function HotelMaster({ open, handleClose, mode, activitySupplimentId }) {
     const [taxIdValues, setTaxIdValues] = useState(null);
     const [taxValues, setTaxValues] = useState(null);
 
-    useEffect(() => {
-        if (mode === 'VIEW_UPDATE' || mode === 'VIEW') {
-            dispatch(getActivity_SupplimentDetailsByCode(activitySupplimentId));
-        }
-    }, [mode]);
+    // useEffect(() => {
+    //     if (mode === 'VIEW_UPDATE' || mode === 'VIEW') {
+    //         dispatch(getActivity_SupplimentDetailsByCode(activitySupplimentId));
+    //     }
+    // }, [mode]);
 
     const showImages = (event) => {
         let images = [];
@@ -375,13 +429,6 @@ function HotelMaster({ open, handleClose, mode, activitySupplimentId }) {
     const [typeOfActivity, setTypeOfActivity] = useState(true);
     const [labelName, setLabelName] = useState('Per Pax Rate');
     const [managingCompanyCode, setManagingCompanyCode] = useState('');
-
-    useEffect(() => {
-        // dispatch(getAllTaxData());
-        // dispatch(getAllCurrencyListData());
-        dispatch(getActiveLocations());
-        dispatch(getAllActiveManagingCompanyDetails());
-    }, []);
 
     useEffect(() => {
         if (currencyListData != null) {
@@ -943,7 +990,7 @@ function HotelMaster({ open, handleClose, mode, activitySupplimentId }) {
                                                                             shrink: true
                                                                         }}
                                                                         sx={{
-                                                                            width: { xs: 150, sm: 550 },
+                                                                            width: { xs: 150, sm: 520 },
                                                                             '& .MuiInputBase-root': {
                                                                                 height: 40
                                                                             }
@@ -958,6 +1005,154 @@ function HotelMaster({ open, handleClose, mode, activitySupplimentId }) {
                                                                         value={values.taxCode}
                                                                         error={Boolean(touched.taxCode && errors.taxCode)}
                                                                         helperText={touched.taxCode && errors.taxCode ? errors.taxCode : ''}
+                                                                    />
+                                                                </Grid>
+
+                                                                {/* <Divider variant="middle" /> */}
+
+                                                                <Grid item xs={6}>
+                                                                    <Autocomplete
+                                                                        // value={values.locationCode}
+                                                                        // name="locationCode"
+                                                                        onChange={(_, value) => {
+                                                                            setFieldValue(`reCreation`, value);
+                                                                        }}
+                                                                        disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                        options={activeReCreationList}
+                                                                        getOptionLabel={(option) => `${option.code}-${option.name}`}
+                                                                        isOptionEqualToValue={(option, value) =>
+                                                                            option.hotelFacilityId === value.hotelFacilityId
+                                                                        }
+                                                                        renderInput={(params) => (
+                                                                            <TextField
+                                                                                {...params}
+                                                                                label="Re Creation"
+                                                                                InputLabelProps={{
+                                                                                    shrink: true
+                                                                                }}
+                                                                                sx={{
+                                                                                    width: {
+                                                                                        sm: 250
+                                                                                    },
+                                                                                    '& .MuiInputBase-root': {
+                                                                                        height: 40
+                                                                                    }
+                                                                                }}
+                                                                                disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                                variant="outlined"
+                                                                                // name="locationCode"
+                                                                                onBlur={handleBlur}
+                                                                            />
+                                                                        )}
+                                                                    />
+                                                                </Grid>
+
+                                                                <Grid item xs={6}>
+                                                                    <Autocomplete
+                                                                        // value={values.locationCode}
+                                                                        name="facilitiesOffered"
+                                                                        onChange={(_, value) => {
+                                                                            setFieldValue(`facilitiesOffered`, value);
+                                                                        }}
+                                                                        disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                        options={activeFacilityOfferedListData}
+                                                                        getOptionLabel={(option) => `${option.code}-${option.name}`}
+                                                                        isOptionEqualToValue={(option, value) =>
+                                                                            option.hotelFacilityId === value.hotelFacilityId
+                                                                        }
+                                                                        renderInput={(params) => (
+                                                                            <TextField
+                                                                                {...params}
+                                                                                label="Facilities Offered"
+                                                                                InputLabelProps={{
+                                                                                    shrink: true
+                                                                                }}
+                                                                                sx={{
+                                                                                    width: {
+                                                                                        sm: 250
+                                                                                    },
+                                                                                    '& .MuiInputBase-root': {
+                                                                                        height: 40
+                                                                                    }
+                                                                                }}
+                                                                                disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                                variant="outlined"
+                                                                                name="facilitiesOffered"
+                                                                                onBlur={handleBlur}
+                                                                            />
+                                                                        )}
+                                                                    />
+                                                                </Grid>
+                                                                <Grid item xs={6}>
+                                                                    <Autocomplete
+                                                                        value={values.locationCode}
+                                                                        name="childrenFacilities"
+                                                                        onChange={(_, value) => {
+                                                                            setFieldValue(`childrenFacilities`, value);
+                                                                        }}
+                                                                        disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                        options={activeChildrenFacilityListData}
+                                                                        getOptionLabel={(option) => `${option.code}-${option.name}`}
+                                                                        isOptionEqualToValue={(option, value) =>
+                                                                            option.hotelFacilityId === value.hotelFacilityId
+                                                                        }
+                                                                        renderInput={(params) => (
+                                                                            <TextField
+                                                                                {...params}
+                                                                                label="Children's Facilities"
+                                                                                InputLabelProps={{
+                                                                                    shrink: true
+                                                                                }}
+                                                                                sx={{
+                                                                                    width: {
+                                                                                        sm: 250
+                                                                                    },
+                                                                                    '& .MuiInputBase-root': {
+                                                                                        height: 40
+                                                                                    }
+                                                                                }}
+                                                                                disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                                variant="outlined"
+                                                                                name="childrenFacilities"
+                                                                                onBlur={handleBlur}
+                                                                            />
+                                                                        )}
+                                                                    />
+                                                                </Grid>
+                                                                <Grid item xs={6}>
+                                                                    <Autocomplete
+                                                                        // value={values.locationCode}
+                                                                        name="serviceOffered"
+                                                                        onChange={(_, value) => {
+                                                                            setFieldValue(`serviceOffered`, value);
+                                                                        }}
+                                                                        disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                        options={activeServiceOfferedListData}
+                                                                        getOptionLabel={(option) => `${option.code}-${option.name}`}
+                                                                        isOptionEqualToValue={(option, value) =>
+                                                                            option.hotelFacilityId === value.hotelFacilityId
+                                                                        }
+                                                                        renderInput={(params) => (
+                                                                            <TextField
+                                                                                {...params}
+                                                                                label="Service Offered"
+                                                                                InputLabelProps={{
+                                                                                    shrink: true
+                                                                                }}
+                                                                                sx={{
+                                                                                    width: {
+                                                                                        sm: 250
+                                                                                    },
+                                                                                    '& .MuiInputBase-root': {
+                                                                                        height: 40
+                                                                                    }
+                                                                                }}
+                                                                                disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                                variant="outlined"
+                                                                                name="serviceOffered"
+                                                                                onBlur={handleBlur}
+                                                                            />
+                                                                        )}
                                                                     />
                                                                 </Grid>
                                                             </Grid>

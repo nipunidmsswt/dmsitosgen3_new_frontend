@@ -277,7 +277,11 @@ import {
     GET_LAST_MODIFIED_DATE_TIME_HOTEL_FACILITY,
     SAVE_HOTEL_FACILITY_DATA,
     UPDATE_HOTEL_FACILITY_DATA,
-    GET_ALL_HOTEL_FACILITY_TYPES_DATA
+    GET_ALL_HOTEL_FACILITY_TYPES_DATA,
+    GET_ALL_ACTIVE_ROOM_RECREATION_DATA,
+    GET_ALL_ACTIVE_SERVICE_OFFERED_DATA,
+    GET_ALL_ACTIVE_CHILDREN_FACILITIES_DATA,
+    GET_ALL_ACTIVE_FACILITIES_OFFERED_DATA
 } from 'store/constant/master/HotelFacilityConstant';
 
 import {
@@ -287,7 +291,11 @@ import {
     getFacilityByIdSaga,
     updateHotelFacilitySaga,
     checkLatestHotelFacilityModifiedDateSaga,
-    getAllHotelFacilityTypesSaga
+    getAllHotelFacilityTypesSaga,
+    getAllActiveRoomRecreationSaga,
+    getAllActiveFacilitiesOfferedSaga,
+    getAllActiveChildrenFacilitiesSaga,
+    getAllActiveServiceOfferedSaga
 } from './mastersaga/HotelFacilitySaga';
 
 import {
@@ -509,6 +517,7 @@ import {
     saveActivity_SupplimentDataHandler,
     updateActivity_SupplimentDataSaga
 } from './mastersaga/Activity_SupplimentSage';
+import { getAllActiveRecreationData } from 'store/actions/masterActions/HotelFacilityAction';
 
 export function* wacherSaga() {
     // tax setup
@@ -794,4 +803,10 @@ export function* wacherSaga() {
     yield takeLatest(CHECK_ACTIVITY_SUPPLIMENT_CODE_DUPLICATE, checkActivity_SupplimentDupicateCodeSaga);
     yield takeLatest(UPDATE_ACTIVITY_SUPPLIMENT_DATA, updateActivity_SupplimentDataSaga);
     yield takeLatest(GET_ALL_ACTIVE_ACTIVITY_SUPPLIMENT_DATA, getAllActiveActivity_SupplimentDataSaga);
+
+    // active facilies
+    yield takeLatest(GET_ALL_ACTIVE_ROOM_RECREATION_DATA, getAllActiveRoomRecreationSaga);
+    yield takeLatest(GET_ALL_ACTIVE_FACILITIES_OFFERED_DATA, getAllActiveFacilitiesOfferedSaga);
+    yield takeLatest(GET_ALL_ACTIVE_CHILDREN_FACILITIES_DATA, getAllActiveChildrenFacilitiesSaga);
+    yield takeLatest(GET_ALL_ACTIVE_SERVICE_OFFERED_DATA, getAllActiveServiceOfferedSaga);
 }
