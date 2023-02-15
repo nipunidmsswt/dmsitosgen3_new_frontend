@@ -71,11 +71,11 @@ export function* updateHotelCateogrySaga(action) {
 
 export function* checkDupicateHotelCateogryCodeSaga(action) {
     console.log('checkDupicateHotelCateogryCodeSaga tax saga');
-    console.log(action);
+    console.log(action.data.code);
 
     let responseData = [];
     try {
-        responseData = yield call(getById, `${process.env.REACT_APP_ACCOMODATION_URL}/hotelcategory/codeDuplicate/${action.data}`);
+        responseData = yield call(getById, `${process.env.REACT_APP_ACCOMODATION_URL}/hotelcategory/codeDuplicate/${action.data.code}`);
         console.log(responseData);
         yield put({ type: HOTEL_CATEGORY_DUPLICATE, data: responseData.data });
     } catch (e) {
