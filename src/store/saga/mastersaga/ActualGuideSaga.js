@@ -1,5 +1,5 @@
 import { put, takeEvery, call } from 'redux-saga/effects';
-import { create, getById, update, get } from '../../../apis/Apis';
+import { create, getById, update, get, createWithUpload } from '../../../apis/Apis';
 
 import {
     ADD_FAILED_ACTUAL_GUIDE_DATA,
@@ -31,9 +31,46 @@ export function* getAllActualGuideDataSaga() {
 export function* saveActualGuideDataHandler(action) {
     console.log('action.data:' + action.data);
     action.data.path = `${process.env.REACT_APP_TOUR_URL}/ActualGuide/`;
+
     let responseData = [];
+    let responseData2 = [];
     try {
         responseData = yield call(create, action.data);
+
+        if (responseData.data.errorMessages.length === 0) {
+            console.log('in side hfcsfsek');
+            let formData = new FormData();
+            console.log(action.data.files);
+            if (action.data.files.length !== 0) {
+                console.log('in side gdywetwytwu');
+                // formData.append(`files`, JSON.stringify(action.data.files));
+                console.log(responseData.data.payload[0].actualGuide);
+                formData.append(`id`, responseData.data.payload[0].actualGuide.id);
+                if (action.data.files != undefined) {
+                    for (let i = 0; i < action.data.files.length; i++) {
+                        formData.append(`files`, action.data.files[i]);
+                    }
+                }
+
+                const requestOptions = {
+                    method: 'POST',
+                    body: formData
+                };
+                console.log('ccccccccccccccccccccccccccccccccccccccccccccc');
+                requestOptions.path = `${process.env.REACT_APP_TOUR_URL}/ActualGuide/actualGuideImg/`;
+                responseData2 = yield call(createWithUpload, requestOptions);
+                console.log(responseData2);
+                if (responseData2.status == 201 || responseData2.status == 200) {
+                    console.log('responseData2');
+                    yield put({ type: ADD_SUCCESS_ACTUAL_GUIDE_DATA, data: responseData.data });
+                } else {
+                    yield put({ type: ADD_FAILED_ACTUAL_GUIDE_DATA, data: 'error' });
+                }
+            } else {
+                yield put({ type: ADD_SUCCESS_ACTUAL_GUIDE_DATA, data: responseData.data });
+            }
+        }
+
         yield put({ type: ADD_SUCCESS_ACTUAL_GUIDE_DATA, data: responseData.data });
     } catch (e) {
         yield put({ type: ADD_FAILED_ACTUAL_GUIDE_DATA, data: responseData.data });
@@ -54,9 +91,43 @@ export function* getActualGuideDetailsByIdeSaga(action) {
 export function* updateActualGuideDataSaga(action) {
     action.data.path = `${process.env.REACT_APP_TOUR_URL}/ActualGuide/${action.data.id}`;
     let responseData = [];
+    let responseData2 = [];
     try {
         responseData = yield call(update, action.data);
         console.log('response data:' + responseData);
+        if (responseData.data.errorMessages.length === 0) {
+            console.log('in side hfcsfsek');
+            let formData = new FormData();
+            console.log(action.data.files);
+            if (action.data.files.length !== 0) {
+                console.log('in side gdywetwytwu');
+                // formData.append(`files`, JSON.stringify(action.data.files));
+                console.log(responseData.data.payload[0].actualGuide);
+                formData.append(`id`, responseData.data.payload[0].actualGuide.id);
+                if (action.data.files != undefined) {
+                    for (let i = 0; i < action.data.files.length; i++) {
+                        formData.append(`files`, action.data.files[i]);
+                    }
+                }
+
+                const requestOptions = {
+                    method: 'POST',
+                    body: formData
+                };
+                console.log('ccccccccccccccccccccccccccccccccccccccccccccc');
+                requestOptions.path = `${process.env.REACT_APP_TOUR_URL}/ActualGuide/actualGuideImg/`;
+                responseData2 = yield call(createWithUpload, requestOptions);
+                console.log(responseData2);
+                if (responseData2.status == 201 || responseData2.status == 200) {
+                    console.log('responseData2');
+                    yield put({ type: ADD_SUCCESS_ACTUAL_GUIDE_DATA, data: responseData.data });
+                } else {
+                    yield put({ type: ADD_FAILED_ACTUAL_GUIDE_DATA, data: 'error' });
+                }
+            } else {
+                yield put({ type: ADD_SUCCESS_ACTUAL_GUIDE_DATA, data: responseData.data });
+            }
+        }
         yield put({ type: UPDATE_SUCCESS_ACTUAL_GUIDE_DATA, data: responseData.data });
     } catch (e) {
         console.log(e);

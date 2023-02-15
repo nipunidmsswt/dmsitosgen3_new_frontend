@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
     Dialog,
     Slide,
+    Switch,
     FormControlLabel,
     Box,
     DialogContent,
@@ -421,16 +422,16 @@ function ExchangeRateTypes({ open, handleClose, mode, code }) {
                                                                 <Typography variant="" component="p">
                                                                     Active
                                                                 </Typography>
+
                                                                 <FormGroup>
                                                                     <FormControlLabel
-                                                                        control={
-                                                                            <Checkbox
-                                                                                name="status"
-                                                                                onChange={handleChange}
-                                                                                checked={values.status}
-                                                                                value={values.status}
-                                                                            />
-                                                                        }
+                                                                        name="status"
+                                                                        control={<Switch />}
+                                                                        label="Status"
+                                                                        disabled={mode == 'VIEW'}
+                                                                        onChange={handleChange}
+                                                                        checked={values.status}
+                                                                        value={values.status}
                                                                     />
                                                                 </FormGroup>
                                                             </div>
@@ -698,27 +699,19 @@ function ExchangeRateTypes({ open, handleClose, mode, code }) {
                                                                                                 <TableCell>
                                                                                                     <FormGroup>
                                                                                                         <FormControlLabel
-                                                                                                            control={
-                                                                                                                <Checkbox
-                                                                                                                    name={`exchangeRates.${idx}.status`}
-                                                                                                                    onChange={handleChange}
-                                                                                                                    checked={
-                                                                                                                        values
-                                                                                                                            .exchangeRates[
-                                                                                                                            idx
-                                                                                                                        ].status
-                                                                                                                    }
-                                                                                                                    value={
-                                                                                                                        values
-                                                                                                                            .exchangeRates[
-                                                                                                                            idx
-                                                                                                                        ] &&
-                                                                                                                        values
-                                                                                                                            .exchangeRates[
-                                                                                                                            idx
-                                                                                                                        ].status
-                                                                                                                    }
-                                                                                                                />
+                                                                                                            name={`exchangeRates.${idx}.status`}
+                                                                                                            control={<Switch />}
+                                                                                                            label="Status"
+                                                                                                            disabled={mode == 'VIEW'}
+                                                                                                            onChange={handleChange}
+                                                                                                            checked={
+                                                                                                                values.exchangeRates[idx]
+                                                                                                                    .status
+                                                                                                            }
+                                                                                                            value={
+                                                                                                                values.exchangeRates[idx] &&
+                                                                                                                values.exchangeRates[idx]
+                                                                                                                    .status
                                                                                                             }
                                                                                                         />
                                                                                                     </FormGroup>

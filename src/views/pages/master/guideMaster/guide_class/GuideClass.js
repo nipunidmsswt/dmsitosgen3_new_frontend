@@ -126,95 +126,153 @@ function GuideClass({ open, handleClose, mode, guideCode }) {
 
     yup.addMethod(yup.string, 'checkDuplicatecode', function (message) {
         return this.test('checkDuplicatecode', 'Duplicate Code', async function validateValue(value) {
-            try {
-                console.log(value);
-                dispatch(checkDuplicateGuideClasssCode(value));
-                console.log(duplicateCode);
-                if (duplicateCode != null && duplicateCode.errorMessages.length != 0) {
-                    return false;
-                } else {
-                    return true;
-                }
-            } catch (error) {}
-            return true;
+            if (mode === 'INSERT') {
+                try {
+                    console.log(value);
+                    dispatch(checkDuplicateGuideClasssCode(value));
+                    console.log(duplicateCode);
+                    if (duplicateCode != null && duplicateCode.errorMessages.length != 0) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                } catch (error) {}
+                return true;
+            }
         });
     });
+
     yup.addMethod(yup.array, 'uniqueStatus', function (message) {
         return this.test('uniqueStatus', message, function (list) {
             const mapper = (x) => {
+                console.log(x);
                 return x.status;
             };
-            const set = [...new Set(list.map(mapper))];
-            console.log(list.map(mapper));
+            let set = [...list.map(mapper)];
+            console.log(set);
+            let trueCount = 0;
+            // let id = -1;
+            let idList = [];
+            let rowId = -1;
+            set.map((data) => {
+                // data.id = id + 1;
+                rowId = rowId + 1;
+                if (data === true) {
+                    idList.push(rowId);
+                    trueCount = trueCount + 1;
+                }
+            });
+            console.log(trueCount);
+            if (trueCount === 1 || trueCount === 0) {
+                return true;
+                // return this.createError({
+                //     path: `guideClassDetails[1].status`,
+                //     message: 'wrrrrrrrr'
 
-            // const isUnique = list !== set;
-            // if (isUnique) {
-            //     return true;
-            // }
-            // console.log('list length:' + list[0]);
-            // if(list[0]==true){
-
-            // }
-            // const isUnique = list.length === new Set(list.map(mapper)).size;
-            // console.log('isUn:' + new Set(list.map(mapper)).size);
-
-            const idx = list.findIndex((l, i) => mapper(l) !== set[i]);
-            // console.log('idx:' + set[i]);
-
+                // });
+            }
+            console.log('here');
+            console.log(idList);
+            // let idx = list.findIndex((l, i) => {
+            //     console.log(l);
+            //     console.log(i);
+            //     console.log(mapper(l) !== set[i]);
+            // });
+            // console.log('idx');
+            // console.log(i  let idx = 1;
+            // idList.map((data) => {
+            //     console.log(typeof data);
+            //     this.createError({
+            //         path: `guideClassDetails[${1}].status`,
+            //         message: 'wrrrrrrrr'
+            //     });
+            // });
             return this.createError({
-                path: `guideClassDetails[${idx}].status`,
-                message: message
+                path: `guideClassDetails[${idList[0]}].status`,
+                message: 'Only one can be true'
             });
         });
     });
 
-    const validationSchema = yup.object().shape({
-        guideCode: yup.string().required('Required field').checkDuplicatecode('Duplicate Code'),
-        description: yup.string().required('Required field'),
-        guideClassDetails: yup.array().of(
-            yup.object().shape({
-                tax: yup.object().typeError('Required field'),
-                fromDate: yup.date().required('Required field'),
-                toDate: yup.date().min(yup.ref('fromDate'), "End date can't be before start date"),
-                currencyList: yup.object().typeError('Required field'),
-                perDayRate: yup.number().required('Required field').positive('entry should be greater than 0'),
-                status: yup.boolean()
-                // status: yup.bool().when('appearing', {
-                //     is: true,s
-                //     then: yup.bool().oneOf([false], 'You need to accept the terms and conditions')
-                // })
-                // status: yup.bool().test({
-                //     name: 'one-true',
-                //     message: 'Required',
-                //     test: (val) => !every(val, ['value', false])
-                // })
-                // status: yup.bool().oneOf([true], 'You need to accept the terms and conditions')
-                // .test('unique', 'Only unique values allowed.', (value) => (console.log(value) ? value === new Set(value) : true))
+    // yup.addMethod(yup.array, 'uniqueStatus', function (message) {
+    //     return this.test('uniqueStatus', message, function (list) {
+    //         const mapper = (x) => {
+    //             return x.status;
+    //         };
+    //         const set = [...new Set(list.map(mapper))];
+    //         console.log(list.map(mapper));
 
-                // status: yup.bool().oneOf(status, 'The profession you chose does not exist')
-                // status: yup.bool().when('status', {
-                //     is: true,
-                //     then: yup.bool().oneOf([true], '').required('Required field')
-                // }) // status: yup.boolean().when('status', {
-                //     is: true,
-                //     then: 'error'
-                // })
-                // status: yup.boolean().when('status', {
-                //     is: true && mode === 'VIEW_UPDATE',
-                //     // then: yup.date().required('Field is required')
-                // })
-                // perDayRate: yup
-                //     .number()
-                //     .transform((_, value) => {
-                //         if (value.includes('.')) {
-                //             return null;
-                //         }
-                //         return +value.replace(/,/, '.');
-                //     })
-                //     .positive()
-            })
-        )
-        // .uniqueStatus('Already Existing Active Record.')
+    //         // const isUnique = list !== set;
+    //         // if (isUnique) {
+    //         //     return true;
+    //         // }
+    //         // console.log('list length:' + list[0]);
+    //         // if(list[0]==true){
+
+    //         // }
+    //         // const isUnique = list.length === new Set(list.map(mapper)).size;
+    //         // console.log('isUn:' + new Set(list.map(mapper)).size);
+
+    //         const idx = list.findIndex((l, i) => mapper(l) !== set[i]);
+    //         // console.log('idx:' + set[i]);
+
+    //         return this.createError({
+    //             path: `guideClassDetails[${idx}].status`,
+    //             message: message
+    //         });
+    //     });
+    // });
+
+    const validationSchema = yup.object().shape({
+        guideCode: yup.string().required('Required field'),
+        // .checkDuplicatecode('Duplicate Code'),
+        description: yup.string().required('Required field'),
+        guideClassDetails: yup
+            .array()
+            .of(
+                yup.object().shape({
+                    tax: yup.object().typeError('Required field'),
+                    fromDate: yup.date().required('Required field'),
+                    toDate: yup.date().min(yup.ref('fromDate'), "End date can't be before start date"),
+                    currencyList: yup.object().typeError('Required field'),
+                    // perDayRate: yup.number().required('Required field').positive('entry should be greater than 0'),
+                    status: yup.boolean()
+                    // status: yup.bool().when('appearing', {
+                    //     is: true,s
+                    //     then: yup.bool().oneOf([false], 'You need to accept the terms and conditions')
+                    // })
+                    // status: yup.bool().test({
+                    //     name: 'one-true',
+                    //     message: 'Required',
+                    //     test: (val) => !every(val, ['value', false])
+                    // })
+                    // status: yup.bool().oneOf([true], 'You need to accept the terms and conditions')
+                    // .test('unique', 'Only unique values allowed.', (value) => (console.log(value) ? value === new Set(value) : true))
+
+                    // status: yup.bool().oneOf(status, 'The profession you chose does not exist')
+                    // status: yup.bool().when('status', {
+                    //     is: true,
+                    //     then: yup.bool().oneOf([true], '').required('Required field')
+                    // }) // status: yup.boolean().when('status', {
+                    //     is: true,
+                    //     then: 'error'
+                    // })
+                    // status: yup.boolean().when('status', {
+                    //     is: true && mode === 'VIEW_UPDATE',
+                    //     // then: yup.date().required('Field is required')
+                    // })
+                    // perDayRate: yup
+                    //     .number()
+                    //     .transform((_, value) => {
+                    //         if (value.includes('.')) {
+                    //             return null;
+                    //         }
+                    //         return +value.replace(/,/, '.');
+                    //     })
+                    //     .positive()
+                })
+            )
+            .uniqueStatus('Already Existing Active Record.')
     });
 
     // const  checkStatus()=>{
@@ -271,6 +329,7 @@ function GuideClass({ open, handleClose, mode, guideCode }) {
     }, [guideClassToUpdate]);
 
     const handleSubmitForm = (data) => {
+        console.log(data);
         if (mode === 'INSERT') {
             const dataArray = [];
             if (data.guideClassDetails.length > 0) {
@@ -323,7 +382,7 @@ function GuideClass({ open, handleClose, mode, guideCode }) {
                 dispatch(updateGuideClassData(saveValues));
             }
         }
-        handleClose();
+        // handleClose();
     };
 
     useEffect(() => {
@@ -990,6 +1049,7 @@ function GuideClass({ open, handleClose, mode, guideCode }) {
                                                                                                                 : ''
                                                                                                         }
                                                                                                         onChange={(_, value) => {
+                                                                                                            // checkStatus();
                                                                                                             // checkStatus(value);
                                                                                                             // console.log(value.currencyListId);
                                                                                                             // setAppearing(value);
@@ -1024,7 +1084,12 @@ function GuideClass({ open, handleClose, mode, guideCode }) {
                                                                                                         errors.guideClassDetails[idx] &&
                                                                                                         errors.guideClassDetails[idx]
                                                                                                             .status && (
-                                                                                                            <p>
+                                                                                                            <p
+                                                                                                                style={{
+                                                                                                                    color: 'red',
+                                                                                                                    fontSize: '0.75rem'
+                                                                                                                }}
+                                                                                                            >
                                                                                                                 {
                                                                                                                     errors
                                                                                                                         .guideClassDetails[

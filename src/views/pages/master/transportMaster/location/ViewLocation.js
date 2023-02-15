@@ -98,7 +98,7 @@ function ViewLocation() {
         if (location) {
             console.log('sucessToast');
             setHandleToast(true);
-            // dispatch(getAllLocationDetails());
+            dispatch(getAllLocationDetails());
         }
     }, [location]);
 

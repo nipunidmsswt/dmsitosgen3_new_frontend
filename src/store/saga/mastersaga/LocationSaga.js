@@ -21,15 +21,39 @@ import {
 export function* saveLocationSaga(action) {
     action.data.path = `${process.env.REACT_APP_ACCOMODATION_URL}/location/`;
     let responseData = [];
+    let responseData2 = [];
+
     try {
-        console.log('saga started');
-        responseData = yield call(createWithUpload, action.data);
-        // console.log(responseData.staus);
-        console.log('saga finished');
-        if (responseData.status == 201 || responseData.status == 200) {
-            yield put({ type: ADD_SUCCESS_LOCATION_DATA, data: action.data });
-        } else {
-            yield put({ type: ADD_FAILED_LOCATION_DATA, data: 'error' });
+        responseData = yield call(create, action.data);
+        console.log(responseData);
+        if (responseData.data.errorMessages.length === 0) {
+            let formData = new FormData();
+            console.log(action.data.files);
+            if (action.data.files.length !== 0) {
+                console.log('in side gdywetwytwu');
+
+                formData.append(`id`, responseData.data.payload[0].Location.location_id);
+                if (action.data.files != undefined) {
+                    for (let i = 0; i < action.data.files.length; i++) {
+                        formData.append(`files`, action.data.files[i]);
+                    }
+                }
+                const requestOptions = {
+                    method: 'POST',
+                    body: formData
+                };
+                requestOptions.path = `${process.env.REACT_APP_ACCOMODATION_URL}/location/locationImg/`;
+                responseData2 = yield call(createWithUpload, requestOptions);
+                console.log(responseData2);
+                if (responseData2.status == 201 || responseData2.status == 200) {
+                    console.log('responseData2');
+                    yield put({ type: ADD_SUCCESS_LOCATION_DATA, data: responseData.data });
+                } else {
+                    yield put({ type: ADD_FAILED_LOCATION_DATA, data: 'error' });
+                }
+            } else {
+                yield put({ type: ADD_SUCCESS_LOCATION_DATA, data: responseData.data });
+            }
         }
     } catch (e) {
         yield put({ type: ADD_FAILED_LOCATION_DATA, data: 'error' });
@@ -56,10 +80,40 @@ export function* updateLocationSaga(action) {
     console.log(action);
     action.data.path = `${process.env.REACT_APP_ACCOMODATION_URL}/location/`;
     let responseData = [];
+    let responseData2 = [];
     try {
-        responseData = yield call(updateWithUpload, action.data);
+        responseData = yield call(update, action.data);
         console.log(responseData);
-        yield put({ type: UPDATE_SUCCESS_LOCATION_DATA, data: responseData.data });
+        // if (responseData.data.errorMessages.length === 0) {
+        //     console.log('in side hfcsfsek');
+        //     let formData = new FormData();
+        //     console.log(action.data.files);
+        //     if (action.data.files.length !== 0) {
+        //         console.log('in side gdywetwytwu');
+        //         // formData.append(`files`, JSON.stringify(action.data.files));
+        //         formData.append(`id`, responseData.data.payload[0].UpdateLocation.location_id);
+        //         if (action.data.files != undefined) {
+        //             for (let i = 0; i < action.data.files.length; i++) {
+        //                 formData.append(`files`, action.data.files[i]);
+        //             }
+        //         }
+        //         const requestOptions = {
+        //             method: 'POST',
+        //             body: formData
+        //         };
+        //         requestOptions.path = `${process.env.REACT_APP_ACCOMODATION_URL}/location/locationImg/`;
+        //         responseData2 = yield call(createWithUpload, requestOptions);
+        //         console.log(responseData2);
+        //         if (responseData2.status == 201 || responseData2.status == 200) {
+        //             console.log('responseData2');
+        //             yield put({ type: UPDATE_SUCCESS_LOCATION_DATA, data: responseData.data });
+        //         } else {
+        //             yield put({ type: UPDATE_FAILED_LOCATION_DATA, data: 'error' });
+        //         }
+        //     } else {
+        //         yield put({ type: UPDATE_SUCCESS_LOCATION_DATA, data: responseData.data });
+        //     }
+        // }
     } catch (e) {
         console.log(e);
         yield put({ type: UPDATE_FAILED_LOCATION_DATA, data: responseData.data });
