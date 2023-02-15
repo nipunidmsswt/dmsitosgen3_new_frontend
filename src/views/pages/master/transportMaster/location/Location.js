@@ -39,7 +39,7 @@ function Location({ open, handleClose, mode, locationCode }) {
         geoName: '',
         website: '',
         narration: '',
-        files: undefined,
+        files: '',
         previewImages: [],
         progressInfos: [],
         message: []
@@ -106,18 +106,28 @@ function Location({ open, handleClose, mode, locationCode }) {
             }
 
             let images = [];
+            let files = [];
             const contentType = 'image/png';
-            // const byteCharacters = atob(locationToUpdate.docPath);
-            // const byteNumbers = new Array(byteCharacters.length);
-            // for (let i = 0; i < byteCharacters.length; i++) {
-            //     byteNumbers[i] = byteCharacters.charCodeAt(i);
-            // }
-            // const byteArray = new Uint8Array(byteNumbers);
-            // const blob1 = new Blob([byteArray], { type: contentType });
-            // images.push(URL.createObjectURL(blob1));
-            // let fileData = new File([blob1], 'name');
-            // locationToUpdate.files = [fileData];
-            // setPreviewImages([images]);
+
+            for (let i in locationToUpdate?.LocationDetails?.docPath) {
+                let byteCharacters = '';
+                byteCharacters = atob(locationToUpdate?.LocationDetails.docPath[i]);
+                let byteNumbers = '';
+                byteNumbers = new Array(byteCharacters.length);
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+                let byteArray = '';
+                byteArray = new Uint8Array(byteNumbers);
+                let blob1 = '';
+                blob1 = new Blob([byteArray], { type: contentType });
+                images.push(URL.createObjectURL(blob1));
+                let fileData = new File([blob1], 'name');
+                files.push(fileData);
+            }
+            locationToUpdate.LocationDetails.files = files;
+            console.log(images);
+            setPreviewImages(images);
             setLoadValues(locationToUpdate?.LocationDetails);
         }
     }, [locationToUpdate]);
@@ -456,6 +466,7 @@ function Location({ open, handleClose, mode, locationCode }) {
                                                                             onChange={(event) => {
                                                                                 // console.log("file", event.currentTarget.files);
                                                                                 showImages(event);
+                                                                                handleChange;
                                                                                 setFieldValue('files', event.currentTarget.files);
                                                                             }}
                                                                         />

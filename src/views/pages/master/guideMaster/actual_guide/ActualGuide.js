@@ -56,6 +56,7 @@ function ActualGuide({ open, handleClose, mode, id }) {
         licenseExpireDate: '',
         remark: '',
         status: true,
+        files: '',
         actualGuideSkills: [
             {
                 guideClass: null,
@@ -72,8 +73,7 @@ function ActualGuide({ open, handleClose, mode, id }) {
     const [loadValues, setLoadValues] = useState(null);
     const [openDialogBox, setOpenDialogBox] = useState(false);
     const [activeGuideListData, setActiveGuideList] = useState([]);
-
-    console.log(languages.getData());
+    const [previewImages, setPreviewImages] = useState([]);
 
     //get data from reducers
     const duplicateCode = useSelector((state) => state.actualGuideReducer.duplicateCode);
@@ -102,7 +102,6 @@ function ActualGuide({ open, handleClose, mode, id }) {
 
     const validationSchema = yup.object().shape({
         code: yup.string().required('Required field').checkDuplicatectualGuideCode('Duplicate Code'),
-        // .checkDuplicateCompanyName('Duplicate Code'),
         initials: yup.string().required('Required field'),
         surName: yup.string().required('Required field'),
         nic: yup.string().required('Required field'),
@@ -133,21 +132,46 @@ function ActualGuide({ open, handleClose, mode, id }) {
     }, [activeGuideList]);
 
     useEffect(() => {
-        console.log(actualGuideToUpdate);
         if ((mode === 'VIEW_UPDATE' && actualGuideToUpdate != null) || (mode === 'VIEW' && actualGuideToUpdate != null)) {
             actualGuideToUpdate.actualGuideSkills.map((data) => {
                 data.enableRow = true;
             });
-            console.log('actualGuideToUpdate');
-            console.log(actualGuideToUpdate);
+
             actualGuideToUpdate.actualGuideSkills.map((data) => {
                 console.log('actualGuideToUpdate 1');
                 data.lang = { language: data.language };
             });
-            console.log(actualGuideToUpdate);
+
+            let images = [];
+            const contentType = 'image/png';
+            const byteCharacters = atob(actualGuideToUpdate.docPath);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            const blob1 = new Blob([byteArray], { type: contentType });
+            images.push(URL.createObjectURL(blob1));
+            let fileData = new File([blob1], 'name');
+            actualGuideToUpdate.files = [fileData];
+            setPreviewImages(images);
             setLoadValues(actualGuideToUpdate);
         }
     }, [actualGuideToUpdate]);
+
+    const showImages = (event) => {
+        let images = [];
+        console.log(event);
+        for (let i = 0; i < event.target.files.length; i++) {
+            images.push(URL.createObjectURL(event.target.files[i]));
+        }
+        setPreviewImages(images);
+    };
+
+    function deleteHandler(image) {
+        setPreviewImages(previewImages.filter((e) => e !== image));
+        URL.revokeObjectURL(image);
+    }
 
     const handleSubmitForm = (data) => {
         console.log(data);
@@ -466,17 +490,81 @@ function ActualGuide({ open, handleClose, mode, id }) {
                                                         helperText={touched.remark && errors.remark ? errors.remark : ''}
                                                     ></TextField>
                                                 </Grid>
-                                                <FormGroup>
-                                                    <FormControlLabel
-                                                        name="status"
-                                                        control={<Switch />}
-                                                        label="Status"
-                                                        disabled={mode == 'VIEW'}
-                                                        onChange={handleChange}
-                                                        checked={values.status}
-                                                        value={values.status}
+                                                <Grid item xs={3}>
+                                                    <FormGroup>
+                                                        <FormControlLabel
+                                                            name="status"
+                                                            control={<Switch />}
+                                                            label="Status"
+                                                            disabled={mode == 'VIEW'}
+                                                            onChange={handleChange}
+                                                            checked={values.status}
+                                                            value={values.status}
+                                                        />
+                                                    </FormGroup>
+                                                </Grid>
+                                                <Grid item xs={6}>
+                                                    <input
+                                                        type="file"
+                                                        multiple
+                                                        accept="image/*"
+                                                        name="files"
+                                                        //  onChange={this.selectFiles}
+                                                        onChange={(event) => {
+                                                            // console.log("file", event.currentTarget.files);
+                                                            showImages(event);
+                                                            handleChange;
+                                                            setFieldValue('files', event.currentTarget.files);
+                                                        }}
+                                                        error={Boolean(errors.files)}
+                                                        helperText={errors.files ? errors.files : ''}
                                                     />
-                                                </FormGroup>
+                                                    {errors.files}
+                                                    {previewImages && (
+                                                        <div>
+                                                            {previewImages.map((img, i) => {
+                                                                return (
+                                                                    <div
+                                                                        style={{
+                                                                            display: 'inline-block',
+                                                                            position: 'relative'
+                                                                        }}
+                                                                    >
+                                                                        <img
+                                                                            width="100"
+                                                                            height="100"
+                                                                            style={{
+                                                                                marginRight: '10px',
+                                                                                marginTop: '10px'
+                                                                            }}
+                                                                            className="preview"
+                                                                            src={img}
+                                                                            alt={'image-' + i}
+                                                                            key={i + 'ke'}
+                                                                        />
+                                                                        <IconButton
+                                                                            aria-label="add an alarm"
+                                                                            onClick={() => deleteHandler(img)}
+                                                                        >
+                                                                            <HighlightOffIcon
+                                                                                key={i}
+                                                                                style={{
+                                                                                    position: 'absolute',
+                                                                                    top: -100,
+                                                                                    right: 0,
+                                                                                    width: '25px',
+                                                                                    height: '25px'
+                                                                                    // marginRight: "10px",
+                                                                                }}
+                                                                                // src="https://png.pngtree.com/png-vector/20190603/ourmid/pngtree-icon-close-button-png-image_1357822.jpg"
+                                                                            />
+                                                                        </IconButton>
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    )}
+                                                </Grid>
                                             </Grid>
                                             <FieldArray name="actualGuideSkills">
                                                 {({ insert, remove, push }) => (

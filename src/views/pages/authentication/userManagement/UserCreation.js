@@ -34,10 +34,7 @@ import { getAllActiveMarketData } from 'store/actions/masterActions/operatorActi
 import { getAllClusterData } from 'store/actions/masterActions/CodeAndNameAction';
 import { getAllCompanyProfileData, getAvailableLicenseCount } from 'store/actions/masterActions/CompanyProfileAction';
 import { getAllDepartmentData, getAllDesignationData } from 'store/actions/masterActions/DepartmentDesignationAction';
-
-const Transition = forwardRef(function Transition(props, ref) {
-    return <Slide direction="up" ref={ref} {...props} />;
-});
+import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 
 function User({ open, handleClose, mode, userCode, component }) {
     const initialValues = {
@@ -59,16 +56,12 @@ function User({ open, handleClose, mode, userCode, component }) {
         userName: '',
         password: '',
         availableLicenceCount: '',
-        allocatedLicenceCount: ''
-        // files: undefined,
-        // previewImages: [],
-        // progressInfos: [],
-        // message: []
+        allocatedLicenceCount: '',
+        files: '',
+        docPath: ''
     };
     const [loadValues, setLoadValues] = useState('');
     const [previewImages, setPreviewImages] = useState([]);
-    const [updatePreviewImages, setupdatePreviewImages] = useState([]);
-
     const formikRef = useRef();
 
     // yup.addMethod(yup.string, 'checkDuplicateLocationCode', function (message) {
@@ -108,8 +101,8 @@ function User({ open, handleClose, mode, userCode, component }) {
         department: yup.object().typeError('Required field'),
         cluster: yup.object().typeError('Required field'),
         userName: yup.string().required('Requied field'),
-        roleId: yup.object().typeError('Required field'),
-        market: yup.object().typeError('Required field')
+        roleId: yup.object().typeError('Required field')
+        // market: yup.object().typeError('Required field')
 
         // password: yup.string().when('disablePassowrdField', {
         //     is: true && mode === 'INSERT' && component === 'user_creation',
@@ -182,7 +175,25 @@ function User({ open, handleClose, mode, userCode, component }) {
             userToUpdate.allocatedLicenceCount = userToUpdate.company.allocatedLicenceCount;
             console.log(userToUpdate);
             userToUpdate.roleId = userToUpdate.role;
+
+            let images = [];
+            const contentType = 'image/png';
+            const byteCharacters = atob(userToUpdate.docPath);
+
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            const blob1 = new Blob([byteArray], { type: contentType });
+            images.push(URL.createObjectURL(blob1));
+            let fileData = new File([blob1], 'name');
+            userToUpdate.files = [fileData];
+
             setLoadValues(userToUpdate);
+            setPreviewImages([images]);
+
+            // setLoadValues(userToUpdate);
             // formikRef.current.setFieldValue('disablePassowrdField', false);
         }
     }, [userToUpdate]);
@@ -193,6 +204,18 @@ function User({ open, handleClose, mode, userCode, component }) {
             profileToUpdate.availableLicenceCount = profileToUpdate.company.availableLicenceCount;
             profileToUpdate.allocatedLicenceCount = profileToUpdate.company.allocatedLicenceCount;
             // setFieldValue('disablePassowrdField', false);
+            let images = [];
+            const contentType = 'image/png';
+            const byteCharacters = atob(profileToUpdate.docPath);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            const blob1 = new Blob([byteArray], { type: contentType });
+            images.push(URL.createObjectURL(blob1));
+            let fileData = new File([blob1], 'name');
+            profileToUpdate.files = [fileData];
             setLoadValues(profileToUpdate);
             // formikRef.current.setFieldValue('disablePassowrdField', false);
         }
@@ -265,6 +288,20 @@ function User({ open, handleClose, mode, userCode, component }) {
         dispatch(getAllDesignationData());
         dispatch(getAllRolesData());
     }, []);
+
+    const showImages = (event) => {
+        let images = [];
+        console.log(event);
+        for (let i = 0; i < event.target.files.length; i++) {
+            images.push(URL.createObjectURL(event.target.files[i]));
+        }
+        setPreviewImages(images);
+    };
+
+    function deleteHandler(image) {
+        setPreviewImages(previewImages.filter((e) => e !== image));
+        URL.revokeObjectURL(image);
+    }
 
     return (
         <div>
@@ -924,6 +961,68 @@ function User({ open, handleClose, mode, userCode, component }) {
                                                                                 checked={values.status}
                                                                             />
                                                                         </FormGroup>
+                                                                    </Grid>
+                                                                    <Grid item sm={4}>
+                                                                        <input
+                                                                            type="file"
+                                                                            multiple
+                                                                            accept="image/*"
+                                                                            name="files"
+                                                                            //  onChange={this.selectFiles}
+                                                                            onChange={(event) => {
+                                                                                // console.log("file", event.currentTarget.files);
+                                                                                showImages(event);
+                                                                                handleChange;
+                                                                                setFieldValue('files', event.currentTarget.files);
+                                                                            }}
+                                                                            error={Boolean(errors.files)}
+                                                                            helperText={errors.files ? errors.files : ''}
+                                                                        />
+                                                                        {errors.files}
+                                                                        {previewImages && (
+                                                                            <div>
+                                                                                {previewImages.map((img, i) => {
+                                                                                    return (
+                                                                                        <div
+                                                                                            style={{
+                                                                                                display: 'inline-block',
+                                                                                                position: 'relative'
+                                                                                            }}
+                                                                                        >
+                                                                                            <img
+                                                                                                width="100"
+                                                                                                height="100"
+                                                                                                style={{
+                                                                                                    marginRight: '10px',
+                                                                                                    marginTop: '10px'
+                                                                                                }}
+                                                                                                className="preview"
+                                                                                                src={img}
+                                                                                                alt={'image-' + i}
+                                                                                                key={i + 'ke'}
+                                                                                            />
+                                                                                            <IconButton
+                                                                                                aria-label="add an alarm"
+                                                                                                onClick={() => deleteHandler(img)}
+                                                                                            >
+                                                                                                <HighlightOffIcon
+                                                                                                    key={i}
+                                                                                                    style={{
+                                                                                                        position: 'absolute',
+                                                                                                        top: -100,
+                                                                                                        right: 0,
+                                                                                                        width: '25px',
+                                                                                                        height: '25px'
+                                                                                                        // marginRight: "10px",
+                                                                                                    }}
+                                                                                                    // src="https://png.pngtree.com/png-vector/20190603/ourmid/pngtree-icon-close-button-png-image_1357822.jpg"
+                                                                                                />
+                                                                                            </IconButton>
+                                                                                        </div>
+                                                                                    );
+                                                                                })}
+                                                                            </div>
+                                                                        )}
                                                                     </Grid>
                                                                 </Grid>
                                                             </div>
