@@ -213,10 +213,19 @@ const utilities = {
                             // path: "/master/codeAndName",
                         },
                         {
-                            id: 'hotelbasis',
-                            title: 'Hotel Basis',
+                            id: 'managing-company',
+                            title: 'Managing Compnay',
                             type: 'item',
-                            url: '/master/hotelbasis',
+                            url: '/master/managingCompanyview',
+                            breadcrumbs: false
+                            // icon: "bi bi-journal-code",
+                            // path: "/master/codeAndName",
+                        },
+                        {
+                            id: 'hotel-facility',
+                            title: 'Hotel Facility',
+                            type: 'item',
+                            url: '/master/hotelFacilityview',
                             breadcrumbs: false
                             // icon: "bi bi-journal-code",
                             // path: "/master/codeAndName",
@@ -230,6 +239,17 @@ const utilities = {
                             // icon: "bi bi-journal-code",
                             // path: "/master/codeAndName",
                         },
+
+                        {
+                            id: 'hotelbasis',
+                            title: 'Hotel Basis',
+                            type: 'item',
+                            url: '/master/hotelbasis',
+                            breadcrumbs: false
+                            // icon: "bi bi-journal-code",
+                            // path: "/master/codeAndName",
+                        },
+
                         {
                             id: 'facility-count',
                             title: 'Facility Count',
@@ -241,10 +261,10 @@ const utilities = {
                         },
 
                         {
-                            id: 'hotel-facility',
-                            title: 'Hotel Facility',
+                            id: 'hotel-main-master',
+                            title: 'Hotel Main Details',
                             type: 'item',
-                            url: '/master/hotelFacilityview',
+                            url: '/master/hotelview',
                             breadcrumbs: false
                             // icon: "bi bi-journal-code",
                             // path: "/master/codeAndName",

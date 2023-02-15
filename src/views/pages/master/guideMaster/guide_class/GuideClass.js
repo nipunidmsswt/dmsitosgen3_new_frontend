@@ -135,7 +135,7 @@ function GuideClass({ open, handleClose, mode, guideCode }) {
                 } else {
                     return true;
                 }
-            } catch (error) { }
+            } catch (error) {}
             return true;
         });
     });
@@ -171,52 +171,50 @@ function GuideClass({ open, handleClose, mode, guideCode }) {
     const validationSchema = yup.object().shape({
         guideCode: yup.string().required('Required field').checkDuplicatecode('Duplicate Code'),
         description: yup.string().required('Required field'),
-        guideClassDetails: yup
-            .array()
-            .of(
-                yup.object().shape({
-                    tax: yup.object().typeError('Required field'),
-                    fromDate: yup.date().required('Required field'),
-                    toDate: yup.date().min(yup.ref('fromDate'), "End date can't be before start date"),
-                    currencyList: yup.object().typeError('Required field'),
-                    perDayRate: yup.number().required('Required field').positive('entry should be greater than 0'),
-                    status: yup.boolean()
-                    // status: yup.bool().when('appearing', {
-                    //     is: true,s
-                    //     then: yup.bool().oneOf([false], 'You need to accept the terms and conditions')
-                    // })
-                    // status: yup.bool().test({
-                    //     name: 'one-true',
-                    //     message: 'Required',
-                    //     test: (val) => !every(val, ['value', false])
-                    // })
-                    // status: yup.bool().oneOf([true], 'You need to accept the terms and conditions')
-                    // .test('unique', 'Only unique values allowed.', (value) => (console.log(value) ? value === new Set(value) : true))
+        guideClassDetails: yup.array().of(
+            yup.object().shape({
+                tax: yup.object().typeError('Required field'),
+                fromDate: yup.date().required('Required field'),
+                toDate: yup.date().min(yup.ref('fromDate'), "End date can't be before start date"),
+                currencyList: yup.object().typeError('Required field'),
+                perDayRate: yup.number().required('Required field').positive('entry should be greater than 0'),
+                status: yup.boolean()
+                // status: yup.bool().when('appearing', {
+                //     is: true,s
+                //     then: yup.bool().oneOf([false], 'You need to accept the terms and conditions')
+                // })
+                // status: yup.bool().test({
+                //     name: 'one-true',
+                //     message: 'Required',
+                //     test: (val) => !every(val, ['value', false])
+                // })
+                // status: yup.bool().oneOf([true], 'You need to accept the terms and conditions')
+                // .test('unique', 'Only unique values allowed.', (value) => (console.log(value) ? value === new Set(value) : true))
 
-                    // status: yup.bool().oneOf(status, 'The profession you chose does not exist')
-                    // status: yup.bool().when('status', {
-                    //     is: true,
-                    //     then: yup.bool().oneOf([true], '').required('Required field')
-                    // }) // status: yup.boolean().when('status', {
-                    //     is: true,
-                    //     then: 'error'
-                    // })
-                    // status: yup.boolean().when('status', {
-                    //     is: true && mode === 'VIEW_UPDATE',
-                    //     // then: yup.date().required('Field is required')
-                    // })
-                    // perDayRate: yup
-                    //     .number()
-                    //     .transform((_, value) => {
-                    //         if (value.includes('.')) {
-                    //             return null;
-                    //         }
-                    //         return +value.replace(/,/, '.');
-                    //     })
-                    //     .positive()
-                })
-            )
-            .uniqueStatus('Already Existing Active Record.')
+                // status: yup.bool().oneOf(status, 'The profession you chose does not exist')
+                // status: yup.bool().when('status', {
+                //     is: true,
+                //     then: yup.bool().oneOf([true], '').required('Required field')
+                // }) // status: yup.boolean().when('status', {
+                //     is: true,
+                //     then: 'error'
+                // })
+                // status: yup.boolean().when('status', {
+                //     is: true && mode === 'VIEW_UPDATE',
+                //     // then: yup.date().required('Field is required')
+                // })
+                // perDayRate: yup
+                //     .number()
+                //     .transform((_, value) => {
+                //         if (value.includes('.')) {
+                //             return null;
+                //         }
+                //         return +value.replace(/,/, '.');
+                //     })
+                //     .positive()
+            })
+        )
+        // .uniqueStatus('Already Existing Active Record.')
     });
 
     // const  checkStatus()=>{
@@ -296,6 +294,7 @@ function GuideClass({ open, handleClose, mode, guideCode }) {
                     status: data.status,
                     guideClassDetails: dataArray
                 };
+                console.log(saveValues);
                 dispatch(saveGuideClassData(saveValues));
             }
         } else if (mode === 'VIEW_UPDATE') {
@@ -455,7 +454,7 @@ function GuideClass({ open, handleClose, mode, guideCode }) {
                                                                             control={<Switch color="success" />}
                                                                             label="Status"
                                                                             checked={values.status}
-                                                                        // disabled={mode == 'VIEW'}
+                                                                            // disabled={mode == 'VIEW'}
                                                                         />
                                                                     </FormGroup>
                                                                 </Grid>
@@ -518,7 +517,7 @@ function GuideClass({ open, handleClose, mode, guideCode }) {
                                                                                             <TableCell>
                                                                                                 <LocalizationProvider
                                                                                                     dateAdapter={AdapterDayjs}
-                                                                                                // adapterLocale={locale}
+                                                                                                    // adapterLocale={locale}
                                                                                                 >
                                                                                                     <DatePicker
                                                                                                         onChange={(value) => {
@@ -545,38 +544,18 @@ function GuideClass({ open, handleClose, mode, guideCode }) {
                                                                                                                         sm: 150
                                                                                                                     },
                                                                                                                     '& .MuiInputBase-root':
-                                                                                                                    {
-                                                                                                                        height: 40
-                                                                                                                    }
+                                                                                                                        {
+                                                                                                                            height: 40
+                                                                                                                        }
                                                                                                                 }}
                                                                                                                 variant="outlined"
                                                                                                                 name={`guideClassDetails.${idx}.fromDate`}
                                                                                                                 onBlur={handleBlur}
                                                                                                                 error={Boolean(
                                                                                                                     touched.guideClassDetails &&
-                                                                                                                    touched
-                                                                                                                        .guideClassDetails[
-                                                                                                                    idx
-                                                                                                                    ] &&
-                                                                                                                    touched
-                                                                                                                        .guideClassDetails[
-                                                                                                                        idx
-                                                                                                                    ].fromDate &&
-                                                                                                                    errors.guideClassDetails &&
-                                                                                                                    errors
-                                                                                                                        .guideClassDetails[
-                                                                                                                    idx
-                                                                                                                    ] &&
-                                                                                                                    errors
-                                                                                                                        .guideClassDetails[
-                                                                                                                        idx
-                                                                                                                    ].fromDate
-                                                                                                                )}
-                                                                                                                helperText={
-                                                                                                                    touched.guideClassDetails &&
                                                                                                                         touched
                                                                                                                             .guideClassDetails[
-                                                                                                                        idx
+                                                                                                                            idx
                                                                                                                         ] &&
                                                                                                                         touched
                                                                                                                             .guideClassDetails[
@@ -585,16 +564,36 @@ function GuideClass({ open, handleClose, mode, guideCode }) {
                                                                                                                         errors.guideClassDetails &&
                                                                                                                         errors
                                                                                                                             .guideClassDetails[
-                                                                                                                        idx
+                                                                                                                            idx
                                                                                                                         ] &&
                                                                                                                         errors
                                                                                                                             .guideClassDetails[
                                                                                                                             idx
                                                                                                                         ].fromDate
+                                                                                                                )}
+                                                                                                                helperText={
+                                                                                                                    touched.guideClassDetails &&
+                                                                                                                    touched
+                                                                                                                        .guideClassDetails[
+                                                                                                                        idx
+                                                                                                                    ] &&
+                                                                                                                    touched
+                                                                                                                        .guideClassDetails[
+                                                                                                                        idx
+                                                                                                                    ].fromDate &&
+                                                                                                                    errors.guideClassDetails &&
+                                                                                                                    errors
+                                                                                                                        .guideClassDetails[
+                                                                                                                        idx
+                                                                                                                    ] &&
+                                                                                                                    errors
+                                                                                                                        .guideClassDetails[
+                                                                                                                        idx
+                                                                                                                    ].fromDate
                                                                                                                         ? errors
-                                                                                                                            .guideClassDetails[
-                                                                                                                            idx
-                                                                                                                        ].fromDate
+                                                                                                                              .guideClassDetails[
+                                                                                                                              idx
+                                                                                                                          ].fromDate
                                                                                                                         : ''
                                                                                                                 }
                                                                                                             />
@@ -632,43 +631,18 @@ function GuideClass({ open, handleClose, mode, guideCode }) {
                                                                                                                         sm: 150
                                                                                                                     },
                                                                                                                     '& .MuiInputBase-root':
-                                                                                                                    {
-                                                                                                                        height: 40
-                                                                                                                    }
+                                                                                                                        {
+                                                                                                                            height: 40
+                                                                                                                        }
                                                                                                                 }}
                                                                                                                 variant="outlined"
                                                                                                                 name={`guideClassDetails.${idx}.toDate`}
                                                                                                                 onBlur={handleBlur}
                                                                                                                 helperText={
                                                                                                                     touched.guideClassDetails &&
-                                                                                                                        touched
-                                                                                                                            .guideClassDetails[
-                                                                                                                        idx
-                                                                                                                        ] &&
-                                                                                                                        touched
-                                                                                                                            .guideClassDetails[
-                                                                                                                            idx
-                                                                                                                        ].toDate &&
-                                                                                                                        errors.guideClassDetails &&
-                                                                                                                        errors
-                                                                                                                            .guideClassDetails[
-                                                                                                                        idx
-                                                                                                                        ] &&
-                                                                                                                        errors
-                                                                                                                            .guideClassDetails[
-                                                                                                                            idx
-                                                                                                                        ].toDate
-                                                                                                                        ? errors
-                                                                                                                            .guideClassDetails[
-                                                                                                                            idx
-                                                                                                                        ].toDate
-                                                                                                                        : ''
-                                                                                                                }
-                                                                                                                error={Boolean(
-                                                                                                                    touched.guideClassDetails &&
                                                                                                                     touched
                                                                                                                         .guideClassDetails[
-                                                                                                                    idx
+                                                                                                                        idx
                                                                                                                     ] &&
                                                                                                                     touched
                                                                                                                         .guideClassDetails[
@@ -677,12 +651,37 @@ function GuideClass({ open, handleClose, mode, guideCode }) {
                                                                                                                     errors.guideClassDetails &&
                                                                                                                     errors
                                                                                                                         .guideClassDetails[
-                                                                                                                    idx
+                                                                                                                        idx
                                                                                                                     ] &&
                                                                                                                     errors
                                                                                                                         .guideClassDetails[
                                                                                                                         idx
                                                                                                                     ].toDate
+                                                                                                                        ? errors
+                                                                                                                              .guideClassDetails[
+                                                                                                                              idx
+                                                                                                                          ].toDate
+                                                                                                                        : ''
+                                                                                                                }
+                                                                                                                error={Boolean(
+                                                                                                                    touched.guideClassDetails &&
+                                                                                                                        touched
+                                                                                                                            .guideClassDetails[
+                                                                                                                            idx
+                                                                                                                        ] &&
+                                                                                                                        touched
+                                                                                                                            .guideClassDetails[
+                                                                                                                            idx
+                                                                                                                        ].toDate &&
+                                                                                                                        errors.guideClassDetails &&
+                                                                                                                        errors
+                                                                                                                            .guideClassDetails[
+                                                                                                                            idx
+                                                                                                                        ] &&
+                                                                                                                        errors
+                                                                                                                            .guideClassDetails[
+                                                                                                                            idx
+                                                                                                                        ].toDate
                                                                                                                 )}
                                                                                                             />
                                                                                                         )}
@@ -695,7 +694,7 @@ function GuideClass({ open, handleClose, mode, guideCode }) {
                                                                                                     value={
                                                                                                         values.guideClassDetails[idx]
                                                                                                             ? values.guideClassDetails[idx]
-                                                                                                                .currencyList
+                                                                                                                  .currencyList
                                                                                                             : null
                                                                                                     }
                                                                                                     name={`guideClassDetails.${idx}.currencyList`}
@@ -734,44 +733,44 @@ function GuideClass({ open, handleClose, mode, guideCode }) {
                                                                                                             onBlur={handleBlur}
                                                                                                             helperText={
                                                                                                                 touched.guideClassDetails &&
-                                                                                                                    touched.guideClassDetails[
+                                                                                                                touched.guideClassDetails[
                                                                                                                     idx
-                                                                                                                    ] &&
-                                                                                                                    touched.guideClassDetails[
-                                                                                                                        idx
-                                                                                                                    ].currencyList &&
-                                                                                                                    errors.guideClassDetails &&
-                                                                                                                    errors.guideClassDetails[
+                                                                                                                ] &&
+                                                                                                                touched.guideClassDetails[
                                                                                                                     idx
-                                                                                                                    ] &&
-                                                                                                                    errors.guideClassDetails[
-                                                                                                                        idx
-                                                                                                                    ].currencyList
+                                                                                                                ].currencyList &&
+                                                                                                                errors.guideClassDetails &&
+                                                                                                                errors.guideClassDetails[
+                                                                                                                    idx
+                                                                                                                ] &&
+                                                                                                                errors.guideClassDetails[
+                                                                                                                    idx
+                                                                                                                ].currencyList
                                                                                                                     ? errors
-                                                                                                                        .guideClassDetails[
-                                                                                                                        idx
-                                                                                                                    ].currencyList
+                                                                                                                          .guideClassDetails[
+                                                                                                                          idx
+                                                                                                                      ].currencyList
                                                                                                                     : ''
                                                                                                             }
                                                                                                             error={Boolean(
                                                                                                                 touched.guideClassDetails &&
-                                                                                                                touched
-                                                                                                                    .guideClassDetails[
-                                                                                                                idx
-                                                                                                                ] &&
-                                                                                                                touched
-                                                                                                                    .guideClassDetails[
-                                                                                                                    idx
-                                                                                                                ].currencyList &&
-                                                                                                                errors.guideClassDetails &&
-                                                                                                                errors
-                                                                                                                    .guideClassDetails[
-                                                                                                                idx
-                                                                                                                ] &&
-                                                                                                                errors
-                                                                                                                    .guideClassDetails[
-                                                                                                                    idx
-                                                                                                                ].currencyList
+                                                                                                                    touched
+                                                                                                                        .guideClassDetails[
+                                                                                                                        idx
+                                                                                                                    ] &&
+                                                                                                                    touched
+                                                                                                                        .guideClassDetails[
+                                                                                                                        idx
+                                                                                                                    ].currencyList &&
+                                                                                                                    errors.guideClassDetails &&
+                                                                                                                    errors
+                                                                                                                        .guideClassDetails[
+                                                                                                                        idx
+                                                                                                                    ] &&
+                                                                                                                    errors
+                                                                                                                        .guideClassDetails[
+                                                                                                                        idx
+                                                                                                                    ].currencyList
                                                                                                             )}
                                                                                                         />
                                                                                                     )}
@@ -782,7 +781,7 @@ function GuideClass({ open, handleClose, mode, guideCode }) {
                                                                                                     value={
                                                                                                         values.guideClassDetails[idx]
                                                                                                             ? values.guideClassDetails[idx]
-                                                                                                                .tax
+                                                                                                                  .tax
                                                                                                             : null
                                                                                                     }
                                                                                                     name={`guideClassDetails.${idx}.tax`}
@@ -819,44 +818,44 @@ function GuideClass({ open, handleClose, mode, guideCode }) {
                                                                                                             onBlur={handleBlur}
                                                                                                             helperText={
                                                                                                                 touched.guideClassDetails &&
-                                                                                                                    touched.guideClassDetails[
+                                                                                                                touched.guideClassDetails[
                                                                                                                     idx
-                                                                                                                    ] &&
-                                                                                                                    touched.guideClassDetails[
-                                                                                                                        idx
-                                                                                                                    ].tax &&
-                                                                                                                    errors.guideClassDetails &&
-                                                                                                                    errors.guideClassDetails[
+                                                                                                                ] &&
+                                                                                                                touched.guideClassDetails[
                                                                                                                     idx
-                                                                                                                    ] &&
-                                                                                                                    errors.guideClassDetails[
-                                                                                                                        idx
-                                                                                                                    ].tax
+                                                                                                                ].tax &&
+                                                                                                                errors.guideClassDetails &&
+                                                                                                                errors.guideClassDetails[
+                                                                                                                    idx
+                                                                                                                ] &&
+                                                                                                                errors.guideClassDetails[
+                                                                                                                    idx
+                                                                                                                ].tax
                                                                                                                     ? errors
-                                                                                                                        .guideClassDetails[
-                                                                                                                        idx
-                                                                                                                    ].tax
+                                                                                                                          .guideClassDetails[
+                                                                                                                          idx
+                                                                                                                      ].tax
                                                                                                                     : ''
                                                                                                             }
                                                                                                             error={Boolean(
                                                                                                                 touched.guideClassDetails &&
-                                                                                                                touched
-                                                                                                                    .guideClassDetails[
-                                                                                                                idx
-                                                                                                                ] &&
-                                                                                                                touched
-                                                                                                                    .guideClassDetails[
-                                                                                                                    idx
-                                                                                                                ].tax &&
-                                                                                                                errors.guideClassDetails &&
-                                                                                                                errors
-                                                                                                                    .guideClassDetails[
-                                                                                                                idx
-                                                                                                                ] &&
-                                                                                                                errors
-                                                                                                                    .guideClassDetails[
-                                                                                                                    idx
-                                                                                                                ].tax
+                                                                                                                    touched
+                                                                                                                        .guideClassDetails[
+                                                                                                                        idx
+                                                                                                                    ] &&
+                                                                                                                    touched
+                                                                                                                        .guideClassDetails[
+                                                                                                                        idx
+                                                                                                                    ].tax &&
+                                                                                                                    errors.guideClassDetails &&
+                                                                                                                    errors
+                                                                                                                        .guideClassDetails[
+                                                                                                                        idx
+                                                                                                                    ] &&
+                                                                                                                    errors
+                                                                                                                        .guideClassDetails[
+                                                                                                                        idx
+                                                                                                                    ].tax
                                                                                                             )}
                                                                                                         />
                                                                                                     )}
@@ -864,9 +863,9 @@ function GuideClass({ open, handleClose, mode, guideCode }) {
                                                                                             </TableCell>
                                                                                             <TableCell>
                                                                                                 {values.guideClassDetails[idx] &&
-                                                                                                    values.guideClassDetails[idx].tax
+                                                                                                values.guideClassDetails[idx].tax
                                                                                                     ? values.guideClassDetails[idx].tax
-                                                                                                        .percentage
+                                                                                                          .percentage
                                                                                                     : 0}
                                                                                             </TableCell>
                                                                                             <TableCell>
@@ -902,48 +901,48 @@ function GuideClass({ open, handleClose, mode, guideCode }) {
                                                                                                     onBlur={handleBlur}
                                                                                                     error={Boolean(
                                                                                                         touched.guideClassDetails &&
-                                                                                                        touched.guideClassDetails[
-                                                                                                        idx
-                                                                                                        ] &&
-                                                                                                        touched.guideClassDetails[idx]
-                                                                                                            .perDayRate &&
-                                                                                                        errors.guideClassDetails &&
-                                                                                                        errors.guideClassDetails[idx] &&
-                                                                                                        errors.guideClassDetails[idx]
-                                                                                                            .perDayRate
-                                                                                                    )}
-                                                                                                    helperText={
-                                                                                                        touched.guideClassDetails &&
-                                                                                                            touched.guideClassDetails[idx] &&
+                                                                                                            touched.guideClassDetails[
+                                                                                                                idx
+                                                                                                            ] &&
                                                                                                             touched.guideClassDetails[idx]
                                                                                                                 .perDayRate &&
                                                                                                             errors.guideClassDetails &&
                                                                                                             errors.guideClassDetails[idx] &&
                                                                                                             errors.guideClassDetails[idx]
                                                                                                                 .perDayRate
+                                                                                                    )}
+                                                                                                    helperText={
+                                                                                                        touched.guideClassDetails &&
+                                                                                                        touched.guideClassDetails[idx] &&
+                                                                                                        touched.guideClassDetails[idx]
+                                                                                                            .perDayRate &&
+                                                                                                        errors.guideClassDetails &&
+                                                                                                        errors.guideClassDetails[idx] &&
+                                                                                                        errors.guideClassDetails[idx]
+                                                                                                            .perDayRate
                                                                                                             ? errors.guideClassDetails[idx]
-                                                                                                                .perDayRate
+                                                                                                                  .perDayRate
                                                                                                             : ''
                                                                                                     }
                                                                                                 />
                                                                                             </TableCell>
                                                                                             <TableCell>
                                                                                                 {values.guideClassDetails[idx] &&
-                                                                                                    values.guideClassDetails[idx].perDayRate
+                                                                                                values.guideClassDetails[idx].perDayRate
                                                                                                     ? values.guideClassDetails[idx]
-                                                                                                        .perDayRate
+                                                                                                          .perDayRate
                                                                                                     : 0}
                                                                                             </TableCell>
                                                                                             <TableCell>
                                                                                                 {values.guideClassDetails[idx] &&
-                                                                                                    values.guideClassDetails[idx].perDayRate
+                                                                                                values.guideClassDetails[idx].perDayRate
                                                                                                     ? values.guideClassDetails[idx]
-                                                                                                        .perDayRate *
-                                                                                                    (values.guideClassDetails[idx].tax
-                                                                                                        .percentage /
-                                                                                                        100) +
-                                                                                                    values.guideClassDetails[idx]
-                                                                                                        .perDayRate
+                                                                                                          .perDayRate *
+                                                                                                          (values.guideClassDetails[idx].tax
+                                                                                                              .percentage /
+                                                                                                              100) +
+                                                                                                      values.guideClassDetails[idx]
+                                                                                                          .perDayRate
                                                                                                     : 0}
                                                                                             </TableCell>
 
@@ -960,34 +959,34 @@ function GuideClass({ open, handleClose, mode, guideCode }) {
                                                                                                         control={<Switch />}
                                                                                                         error={Boolean(
                                                                                                             touched.guideClassDetails &&
-                                                                                                            touched.guideClassDetails[
-                                                                                                            idx
-                                                                                                            ] &&
-                                                                                                            touched.guideClassDetails[
-                                                                                                                idx
-                                                                                                            ].status &&
-                                                                                                            errors.guideClassDetails &&
-                                                                                                            errors.guideClassDetails[
-                                                                                                            idx
-                                                                                                            ] &&
-                                                                                                            errors.guideClassDetails[
-                                                                                                                idx
-                                                                                                            ].status
+                                                                                                                touched.guideClassDetails[
+                                                                                                                    idx
+                                                                                                                ] &&
+                                                                                                                touched.guideClassDetails[
+                                                                                                                    idx
+                                                                                                                ].status &&
+                                                                                                                errors.guideClassDetails &&
+                                                                                                                errors.guideClassDetails[
+                                                                                                                    idx
+                                                                                                                ] &&
+                                                                                                                errors.guideClassDetails[
+                                                                                                                    idx
+                                                                                                                ].status
                                                                                                         )}
                                                                                                         helperText={
                                                                                                             touched.guideClassDetails &&
-                                                                                                                touched.guideClassDetails[
+                                                                                                            touched.guideClassDetails[
                                                                                                                 idx
-                                                                                                                ] &&
-                                                                                                                touched.guideClassDetails[idx]
-                                                                                                                    .status &&
-                                                                                                                errors.guideClassDetails &&
-                                                                                                                errors.guideClassDetails[idx] &&
-                                                                                                                errors.guideClassDetails[idx]
-                                                                                                                    .status
+                                                                                                            ] &&
+                                                                                                            touched.guideClassDetails[idx]
+                                                                                                                .status &&
+                                                                                                            errors.guideClassDetails &&
+                                                                                                            errors.guideClassDetails[idx] &&
+                                                                                                            errors.guideClassDetails[idx]
+                                                                                                                .status
                                                                                                                 ? errors.guideClassDetails[
-                                                                                                                    idx
-                                                                                                                ].status
+                                                                                                                      idx
+                                                                                                                  ].status
                                                                                                                 : ''
                                                                                                         }
                                                                                                         onChange={(_, value) => {
@@ -1021,7 +1020,7 @@ function GuideClass({ open, handleClose, mode, guideCode }) {
                                                                                                         }
                                                                                                         disabled={mode == 'VIEW'}
                                                                                                     />
-                                                                                                    {errors.guideClassDetails &&
+                                                                                                    {/* {errors.guideClassDetails &&
                                                                                                         errors.guideClassDetails[idx] &&
                                                                                                         errors.guideClassDetails[idx]
                                                                                                             .status && (
@@ -1033,7 +1032,7 @@ function GuideClass({ open, handleClose, mode, guideCode }) {
                                                                                                                     ].status
                                                                                                                 }
                                                                                                             </p>
-                                                                                                        )}
+                                                                                                        )} */}
                                                                                                 </FormGroup>
                                                                                             </TableCell>
                                                                                             <TableCell>
@@ -1081,7 +1080,7 @@ function GuideClass({ open, handleClose, mode, guideCode }) {
                                                                     style={{
                                                                         marginLeft: '10px'
                                                                     }}
-                                                                // onClick={handleCancel}
+                                                                    // onClick={handleCancel}
                                                                 >
                                                                     Cancel
                                                                 </Button>

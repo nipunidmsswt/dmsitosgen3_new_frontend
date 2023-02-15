@@ -12,10 +12,14 @@ import MainCard from 'ui-component/cards/MainCard';
 import { getAllGuideClassData } from 'store/actions/masterActions/GuideClassAction';
 import { FormControlLabel, FormGroup, Switch } from '@mui/material';
 import ActivitySupplement from './ActivitySupplement';
+import {
+    getActivity_SupplementLatestModifiedDetails,
+    getAllActivity_SupplimentData
+} from 'store/actions/masterActions/Activity_SupplimentAction';
 
 function ViewActivitySupplement() {
     const [open, setOpen] = useState(false);
-    const [guideCode, setGuideCode] = useState('');
+    const [activitySupplimentId, setActivitySupplimentId] = useState('');
     const [mode, setMode] = useState('INSERT');
     const [openToast, setHandleToast] = useState(false);
     const [openErrorToast, setOpenErrorToast] = useState(false);
@@ -24,20 +28,40 @@ function ViewActivitySupplement() {
 
     const columns = [
         {
-            title: 'Guide Code',
-            field: 'guideCode',
+            title: 'Type',
+            field: 'type',
             filterPlaceholder: 'filter',
             align: 'center'
         },
         {
-            title: 'Description',
-            field: 'description',
+            title: 'Type Of Activity',
+            field: 'typeOfActivity',
             filterPlaceholder: 'filter',
             align: 'center'
         },
 
         {
-            title: 'Active',
+            title: 'Code',
+            field: 'code',
+            filterPlaceholder: 'filter',
+            align: 'center'
+        },
+
+        // {
+        //     title: 'Location Code',
+        //     field: 'locationCode',
+        //     filterPlaceholder: 'filter',
+        //     align: 'center'
+        // },
+        {
+            title: 'Max Pax',
+            field: 'maxPax',
+            filterPlaceholder: 'filter',
+            align: 'center'
+        },
+
+        {
+            title: 'Status',
             field: 'status',
             filterPlaceholder: 'True || False',
             align: 'center',
@@ -54,11 +78,11 @@ function ViewActivitySupplement() {
                 >
                     {rowData.status === true ? (
                         <FormGroup>
-                            <FormControlLabel control={<Switch color="success" size="small" />} checked={true} />
+                            <FormControlLabel control={<Switch size="small" />} checked={true} />
                         </FormGroup>
                     ) : (
                         <FormGroup>
-                            <FormControlLabel control={<Switch color="error" size="small" />} checked={false} />
+                            <FormControlLabel control={<Switch size="small" />} checked={false} />
                         </FormGroup>
                     )}
                 </div>
@@ -67,20 +91,20 @@ function ViewActivitySupplement() {
     ];
 
     const dispatch = useDispatch();
-    const error = useSelector((state) => state.guideClassReducer.errorMsg);
-    const guideClass = useSelector((state) => state.guideClassReducer.guideClass);
-    const guideClassList = useSelector((state) => state.guideClassReducer.guideClassList);
-    const lastModifiedDate = useSelector((state) => state.locationReducer.lastModifiedDateTime);
+    const error = useSelector((state) => state.activity_supplimentReducer.errorMsg);
+    const activity_suppliment = useSelector((state) => state.activity_supplimentReducer.activity_suppliment);
+    const activity_supplimentList = useSelector((state) => state.activity_supplimentReducer.activity_supplimentList);
+    const lastModifiedDate = useSelector((state) => state.activity_supplimentReducer.lastModifiedDateTime);
 
     useEffect(() => {
         setLastModifiedTimeDate(lastModifiedDate);
     }, [lastModifiedDate]);
 
     useEffect(() => {
-        if (guideClassList?.length > 0) {
-            setTableData(guideClassList);
+        if (activity_supplimentList?.length > 0) {
+            setTableData(activity_supplimentList);
         }
-    }, [guideClassList]);
+    }, [activity_supplimentList]);
 
     useEffect(() => {
         if (error != null) {
@@ -89,27 +113,27 @@ function ViewActivitySupplement() {
     }, [error]);
 
     useEffect(() => {
-        if (guideClass) {
+        if (activity_suppliment) {
             setHandleToast(true);
-            dispatch(getAllGuideClassData());
+            // dispatch(getAllGuideClassData());
         }
-    }, [guideClass]);
+    }, [activity_suppliment]);
 
     useEffect(() => {
-        dispatch(getAllGuideClassData());
-        dispatch(getLatestModifiedLocationDetails());
+        dispatch(getAllActivity_SupplimentData());
+        dispatch(getActivity_SupplementLatestModifiedDetails());
     }, []);
 
     const handleClickOpen = (type, data) => {
         if (type === 'VIEW_UPDATE') {
             setMode(type);
-            setGuideCode(data.guideCode);
+            setActivitySupplimentId(data.id);
         } else if (type === 'INSERT') {
-            setGuideCode('');
+            setActivitySupplimentId('');
             setMode(type);
         } else {
             setMode(type);
-            setGuideCode(data.guideCode);
+            setActivitySupplimentId(data.guideCode);
         }
         setOpen(true);
     };
@@ -195,7 +219,16 @@ function ViewActivitySupplement() {
                                     }}
                                 />
 
-                                {open ? <ActivitySupplement open={open} handleClose={handleClose} guideCode={guideCode} mode={mode} /> : ''}
+                                {open ? (
+                                    <ActivitySupplement
+                                        open={open}
+                                        handleClose={handleClose}
+                                        activitySupplimentId={activitySupplimentId}
+                                        mode={mode}
+                                    />
+                                ) : (
+                                    ''
+                                )}
                                 {openToast ? <SuccessMsg openToast={openToast} handleToast={handleToast} mode={mode} /> : null}
                                 {openErrorToast ? (
                                     <ErrorMsg openToast={openErrorToast} handleToast={setOpenErrorToast} mode={mode} />

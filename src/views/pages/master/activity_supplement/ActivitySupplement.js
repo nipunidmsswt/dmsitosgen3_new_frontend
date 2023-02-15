@@ -43,37 +43,70 @@ import {
 
 import { getGuideClassDetailsByCode, saveGuideClassData, updateGuideClassData } from 'store/actions/masterActions/GuideClassAction';
 import CreatedUpdatedUserDetailsWithTableFormat from '../userTimeDetails/CreatedUpdatedUserDetailsWithTableFormat';
+import { getActiveLocations } from 'store/actions/masterActions/LocationAction';
+import {
+    checkDuplicateActivity_SupplimentsCode,
+    getActivity_SupplimentDetailsByCode,
+    saveActivity_SupplimentData,
+    updateActivity_SupplimentData
+} from 'store/actions/masterActions/Activity_SupplimentAction';
+import { getActivity_SupplimentDetailsByCodeSaga } from 'store/saga/mastersaga/Activity_SupplimentSage';
 const Transition = forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
 
-function ActivitySupplement({ open, handleClose, mode, guideCode }) {
+function ActivitySupplement({ open, handleClose, mode, activitySupplimentId }) {
     const initialValues = {
-        guideCode: '',
-        description: '',
+        id: '',
+        type: '',
+        typeOfActivity: '',
+        code: '',
+        locationCode: null,
+        activityDescription: '',
+        advanceType: '',
+        contactPerson: '',
+        phone: '',
+        email: '',
+        address: '',
+        website: '',
+        fax: '',
+        maxPax: '',
         status: true,
         advanceType: true,
-        guideClassDetails: [
+        youtubeLinks: [
+            {
+                id: '',
+                url: '',
+                status: true,
+                enableYoutubeRow: false
+            }
+        ],
+
+        activityWithTaxes: [
             {
                 fromDate: '',
                 toDate: '',
                 currencyList: null,
                 tax: null,
-                perDayRate: '',
+                perPaxBuyRate: '',
                 rateWithoutTax: '',
                 rateWithTax: '',
-                status: false
+                status: true,
+                enableRow: false
             }
         ]
     };
-
+    const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
     const [existOpenModal, setExistOpenModal] = useState(false);
-
-    const [loadValues, setLoadValues] = useState(null);
+    const activity_supplimentToUpdate = useSelector((state) => state.activity_supplimentReducer.activity_supplimentToUpdate);
+    const activeLocations = useSelector((state) => state.locationReducer.activeLocations);
+    const [loadValues, setLoadValues] = useState(initialValues);
     const [currencyListArray, setCurrecyListArray] = useState([]);
     const ref = useRef(null);
     const [appearing, setAppearing] = useState(false);
-
+    const [activeLocationList, setActiveLocationList] = useState([]);
+    const [previewImages, setPreviewImages] = useState([]);
+    const [updatePreviewImages, setupdatePreviewImages] = useState([]);
     // const handleChangeStatus = (event) => {
     //     console.log(event.target.checked);
     //     // this.setState({ checked: event.target.checked });
@@ -83,93 +116,104 @@ function ActivitySupplement({ open, handleClose, mode, guideCode }) {
             setExistOpenModal(false);
         }
     };
+    useEffect(() => {
+        setActiveLocationList(activeLocations);
+    }, [activeLocations]);
 
-    // yup.addMethod(yup.array, "uniqueTaxOrder", function (message) {
-    //   return this.test("uniqueTaxOrder", message, function (list) {
-    //     const mapper = (x) => {
-    //       return x.taxOrder;
-    //     };
-    //     const set = [...new Set(list.map(mapper))];
-    //     const isUnique = list.length === set.length;
-    //     if (isUnique) {
-    //       return true;
-    //     }
+    useEffect(() => {
+        if (activity_supplimentToUpdate != null) {
+            const dataArray = [];
+            const dataArrayYoutube = [];
+            if (
+                (mode === 'VIEW_UPDATE' && activity_supplimentToUpdate != null) ||
+                (mode === 'VIEW' && activity_supplimentToUpdate != null)
+            ) {
+                activity_supplimentToUpdate.activityWithTaxes.map((item) => {
+                    const activityWithTaxes = {
+                        enableRow: true,
+                        fromDate: item.fromDate,
+                        toDate: item.toDate,
+                        currencyList: item.currencyList,
+                        tax: item.tax,
+                        perDayRate: item.perPaxBuyRate == null ? 0.0 : item.perPaxBuyRate,
 
-    //     const idx = list.findIndex((l, i) => mapper(l) !== set[i]);
-    //     return this.createError({
-    //       path: `guideClassDetails[${idx}].taxOrder`,
-    //       message: message,
-    //     });
-    //   });
-    // });
+                        status: item.status
+                    };
 
-    // yup.addMethod(yup.array, "uniqueTaxCode", function (message) {
-    //   return this.test("uniqueTaxCode", message, function (list) {
-    //     const mapper = (x) => {
-    //       return x.tax?.taxCode;
-    //     };
-    //     const set = [...new Set(list.map(mapper))];
-    //     const isUnique = list.length === set.length;
-    //     if (isUnique) {
-    //       return true;
-    //     }
+                    dataArray.push(activityWithTaxes);
+                });
 
-    //     const idx = list.findIndex((l, i) => mapper(l) !== set[i]);
-    //     return this.createError({
-    //       path: `exchangeRates[${idx}].tax`,
-    //       message: message,
-    //     });
-    //   });
-    // });
+                activity_supplimentToUpdate.youtubeLinks.map((itemYoutube) => {
+                    const youtubeLinks = {
+                        url: itemYoutube.url,
+                        status: itemYoutube.status
+                    };
+                    dataArrayYoutube.push(youtubeLinks);
+                });
 
-    yup.addMethod(yup.string, 'checkDuplicatecode', function (message) {
-        return this.test('checkDuplicatecode', 'Duplicate Expense Code', async function validateValue(value) {
-            try {
-                console.log(value);
-                dispatch(checkDuplicateExpenseRateCode(value));
-                console.log(duplicateCode);
-                if (duplicateCode != null && duplicateCode.errorMessages.length != 0) {
-                    return false;
+                const saveValues = {
+                    id: activity_supplimentToUpdate.id,
+                    type: activity_supplimentToUpdate.type,
+                    typeOfActivity: activity_supplimentToUpdate.typeOfActivity,
+                    code: activity_supplimentToUpdate.code,
+                    locationCode: activity_supplimentToUpdate.locationCode,
+                    activityDescription: activity_supplimentToUpdate.activityDescription,
+                    advanceType: activity_supplimentToUpdate.advanceType,
+                    contactPerson: activity_supplimentToUpdate.contactPerson,
+                    phone: activity_supplimentToUpdate.phone,
+                    email: activity_supplimentToUpdate.email,
+                    address: activity_supplimentToUpdate.address,
+                    website: activity_supplimentToUpdate.website,
+                    fax: activity_supplimentToUpdate.fax,
+                    maxPax: activity_supplimentToUpdate.maxPax,
+                    status: activity_supplimentToUpdate.status,
+                    advanceType: activity_supplimentToUpdate.advanceType,
+                    // files: data.files,AS
+                    youtubeLinks: dataArrayYoutube,
+                    activityWithTaxes: dataArray
+                };
+                setLoadValues(saveValues);
+                activity_supplimentToUpdate.type == 'Supplement' ? setCategoryType('Supplement') : setCategoryType('Activity');
+                activity_supplimentToUpdate.type == 'Supplement' ? setTypeOfActivity(false) : setTypeOfActivity(true);
+                // activity_supplimentToUpdate.typeOfActivity == 'Supplement' ? setCategoryType('Supplement') : setCategoryType('Activity');
+                if (activity_supplimentToUpdate.typeOfActivity == 'Group') {
+                    setLabelName('Per Group Rate');
+                } else if (activity_supplimentToUpdate.typeOfActivity == 'Ride') {
+                    setLabelName('Max Pax Rate');
+                    // setTypeOfActivity(false);
                 } else {
-                    return true;
+                    setLabelName('Per Pax Rate');
                 }
-            } catch (error) {}
+            }
+        }
+    }, [activity_supplimentToUpdate]);
+
+    yup.addMethod(yup.string, 'checkDuplicateActivitySupplementCode', function (message) {
+        return this.test('checkDuplicateActivitySupplementCode', message, async function validateValue(value) {
+            if (mode === 'INSERT') {
+                try {
+                    await dispatch(checkDuplicateActivity_SupplimentsCode(value, categoryType));
+
+                    if (duplicateCode != null && duplicateCode.errorMessages.length != 0) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                    return false;
+                } catch (error) {}
+            }
             return true;
-        });
-    });
-    yup.addMethod(yup.array, 'uniqueStatus', function (message) {
-        return this.test('uniqueStatus', message, function (list) {
-            const mapper = (x) => {
-                return x.status;
-            };
-            const set = [...new Set(list.map(mapper))];
-            console.log(list.map(mapper));
-
-            // const isUnique = list !== set;
-            // if (isUnique) {
-            //     return true;
-            // }
-            // console.log('list length:' + list[0]);
-            // if(list[0]==true){
-
-            // }
-            // const isUnique = list.length === new Set(list.map(mapper)).size;
-            // console.log('isUn:' + new Set(list.map(mapper)).size);
-
-            const idx = list.findIndex((l, i) => mapper(l) !== set[i]);
-            // console.log('idx:' + set[i]);
-
-            return this.createError({
-                path: `guideClassDetails[${idx}].status`,
-                message: message
-            });
         });
     });
 
     const validationSchema = yup.object().shape({
-        guideCode: yup.string().required('Required field'),
-        description: yup.string().required('Required field'),
-        guideClassDetails: yup.array().of(
+        code: yup.string().required('Required field').checkDuplicateActivitySupplementCode('Duplicate Code'),
+        activityDescription: yup.string().required('Required field'),
+        maxPax: yup.number().required('Required field'),
+        email: yup.string().email(),
+        phone: yup.string().matches(phoneRegExp, 'Not valid').min(10, 'Must be exactly 10 digits').max(10, 'Must be 10 digits'),
+
+        activityWithTaxes: yup.array().of(
             yup.object().shape({
                 tax: yup.object().typeError('Required field'),
                 fromDate: yup.date().required('Required field'),
@@ -177,39 +221,6 @@ function ActivitySupplement({ open, handleClose, mode, guideCode }) {
                 currencyList: yup.object().typeError('Required field'),
                 perDayRate: yup.number().required('Required field').positive('entry should be greater than 0'),
                 status: yup.boolean()
-                // status: yup.bool().when('appearing', {
-                //     is: true,s
-                //     then: yup.bool().oneOf([false], 'You need to accept the terms and conditions')
-                // })
-                // status: yup.bool().test({
-                //     name: 'one-true',
-                //     message: 'Required',
-                //     test: (val) => !every(val, ['value', false])
-                // })
-                // status: yup.bool().oneOf([true], 'You need to accept the terms and conditions')
-                // .test('unique', 'Only unique values allowed.', (value) => (console.log(value) ? value === new Set(value) : true))
-
-                // status: yup.bool().oneOf(status, 'The profession you chose does not exist')
-                // status: yup.bool().when('status', {
-                //     is: true,
-                //     then: yup.bool().oneOf([true], '').required('Required field')
-                // }) // status: yup.boolean().when('status', {
-                //     is: true,
-                //     then: 'error'
-                // })
-                // status: yup.boolean().when('status', {
-                //     is: true && mode === 'VIEW_UPDATE',
-                //     // then: yup.date().required('Field is required')
-                // })
-                // perDayRate: yup
-                //     .number()
-                //     .transform((_, value) => {
-                //         if (value.includes('.')) {
-                //             return null;
-                //         }
-                //         return +value.replace(/,/, '.');
-                //     })
-                //     .positive()
             })
         )
         // .uniqueStatus('Already Existing Active Record.')
@@ -223,100 +234,126 @@ function ActivitySupplement({ open, handleClose, mode, guideCode }) {
         // console.log('value:' + value);
     };
 
-    const guideClassToUpdate = useSelector((state) => state.guideClassReducer.guideClassToUpdate);
-
     const dispatch = useDispatch();
     const [taxIdValues, setTaxIdValues] = useState(null);
     const [taxValues, setTaxValues] = useState(null);
 
     useEffect(() => {
         if (mode === 'VIEW_UPDATE' || mode === 'VIEW') {
-            dispatch(getGuideClassDetailsByCode(guideCode));
+            dispatch(getActivity_SupplimentDetailsByCode(activitySupplimentId));
         }
     }, [mode]);
 
-    useEffect(() => {
-        if (guideClassToUpdate != null) {
-            const dataArray = [];
-            if ((mode === 'VIEW_UPDATE' && guideClassToUpdate != null) || (mode === 'VIEW' && guideClassToUpdate != null)) {
-                if (guideClassToUpdate.guideClassDetails.length > 0) {
-                    guideClassToUpdate.guideClassDetails.map((item) => {
-                        const guideClassDetails = {
-                            fromDate: item.fromDate,
-                            toDate: item.toDate,
-                            currencyList: item.currencyList,
-                            tax: item.tax,
-                            perDayRate: item.perDayRate,
-                            rateWithÓutTax: item.rateWithÓutTax,
-                            rateWithTax: item.rateWithTax,
-                            status: item.status
-                        };
-                        dataArray.push(guideClassDetails);
-                    });
-
-                    const saveValues = {
-                        guideCode: guideClassToUpdate.guideCode,
-                        description: guideClassToUpdate.description,
-                        status: guideClassToUpdate.status,
-                        guideClassDetails: dataArray
-                    };
-                    setLoadValues(saveValues);
-                }
-            }
+    const showImages = (event) => {
+        let images = [];
+        console.log(event);
+        for (let i = 0; i < event.target.files.length; i++) {
+            // console.log(event.target.files[i])
+            images.push(URL.createObjectURL(event.target.files[i]));
         }
-    }, [guideClassToUpdate]);
+
+        setPreviewImages(images);
+        setupdatePreviewImages([]);
+    };
 
     const handleSubmitForm = (data) => {
         if (mode === 'INSERT') {
             const dataArray = [];
-            if (data.guideClassDetails.length > 0) {
-                data.guideClassDetails.map((item) => {
-                    const guideClassDetails = {
+            const dataArrayYoutube = [];
+            if (data.activityWithTaxes.length > 0 || data.youtubeLinks.length > 0) {
+                data.activityWithTaxes.map((item) => {
+                    const activityWithTaxes = {
                         fromDate: item.fromDate,
                         toDate: item.toDate,
                         currencyList: item.currencyList.currencyListId,
                         tax: item.tax.taxId,
-                        perDayRate: item.perDayRate == null ? 0.0 : item.perDayRate,
-                        rateWithÓutTax: item.perDayRate,
+                        perPaxBuyRate: item.perDayRate == null ? 0.0 : item.perDayRate,
+                        rateWithoutTax: item.perDayRate,
                         rateWithTax: item.perDayRate,
                         status: item.status
                     };
-                    dataArray.push(guideClassDetails);
+                    dataArray.push(activityWithTaxes);
+                });
+
+                data.youtubeLinks.map((itemYoutube) => {
+                    const youtubeLinks = {
+                        url: itemYoutube.url,
+                        status: itemYoutube.status
+                    };
+                    dataArrayYoutube.push(youtubeLinks);
                 });
 
                 const saveValues = {
-                    guideCode: data.guideCode,
-                    description: data.description,
+                    type: data.type,
+                    typeOfActivity: data.typeOfActivity,
+                    code: data.code,
+                    locationCode: data.locationCode.location_id,
+                    activityDescription: data.activityDescription,
+                    advanceType: data.advanceType,
+                    contactPerson: data.contactPerson,
+                    phone: data.phone,
+                    email: data.email,
+                    address: data.address,
+                    website: data.website,
+                    fax: data.fax,
+                    maxPax: data.maxPax,
                     status: data.status,
-                    guideClassDetails: dataArray
+                    advanceType: data.advanceType,
+                    // files: data.files,AS
+                    youtubeLinks: dataArrayYoutube,
+                    activityWithTaxes: dataArray
                 };
-                dispatch(saveGuideClassData(saveValues));
+                dispatch(saveActivity_SupplimentData(saveValues));
             }
         } else if (mode === 'VIEW_UPDATE') {
             const dataArray = [];
-            if (data.guideClassDetails.length > 0) {
-                data.guideClassDetails.map((item) => {
-                    const guideClassDetails = {
-                        fromDate: item.fromDate,
-                        toDate: item.toDate,
-                        currencyList: item.currencyList.currencyListId,
-                        tax: item.tax.taxId,
-                        perDayRate: item.perDayRate == null ? 0.0 : item.perDayRate,
-                        rateWithÓutTax: item.perDayRate,
-                        rateWithTax: item.perDayRate,
-                        status: item.status
-                    };
-                    dataArray.push(guideClassDetails);
-                });
-
-                const saveValues = {
-                    guideCode: data.guideCode,
-                    description: data.description,
-                    status: data.status,
-                    guideClassDetails: dataArray
+            const dataArrayYoutube = [];
+            console.log('activity_supplimentToUpdate.id:' + activity_supplimentToUpdate.id);
+            data.activityWithTaxes.map((item) => {
+                const activityWithTaxes = {
+                    id: item.id,
+                    fromDate: item.fromDate,
+                    toDate: item.toDate,
+                    currencyList: item.currencyList.currencyListId,
+                    tax: item.tax.taxId,
+                    perPaxBuyRate: item.perDayRate == null ? 0.0 : item.perDayRate,
+                    rateWithoutTax: item.perDayRate,
+                    rateWithTax: item.perDayRate,
+                    status: item.status
                 };
-                dispatch(updateGuideClassData(saveValues));
-            }
+                dataArray.push(activityWithTaxes);
+            });
+
+            data.youtubeLinks.map((itemYoutube) => {
+                const youtubeLinks = {
+                    url: itemYoutube.url,
+                    status: itemYoutube.status
+                };
+                dataArrayYoutube.push(youtubeLinks);
+            });
+
+            const saveValues = {
+                id: data.id,
+                type: data.type,
+                typeOfActivity: data.typeOfActivity,
+                code: data.code,
+                locationCode: data.locationCode.location_id,
+                activityDescription: data.activityDescription,
+                advanceType: data.advanceType,
+                contactPerson: data.contactPerson,
+                phone: data.phone,
+                email: data.email,
+                address: data.address,
+                website: data.website,
+                fax: data.fax,
+                maxPax: data.maxPax,
+                status: data.status,
+                advanceType: data.advanceType,
+                // files: data.files,AS
+                youtubeLinks: dataArrayYoutube,
+                activityWithTaxes: dataArray
+            };
+            dispatch(updateActivity_SupplimentData(saveValues));
         }
         handleClose();
     };
@@ -327,7 +364,7 @@ function ActivitySupplement({ open, handleClose, mode, guideCode }) {
 
     const taxListData = useSelector((state) => state.taxReducer.taxes);
     const currencyListData = useSelector((state) => state.expenseTypesReducer.currencyList);
-    const duplicateCode = useSelector((state) => state.expenseTypesReducer.duplicateExpenseType);
+    const duplicateCode = useSelector((state) => state.activity_supplimentReducer.duplicateCode);
     const [taxListOptions, setTaxListOptions] = useState([]);
     const [currencyListOptions, setCurrencyListOptions] = useState([]);
     const [categoryType, setCategoryType] = useState('Activity');
@@ -337,6 +374,7 @@ function ActivitySupplement({ open, handleClose, mode, guideCode }) {
     useEffect(() => {
         dispatch(getAllTaxData());
         dispatch(getAllCurrencyListData());
+        dispatch(getActiveLocations());
     }, []);
 
     useEffect(() => {
@@ -366,8 +404,6 @@ function ActivitySupplement({ open, handleClose, mode, guideCode }) {
 
     const selectedActivityType = (event) => {
         const selectedType = event.currentTarget.dataset.value;
-
-        // setCategoryType(selectedType);
         if (selectedType == 'Group') {
             setLabelName('Per Group Rate');
         } else if (selectedType == 'Ride') {
@@ -433,18 +469,15 @@ function ActivitySupplement({ open, handleClose, mode, guideCode }) {
                                                                         id="standard-select-currency"
                                                                         select
                                                                         label="Activity / Supplement"
-                                                                        name="groupType"
+                                                                        name="type"
                                                                         onChange={handleChange}
                                                                         onBlur={handleBlur}
                                                                         InputLabelProps={{
                                                                             shrink: true
                                                                         }}
                                                                         // defaultValue={values.groupType}
-                                                                        value={values.groupType}
-                                                                        // onClick={handleClick}
-                                                                        onClick={(values) => {
-                                                                            handleClick(values);
-                                                                        }}
+                                                                        value={values.type}
+
                                                                         // error={Boolean(touched.groupType && errors.groupType)}
                                                                         // helperText={
                                                                         //     touched.groupType && errors.groupType
@@ -473,17 +506,15 @@ function ActivitySupplement({ open, handleClose, mode, guideCode }) {
                                                                             id="standard-select-currency"
                                                                             select
                                                                             label="Type Of Activity"
-                                                                            name="groupType"
+                                                                            name="typeOfActivity"
                                                                             onChange={handleChange}
                                                                             onBlur={handleBlur}
                                                                             InputLabelProps={{
                                                                                 shrink: true
                                                                             }}
-                                                                            // value={values.groupType}
+                                                                            value={values.typeOfActivity}
                                                                             // onClick={handleClick}
-                                                                            onClick={(values) => {
-                                                                                handleClick(values);
-                                                                            }}
+
                                                                             // error={Boolean(touched.groupType && errors.groupType)}
                                                                             // helperText={
                                                                             //     touched.groupType && errors.groupType
@@ -549,7 +580,7 @@ function ActivitySupplement({ open, handleClose, mode, guideCode }) {
                                                                                 height: 40
                                                                             }
                                                                         }}
-                                                                        name="description"
+                                                                        name="activityDescription"
                                                                         InputLabelProps={{
                                                                             shrink: true
                                                                         }}
@@ -557,11 +588,13 @@ function ActivitySupplement({ open, handleClose, mode, guideCode }) {
                                                                         label={categoryType + '  Description'}
                                                                         onChange={handleChange}
                                                                         onBlur={handleBlur}
-                                                                        value={values.description}
-                                                                        error={Boolean(touched.description && errors.description)}
+                                                                        value={values.activityDescription}
+                                                                        error={Boolean(
+                                                                            touched.activityDescription && errors.activityDescription
+                                                                        )}
                                                                         helperText={
-                                                                            touched.description && errors.description
-                                                                                ? errors.description
+                                                                            touched.activityDescription && errors.activityDescription
+                                                                                ? errors.activityDescription
                                                                                 : ''
                                                                         }
                                                                     ></TextField>
@@ -571,8 +604,8 @@ function ActivitySupplement({ open, handleClose, mode, guideCode }) {
                                                                         <FormGroup>
                                                                             <FormControlLabel
                                                                                 name="advanceType"
-                                                                                disabled={mode == 'VIEW'}
                                                                                 onChange={handleChange}
+                                                                                disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
                                                                                 value={values.advanceType}
                                                                                 control={<Switch />}
                                                                                 label="Advance Type"
@@ -584,6 +617,203 @@ function ActivitySupplement({ open, handleClose, mode, guideCode }) {
                                                                 ) : (
                                                                     ''
                                                                 )}
+                                                            </Grid>
+                                                            <br />
+
+                                                            <Grid container spacing={gridSpacing}>
+                                                                <Grid item>
+                                                                    <Autocomplete
+                                                                        value={values.locationCode}
+                                                                        name="locationCode"
+                                                                        onChange={(_, value) => {
+                                                                            setFieldValue(`locationCode`, value);
+                                                                        }}
+                                                                        disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                        options={activeLocationList}
+                                                                        getOptionLabel={(option) => `${option.code}`}
+                                                                        isOptionEqualToValue={(option, value) =>
+                                                                            option.location_id === value.location_id
+                                                                        }
+                                                                        renderInput={(params) => (
+                                                                            <TextField
+                                                                                {...params}
+                                                                                label="Location Code"
+                                                                                InputLabelProps={{
+                                                                                    shrink: true
+                                                                                }}
+                                                                                sx={{
+                                                                                    width: {
+                                                                                        sm: 200
+                                                                                    },
+                                                                                    '& .MuiInputBase-root': {
+                                                                                        height: 40
+                                                                                    }
+                                                                                }}
+                                                                                disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                                variant="outlined"
+                                                                                name="locationCode"
+                                                                                onBlur={handleBlur}
+                                                                            />
+                                                                        )}
+                                                                    />
+                                                                </Grid>
+                                                                <Grid item>
+                                                                    <TextField
+                                                                        label="Contact Person"
+                                                                        sx={{
+                                                                            width: { sm: 200, md: 200 },
+                                                                            '& .MuiInputBase-root': {
+                                                                                height: 40
+                                                                            }
+                                                                        }}
+                                                                        // disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                        type="text"
+                                                                        variant="outlined"
+                                                                        InputLabelProps={{
+                                                                            shrink: true
+                                                                        }}
+                                                                        disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                        name="contactPerson"
+                                                                        value={values.contactPerson}
+                                                                        onChange={handleChange}
+                                                                        onBlur={handleBlur}
+                                                                    />
+                                                                </Grid>
+                                                                <Grid item>
+                                                                    <TextField
+                                                                        label="Phone"
+                                                                        sx={{
+                                                                            width: { sm: 200, md: 200 },
+                                                                            '& .MuiInputBase-root': {
+                                                                                height: 40
+                                                                            }
+                                                                        }}
+                                                                        // disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                        type="text"
+                                                                        variant="outlined"
+                                                                        InputLabelProps={{
+                                                                            shrink: true
+                                                                        }}
+                                                                        disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                        name="phone"
+                                                                        value={values.phone}
+                                                                        onChange={handleChange}
+                                                                        onBlur={handleBlur}
+                                                                    />
+                                                                </Grid>
+                                                                <Grid item>
+                                                                    <TextField
+                                                                        label="Email"
+                                                                        sx={{
+                                                                            width: { sm: 200, md: 200 },
+                                                                            '& .MuiInputBase-root': {
+                                                                                height: 40
+                                                                            }
+                                                                        }}
+                                                                        disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                        type="text"
+                                                                        variant="outlined"
+                                                                        InputLabelProps={{
+                                                                            shrink: true
+                                                                        }}
+                                                                        name="email"
+                                                                        value={values.email}
+                                                                        onChange={handleChange}
+                                                                        onBlur={handleBlur}
+                                                                        error={Boolean(touched.email && errors.email)}
+                                                                        helperText={touched.email && errors.email ? errors.email : ''}
+                                                                    />
+                                                                </Grid>
+                                                            </Grid>
+                                                            <br />
+                                                            <Grid container spacing={gridSpacing}>
+                                                                <Grid item>
+                                                                    <TextField
+                                                                        label="Address"
+                                                                        sx={{
+                                                                            width: { sm: 200, md: 200 },
+                                                                            '& .MuiInputBase-root': {
+                                                                                height: 40
+                                                                            }
+                                                                        }}
+                                                                        disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                        type="text"
+                                                                        variant="outlined"
+                                                                        InputLabelProps={{
+                                                                            shrink: true
+                                                                        }}
+                                                                        name="address"
+                                                                        value={values.address}
+                                                                        onChange={handleChange}
+                                                                        onBlur={handleBlur}
+                                                                    />
+                                                                </Grid>
+                                                                <Grid item>
+                                                                    <TextField
+                                                                        label="Website"
+                                                                        sx={{
+                                                                            width: { sm: 200, md: 200 },
+                                                                            '& .MuiInputBase-root': {
+                                                                                height: 40
+                                                                            }
+                                                                        }}
+                                                                        disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                        type="text"
+                                                                        variant="outlined"
+                                                                        InputLabelProps={{
+                                                                            shrink: true
+                                                                        }}
+                                                                        name="website"
+                                                                        value={values.website}
+                                                                        onChange={handleChange}
+                                                                        onBlur={handleBlur}
+                                                                    />
+                                                                </Grid>
+                                                                <Grid item>
+                                                                    <TextField
+                                                                        label="Fax"
+                                                                        sx={{
+                                                                            width: { sm: 200, md: 200 },
+                                                                            '& .MuiInputBase-root': {
+                                                                                height: 40
+                                                                            }
+                                                                        }}
+                                                                        disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                        type="text"
+                                                                        variant="outlined"
+                                                                        InputLabelProps={{
+                                                                            shrink: true
+                                                                        }}
+                                                                        name="fax"
+                                                                        value={values.fax}
+                                                                        onChange={handleChange}
+                                                                        onBlur={handleBlur}
+                                                                    />
+                                                                </Grid>
+                                                                <Grid item>
+                                                                    <TextField
+                                                                        label="Max Pax"
+                                                                        sx={{
+                                                                            width: { sm: 200, md: 200 },
+                                                                            '& .MuiInputBase-root': {
+                                                                                height: 40
+                                                                            }
+                                                                        }}
+                                                                        disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                        type="number"
+                                                                        variant="outlined"
+                                                                        InputLabelProps={{
+                                                                            shrink: true
+                                                                        }}
+                                                                        name="maxPax"
+                                                                        value={values.maxPax}
+                                                                        onChange={handleChange}
+                                                                        onBlur={handleBlur}
+                                                                        error={Boolean(touched.maxPax && errors.maxPax)}
+                                                                        helperText={touched.maxPax && errors.maxPax ? errors.maxPax : ''}
+                                                                    />
+                                                                </Grid>
+
                                                                 <Grid item>
                                                                     <FormGroup>
                                                                         <FormControlLabel
@@ -599,8 +829,204 @@ function ActivitySupplement({ open, handleClose, mode, guideCode }) {
                                                                     </FormGroup>
                                                                 </Grid>
                                                             </Grid>
+
+                                                            <br />
+                                                            <Grid item xs={8}>
+                                                                <input
+                                                                    type="file"
+                                                                    multiple
+                                                                    accept="image/*"
+                                                                    name="files"
+                                                                    //  onChange={this.selectFiles}
+                                                                    onChange={(event) => {
+                                                                        // console.log("file", event.currentTarget.files);
+                                                                        showImages(event);
+                                                                        handleChange;
+                                                                        setFieldValue('files', event.currentTarget.files);
+                                                                    }}
+                                                                />
+                                                                {previewImages && (
+                                                                    <div>
+                                                                        {previewImages.map((img, i) => {
+                                                                            return (
+                                                                                <div
+                                                                                    style={{
+                                                                                        display: 'inline-block',
+                                                                                        position: 'relative'
+                                                                                    }}
+                                                                                >
+                                                                                    <img
+                                                                                        width="100"
+                                                                                        height="100"
+                                                                                        style={{
+                                                                                            marginRight: '10px',
+                                                                                            marginTop: '10px'
+                                                                                        }}
+                                                                                        className="preview"
+                                                                                        src={img}
+                                                                                        alt={'image-' + i}
+                                                                                        key={i + 'ke'}
+                                                                                    />
+                                                                                    <IconButton aria-label="add an alarm">
+                                                                                        <HighlightOffIcon
+                                                                                            key={i}
+                                                                                            style={{
+                                                                                                position: 'absolute',
+                                                                                                top: -100,
+                                                                                                right: 0,
+                                                                                                width: '25px',
+                                                                                                height: '25px'
+                                                                                                // marginRight: "10px",
+                                                                                            }}
+                                                                                            // src="https://png.pngtree.com/png-vector/20190603/ourmid/pngtree-icon-close-button-png-image_1357822.jpg"
+                                                                                        />
+                                                                                    </IconButton>
+                                                                                </div>
+                                                                            );
+                                                                        })}
+                                                                    </div>
+                                                                )}
+                                                                {updatePreviewImages && (
+                                                                    <div>
+                                                                        {updatePreviewImages.map((img, i) => {
+                                                                            return (
+                                                                                <img
+                                                                                    width="100"
+                                                                                    height="100"
+                                                                                    style={{
+                                                                                        marginRight: '10px',
+                                                                                        marginTop: '10px'
+                                                                                    }}
+                                                                                    src={`data:image/;base64,${img}`}
+                                                                                    className="preview"
+                                                                                    // src={img}
+                                                                                    alt={'image-' + i}
+                                                                                    key={i}
+                                                                                />
+                                                                            );
+                                                                        })}
+                                                                    </div>
+                                                                )}
+                                                            </Grid>
                                                         </div>
-                                                        <FieldArray name="guideClassDetails">
+
+                                                        {/* youtubeLinks */}
+                                                        <FieldArray name="youtubeLinks">
+                                                            {({ insert, remove, push }) => (
+                                                                <Paper>
+                                                                    {mode != 'VIEW' ? (
+                                                                        <Box display="flex" flexDirection="row-reverse">
+                                                                            <IconButton
+                                                                                aria-label="delete"
+                                                                                onClick={() => {
+                                                                                    push({
+                                                                                        url: '',
+                                                                                        status: false
+                                                                                    });
+                                                                                }}
+                                                                            >
+                                                                                <AddBoxIcon />
+                                                                            </IconButton>
+                                                                        </Box>
+                                                                    ) : (
+                                                                        ''
+                                                                    )}
+
+                                                                    <TableContainer>
+                                                                        <Table stickyHeader size="small">
+                                                                            <TableHead>
+                                                                                <TableRow>
+                                                                                    <TableCell>Sequence</TableCell>
+                                                                                    <TableCell>Youtube Link</TableCell>
+
+                                                                                    <TableCell>Status</TableCell>
+                                                                                    <TableCell>Actions</TableCell>
+                                                                                </TableRow>
+                                                                            </TableHead>
+                                                                            <TableBody>
+                                                                                {values.youtubeLinks.map((record, idx) => {
+                                                                                    return (
+                                                                                        <TableRow key={idx} hover>
+                                                                                            <TableCell>{idx + 1}</TableCell>
+
+                                                                                            <TableCell>
+                                                                                                <TextField
+                                                                                                    sx={{
+                                                                                                        width: { sm: 500 },
+                                                                                                        '& .MuiInputBase-root': {
+                                                                                                            height: 40
+                                                                                                        }
+                                                                                                    }}
+                                                                                                    // label="Additional Price"
+                                                                                                    type="text"
+                                                                                                    variant="outlined"
+                                                                                                    // disabled={
+                                                                                                    //     mode == 'VIEW_UPDATE' ||
+                                                                                                    //     mode == 'VIEW'
+                                                                                                    // }
+
+                                                                                                    name={`youtubeLinks.${idx}.url`}
+                                                                                                    value={
+                                                                                                        values.youtubeLinks[idx] &&
+                                                                                                        values.youtubeLinks[idx].url
+                                                                                                    }
+                                                                                                    onChange={handleChange}
+                                                                                                    // onChange={(e) =>
+                                                                                                    //     setRateWithTax(e.target.value)
+                                                                                                    // }
+                                                                                                    onBlur={handleBlur}
+                                                                                                />
+                                                                                            </TableCell>
+
+                                                                                            <TableCell>
+                                                                                                <FormGroup>
+                                                                                                    <FormControlLabel
+                                                                                                        name={`youtubeLinks.${idx}.status`}
+                                                                                                        // onChange={handleChangeStatus}
+                                                                                                        value={
+                                                                                                            values.youtubeLinks[idx] &&
+                                                                                                            values.youtubeLinks[idx].status
+                                                                                                        }
+                                                                                                        control={<Switch />}
+                                                                                                        onChange={(_, value) => {
+                                                                                                            checkStatus();
+                                                                                                            // console.log(value.currencyListId);
+                                                                                                            // setAppearing(value);
+                                                                                                            setFieldValue(
+                                                                                                                `youtubeLinks.${idx}.status`,
+                                                                                                                value
+                                                                                                            );
+                                                                                                        }}
+                                                                                                        // label="Status"
+                                                                                                        checked={
+                                                                                                            values.youtubeLinks[idx] &&
+                                                                                                            values.youtubeLinks[idx].status
+                                                                                                        }
+                                                                                                        disabled={mode == 'VIEW'}
+                                                                                                    />
+                                                                                                </FormGroup>
+                                                                                            </TableCell>
+                                                                                            <TableCell>
+                                                                                                <IconButton
+                                                                                                    aria-label="delete"
+                                                                                                    onClick={() => {
+                                                                                                        remove(idx);
+                                                                                                    }}
+                                                                                                >
+                                                                                                    <HighlightOffIcon />
+                                                                                                </IconButton>
+                                                                                            </TableCell>
+                                                                                        </TableRow>
+                                                                                    );
+                                                                                })}
+                                                                            </TableBody>
+                                                                        </Table>
+                                                                    </TableContainer>
+                                                                </Paper>
+                                                            )}
+                                                        </FieldArray>
+
+                                                        <FieldArray name="activityWithTaxes">
                                                             {({ insert, remove, push }) => (
                                                                 <Paper>
                                                                     {mode != 'VIEW' ? (
@@ -613,14 +1039,19 @@ function ActivitySupplement({ open, handleClose, mode, guideCode }) {
                                                                                     //   ref.current.values.taxGroupDetails.length+1
                                                                                     // );
                                                                                     push({
+                                                                                        id: '',
                                                                                         fromDate: '',
                                                                                         toDate: '',
-                                                                                        currency: '',
+                                                                                        currencyList: '',
                                                                                         tax: null,
                                                                                         perDayRate: '',
                                                                                         rateWithoutTax: '',
                                                                                         rateWithTax: '',
-                                                                                        status: false
+                                                                                        status: true,
+                                                                                        enableRow:
+                                                                                            mode === 'VIEW_UPDATE' || mode === 'INSERT'
+                                                                                                ? false
+                                                                                                : true
                                                                                     });
                                                                                 }}
                                                                             >
@@ -648,7 +1079,7 @@ function ActivitySupplement({ open, handleClose, mode, guideCode }) {
                                                                                 </TableRow>
                                                                             </TableHead>
                                                                             <TableBody>
-                                                                                {values.guideClassDetails.map((record, idx) => {
+                                                                                {values.activityWithTaxes.map((record, idx) => {
                                                                                     return (
                                                                                         <TableRow key={idx} hover>
                                                                                             {/* <TableCell>
@@ -662,18 +1093,18 @@ function ActivitySupplement({ open, handleClose, mode, guideCode }) {
                                                                                                     <DatePicker
                                                                                                         onChange={(value) => {
                                                                                                             setFieldValue(
-                                                                                                                `guideClassDetails.${idx}.fromDate`,
+                                                                                                                `activityWithTaxes.${idx}.fromDate`,
                                                                                                                 value
                                                                                                             );
                                                                                                         }}
                                                                                                         disabled={
-                                                                                                            mode == 'VIEW_UPDATE' ||
-                                                                                                            mode == 'VIEW'
+                                                                                                            values.activityWithTaxes[idx]
+                                                                                                                .enableRow || mode == 'VIEW'
                                                                                                         }
                                                                                                         inputFormat="DD/MM/YYYY"
                                                                                                         value={
-                                                                                                            values.guideClassDetails[idx] &&
-                                                                                                            values.guideClassDetails[idx]
+                                                                                                            values.activityWithTaxes[idx] &&
+                                                                                                            values.activityWithTaxes[idx]
                                                                                                                 .fromDate
                                                                                                         }
                                                                                                         renderInput={(params) => (
@@ -688,50 +1119,57 @@ function ActivitySupplement({ open, handleClose, mode, guideCode }) {
                                                                                                                             height: 40
                                                                                                                         }
                                                                                                                 }}
+                                                                                                                disabled={
+                                                                                                                    values
+                                                                                                                        .activityWithTaxes[
+                                                                                                                        idx
+                                                                                                                    ].enableRow ||
+                                                                                                                    mode == 'VIEW'
+                                                                                                                }
                                                                                                                 variant="outlined"
-                                                                                                                name={`guideClassDetails.${idx}.fromDate`}
+                                                                                                                name={`activityWithTaxes.${idx}.fromDate`}
                                                                                                                 onBlur={handleBlur}
                                                                                                                 error={Boolean(
-                                                                                                                    touched.guideClassDetails &&
+                                                                                                                    touched.activityWithTaxes &&
                                                                                                                         touched
-                                                                                                                            .guideClassDetails[
+                                                                                                                            .activityWithTaxes[
                                                                                                                             idx
                                                                                                                         ] &&
                                                                                                                         touched
-                                                                                                                            .guideClassDetails[
+                                                                                                                            .activityWithTaxes[
                                                                                                                             idx
                                                                                                                         ].fromDate &&
-                                                                                                                        errors.guideClassDetails &&
+                                                                                                                        errors.activityWithTaxes &&
                                                                                                                         errors
-                                                                                                                            .guideClassDetails[
+                                                                                                                            .activityWithTaxes[
                                                                                                                             idx
                                                                                                                         ] &&
                                                                                                                         errors
-                                                                                                                            .guideClassDetails[
+                                                                                                                            .activityWithTaxes[
                                                                                                                             idx
                                                                                                                         ].fromDate
                                                                                                                 )}
                                                                                                                 helperText={
-                                                                                                                    touched.guideClassDetails &&
+                                                                                                                    touched.activityWithTaxes &&
                                                                                                                     touched
-                                                                                                                        .guideClassDetails[
+                                                                                                                        .activityWithTaxes[
                                                                                                                         idx
                                                                                                                     ] &&
                                                                                                                     touched
-                                                                                                                        .guideClassDetails[
+                                                                                                                        .activityWithTaxes[
                                                                                                                         idx
                                                                                                                     ].fromDate &&
-                                                                                                                    errors.guideClassDetails &&
+                                                                                                                    errors.activityWithTaxes &&
                                                                                                                     errors
-                                                                                                                        .guideClassDetails[
+                                                                                                                        .activityWithTaxes[
                                                                                                                         idx
                                                                                                                     ] &&
                                                                                                                     errors
-                                                                                                                        .guideClassDetails[
+                                                                                                                        .activityWithTaxes[
                                                                                                                         idx
                                                                                                                     ].fromDate
                                                                                                                         ? errors
-                                                                                                                              .guideClassDetails[
+                                                                                                                              .activityWithTaxes[
                                                                                                                               idx
                                                                                                                           ].fromDate
                                                                                                                         : ''
@@ -749,18 +1187,18 @@ function ActivitySupplement({ open, handleClose, mode, guideCode }) {
                                                                                                         onChange={(value) => {
                                                                                                             console.log(value);
                                                                                                             setFieldValue(
-                                                                                                                `guideClassDetails.${idx}.toDate`,
+                                                                                                                `activityWithTaxes.${idx}.toDate`,
                                                                                                                 value
                                                                                                             );
                                                                                                         }}
                                                                                                         disabled={
-                                                                                                            mode == 'VIEW_UPDATE' ||
-                                                                                                            mode == 'VIEW'
+                                                                                                            values.activityWithTaxes[idx]
+                                                                                                                .enableRow || mode == 'VIEW'
                                                                                                         }
                                                                                                         inputFormat="DD/MM/YYYY"
                                                                                                         value={
-                                                                                                            values.guideClassDetails[idx] &&
-                                                                                                            values.guideClassDetails[idx]
+                                                                                                            values.activityWithTaxes[idx] &&
+                                                                                                            values.activityWithTaxes[idx]
                                                                                                                 .toDate
                                                                                                         }
                                                                                                         renderInput={(params) => (
@@ -775,51 +1213,58 @@ function ActivitySupplement({ open, handleClose, mode, guideCode }) {
                                                                                                                             height: 40
                                                                                                                         }
                                                                                                                 }}
+                                                                                                                disabled={
+                                                                                                                    values
+                                                                                                                        .activityWithTaxes[
+                                                                                                                        idx
+                                                                                                                    ].enableRow ||
+                                                                                                                    mode == 'VIEW'
+                                                                                                                }
                                                                                                                 variant="outlined"
-                                                                                                                name={`guideClassDetails.${idx}.toDate`}
+                                                                                                                name={`activityWithTaxes.${idx}.toDate`}
                                                                                                                 onBlur={handleBlur}
                                                                                                                 helperText={
-                                                                                                                    touched.guideClassDetails &&
+                                                                                                                    touched.activityWithTaxes &&
                                                                                                                     touched
-                                                                                                                        .guideClassDetails[
+                                                                                                                        .activityWithTaxes[
                                                                                                                         idx
                                                                                                                     ] &&
                                                                                                                     touched
-                                                                                                                        .guideClassDetails[
+                                                                                                                        .activityWithTaxes[
                                                                                                                         idx
                                                                                                                     ].toDate &&
-                                                                                                                    errors.guideClassDetails &&
+                                                                                                                    errors.activityWithTaxes &&
                                                                                                                     errors
-                                                                                                                        .guideClassDetails[
+                                                                                                                        .activityWithTaxes[
                                                                                                                         idx
                                                                                                                     ] &&
                                                                                                                     errors
-                                                                                                                        .guideClassDetails[
+                                                                                                                        .activityWithTaxes[
                                                                                                                         idx
                                                                                                                     ].toDate
                                                                                                                         ? errors
-                                                                                                                              .guideClassDetails[
+                                                                                                                              .activityWithTaxes[
                                                                                                                               idx
                                                                                                                           ].toDate
                                                                                                                         : ''
                                                                                                                 }
                                                                                                                 error={Boolean(
-                                                                                                                    touched.guideClassDetails &&
+                                                                                                                    touched.activityWithTaxes &&
                                                                                                                         touched
-                                                                                                                            .guideClassDetails[
+                                                                                                                            .activityWithTaxes[
                                                                                                                             idx
                                                                                                                         ] &&
                                                                                                                         touched
-                                                                                                                            .guideClassDetails[
+                                                                                                                            .activityWithTaxes[
                                                                                                                             idx
                                                                                                                         ].toDate &&
-                                                                                                                        errors.guideClassDetails &&
+                                                                                                                        errors.activityWithTaxes &&
                                                                                                                         errors
-                                                                                                                            .guideClassDetails[
+                                                                                                                            .activityWithTaxes[
                                                                                                                             idx
                                                                                                                         ] &&
                                                                                                                         errors
-                                                                                                                            .guideClassDetails[
+                                                                                                                            .activityWithTaxes[
                                                                                                                             idx
                                                                                                                         ].toDate
                                                                                                                 )}
@@ -832,22 +1277,22 @@ function ActivitySupplement({ open, handleClose, mode, guideCode }) {
                                                                                             <TableCell>
                                                                                                 <Autocomplete
                                                                                                     value={
-                                                                                                        values.guideClassDetails[idx]
-                                                                                                            ? values.guideClassDetails[idx]
+                                                                                                        values.activityWithTaxes[idx]
+                                                                                                            ? values.activityWithTaxes[idx]
                                                                                                                   .currencyList
                                                                                                             : null
                                                                                                     }
-                                                                                                    name={`guideClassDetails.${idx}.currencyList`}
+                                                                                                    name={`activityWithTaxes.${idx}.currencyList`}
                                                                                                     onChange={(_, value) => {
                                                                                                         console.log(value.currencyListId);
                                                                                                         setFieldValue(
-                                                                                                            `guideClassDetails.${idx}.currencyList`,
+                                                                                                            `activityWithTaxes.${idx}.currencyList`,
                                                                                                             value
                                                                                                         );
                                                                                                     }}
                                                                                                     disabled={
-                                                                                                        mode == 'VIEW_UPDATE' ||
-                                                                                                        mode == 'VIEW'
+                                                                                                        values.activityWithTaxes[idx]
+                                                                                                            .enableRow || mode == 'VIEW'
                                                                                                     }
                                                                                                     options={currencyListOptions}
                                                                                                     getOptionLabel={(option) =>
@@ -869,46 +1314,46 @@ function ActivitySupplement({ open, handleClose, mode, guideCode }) {
                                                                                                             }}
                                                                                                             placeholder="--Select a Currency Code --"
                                                                                                             variant="outlined"
-                                                                                                            name={`guideClassDetails.${idx}.currencyList`}
+                                                                                                            name={`activityWithTaxes.${idx}.currencyList`}
                                                                                                             onBlur={handleBlur}
                                                                                                             helperText={
-                                                                                                                touched.guideClassDetails &&
-                                                                                                                touched.guideClassDetails[
+                                                                                                                touched.activityWithTaxes &&
+                                                                                                                touched.activityWithTaxes[
                                                                                                                     idx
                                                                                                                 ] &&
-                                                                                                                touched.guideClassDetails[
+                                                                                                                touched.activityWithTaxes[
                                                                                                                     idx
                                                                                                                 ].currencyList &&
-                                                                                                                errors.guideClassDetails &&
-                                                                                                                errors.guideClassDetails[
+                                                                                                                errors.activityWithTaxes &&
+                                                                                                                errors.activityWithTaxes[
                                                                                                                     idx
                                                                                                                 ] &&
-                                                                                                                errors.guideClassDetails[
+                                                                                                                errors.activityWithTaxes[
                                                                                                                     idx
                                                                                                                 ].currencyList
                                                                                                                     ? errors
-                                                                                                                          .guideClassDetails[
+                                                                                                                          .activityWithTaxes[
                                                                                                                           idx
                                                                                                                       ].currencyList
                                                                                                                     : ''
                                                                                                             }
                                                                                                             error={Boolean(
-                                                                                                                touched.guideClassDetails &&
+                                                                                                                touched.activityWithTaxes &&
                                                                                                                     touched
-                                                                                                                        .guideClassDetails[
+                                                                                                                        .activityWithTaxes[
                                                                                                                         idx
                                                                                                                     ] &&
                                                                                                                     touched
-                                                                                                                        .guideClassDetails[
+                                                                                                                        .activityWithTaxes[
                                                                                                                         idx
                                                                                                                     ].currencyList &&
-                                                                                                                    errors.guideClassDetails &&
+                                                                                                                    errors.activityWithTaxes &&
                                                                                                                     errors
-                                                                                                                        .guideClassDetails[
+                                                                                                                        .activityWithTaxes[
                                                                                                                         idx
                                                                                                                     ] &&
                                                                                                                     errors
-                                                                                                                        .guideClassDetails[
+                                                                                                                        .activityWithTaxes[
                                                                                                                         idx
                                                                                                                     ].currencyList
                                                                                                             )}
@@ -919,15 +1364,15 @@ function ActivitySupplement({ open, handleClose, mode, guideCode }) {
                                                                                             <TableCell>
                                                                                                 <Autocomplete
                                                                                                     value={
-                                                                                                        values.guideClassDetails[idx]
-                                                                                                            ? values.guideClassDetails[idx]
+                                                                                                        values.activityWithTaxes[idx]
+                                                                                                            ? values.activityWithTaxes[idx]
                                                                                                                   .tax
                                                                                                             : null
                                                                                                     }
-                                                                                                    name={`guideClassDetails.${idx}.tax`}
+                                                                                                    name={`activityWithTaxes.${idx}.tax`}
                                                                                                     onChange={(_, value) => {
                                                                                                         setFieldValue(
-                                                                                                            `guideClassDetails.${idx}.tax`,
+                                                                                                            `activityWithTaxes.${idx}.tax`,
                                                                                                             value
                                                                                                         );
                                                                                                     }}
@@ -950,50 +1395,52 @@ function ActivitySupplement({ open, handleClose, mode, guideCode }) {
                                                                                                             }}
                                                                                                             placeholder="--Select a Tax Code --"
                                                                                                             variant="outlined"
-                                                                                                            name={`guideClassDetails.${idx}.tax`}
+                                                                                                            name={`activityWithTaxes.${idx}.tax`}
                                                                                                             disabled={
-                                                                                                                mode == 'VIEW_UPDATE' ||
+                                                                                                                values.activityWithTaxes[
+                                                                                                                    idx
+                                                                                                                ].enableRow ||
                                                                                                                 mode == 'VIEW'
                                                                                                             }
                                                                                                             onBlur={handleBlur}
                                                                                                             helperText={
-                                                                                                                touched.guideClassDetails &&
-                                                                                                                touched.guideClassDetails[
+                                                                                                                touched.activityWithTaxes &&
+                                                                                                                touched.activityWithTaxes[
                                                                                                                     idx
                                                                                                                 ] &&
-                                                                                                                touched.guideClassDetails[
+                                                                                                                touched.activityWithTaxes[
                                                                                                                     idx
                                                                                                                 ].tax &&
-                                                                                                                errors.guideClassDetails &&
-                                                                                                                errors.guideClassDetails[
+                                                                                                                errors.activityWithTaxes &&
+                                                                                                                errors.activityWithTaxes[
                                                                                                                     idx
                                                                                                                 ] &&
-                                                                                                                errors.guideClassDetails[
+                                                                                                                errors.activityWithTaxes[
                                                                                                                     idx
                                                                                                                 ].tax
                                                                                                                     ? errors
-                                                                                                                          .guideClassDetails[
+                                                                                                                          .activityWithTaxes[
                                                                                                                           idx
                                                                                                                       ].tax
                                                                                                                     : ''
                                                                                                             }
                                                                                                             error={Boolean(
-                                                                                                                touched.guideClassDetails &&
+                                                                                                                touched.activityWithTaxes &&
                                                                                                                     touched
-                                                                                                                        .guideClassDetails[
+                                                                                                                        .activityWithTaxes[
                                                                                                                         idx
                                                                                                                     ] &&
                                                                                                                     touched
-                                                                                                                        .guideClassDetails[
+                                                                                                                        .activityWithTaxes[
                                                                                                                         idx
                                                                                                                     ].tax &&
-                                                                                                                    errors.guideClassDetails &&
+                                                                                                                    errors.activityWithTaxes &&
                                                                                                                     errors
-                                                                                                                        .guideClassDetails[
+                                                                                                                        .activityWithTaxes[
                                                                                                                         idx
                                                                                                                     ] &&
                                                                                                                     errors
-                                                                                                                        .guideClassDetails[
+                                                                                                                        .activityWithTaxes[
                                                                                                                         idx
                                                                                                                     ].tax
                                                                                                             )}
@@ -1002,9 +1449,9 @@ function ActivitySupplement({ open, handleClose, mode, guideCode }) {
                                                                                                 />
                                                                                             </TableCell>
                                                                                             <TableCell>
-                                                                                                {values.guideClassDetails[idx] &&
-                                                                                                values.guideClassDetails[idx].tax
-                                                                                                    ? values.guideClassDetails[idx].tax
+                                                                                                {values.activityWithTaxes[idx] &&
+                                                                                                values.activityWithTaxes[idx].tax
+                                                                                                    ? values.activityWithTaxes[idx].tax
                                                                                                           .percentage
                                                                                                     : 0}
                                                                                             </TableCell>
@@ -1024,14 +1471,14 @@ function ActivitySupplement({ open, handleClose, mode, guideCode }) {
                                                                                                     type="number"
                                                                                                     variant="outlined"
                                                                                                     disabled={
-                                                                                                        mode == 'VIEW_UPDATE' ||
-                                                                                                        mode == 'VIEW'
+                                                                                                        values.activityWithTaxes[idx]
+                                                                                                            .enableRow || mode == 'VIEW'
                                                                                                     }
                                                                                                     placeholder="0"
-                                                                                                    name={`guideClassDetails.${idx}.perDayRate`}
+                                                                                                    name={`activityWithTaxes.${idx}.perDayRate`}
                                                                                                     value={
-                                                                                                        values.guideClassDetails[idx] &&
-                                                                                                        values.guideClassDetails[idx]
+                                                                                                        values.activityWithTaxes[idx] &&
+                                                                                                        values.activityWithTaxes[idx]
                                                                                                             .perDayRate
                                                                                                     }
                                                                                                     onChange={handleChange}
@@ -1040,48 +1487,48 @@ function ActivitySupplement({ open, handleClose, mode, guideCode }) {
                                                                                                     // }
                                                                                                     onBlur={handleBlur}
                                                                                                     error={Boolean(
-                                                                                                        touched.guideClassDetails &&
-                                                                                                            touched.guideClassDetails[
+                                                                                                        touched.activityWithTaxes &&
+                                                                                                            touched.activityWithTaxes[
                                                                                                                 idx
                                                                                                             ] &&
-                                                                                                            touched.guideClassDetails[idx]
+                                                                                                            touched.activityWithTaxes[idx]
                                                                                                                 .perDayRate &&
-                                                                                                            errors.guideClassDetails &&
-                                                                                                            errors.guideClassDetails[idx] &&
-                                                                                                            errors.guideClassDetails[idx]
+                                                                                                            errors.activityWithTaxes &&
+                                                                                                            errors.activityWithTaxes[idx] &&
+                                                                                                            errors.activityWithTaxes[idx]
                                                                                                                 .perDayRate
                                                                                                     )}
                                                                                                     helperText={
-                                                                                                        touched.guideClassDetails &&
-                                                                                                        touched.guideClassDetails[idx] &&
-                                                                                                        touched.guideClassDetails[idx]
+                                                                                                        touched.activityWithTaxes &&
+                                                                                                        touched.activityWithTaxes[idx] &&
+                                                                                                        touched.activityWithTaxes[idx]
                                                                                                             .perDayRate &&
-                                                                                                        errors.guideClassDetails &&
-                                                                                                        errors.guideClassDetails[idx] &&
-                                                                                                        errors.guideClassDetails[idx]
+                                                                                                        errors.activityWithTaxes &&
+                                                                                                        errors.activityWithTaxes[idx] &&
+                                                                                                        errors.activityWithTaxes[idx]
                                                                                                             .perDayRate
-                                                                                                            ? errors.guideClassDetails[idx]
+                                                                                                            ? errors.activityWithTaxes[idx]
                                                                                                                   .perDayRate
                                                                                                             : ''
                                                                                                     }
                                                                                                 />
                                                                                             </TableCell>
                                                                                             <TableCell>
-                                                                                                {values.guideClassDetails[idx] &&
-                                                                                                values.guideClassDetails[idx].perDayRate
-                                                                                                    ? values.guideClassDetails[idx]
+                                                                                                {values.activityWithTaxes[idx] &&
+                                                                                                values.activityWithTaxes[idx].perDayRate
+                                                                                                    ? values.activityWithTaxes[idx]
                                                                                                           .perDayRate
                                                                                                     : 0}
                                                                                             </TableCell>
                                                                                             <TableCell>
-                                                                                                {values.guideClassDetails[idx] &&
-                                                                                                values.guideClassDetails[idx].perDayRate
-                                                                                                    ? values.guideClassDetails[idx]
+                                                                                                {values.activityWithTaxes[idx] &&
+                                                                                                values.activityWithTaxes[idx].perDayRate
+                                                                                                    ? values.activityWithTaxes[idx]
                                                                                                           .perDayRate *
-                                                                                                          (values.guideClassDetails[idx].tax
+                                                                                                          (values.activityWithTaxes[idx].tax
                                                                                                               .percentage /
                                                                                                               100) +
-                                                                                                      values.guideClassDetails[idx]
+                                                                                                      values.activityWithTaxes[idx]
                                                                                                           .perDayRate
                                                                                                     : 0}
                                                                                             </TableCell>
@@ -1089,42 +1536,42 @@ function ActivitySupplement({ open, handleClose, mode, guideCode }) {
                                                                                             <TableCell>
                                                                                                 <FormGroup>
                                                                                                     <FormControlLabel
-                                                                                                        name={`guideClassDetails.${idx}.status`}
+                                                                                                        name={`activityWithTaxes.${idx}.status`}
                                                                                                         // onChange={handleChangeStatus}
                                                                                                         value={
-                                                                                                            values.guideClassDetails[idx] &&
-                                                                                                            values.guideClassDetails[idx]
+                                                                                                            values.activityWithTaxes[idx] &&
+                                                                                                            values.activityWithTaxes[idx]
                                                                                                                 .status
                                                                                                         }
-                                                                                                        control={<Switch color="success" />}
+                                                                                                        control={<Switch />}
                                                                                                         error={Boolean(
-                                                                                                            touched.guideClassDetails &&
-                                                                                                                touched.guideClassDetails[
+                                                                                                            touched.activityWithTaxes &&
+                                                                                                                touched.activityWithTaxes[
                                                                                                                     idx
                                                                                                                 ] &&
-                                                                                                                touched.guideClassDetails[
+                                                                                                                touched.activityWithTaxes[
                                                                                                                     idx
                                                                                                                 ].status &&
-                                                                                                                errors.guideClassDetails &&
-                                                                                                                errors.guideClassDetails[
+                                                                                                                errors.activityWithTaxes &&
+                                                                                                                errors.activityWithTaxes[
                                                                                                                     idx
                                                                                                                 ] &&
-                                                                                                                errors.guideClassDetails[
+                                                                                                                errors.activityWithTaxes[
                                                                                                                     idx
                                                                                                                 ].status
                                                                                                         )}
                                                                                                         helperText={
-                                                                                                            touched.guideClassDetails &&
-                                                                                                            touched.guideClassDetails[
+                                                                                                            touched.activityWithTaxes &&
+                                                                                                            touched.activityWithTaxes[
                                                                                                                 idx
                                                                                                             ] &&
-                                                                                                            touched.guideClassDetails[idx]
+                                                                                                            touched.activityWithTaxes[idx]
                                                                                                                 .status &&
-                                                                                                            errors.guideClassDetails &&
-                                                                                                            errors.guideClassDetails[idx] &&
-                                                                                                            errors.guideClassDetails[idx]
+                                                                                                            errors.activityWithTaxes &&
+                                                                                                            errors.activityWithTaxes[idx] &&
+                                                                                                            errors.activityWithTaxes[idx]
                                                                                                                 .status
-                                                                                                                ? errors.guideClassDetails[
+                                                                                                                ? errors.activityWithTaxes[
                                                                                                                       idx
                                                                                                                   ].status
                                                                                                                 : ''
@@ -1134,11 +1581,11 @@ function ActivitySupplement({ open, handleClose, mode, guideCode }) {
                                                                                                             // console.log(value.currencyListId);
                                                                                                             // setAppearing(value);
                                                                                                             setFieldValue(
-                                                                                                                `guideClassDetails.${idx}.status`,
+                                                                                                                `activityWithTaxes.${idx}.status`,
                                                                                                                 value
                                                                                                             );
                                                                                                             console.log(
-                                                                                                                values.guideClassDetails
+                                                                                                                values.activityWithTaxes
                                                                                                             );
 
                                                                                                             // s.code ===
@@ -1154,20 +1601,20 @@ function ActivitySupplement({ open, handleClose, mode, guideCode }) {
                                                                                                         }}
                                                                                                         // label="Status"
                                                                                                         checked={
-                                                                                                            values.guideClassDetails[idx] &&
-                                                                                                            values.guideClassDetails[idx]
+                                                                                                            values.activityWithTaxes[idx] &&
+                                                                                                            values.activityWithTaxes[idx]
                                                                                                                 .status
                                                                                                         }
                                                                                                         disabled={mode == 'VIEW'}
                                                                                                     />
-                                                                                                    {errors.guideClassDetails &&
-                                                                                                        errors.guideClassDetails[idx] &&
-                                                                                                        errors.guideClassDetails[idx]
+                                                                                                    {errors.activityWithTaxes &&
+                                                                                                        errors.activityWithTaxes[idx] &&
+                                                                                                        errors.activityWithTaxes[idx]
                                                                                                             .status && (
                                                                                                             <p>
                                                                                                                 {
                                                                                                                     errors
-                                                                                                                        .guideClassDetails[
+                                                                                                                        .activityWithTaxes[
                                                                                                                         idx
                                                                                                                     ].status
                                                                                                                 }
@@ -1176,14 +1623,18 @@ function ActivitySupplement({ open, handleClose, mode, guideCode }) {
                                                                                                 </FormGroup>
                                                                                             </TableCell>
                                                                                             <TableCell>
-                                                                                                <IconButton
-                                                                                                    aria-label="delete"
-                                                                                                    onClick={() => {
-                                                                                                        remove(idx);
-                                                                                                    }}
-                                                                                                >
-                                                                                                    <HighlightOffIcon />
-                                                                                                </IconButton>
+                                                                                                {(values.activityWithTaxes[idx] &&
+                                                                                                    values.activityWithTaxes[idx].id) ===
+                                                                                                '' ? (
+                                                                                                    <IconButton
+                                                                                                        aria-label="delete"
+                                                                                                        onClick={() => {
+                                                                                                            remove(idx);
+                                                                                                        }}
+                                                                                                    >
+                                                                                                        <HighlightOffIcon />
+                                                                                                    </IconButton>
+                                                                                                ) : null}
                                                                                             </TableCell>
                                                                                         </TableRow>
                                                                                     );
