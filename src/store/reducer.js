@@ -31,6 +31,7 @@ import { departmentDesignationReducer } from './reducers/masterReducer/Departmen
 import { actualGuideReducer } from './reducers/masterReducer/ActualGuideReducer';
 import { agentReducer } from './reducers/masterReducer/AgentReducer';
 import { activity_supplimentReducer } from './reducers/masterReducer/Activity_SupplimentReducer';
+import { hotelMainReducer } from './reducers/masterReducer/HotelMainReducer';
 // ==============================|| COMBINE REDUCER ||============================== //
 
 const reducer = combineReducers({
@@ -66,7 +67,8 @@ const reducer = combineReducers({
     departmentDesignationReducer,
     actualGuideReducer,
     agentReducer,
-    activity_supplimentReducer
+    activity_supplimentReducer,
+    hotelMainReducer
 });
 
 export default reducer;
