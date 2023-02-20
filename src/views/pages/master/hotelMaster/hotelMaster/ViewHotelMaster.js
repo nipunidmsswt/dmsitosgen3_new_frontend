@@ -36,6 +36,12 @@ function ViewHotelMaster() {
             align: 'center'
         },
         {
+            title: 'Property Code',
+            field: 'propertyCode',
+            filterPlaceholder: 'filter',
+            align: 'center'
+        },
+        {
             title: 'Hotel Name',
             field: 'longName',
             filterPlaceholder: 'filter',
@@ -103,8 +109,9 @@ function ViewHotelMaster() {
     }, [lastModifiedDate]);
 
     useEffect(() => {
-        if (hotelMainList?.length > 0) {
-            setTableData(hotelMainList);
+        console.log(hotelMainList);
+        if (hotelMainList?.payload?.length > 0) {
+            setTableData(hotelMainList.payload[0]);
         }
     }, [hotelMainList]);
 
@@ -117,7 +124,8 @@ function ViewHotelMaster() {
     useEffect(() => {
         if (hotelMainData) {
             setHandleToast(true);
-            // dispatch(getAllGuideClassData());
+
+            dispatch(getAllHotelMainData());
         }
     }, [hotelMainData]);
 
