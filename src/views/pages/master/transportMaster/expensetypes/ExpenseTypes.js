@@ -40,7 +40,7 @@ import {
     updateExpenseTypesData
 } from 'store/actions/masterActions/ExpenseTypeAction';
 import CreatedUpdatedUserDetailsWithTableFormat from '../../userTimeDetails/CreatedUpdatedUserDetailsWithTableFormat';
-import axios from 'axios';
+
 const Transition = forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
@@ -59,81 +59,27 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                 expenseRate: '',
                 rateWithoutTax: '',
                 rateWithTax: '',
-                status: true
+                status: true,
+                enableRow: false
             }
         ]
     };
 
     const [loadValues, setLoadValues] = useState(null);
-    const [currencyListArray, setCurrecyListArray] = useState([]);
-    // const [Data, setData] = useState({
-    //     expenseCode: '',
-    //     description: '',
-    //     status: true,
-    //     expenseTypeDetails: [
-    //         {
-    //             fromDate: '',
-    //             toDate: '',
-    //             currencyList: '',
-    //             tax: '',
-    //             expenseRate: '',
-    //             rateWithoutTax: '',
-    //             rateWithTax: '',
-    //             status: true
-    //         }
-    //     ]
-    // });
 
     const ref = useRef(null);
-
-    // yup.addMethod(yup.array, "uniqueTaxOrder", function (message) {
-    //   return this.test("uniqueTaxOrder", message, function (list) {
-    //     const mapper = (x) => {
-    //       return x.taxOrder;
-    //     };
-    //     const set = [...new Set(list.map(mapper))];
-    //     const isUnique = list.length === set.length;
-    //     if (isUnique) {
-    //       return true;
-    //     }
-
-    //     const idx = list.findIndex((l, i) => mapper(l) !== set[i]);
-    //     return this.createError({
-    //       path: `expenseTypeDetails[${idx}].taxOrder`,
-    //       message: message,
-    //     });
-    //   });
-    // });
-
-    // yup.addMethod(yup.array, "uniqueTaxCode", function (message) {
-    //   return this.test("uniqueTaxCode", message, function (list) {
-    //     const mapper = (x) => {
-    //       return x.tax?.taxCode;
-    //     };
-    //     const set = [...new Set(list.map(mapper))];
-    //     const isUnique = list.length === set.length;
-    //     if (isUnique) {
-    //       return true;
-    //     }
-
-    //     const idx = list.findIndex((l, i) => mapper(l) !== set[i]);
-    //     return this.createError({
-    //       path: `exchangeRates[${idx}].tax`,
-    //       message: message,
-    //     });
-    //   });
-    // });
-
     yup.addMethod(yup.string, 'checkDuplicateExpenseCode', function (message) {
         return this.test('checkDuplicateExpenseCode', 'Duplicate Expense Code', async function validateValue(value) {
             try {
                 console.log(value);
-                dispatch(checkDuplicateExpenseRateCode(value));
-                console.log(duplicateCode);
-                if (duplicateCode != null && duplicateCode.errorMessages.length != 0) {
-                    return false;
-                } else {
-                    return true;
+                if (mode == 'INSERT') {
+                    dispatch(checkDuplicateExpenseRateCode(value));
+                    console.log(duplicateCode);
+                    if (duplicateCode != null && duplicateCode.errorMessages.length != 0) {
+                        return false;
+                    } else {
+                        return true;
+                    }
                 }
             } catch (error) {}
             return true;
@@ -143,30 +89,12 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
     const validationSchema = yup.object().shape({
         expenseCode: yup.string().required('Required field').checkDuplicateExpenseCode('ggg'),
         description: yup.string().required('Required field'),
-        // currencyISOCode: yup.string().required('Required field'),
 
-        // baseCurrencyCode: yup
-        //   .string()
-        //   .required("Required field")
-        //   .checkDuplicateTaxGroup("ggg"),
-        // description: yup.string().required("Required field"),
-        // exchangeRates: yup.array().of(
-        //   yup.object().shape({
-        //     // tax: yup.object().typeError("Required field"),
-        //     // taxOrder: yup.string(),
-        //     // onOriginal: yup.string().required("Required field"),
-        //     // fromDate: yup.date().required('Required').nullable(),
-        //     // toDate: ,
-        //     rate: yup.string().required("Required")
-        //   })
-        // ),
-        //   .uniqueTaxOrder("Must be unique")
-        //   .uniqueTaxCode("Must be unique"),
         expenseTypeDetails: yup.array().of(
             yup.object().shape({
                 tax: yup.object().typeError('Required field'),
                 fromDate: yup.date().required('Required field'),
-                toDate: yup.date().required('Required field'),
+                toDate: yup.date().min(yup.ref('fromDate'), "End date can't be before start date"),
                 currencyList: yup.object().typeError('Required field'),
                 expenseRate: yup.string().required('Required field')
             })
@@ -174,24 +102,9 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
     });
 
     const expenseTypeToUpdate = useSelector((state) => state.expenseTypesReducer.expenseTypeToUpdate);
-
     const dispatch = useDispatch();
-    const [taxIdValues, setTaxIdValues] = useState(null);
-    const [taxValues, setTaxValues] = useState(null);
 
-    // useEffect(() => {
-    //     if (currencies.length != 0) {
-    //         let array = [];
-
-    //         for (let [key, value] of Object.entries(currencies.currencies)) {
-    //             array.push({ name: key, value: value });
-    //         }
-
-    //         setCurrecyListArray(array);
-    //     }
-    // }, [currencies]);
     useEffect(() => {
-        console.log('192');
         if (mode === 'VIEW_UPDATE' || mode === 'VIEW') {
             dispatch(getExpenseTypesById(code));
         }
@@ -199,295 +112,44 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
 
     const taxToUpdate = useSelector((state) => state.taxReducer.taxToUpdate);
     const taxToEdit = useSelector((state) => state.taxReducer.taxToEdit);
-    console.log(taxToEdit);
-
-    // useEffect(() => {
-    //     if ((mode === 'VIEW_UPDATE' && taxToEdit != null) || (mode === 'VIEW' && taxToEdit != null)) {
-    //         console.log('tax to edit:' + taxToEdit.taxCode);
-    //         setTaxValues(taxToEdit);
-    //     }
-    // }, [taxToEdit != null]);
-
-    // useEffect(() => {
-    //     (async () => {
-    //         if ((mode === 'VIEW_UPDATE' && taxToEdit != null) || (mode === 'VIEW' && taxToEdit != null)) {
-    //             console.log('taxToEdit:' + taxToEdit);
-    //             setTaxValues(taxToEdit);
-    //         }
-    //     })();
-    // }, [taxToEdit]);
-
-    // useEffect(() => {
-    //     async function fetchData() {
-    //         try {
-    //             const response = await fetch(`https://www.reddit.com/r/${subreddit}.json`);
-    //             const json = await response.json();
-    //             setPosts(json.data.children.map((it) => it.data));
-    //         } catch (e) {
-    //             console.error(e);
-    //         }
-    //     }
-    //     fetchData();
-    // }, [expenseTypeToUpdate]);
 
     const [taxData, setData] = useState(null);
-    // async function getData(userId) {
-    //     console.log(userId);
-    //     // const realData1 = null;
-    //     const data = await axios
-    //         .get(`${process.env.REACT_APP_FINANCE_URL}/taxDetails/${userId}`)
-    //         .then((result) => {
-    //             console.log(result.json);
-    //             console.log(result.data.payload[0]);
-    //             const realData1 = result.data.payload[0];
-    //             return realData1;
-    //         })
-    //         .catch((e) => {
-    //             console.error(e);
-    //         });
-    //     console.log(data);
-
-    //     // // const realData = data.data.payload[0];
-    //     // // setData(realData);
-    //     return data;
-    // }
-
-    // useEffect(() => {
-    //     console.log(taxData);
-
-    //     //   return () => {
-    //     //     second
-    //     //   }
-    // }, [taxData]);
-
-    async function getData(userId) {
-        const data = await getTaxDetails(userId);
-        const value = data.data.payload[0];
-        console.log(value);
-        return value;
-    }
-
-    const getTaxDetails = async (userId) => {
-        const response = axios.get(`${process.env.REACT_APP_FINANCE_URL}/taxDetails/${userId}`);
-        return response;
-    };
-    // getTaxDetails(item.tax);
-    async function getTaxDetailsn(value) {
-        try {
-            await dispatch(getTaxDataByUniqueId(value));
-            console.log(taxToEdit);
-            // if (duplicateCode != null && duplicateCode.errorMessages.length != 0) {
-            //     return false;
-            // } else {
-            //     return true;
-            // }
-        } catch (error) {}
-        return taxToEdit;
-    }
+    const [closeButton, setCloseButton] = useState(true);
 
     useEffect(() => {
-        // fetchData();
-        // declare the data fetching function
-        // const fetchData = () => {
         if (expenseTypeToUpdate != null) {
             const dataArray = [];
-            if ((mode === 'VIEW_UPDATE' && expenseTypeToUpdate != null) || (mode === 'VIEW' && expenseTypeToUpdate != null)) {
-                console.log(expenseTypeToUpdate.expenseTypeDetails.length);
-                if (expenseTypeToUpdate.expenseTypeDetails.length > 0) {
-                    expenseTypeToUpdate.expenseTypeDetails.map((item) => {
-                        console.log(item.tax);
+            // if ((mode === 'VIEW_UPDATE' && expenseTypeToUpdate != null) || (mode === 'VIEW' && expenseTypeToUpdate != null)) {
+            expenseTypeToUpdate.expenseTypeDetails.map((item) => {
+                const expenseTypeDetails = {
+                    enableRow: true,
+                    fromDate: item.fromDate,
+                    toDate: item.toDate,
+                    currencyList: item.currencyList,
 
-                        const taxDe = getTaxDetailsn(item.tax);
-                        console.log(taxDe);
-                        // setTaxIdValues(item.Tax);
-                        // console.log('inside');
-                        // dispatch(getTaxDataByUniqueId(item.tax));
+                    tax: item.tax,
+                    expenseRate: item.expenseRate,
+                    rateWithoutTax: '',
+                    rateWithTax: '',
+                    status: item.status
+                };
+                dataArray.push(expenseTypeDetails);
+            });
 
-                        // dispatch(addUser(values))
-                        // .then(data=>{
-                        //     console.log(data)
-                        // })
-                        // const getList = async () => {
-                        //     console.log('fetch:' + item.tax);
-                        //     //await has no effect
-                        //     await dispatch(getTaxDataByUniqueId(item.tax));
-                        //     console.log(taxValues);
-                        // };
-                        // getList();
-                        // const fetchData = async () => {
-                        //     try {
-                        //         const list = await dispatch(getTaxDataByUniqueId(item.tax));
-                        //         // if (list) {
-                        //         console.log('data567:' + list); //
-                        //         console.log('return90:' + taxToEdit.taxCode);
-                        //         const expenseTypeDetails = {
-                        //             fromDate: item.fromDate,
-                        //             toDate: item.toDate,
-                        //             // currencyList: item.currencyList,
+            const saveValues = {
+                expenseCode: expenseTypeToUpdate.expenseCode,
+                description: expenseTypeToUpdate.description,
+                status: expenseTypeToUpdate.status,
+                expenseTypeDetails: dataArray
+            };
 
-                        //             // tax: taxToEdit,
-                        //             expenseRate: item.expenseRate,
-                        //             rateWithoutTax: '',
-                        //             rateWithTax: '',
-                        //             status: item.status
-                        //         };
-                        //         dataArray.push(expenseTypeDetails);
-                        //         console.log(expenseTypeDetails);
-                        //         // }
-
-                        //         //
-                        //         // });
-
-                        //         // const json = await response.json();
-                        //         // setPosts(json.data.children.map((it) => it.data));
-                        //     } catch (e) {
-                        //         console.error(e);
-                        //     }
-                        // };
-                        // fetchData();
-                        const data = getData(item.tax);
-                        // // setData(getData(item.tax));
-                        console.log(data);
-                        const taxDes = data;
-                        // console.log(taxDes);
-                        // let allPromises = null;
-                        // allPromises == data;
-                        // console.log(allPromises);
-                        // async () => {
-                        //     const value = dispatch(getTaxDataByUniqueId(item.tax)).then;
-                        //     if (value) {
-                        //         // setTaxIdValues(...taxToEdit);
-                        //         console.log('dfdfdfdf');
-                        //     }
-                        // };
-                        // axios.get(`${process.env.REACT_APP_FINANCE_URL}/taxDetails/${item.tax}`).then(() => {
-                        //     // dispatch(functionToDispatch())
-                        //     console.log('dfdfdfdf' + taxToEdit);
-                        // });
-
-                        // here i'm using the location from the first function
-                        // await getInfo(location);
-                        // })();
-                        // const fetchData = async () => {
-                        //     const data = await fetch('https://yourapi.com');
-                        //   }
-                        // console.log(taxData);
-
-                        const expenseTypeDetails = {
-                            fromDate: item.fromDate,
-                            toDate: item.toDate,
-                            currencyList: item.currencyList,
-
-                            tax: taxDes,
-                            expenseRate: item.expenseRate,
-                            rateWithoutTax: '',
-                            rateWithTax: '',
-                            status: item.status
-                        };
-                        dataArray.push(expenseTypeDetails);
-                    });
-
-                    const saveValues = {
-                        expenseCode: expenseTypeToUpdate.expenseCode,
-                        description: expenseTypeToUpdate.description,
-                        status: expenseTypeToUpdate.status,
-                        expenseTypeDetails: dataArray
-
-                        // expenseTypeDetails: [
-                        //     {
-                        //         fromDate: item.fromDate,
-                        //         toDate: item.toDate,
-                        //         currencyList: item.currencyList.currencyListId,
-                        //         tax: item.tax.taxId,
-                        //         expenseRate: item.expenseRate,
-                        //         rateWithoutTax: '',
-                        //         rateWithTax: '',
-                        //         status:item.status,
-                        //     }
-                        // ]
-                    };
-                    console.log(saveValues);
-                    setLoadValues(saveValues);
-                }
-                // dispatch(saveExpenseTypesData(saveValues));
-            }
+            setLoadValues(saveValues);
         }
-        // };
-
-        // call the function
-        // getList()
-        // make sure to catch any error
-        // .catch(console.error);
     }, [expenseTypeToUpdate]);
 
-    // useEffect(() => {
-    //     console.log(taxIdValues);
-    //     const value = dispatch(getTaxDataByUniqueId(taxIdValues));
-
-    //     return () => {
-    //         console.log(taxToEdit);
-    //     };
-    // }, [taxIdValues]);
-
-    // useEffect(() => {
-    //     console.log(expenseTypeToUpdate);
-    //     const dataArray = [];
-    //     if ((mode === 'VIEW_UPDATE' && expenseTypeToUpdate != null) || (mode === 'VIEW' && expenseTypeToUpdate != null)) {
-    //         if (expenseTypeToUpdate.expenseTypeDetails.length > 0) {
-    //             expenseTypeToUpdate.expenseTypeDetails.map((item) => {
-    //                 dispatch(await getTaxDataByUniqueId(item.tax));
-    //                 const fetchData = async () => {
-    //                     const data = await fetch('https://yourapi.com');
-    //                   }
-    //                 console.log(taxToEdit);
-    //                 const expenseTypeDetails = {
-    //                     fromDate: item.fromDate,
-    //                     toDate: item.toDate,
-    //                     currencyList: item.currencyList,
-
-    //                     tax: taxToEdit,
-    //                     expenseRate: item.expenseRate,
-    //                     rateWithoutTax: '',
-    //                     rateWithTax: '',
-    //                     status: item.status
-    //                 };
-    //                 dataArray.push(expenseTypeDetails);
-    //             });
-
-    //             const saveValues = {
-    //                 expenseCode: expenseTypeToUpdate.expenseCode,
-    //                 description: expenseTypeToUpdate.description,
-    //                 status: expenseTypeToUpdate.status,
-    //                 expenseTypeDetails: dataArray
-
-    //                 // expenseTypeDetails: [
-    //                 //     {
-    //                 //         fromDate: item.fromDate,
-    //                 //         toDate: item.toDate,
-    //                 //         currencyList: item.currencyList.currencyListId,
-    //                 //         tax: item.tax.taxId,
-    //                 //         expenseRate: item.expenseRate,
-    //                 //         rateWithoutTax: '',
-    //                 //         rateWithTax: '',
-    //                 //         status:item.status,
-    //                 //     }
-    //                 // ]
-    //             };
-    //             console.log(saveValues);
-    //             setLoadValues(saveValues);
-    //         }
-    //         // dispatch(saveExpenseTypesData(saveValues));
-    //     }
-    //     // di
-    // }, [expenseTypeToUpdate]);
-
     const handleSubmitForm = (data) => {
-        console.log(data);
         if (mode === 'INSERT') {
             const dataArray = [];
-
-            console.log(data.expenseTypeDetails.length);
-            console.log(data.expenseTypeDetails.size);
             if (data.expenseTypeDetails.length > 0) {
                 data.expenseTypeDetails.map((item) => {
                     const expenseTypeDetails = {
@@ -508,30 +170,11 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                     description: data.description,
                     status: data.status,
                     expenseTypeDetails: dataArray
-
-                    // expenseTypeDetails: [
-                    //     {
-                    //         fromDate: item.fromDate,
-                    //         toDate: item.toDate,
-                    //         currencyList: item.currencyList.currencyListId,
-                    //         tax: item.tax.taxId,
-                    //         expenseRate: item.expenseRate,
-                    //         rateWithoutTax: '',
-                    //         rateWithTax: '',
-                    //         status:item.status,
-                    //     }
-                    // ]
                 };
-                console.log(saveValues);
                 dispatch(saveExpenseTypesData(saveValues));
             }
-            // dispatch(saveExpenseTypesData(data));
-            // setTableData(dataArray);
         } else if (mode === 'VIEW_UPDATE') {
             const dataArray = [];
-
-            console.log(data.expenseTypeDetails.length);
-            console.log(data.expenseTypeDetails.size);
             if (data.expenseTypeDetails.length > 0) {
                 data.expenseTypeDetails.map((item) => {
                     const expenseTypeDetails = {
@@ -540,8 +183,8 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                         currencyList: item.currencyList.currencyListId,
                         tax: item.tax.taxId,
                         expenseRate: item.expenseRate,
-                        rateWithoutTax: '',
-                        rateWithTax: '',
+                        rateWithoutTax: item.expenseRate,
+                        rateWithTax: item.expenseRate,
                         status: item.status
                     };
                     dataArray.push(expenseTypeDetails);
@@ -552,30 +195,14 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                     description: data.description,
                     status: data.status,
                     expenseTypeDetails: dataArray
-
-                    // expenseTypeDetails: [
-                    //     {
-                    //         fromDate: item.fromDate,
-                    //         toDate: item.toDate,
-                    //         currencyList: item.currencyList.currencyListId,
-                    //         tax: item.tax.taxId,
-                    //         expenseRate: item.expenseRate,
-                    //         rateWithoutTax: '',
-                    //         rateWithTax: '',
-                    //         status:item.status,
-                    //     }
-                    // ]
                 };
-                console.log(saveValues);
                 dispatch(updateExpenseTypesData(saveValues));
             }
         }
         handleClose();
     };
 
-    useEffect(() => {
-        console.log(ref.current);
-    }, [ref]);
+    useEffect(() => {}, [ref]);
 
     const taxListData = useSelector((state) => state.taxReducer.taxes);
     const currencyListData = useSelector((state) => state.expenseTypesReducer.currencyList);
@@ -589,7 +216,6 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
     }, []);
 
     useEffect(() => {
-        console.log(currencyListData);
         if (currencyListData != null) {
             setCurrencyListOptions(currencyListData);
         }
@@ -701,7 +327,7 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                                                                             disabled={mode == 'VIEW'}
                                                                             onChange={handleChange}
                                                                             value={values.status}
-                                                                            control={<Switch color="success" />}
+                                                                            control={<Switch />}
                                                                             label="Status"
                                                                             checked={values.status}
                                                                             // disabled={mode == 'VIEW'}
@@ -718,19 +344,20 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                                                                             <IconButton
                                                                                 aria-label="delete"
                                                                                 onClick={() => {
-                                                                                    // setFieldValue(
-                                                                                    //   `taxGroupDetails.${ref.current.values.taxGroupDetails.length}.taxOrder`,
-                                                                                    //   ref.current.values.taxGroupDetails.length+1
-                                                                                    // );
                                                                                     push({
+                                                                                        expenseTypesDetailsId: '',
                                                                                         fromDate: '',
                                                                                         toDate: '',
-                                                                                        currency: '',
+                                                                                        currencyList: '',
                                                                                         tax: null,
                                                                                         expenseRate: '',
                                                                                         rateWithoutTax: '',
                                                                                         rateWithTax: '',
-                                                                                        status: true
+                                                                                        status: true,
+                                                                                        enableRow:
+                                                                                            mode === 'VIEW_UPDATE' || mode === 'INSERT'
+                                                                                                ? false
+                                                                                                : true
                                                                                     });
                                                                                 }}
                                                                             >
@@ -777,8 +404,8 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                                                                                                             );
                                                                                                         }}
                                                                                                         disabled={
-                                                                                                            mode == 'VIEW_UPDATE' ||
-                                                                                                            mode == 'VIEW'
+                                                                                                            values.expenseTypeDetails[idx]
+                                                                                                                .enableRow || mode == 'VIEW'
                                                                                                         }
                                                                                                         inputFormat="DD/MM/YYYY"
                                                                                                         value={
@@ -866,8 +493,8 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                                                                                                             );
                                                                                                         }}
                                                                                                         disabled={
-                                                                                                            mode == 'VIEW_UPDATE' ||
-                                                                                                            mode == 'VIEW'
+                                                                                                            values.expenseTypeDetails[idx]
+                                                                                                                .enableRow || mode == 'VIEW'
                                                                                                         }
                                                                                                         inputFormat="DD/MM/YYYY"
                                                                                                         value={
@@ -945,12 +572,12 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
 
                                                                                             <TableCell>
                                                                                                 <Autocomplete
-                                                                                                    // value={
-                                                                                                    //     values.expenseTypeDetails[idx]
-                                                                                                    //         ? values.expenseTypeDetails[idx]
-                                                                                                    //               .currencyList
-                                                                                                    //         : null
-                                                                                                    // }
+                                                                                                    value={
+                                                                                                        values.expenseTypeDetails[idx]
+                                                                                                            ? values.expenseTypeDetails[idx]
+                                                                                                                  .currencyList
+                                                                                                            : null
+                                                                                                    }
                                                                                                     name={`expenseTypeDetails.${idx}.currencyList`}
                                                                                                     onChange={(_, value) => {
                                                                                                         console.log(value.currencyListId);
@@ -964,8 +591,8 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                                                                                                         );
                                                                                                     }}
                                                                                                     disabled={
-                                                                                                        mode == 'VIEW_UPDATE' ||
-                                                                                                        mode == 'VIEW'
+                                                                                                        values.expenseTypeDetails[idx]
+                                                                                                            .enableRow || mode == 'VIEW'
                                                                                                     }
                                                                                                     options={currencyListOptions}
                                                                                                     getOptionLabel={(option) =>
@@ -1042,10 +669,10 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                                                                                                                   .tax
                                                                                                             : null
                                                                                                     }
-                                                                                                    // disabled={
-                                                                                                    //     mode == 'VIEW_UPDATE' ||
-                                                                                                    //     mode == 'VIEW'
-                                                                                                    // }
+                                                                                                    disabled={
+                                                                                                        values.expenseTypeDetails[idx]
+                                                                                                            .enableRow || mode == 'VIEW'
+                                                                                                    }
                                                                                                     name={`expenseTypeDetails.${idx}.tax`}
                                                                                                     onChange={(_, value) => {
                                                                                                         console.log(value);
@@ -1143,8 +770,8 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                                                                                                     type="number"
                                                                                                     variant="outlined"
                                                                                                     disabled={
-                                                                                                        mode == 'VIEW_UPDATE' ||
-                                                                                                        mode == 'VIEW'
+                                                                                                        values.expenseTypeDetails[idx]
+                                                                                                            .enableRow || mode == 'VIEW'
                                                                                                     }
                                                                                                     placeholder="0"
                                                                                                     name={`expenseTypeDetails.${idx}.expenseRate`}
@@ -1205,51 +832,6 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                                                                                                       values.expenseTypeDetails[idx]
                                                                                                           .expenseRate
                                                                                                     : 0}
-                                                                                                {/* <TextField
-                                                                                                    sx={{
-                                                                                                        width: { sm: 200 },
-                                                                                                        '& .MuiInputBase-root': {
-                                                                                                            height: 40
-                                                                                                        }
-                                                                                                    }}
-                                                                                                    // label="Additional Price"
-                                                                                                    type="number"
-                                                                                                    variant="outlined"
-                                                                                                    placeholder="0"
-                                                                                                    // name={`expenseTypeDetails.${idx}.expenseRate`}
-                                                                                                    // value={
-                                                                                                    //     values.expenseTypeDetails[idx] &&
-                                                                                                    //     values.expenseTypeDetails[idx].expenseRate
-                                                                                                    // }
-                                                                                                    onChange={handleChange}
-                                                                                                    onBlur={handleBlur}
-                                                                                                    // error={Boolean(
-                                                                                                    //     touched.expenseTypeDetails &&
-                                                                                                    //         touched.expenseTypeDetails[
-                                                                                                    //             idx
-                                                                                                    //         ] &&
-                                                                                                    //         touched.expenseTypeDetails[idx]
-                                                                                                    //             .rate &&
-                                                                                                    //         errors.expenseTypeDetails &&
-                                                                                                    //         errors.expenseTypeDetails[
-                                                                                                    //             idx
-                                                                                                    //         ] &&
-                                                                                                    //         errors.expenseTypeDetails[idx]
-                                                                                                    //             .rate
-                                                                                                    // )}
-                                                                                                    // helperText={
-                                                                                                    //     touched.expenseTypeDetails &&
-                                                                                                    //     touched.expenseTypeDetails[idx] &&
-                                                                                                    //     touched.expenseTypeDetails[idx]
-                                                                                                    //         .rate &&
-                                                                                                    //     errors.expenseTypeDetails &&
-                                                                                                    //     errors.expenseTypeDetails[idx] &&
-                                                                                                    //     errors.expenseTypeDetails[idx].rate
-                                                                                                    //         ? errors.expenseTypeDetails[idx]
-                                                                                                    //               .rate
-                                                                                                    //         : ''
-                                                                                                    // }
-                                                                                                /> */}
                                                                                             </TableCell>
 
                                                                                             <TableCell>
@@ -1258,7 +840,7 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                                                                                                         name={`expenseTypeDetails.${idx}.status`}
                                                                                                         onChange={handleChange}
                                                                                                         // value={formValues.status}
-                                                                                                        control={<Switch color="success" />}
+                                                                                                        control={<Switch />}
                                                                                                         // label="Status"
                                                                                                         checked={
                                                                                                             values.expenseTypeDetails[
@@ -1271,15 +853,20 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                                                                                                     />
                                                                                                 </FormGroup>
                                                                                             </TableCell>
+
                                                                                             <TableCell>
-                                                                                                <IconButton
-                                                                                                    aria-label="delete"
-                                                                                                    onClick={() => {
-                                                                                                        remove(idx);
-                                                                                                    }}
-                                                                                                >
-                                                                                                    <HighlightOffIcon />
-                                                                                                </IconButton>
+                                                                                                {(values.expenseTypeDetails[idx] &&
+                                                                                                    values.expenseTypeDetails[idx]
+                                                                                                        .expenseTypesDetailsId) === '' ? (
+                                                                                                    <IconButton
+                                                                                                        aria-label="delete"
+                                                                                                        onClick={() => {
+                                                                                                            remove(idx);
+                                                                                                        }}
+                                                                                                    >
+                                                                                                        <HighlightOffIcon />
+                                                                                                    </IconButton>
+                                                                                                ) : null}
                                                                                             </TableCell>
                                                                                         </TableRow>
                                                                                     );

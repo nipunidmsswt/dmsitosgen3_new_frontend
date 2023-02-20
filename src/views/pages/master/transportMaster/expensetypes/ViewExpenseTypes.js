@@ -50,7 +50,7 @@ function ViewExpenseTypes() {
                 >
                     {rowData.status === true ? (
                         <FormGroup>
-                            <FormControlLabel control={<Switch color="success" size="small" />} checked={true} />
+                            <FormControlLabel control={<Switch size="small" />} checked={true} />
                         </FormGroup>
                     ) : (
                         <FormGroup>
