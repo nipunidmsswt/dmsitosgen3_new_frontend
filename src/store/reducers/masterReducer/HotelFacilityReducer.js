@@ -92,28 +92,33 @@ export const hotelFacilityReducer = (state = initialState, action) => {
             return { ...state, hotelFacilityTypes: data };
 
         case SUCCESS_ACTIVE_ROOM_RECREATION_LIST_DATA:
-            return { ...state, activeRoomRecreationList: data.payload[0].facility };
+            console.log(data.payload[0].Rec);
+            return { ...state, activeRoomRecreationList: data.payload[0].Rec };
 
         case FAILED_ACTIVE_ROOM_RECREATION_LIST_DATA:
-            return { ...state, activeRoomRecreationList: data.payload[0].facility };
+            // console.log(data.payload[0].facility);
+            return { ...state, activeRoomRecreationList: data.payload[0].Rec };
 
         case SUCCESS_ACTIVE_FACILITIES_OFFERED_LIST_DATA:
-            return { ...state, activeFacilityOfferedList: data.payload[0].facility };
+            // console.log(data.payload[0].facility);
+            return { ...state, activeFacilityOfferedList: data.payload[0].FO };
 
         case FAILED_ACTIVE_FACILITIES_OFFERED_LIST_DATA:
-            return { ...state, activeFacilityOfferedList: data.payload[0].facility };
+            return { ...state, activeFacilityOfferedList: data.payload[0].FO };
 
         case SUCCESS_ACTIVE_CHILDREN_FACILITIES_LIST_DATA:
-            return { ...state, activeChildrenFacilitiesList: data.payload[0].facility };
+            // console.log(data.payload[0].facility);
+            return { ...state, activeChildrenFacilitiesList: data.payload[0].CF };
 
         case FAILED_ACTIVE_CHILDREN_FACILITIES_LIST_DATA:
-            return { ...state, activeChildrenFacilitiesList: data.payload[0].facility };
+            return { ...state, activeChildrenFacilitiesList: data.payload[0].CF };
 
         case SUCCESS_ACTIVE_SERVICE_OFFERED_LIST_DATA:
-            return { ...state, activeServiceOfferedList: data.payload[0].facility };
+            // console.log(data.payload[0].facility);
+            return { ...state, activeServiceOfferedList: data.payload[0].SO };
 
         case FAILED_ACTIVE_SERVICE_OFFERED_LIST_DATA:
-            return { ...state, activeServiceOfferedList: data.payload[0].facility };
+            return { ...state, activeServiceOfferedList: data.payload[0].SO };
 
         default:
             return state;

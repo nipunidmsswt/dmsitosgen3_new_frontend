@@ -164,7 +164,7 @@ export function* getAllActiveRoomRecreationSaga() {
 
     try {
         responseData = yield call(get, process.env.REACT_APP_ACCOMODATION_URL + '/hotelfacility/reCreation');
-        console.log('re:' + responseData.data.payload);
+        console.log(responseData.data.payload);
         yield put({
             type: SUCCESS_ACTIVE_ROOM_RECREATION_LIST_DATA,
             data: responseData.data
