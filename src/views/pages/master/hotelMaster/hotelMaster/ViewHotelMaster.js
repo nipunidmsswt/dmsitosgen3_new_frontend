@@ -17,6 +17,7 @@ import {
     getAllActivity_SupplimentData
 } from 'store/actions/masterActions/Activity_SupplimentAction';
 import HotelMaster from './HotelMaster';
+import { getAllHotelMainData } from 'store/actions/masterActions/HotelMasterAction';
 
 function ViewHotelMaster() {
     const [open, setOpen] = useState(false);
@@ -29,37 +30,43 @@ function ViewHotelMaster() {
 
     const columns = [
         {
-            title: 'Type',
-            field: 'type',
+            title: 'Hotel Code',
+            field: 'hotelCode',
             filterPlaceholder: 'filter',
             align: 'center'
         },
         {
-            title: 'Type Of Activity',
-            field: 'typeOfActivity',
+            title: 'Property Code',
+            field: 'propertyCode',
+            filterPlaceholder: 'filter',
+            align: 'center'
+        },
+        {
+            title: 'Hotel Name',
+            field: 'longName',
             filterPlaceholder: 'filter',
             align: 'center'
         },
 
         {
-            title: 'Code',
-            field: 'code',
+            title: 'Star Class',
+            field: 'starClass',
             filterPlaceholder: 'filter',
             align: 'center'
         },
 
+        {
+            title: 'Email',
+            field: 'email',
+            filterPlaceholder: 'filter',
+            align: 'center'
+        },
         // {
-        //     title: 'Location Code',
-        //     field: 'locationCode',
+        //     title: 'Max Pax',
+        //     field: 'maxPax',
         //     filterPlaceholder: 'filter',
         //     align: 'center'
         // },
-        {
-            title: 'Max Pax',
-            field: 'maxPax',
-            filterPlaceholder: 'filter',
-            align: 'center'
-        },
 
         {
             title: 'Status',
@@ -93,8 +100,8 @@ function ViewHotelMaster() {
 
     const dispatch = useDispatch();
     const error = useSelector((state) => state.activity_supplimentReducer.errorMsg);
-    const activity_suppliment = useSelector((state) => state.activity_supplimentReducer.activity_suppliment);
-    const activity_supplimentList = useSelector((state) => state.activity_supplimentReducer.activity_supplimentList);
+    const hotelMainData = useSelector((state) => state.hotelMainReducer.hotelMain);
+    const hotelMainList = useSelector((state) => state.hotelMainReducer.hotelMainList);
     const lastModifiedDate = useSelector((state) => state.activity_supplimentReducer.lastModifiedDateTime);
 
     useEffect(() => {
@@ -102,10 +109,11 @@ function ViewHotelMaster() {
     }, [lastModifiedDate]);
 
     useEffect(() => {
-        if (activity_supplimentList?.length > 0) {
-            setTableData(activity_supplimentList);
+        console.log(hotelMainList);
+        if (hotelMainList?.payload?.length > 0) {
+            setTableData(hotelMainList.payload[0]);
         }
-    }, [activity_supplimentList]);
+    }, [hotelMainList]);
 
     useEffect(() => {
         if (error != null) {
@@ -114,15 +122,16 @@ function ViewHotelMaster() {
     }, [error]);
 
     useEffect(() => {
-        if (activity_suppliment) {
+        if (hotelMainData) {
             setHandleToast(true);
-            // dispatch(getAllGuideClassData());
+
+            dispatch(getAllHotelMainData());
         }
-    }, [activity_suppliment]);
+    }, [hotelMainData]);
 
     useEffect(() => {
-        dispatch(getAllActivity_SupplimentData());
-        dispatch(getActivity_SupplementLatestModifiedDetails());
+        dispatch(getAllHotelMainData());
+        // dispatch(getActivity_SupplementLatestModifiedDetails());
     }, []);
 
     const handleClickOpen = (type, data) => {
@@ -151,7 +160,7 @@ function ViewHotelMaster() {
     };
     return (
         <div>
-            <MainCard title="Activity / Supplement">
+            <MainCard title="Hotel Master">
                 <div style={{ textAlign: 'right' }}> Last Modified Date : {lastModifiedTimeDate}</div>
                 <br />
                 <Grid container spacing={gridSpacing}>

@@ -18,7 +18,8 @@ import {
     Switch,
     Autocomplete,
     Button,
-    MenuItem
+    MenuItem,
+    Divider
 } from '@mui/material';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -45,6 +46,14 @@ import PreviewIcon from '@mui/icons-material/Preview';
 import { getAllActiveManagingCompanyDetails } from 'store/actions/masterActions/ManagingComapanyAction';
 import AlertItemExist from 'messages/AlertItemExist';
 import ManagingCompany from '../../managing_company/ManagingCompany';
+import {
+    getAllActiveChildrenFacilitiesData,
+    getAllActiveFacilitiesOfferedData,
+    getAllActiveRecreationData,
+    getAllActiveServiceOfferedData
+} from 'store/actions/masterActions/HotelFacilityAction';
+import { getAllActiveHotelCategoryData } from 'store/actions/masterActions/HotelCategoryAction';
+import { saveHotelMainData } from 'store/actions/masterActions/HotelMasterAction';
 const Transition = forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
@@ -52,44 +61,24 @@ const Transition = forwardRef(function Transition(props, ref) {
 function HotelMaster({ open, handleClose, mode, activitySupplimentId }) {
     const initialValues = {
         id: '',
+        hotelCode: '',
+        propertyCode: '',
+        starClass: '',
         managingCompany: null,
-        type: '',
-        typeOfActivity: '',
-        code: '',
-        locationCode: null,
-        activityDescription: '',
-        advanceType: '',
-        contactPerson: '',
-        phone: '',
-        email: '',
+        longName: '',
         address: '',
-        website: '',
-        fax: '',
-        maxPax: '',
-        status: true,
-        advanceType: true,
-        youtubeLinks: [
-            {
-                id: '',
-                url: '',
-                status: true,
-                enableYoutubeRow: false
-            }
-        ],
-
-        activityWithTaxes: [
-            {
-                fromDate: '',
-                toDate: '',
-                currencyList: null,
-                tax: null,
-                perPaxBuyRate: '',
-                rateWithoutTax: '',
-                rateWithTax: '',
-                status: true,
-                enableRow: false
-            }
-        ]
+        hotelCategory: null,
+        location: null,
+        phone1: '',
+        phone2: '',
+        fax1: '',
+        fax2: '',
+        email: '',
+        cancellationPolicy: '',
+        reCreation: [],
+        facilitiesOffered: [],
+        childrenFacilities: [],
+        serviceOffered: []
     };
     const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
     const [existOpenModal, setExistOpenModal] = useState(false);
@@ -102,12 +91,27 @@ function HotelMaster({ open, handleClose, mode, activitySupplimentId }) {
     const [appearing, setAppearing] = useState(false);
     const [activeLocationList, setActiveLocationList] = useState([]);
     const [activeManagingCompanyList, setActiveManagingCompanyList] = useState([]);
-    const [previewImages, setPreviewImages] = useState([]);
-    const [updatePreviewImages, setupdatePreviewImages] = useState([]);
-    // const handleChangeStatus = (event) => {
-    //     console.log(event.target.checked);
-    //     // this.setState({ checked: event.target.checked });
-    // };
+
+    const [activeReCreationList, setActiveRecreationList] = useState([]);
+    const [activeFacilityOfferedListData, setActiveFacilityOfferedListData] = useState([]);
+    const [activeChildrenFacilityListData, setActiveChildrenFacilityListData] = useState([]);
+    const [activeServiceOfferedListData, setActiveServiceOfferedListData] = useState([]);
+
+    const [activeHotelCategoriesData, setActiveHotelCategoriesData] = useState([]);
+    const activeRoomRecreationList = useSelector((state) => state.hotelFacilityReducer.activeRoomRecreationList);
+    const activeFacilityOfferedList = useSelector((state) => state.hotelFacilityReducer.activeFacilityOfferedList);
+    const activeChildrenFacilitiesList = useSelector((state) => state.hotelFacilityReducer.activeChildrenFacilitiesList);
+    const activeServiceOfferedList = useSelector((state) => state.hotelFacilityReducer.activeServiceOfferedList);
+    const activeHotelCategories = useSelector((state) => state.hotelCategoryReducer.activeHotelCategories);
+    useEffect(() => {
+        dispatch(getActiveLocations());
+        dispatch(getAllActiveManagingCompanyDetails());
+        dispatch(getAllActiveRecreationData());
+        dispatch(getAllActiveFacilitiesOfferedData());
+        dispatch(getAllActiveChildrenFacilitiesData());
+        dispatch(getAllActiveServiceOfferedData());
+        dispatch(getAllActiveHotelCategoryData());
+    }, []);
     const handleExistModalClose = (status) => {
         if (status) {
             setExistOpenModal(false);
@@ -116,6 +120,43 @@ function HotelMaster({ open, handleClose, mode, activitySupplimentId }) {
     useEffect(() => {
         setActiveLocationList(activeLocations);
     }, [activeLocations]);
+
+    useEffect(() => {
+        console.log(activeHotelCategories);
+        setActiveHotelCategoriesData(activeHotelCategories);
+    }, [activeHotelCategories]);
+
+    useEffect(() => {
+        console.log(activeRoomRecreationList);
+        // if (activeRoomRecreationList?.length > 0) {
+        setActiveRecreationList(activeRoomRecreationList);
+        // }
+        // setActiveLocationList(activeLocations);
+    }, [activeRoomRecreationList]);
+
+    useEffect(() => {
+        console.log(activeServiceOfferedList);
+        // if (activeRoomRecreationList?.length > 0) {
+        setActiveServiceOfferedListData(activeServiceOfferedList);
+        // }
+        // setActiveLocationList(activeLocations);
+    }, [activeServiceOfferedList]);
+
+    useEffect(() => {
+        console.log(activeChildrenFacilitiesList);
+        // if (activeRoomRecreationList?.length > 0) {
+        setActiveChildrenFacilityListData(activeChildrenFacilitiesList);
+        // }
+        // setActiveLocationList(activeLocations);
+    }, [activeChildrenFacilitiesList]);
+
+    useEffect(() => {
+        console.log(activeFacilityOfferedList);
+        // if (activeRoomRecreationList?.length > 0) {
+        setActiveFacilityOfferedListData(activeFacilityOfferedList);
+        // }
+        // setActiveLocationList(activeLocations);
+    }, [activeFacilityOfferedList]);
 
     useEffect(() => {
         if (activeManagingCompanies?.payload?.length > 0) {
@@ -192,41 +233,40 @@ function HotelMaster({ open, handleClose, mode, activitySupplimentId }) {
         }
     }, [activity_supplimentToUpdate]);
 
-    yup.addMethod(yup.string, 'checkDuplicateActivitySupplementCode', function (message) {
-        return this.test('checkDuplicateActivitySupplementCode', message, async function validateValue(value) {
-            if (mode === 'INSERT') {
-                try {
-                    await dispatch(checkDuplicateActivity_SupplimentsCode(value, categoryType));
+    // yup.addMethod(yup.string, 'checkDuplicateActivitySupplementCode', function (message) {
+    //     return this.test('checkDuplicateActivitySupplementCode', message, async function validateValue(value) {
+    //         if (mode === 'INSERT') {
+    //             try {
+    //                 await dispatch(checkDuplicateActivity_SupplimentsCode(value, categoryType));
 
-                    if (duplicateCode != null && duplicateCode.errorMessages.length != 0) {
-                        return false;
-                    } else {
-                        return true;
-                    }
-                    return false;
-                } catch (error) {}
-            }
-            return true;
-        });
-    });
+    //                 if (duplicateCode != null && duplicateCode.errorMessages.length != 0) {
+    //                     return false;
+    //                 } else {
+    //                     return true;
+    //                 }
+    //                 return false;
+    //             } catch (error) {}
+    //         }
+    //         return true;
+    //     });
+    // });
 
     const validationSchema = yup.object().shape({
-        code: yup.string().required('Required field').checkDuplicateActivitySupplementCode('Duplicate Code'),
-        activityDescription: yup.string().required('Required field'),
-        maxPax: yup.number().required('Required field'),
-        email: yup.string().email(),
-        phone: yup.string().matches(phoneRegExp, 'Not valid').min(10, 'Must be exactly 10 digits').max(10, 'Must be 10 digits'),
-
-        activityWithTaxes: yup.array().of(
-            yup.object().shape({
-                tax: yup.object().typeError('Required field'),
-                fromDate: yup.date().required('Required field'),
-                toDate: yup.date().min(yup.ref('fromDate'), "End date can't be before start date"),
-                currencyList: yup.object().typeError('Required field'),
-                perDayRate: yup.number().required('Required field').positive('entry should be greater than 0'),
-                status: yup.boolean()
-            })
-        )
+        // code: yup.string().required('Required field').checkDuplicateActivitySupplementCode('Duplicate Code'),
+        // activityDescription: yup.string().required('Required field'),
+        // maxPax: yup.number().required('Required field'),
+        // email: yup.string().email(),
+        // phone: yup.string().matches(phoneRegExp, 'Not valid').min(10, 'Must be exactly 10 digits').max(10, 'Must be 10 digits'),
+        // activityWithTaxes: yup.array().of(
+        //     yup.object().shape({
+        //         tax: yup.object().typeError('Required field'),
+        //         fromDate: yup.date().required('Required field'),
+        //         toDate: yup.date().min(yup.ref('fromDate'), "End date can't be before start date"),
+        //         currencyList: yup.object().typeError('Required field'),
+        //         perDayRate: yup.number().required('Required field').positive('entry should be greater than 0'),
+        //         status: yup.boolean()
+        //     })
+        // )
         // .uniqueStatus('Already Existing Active Record.')
     });
 
@@ -242,11 +282,11 @@ function HotelMaster({ open, handleClose, mode, activitySupplimentId }) {
     const [taxIdValues, setTaxIdValues] = useState(null);
     const [taxValues, setTaxValues] = useState(null);
 
-    useEffect(() => {
-        if (mode === 'VIEW_UPDATE' || mode === 'VIEW') {
-            dispatch(getActivity_SupplimentDetailsByCode(activitySupplimentId));
-        }
-    }, [mode]);
+    // useEffect(() => {
+    //     if (mode === 'VIEW_UPDATE' || mode === 'VIEW') {
+    //         dispatch(getActivity_SupplimentDetailsByCode(activitySupplimentId));
+    //     }
+    // }, [mode]);
 
     const showImages = (event) => {
         let images = [];
@@ -262,53 +302,53 @@ function HotelMaster({ open, handleClose, mode, activitySupplimentId }) {
 
     const handleSubmitForm = (data) => {
         if (mode === 'INSERT') {
-            const dataArray = [];
-            const dataArrayYoutube = [];
-            if (data.activityWithTaxes.length > 0 || data.youtubeLinks.length > 0) {
-                data.activityWithTaxes.map((item) => {
-                    const activityWithTaxes = {
-                        fromDate: item.fromDate,
-                        toDate: item.toDate,
-                        currencyList: item.currencyList.currencyListId,
-                        tax: item.tax.taxId,
-                        perPaxBuyRate: item.perDayRate == null ? 0.0 : item.perDayRate,
-                        rateWithoutTax: item.perDayRate,
-                        rateWithTax: item.perDayRate,
-                        status: item.status
-                    };
-                    dataArray.push(activityWithTaxes);
-                });
+            // const dataArray = [];
+            // const dataArrayYoutube = [];
+            // if (data.activityWithTaxes.length > 0 || data.youtubeLinks.length > 0) {
+            //     data.activityWithTaxes.map((item) => {
+            //         const activityWithTaxes = {
+            //             fromDate: item.fromDate,
+            //             toDate: item.toDate,
+            //             currencyList: item.currencyList.currencyListId,
+            //             tax: item.tax.taxId,
+            //             perPaxBuyRate: item.perDayRate == null ? 0.0 : item.perDayRate,
+            //             rateWithoutTax: item.perDayRate,
+            //             rateWithTax: item.perDayRate,
+            //             status: item.status
+            //         };
+            //         dataArray.push(activityWithTaxes);
+            //     });
 
-                data.youtubeLinks.map((itemYoutube) => {
-                    const youtubeLinks = {
-                        url: itemYoutube.url,
-                        status: itemYoutube.status
-                    };
-                    dataArrayYoutube.push(youtubeLinks);
-                });
+            //     data.youtubeLinks.map((itemYoutube) => {
+            //         const youtubeLinks = {
+            //             url: itemYoutube.url,
+            //             status: itemYoutube.status
+            //         };
+            //         dataArrayYoutube.push(youtubeLinks);
+            //     });
 
-                const saveValues = {
-                    type: data.type,
-                    typeOfActivity: data.typeOfActivity,
-                    code: data.code,
-                    locationCode: data.locationCode.location_id,
-                    activityDescription: data.activityDescription,
-                    advanceType: data.advanceType,
-                    contactPerson: data.contactPerson,
-                    phone: data.phone,
-                    email: data.email,
-                    address: data.address,
-                    website: data.website,
-                    fax: data.fax,
-                    maxPax: data.maxPax,
-                    status: data.status,
-                    advanceType: data.advanceType,
-                    // files: data.files,AS
-                    youtubeLinks: dataArrayYoutube,
-                    activityWithTaxes: dataArray
-                };
-                dispatch(saveActivity_SupplimentData(saveValues));
-            }
+            //     const saveValues = {
+            //         type: data.type,
+            //         typeOfActivity: data.typeOfActivity,
+            //         code: data.code,
+            //         locationCode: data.locationCode.location_id,
+            //         activityDescription: data.activityDescription,
+            //         advanceType: data.advanceType,
+            //         contactPerson: data.contactPerson,
+            //         phone: data.phone,
+            //         email: data.email,
+            //         address: data.address,
+            //         website: data.website,
+            //         fax: data.fax,
+            //         maxPax: data.maxPax,
+            //         status: data.status,
+            //         advanceType: data.advanceType,
+            //         // files: data.files,AS
+            //         youtubeLinks: dataArrayYoutube,
+            //         activityWithTaxes: dataArray
+            //     };
+            console.log(data);
+            dispatch(saveHotelMainData(data));
         } else if (mode === 'VIEW_UPDATE') {
             const dataArray = [];
             const dataArrayYoutube = [];
@@ -375,13 +415,6 @@ function HotelMaster({ open, handleClose, mode, activitySupplimentId }) {
     const [typeOfActivity, setTypeOfActivity] = useState(true);
     const [labelName, setLabelName] = useState('Per Pax Rate');
     const [managingCompanyCode, setManagingCompanyCode] = useState('');
-
-    useEffect(() => {
-        // dispatch(getAllTaxData());
-        // dispatch(getAllCurrencyListData());
-        dispatch(getActiveLocations());
-        dispatch(getAllActiveManagingCompanyDetails());
-    }, []);
 
     useEffect(() => {
         if (currencyListData != null) {
@@ -469,25 +502,6 @@ function HotelMaster({ open, handleClose, mode, activitySupplimentId }) {
                                                         <Box sx={{ width: '100%' }}>
                                                             <Grid container rowSpacing={2} style={{ marginTop: '2px' }}>
                                                                 <Grid item xs={6}>
-                                                                    {/* <TextField
-                                                        sx={{
-                                                            width: { xs: 100, sm: 200 },
-                                                            '& .MuiInputBase-root': {
-                                                                height: 40
-                                                            }
-                                                        }}
-                                                        InputLabelProps={{
-                                                            shrink: true
-                                                        }}
-                                                        disabled={mode == 'VIEW_UPDATE'}
-                                                        label="Company Name"
-                                                        name="companyName"
-                                                        onChange={handleChange}
-                                                        onBlur={handleBlur}
-                                                        value={values.companyName}
-                                                        error={Boolean(touched.companyName && errors.companyName)}
-                                                        helperText={touched.companyName && errors.companyName ? errors.companyName : ''}
-                                                    ></TextField> */}
                                                                     <TextField
                                                                         disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
                                                                         // label={taxCode}
@@ -504,13 +518,13 @@ function HotelMaster({ open, handleClose, mode, activitySupplimentId }) {
                                                                         type="text"
                                                                         variant="outlined"
                                                                         // className="txt"
-                                                                        id="taxCode"
-                                                                        name="taxCode"
+                                                                        id="hotelCode"
+                                                                        name="hotelCode"
                                                                         onChange={handleChange}
                                                                         onBlur={handleBlur}
-                                                                        value={values.taxCode}
-                                                                        error={Boolean(touched.taxCode && errors.taxCode)}
-                                                                        helperText={touched.taxCode && errors.taxCode ? errors.taxCode : ''}
+                                                                        value={values.hotelCode}
+                                                                        // error={Boolean(touched.taxCode && errors.taxCode)}
+                                                                        // helperText={touched.taxCode && errors.taxCode ? errors.taxCode : ''}
                                                                     />
                                                                 </Grid>
                                                                 <Grid item xs={6}>
@@ -518,7 +532,7 @@ function HotelMaster({ open, handleClose, mode, activitySupplimentId }) {
                                                                         <Grid item>
                                                                             <Autocomplete
                                                                                 value={values.managingCompany}
-                                                                                name="managingCompany"
+                                                                                name="managingCompanyy"
                                                                                 onChange={(_, value) => {
                                                                                     setFieldValue(`managingCompany`, value);
                                                                                 }}
@@ -576,16 +590,16 @@ function HotelMaster({ open, handleClose, mode, activitySupplimentId }) {
                                                                         InputLabelProps={{
                                                                             shrink: true
                                                                         }}
-                                                                        id="percentage"
-                                                                        name="percentage"
-                                                                        type="number"
+                                                                        id="propertyCode"
+                                                                        name="propertyCode"
+                                                                        type="text"
                                                                         onChange={handleChange}
                                                                         onBlur={handleBlur}
-                                                                        value={values.percentage}
-                                                                        error={Boolean(touched.percentage && errors.percentage)}
-                                                                        helperText={
-                                                                            touched.percentage && errors.percentage ? errors.percentage : ''
-                                                                        }
+                                                                        value={values.propertyCode}
+                                                                        // error={Boolean(touched.propertyCode && errors.propertyCode)}
+                                                                        // helperText={
+                                                                        //     touched.propertyCode && errors.propertyCode ? errors.propertyCode : ''
+                                                                        // }
                                                                     />
                                                                 </Grid>
 
@@ -601,14 +615,14 @@ function HotelMaster({ open, handleClose, mode, activitySupplimentId }) {
                                                                         id="standard-select-currency"
                                                                         select
                                                                         label="Star Class"
-                                                                        name="type"
+                                                                        name="starClass"
                                                                         onChange={handleChange}
                                                                         onBlur={handleBlur}
                                                                         InputLabelProps={{
                                                                             shrink: true
                                                                         }}
                                                                         // defaultValue={values.groupType}
-                                                                        value={values.type}
+                                                                        value={values.starClass}
 
                                                                         // error={Boolean(touched.groupType && errors.groupType)}
                                                                         // helperText={
@@ -617,19 +631,19 @@ function HotelMaster({ open, handleClose, mode, activitySupplimentId }) {
                                                                         //         : ''
                                                                         // }
                                                                     >
-                                                                        <MenuItem dense={true} value={'3 Class'}>
+                                                                        <MenuItem dense={true} value={'3'}>
                                                                             3 Class
                                                                         </MenuItem>
-                                                                        <MenuItem dense={true} value={'4 Class'}>
+                                                                        <MenuItem dense={true} value={'4'}>
                                                                             4 Class
                                                                         </MenuItem>
-                                                                        <MenuItem dense={true} value={'5 Class'}>
+                                                                        <MenuItem dense={true} value={'5'}>
                                                                             5 Class
                                                                         </MenuItem>
-                                                                        <MenuItem dense={true} value={'6 Class'}>
+                                                                        <MenuItem dense={true} value={'6'}>
                                                                             6 Class
                                                                         </MenuItem>
-                                                                        <MenuItem dense={true} value={'7 Class'}>
+                                                                        <MenuItem dense={true} value={'7'}>
                                                                             7 Class
                                                                         </MenuItem>
                                                                     </TextField>
@@ -652,13 +666,13 @@ function HotelMaster({ open, handleClose, mode, activitySupplimentId }) {
                                                                         type="text"
                                                                         variant="outlined"
                                                                         // className="txt"
-                                                                        id="taxCode"
-                                                                        name="taxCode"
+                                                                        id="longName"
+                                                                        name="longName"
                                                                         onChange={handleChange}
                                                                         onBlur={handleBlur}
-                                                                        value={values.taxCode}
-                                                                        error={Boolean(touched.taxCode && errors.taxCode)}
-                                                                        helperText={touched.taxCode && errors.taxCode ? errors.taxCode : ''}
+                                                                        value={values.longName}
+                                                                        // error={Boolean(touched.longName && errors.longName)}
+                                                                        // helperText={touched.longName && errors.longName ? errors.longName : ''}
                                                                     />
                                                                     {/* <FormGroup>
                                                                         <FormControlLabel
@@ -690,21 +704,21 @@ function HotelMaster({ open, handleClose, mode, activitySupplimentId }) {
                                                                         type="text"
                                                                         variant="outlined"
                                                                         // className="txt"
-                                                                        id="taxCode"
-                                                                        name="taxCode"
+                                                                        id="address"
+                                                                        name="address"
                                                                         onChange={handleChange}
                                                                         onBlur={handleBlur}
-                                                                        value={values.taxCode}
-                                                                        error={Boolean(touched.taxCode && errors.taxCode)}
-                                                                        helperText={touched.taxCode && errors.taxCode ? errors.taxCode : ''}
+                                                                        value={values.address}
+                                                                        // error={Boolean(touched.address && errors.address)}
+                                                                        // helperText={touched.address && errors.address ? errors.address : ''}
                                                                     />
                                                                 </Grid>
                                                                 <Grid item xs={6}>
                                                                     <Autocomplete
-                                                                        value={values.locationCode}
-                                                                        name="locationCode"
+                                                                        value={values.location}
+                                                                        name="location"
                                                                         onChange={(_, value) => {
-                                                                            setFieldValue(`locationCode`, value);
+                                                                            setFieldValue(`location`, value);
                                                                         }}
                                                                         disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
                                                                         options={activeLocationList}
@@ -729,7 +743,7 @@ function HotelMaster({ open, handleClose, mode, activitySupplimentId }) {
                                                                                 }}
                                                                                 disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
                                                                                 variant="outlined"
-                                                                                name="locationCode"
+                                                                                name="location"
                                                                                 onBlur={handleBlur}
                                                                             />
                                                                         )}
@@ -738,17 +752,15 @@ function HotelMaster({ open, handleClose, mode, activitySupplimentId }) {
 
                                                                 <Grid item xs={6}>
                                                                     <Autocomplete
-                                                                        value={values.locationCode}
-                                                                        name="locationCode"
+                                                                        value={values.hotelCategory}
+                                                                        name="hotelCategory"
                                                                         onChange={(_, value) => {
-                                                                            setFieldValue(`locationCode`, value);
+                                                                            setFieldValue(`hotelCategory`, value);
                                                                         }}
                                                                         disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
-                                                                        options={activeLocationList}
-                                                                        getOptionLabel={(option) => `${option.code}`}
-                                                                        isOptionEqualToValue={(option, value) =>
-                                                                            option.location_id === value.location_id
-                                                                        }
+                                                                        options={activeHotelCategoriesData}
+                                                                        getOptionLabel={(option) => `${option.code}-${option.name}`}
+                                                                        isOptionEqualToValue={(option, value) => option.id === value.id}
                                                                         renderInput={(params) => (
                                                                             <TextField
                                                                                 {...params}
@@ -766,7 +778,7 @@ function HotelMaster({ open, handleClose, mode, activitySupplimentId }) {
                                                                                 }}
                                                                                 disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
                                                                                 variant="outlined"
-                                                                                name="locationCode"
+                                                                                name="hotelCategory"
                                                                                 onBlur={handleBlur}
                                                                             />
                                                                         )}
@@ -790,13 +802,13 @@ function HotelMaster({ open, handleClose, mode, activitySupplimentId }) {
                                                                         type="text"
                                                                         variant="outlined"
                                                                         // className="txt"
-                                                                        id="taxCode"
-                                                                        name="taxCode"
+                                                                        id="phone1"
+                                                                        name="phone1"
                                                                         onChange={handleChange}
                                                                         onBlur={handleBlur}
-                                                                        value={values.taxCode}
-                                                                        error={Boolean(touched.taxCode && errors.taxCode)}
-                                                                        helperText={touched.taxCode && errors.taxCode ? errors.taxCode : ''}
+                                                                        value={values.phone1}
+                                                                        // error={Boolean(touched.phone1 && errors.phone1)}
+                                                                        // helperText={touched.phone1 && errors.phone1 ? errors.phone1 : ''}
                                                                     />
                                                                 </Grid>
 
@@ -817,13 +829,13 @@ function HotelMaster({ open, handleClose, mode, activitySupplimentId }) {
                                                                         type="text"
                                                                         variant="outlined"
                                                                         // className="txt"
-                                                                        id="taxCode"
-                                                                        name="taxCode"
+                                                                        id="phone2"
+                                                                        name="phone2"
                                                                         onChange={handleChange}
                                                                         onBlur={handleBlur}
-                                                                        value={values.taxCode}
-                                                                        error={Boolean(touched.taxCode && errors.taxCode)}
-                                                                        helperText={touched.taxCode && errors.taxCode ? errors.taxCode : ''}
+                                                                        value={values.phone2}
+                                                                        // error={Boolean(touched.phone2 && errors.phone2)}
+                                                                        // helperText={touched.phone2 && errors.phone2 ? errors.phone2 : ''}
                                                                     />
                                                                 </Grid>
 
@@ -844,13 +856,13 @@ function HotelMaster({ open, handleClose, mode, activitySupplimentId }) {
                                                                         type="text"
                                                                         variant="outlined"
                                                                         // className="txt"
-                                                                        id="taxCode"
-                                                                        name="taxCode"
+                                                                        id="fax1"
+                                                                        name="fax1"
                                                                         onChange={handleChange}
                                                                         onBlur={handleBlur}
-                                                                        value={values.taxCode}
-                                                                        error={Boolean(touched.taxCode && errors.taxCode)}
-                                                                        helperText={touched.taxCode && errors.taxCode ? errors.taxCode : ''}
+                                                                        value={values.fax1}
+                                                                        // error={Boolean(touched.fax1 && errors.fax1)}
+                                                                        // helperText={touched.fax1 && errors.fax1 ? errors.fax1 : ''}
                                                                     />
                                                                 </Grid>
 
@@ -871,13 +883,13 @@ function HotelMaster({ open, handleClose, mode, activitySupplimentId }) {
                                                                         type="text"
                                                                         variant="outlined"
                                                                         // className="txt"
-                                                                        id="taxCode"
-                                                                        name="taxCode"
+                                                                        id="fax2"
+                                                                        name="fax2"
                                                                         onChange={handleChange}
                                                                         onBlur={handleBlur}
-                                                                        value={values.taxCode}
-                                                                        error={Boolean(touched.taxCode && errors.taxCode)}
-                                                                        helperText={touched.taxCode && errors.taxCode ? errors.taxCode : ''}
+                                                                        value={values.fax2}
+                                                                        // error={Boolean(touched.fax2 && errors.fax2)}
+                                                                        // helperText={touched.fax2 && errors.fax2 ? errors.fax2 : ''}
                                                                     />
                                                                 </Grid>
                                                                 <Grid item xs={6}>
@@ -897,13 +909,13 @@ function HotelMaster({ open, handleClose, mode, activitySupplimentId }) {
                                                                         type="text"
                                                                         variant="outlined"
                                                                         // className="txt"
-                                                                        id="taxCode"
-                                                                        name="taxCode"
+                                                                        id="email"
+                                                                        name="email"
                                                                         onChange={handleChange}
                                                                         onBlur={handleBlur}
-                                                                        value={values.taxCode}
-                                                                        error={Boolean(touched.taxCode && errors.taxCode)}
-                                                                        helperText={touched.taxCode && errors.taxCode ? errors.taxCode : ''}
+                                                                        value={values.email}
+                                                                        // error={Boolean(touched.email && errors.email)}
+                                                                        // helperText={touched.email && errors.email ? errors.email : ''}
                                                                     />
                                                                 </Grid>
 
@@ -924,13 +936,13 @@ function HotelMaster({ open, handleClose, mode, activitySupplimentId }) {
                                                                         type="text"
                                                                         variant="outlined"
                                                                         // className="txt"
-                                                                        id="taxCode"
-                                                                        name="taxCode"
+                                                                        id="website"
+                                                                        name="website"
                                                                         onChange={handleChange}
                                                                         onBlur={handleBlur}
-                                                                        value={values.taxCode}
-                                                                        error={Boolean(touched.taxCode && errors.taxCode)}
-                                                                        helperText={touched.taxCode && errors.taxCode ? errors.taxCode : ''}
+                                                                        value={values.website}
+                                                                        // error={Boolean(touched.website && errors.website)}
+                                                                        // helperText={touched.website && errors.website ? errors.website : ''}
                                                                     />
                                                                 </Grid>
 
@@ -943,7 +955,7 @@ function HotelMaster({ open, handleClose, mode, activitySupplimentId }) {
                                                                             shrink: true
                                                                         }}
                                                                         sx={{
-                                                                            width: { xs: 150, sm: 550 },
+                                                                            width: { xs: 150, sm: 520 },
                                                                             '& .MuiInputBase-root': {
                                                                                 height: 40
                                                                             }
@@ -951,13 +963,165 @@ function HotelMaster({ open, handleClose, mode, activitySupplimentId }) {
                                                                         type="text"
                                                                         variant="outlined"
                                                                         // className="txt"
-                                                                        id="taxCode"
-                                                                        name="taxCode"
+                                                                        id="cancellationPolicy"
+                                                                        name="cancellationPolicy"
                                                                         onChange={handleChange}
                                                                         onBlur={handleBlur}
-                                                                        value={values.taxCode}
-                                                                        error={Boolean(touched.taxCode && errors.taxCode)}
-                                                                        helperText={touched.taxCode && errors.taxCode ? errors.taxCode : ''}
+                                                                        value={values.cancellationPolicy}
+                                                                        // error={Boolean(touched.cancellationPolicy && errors.cancellationPolicy)}
+                                                                        // helperText={touched.cancellationPolicy && errors.cancellationPolicy ? errors.cancellationPolicy : ''}
+                                                                    />
+                                                                </Grid>
+
+                                                                {/* <Divider variant="middle" /> */}
+
+                                                                <Grid item xs={12}>
+                                                                    <Autocomplete
+                                                                        value={values.reCreation}
+                                                                        name="reCreation"
+                                                                        onChange={(_, value) => {
+                                                                            setFieldValue(`reCreation`, value);
+                                                                        }}
+                                                                        multiple
+                                                                        disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                        options={activeReCreationList}
+                                                                        getOptionLabel={(option) => `${option.code}-${option.name}`}
+                                                                        isOptionEqualToValue={(option, value) =>
+                                                                            option.hotelFacilityId === value.hotelFacilityId
+                                                                        }
+                                                                        renderInput={(params) => (
+                                                                            <TextField
+                                                                                {...params}
+                                                                                label="Re Creation"
+                                                                                InputLabelProps={{
+                                                                                    shrink: true
+                                                                                }}
+                                                                                sx={{
+                                                                                    width: {
+                                                                                        sm: 520
+                                                                                    },
+                                                                                    '& .MuiInputBase-root': {
+                                                                                        height: 40
+                                                                                    }
+                                                                                }}
+                                                                                disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                                variant="outlined"
+                                                                                name="reCreation"
+                                                                                onBlur={handleBlur}
+                                                                            />
+                                                                        )}
+                                                                    />
+                                                                </Grid>
+
+                                                                <Grid item xs={12}>
+                                                                    <Autocomplete
+                                                                        value={values.facilitiesOffered}
+                                                                        name="facilitiesOffered"
+                                                                        onChange={(_, value) => {
+                                                                            setFieldValue(`facilitiesOffered`, value);
+                                                                        }}
+                                                                        multiple
+                                                                        disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                        options={activeFacilityOfferedListData}
+                                                                        getOptionLabel={(option) => `${option.code}-${option.name}`}
+                                                                        isOptionEqualToValue={(option, value) =>
+                                                                            option.hotelFacilityId === value.hotelFacilityId
+                                                                        }
+                                                                        renderInput={(params) => (
+                                                                            <TextField
+                                                                                {...params}
+                                                                                label="Facilities Offered"
+                                                                                InputLabelProps={{
+                                                                                    shrink: true
+                                                                                }}
+                                                                                sx={{
+                                                                                    width: {
+                                                                                        sm: 520
+                                                                                    },
+                                                                                    '& .MuiInputBase-root': {
+                                                                                        height: 40
+                                                                                    }
+                                                                                }}
+                                                                                disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                                variant="outlined"
+                                                                                name="facilitiesOffered"
+                                                                                onBlur={handleBlur}
+                                                                            />
+                                                                        )}
+                                                                    />
+                                                                </Grid>
+                                                                <Grid item xs={12}>
+                                                                    <Autocomplete
+                                                                        value={values.childrenFacilities}
+                                                                        name="childrenFacilities"
+                                                                        onChange={(_, value) => {
+                                                                            setFieldValue(`childrenFacilities`, value);
+                                                                        }}
+                                                                        multiple
+                                                                        disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                        options={activeChildrenFacilityListData}
+                                                                        getOptionLabel={(option) => `${option.code}-${option.name}`}
+                                                                        isOptionEqualToValue={(option, value) =>
+                                                                            option.hotelFacilityId === value.hotelFacilityId
+                                                                        }
+                                                                        renderInput={(params) => (
+                                                                            <TextField
+                                                                                {...params}
+                                                                                label="Children's Facilities"
+                                                                                InputLabelProps={{
+                                                                                    shrink: true
+                                                                                }}
+                                                                                sx={{
+                                                                                    width: {
+                                                                                        sm: 520
+                                                                                    },
+                                                                                    '& .MuiInputBase-root': {
+                                                                                        height: 40
+                                                                                    }
+                                                                                }}
+                                                                                disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                                variant="outlined"
+                                                                                name="childrenFacilities"
+                                                                                onBlur={handleBlur}
+                                                                            />
+                                                                        )}
+                                                                    />
+                                                                </Grid>
+                                                                <Grid item xs={12}>
+                                                                    <Autocomplete
+                                                                        value={values.serviceOffered}
+                                                                        name="serviceOffered"
+                                                                        onChange={(_, value) => {
+                                                                            setFieldValue(`serviceOffered`, value);
+                                                                        }}
+                                                                        multiple
+                                                                        disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                        options={activeServiceOfferedListData}
+                                                                        getOptionLabel={(option) => `${option.code}-${option.name}`}
+                                                                        isOptionEqualToValue={(option, value) =>
+                                                                            option.hotelFacilityId === value.hotelFacilityId
+                                                                        }
+                                                                        renderInput={(params) => (
+                                                                            <TextField
+                                                                                {...params}
+                                                                                label="Service Offered"
+                                                                                InputLabelProps={{
+                                                                                    shrink: true
+                                                                                }}
+                                                                                sx={{
+                                                                                    width: {
+                                                                                        sm: 520
+                                                                                    },
+                                                                                    '& .MuiInputBase-root': {
+                                                                                        height: 40
+                                                                                    }
+                                                                                }}
+                                                                                disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                                variant="outlined"
+                                                                                name="serviceOffered"
+                                                                                onBlur={handleBlur}
+                                                                            />
+                                                                        )}
                                                                     />
                                                                 </Grid>
                                                             </Grid>

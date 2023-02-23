@@ -168,12 +168,14 @@ import {
     GET_ALL_HOTEL_CATEGORY_DATA,
     UPDATE_HOTEL_CATEGORY_DATA,
     CHECK_HOTEL_CATEGORY_DUPLICATE,
-    GET_LAST_MODIFIED_DATE_TIME_HOTEL_CATEGORY
+    GET_LAST_MODIFIED_DATE_TIME_HOTEL_CATEGORY,
+    GET_ALL_ACTIVE_HOTEL_CATEGORY_DATA
 } from 'store/constant/master/HotelCategoryConstant';
 
 import {
     checkDupicateHotelCateogryCodeSaga,
     checkLatestHotelCateogryModifiedDateSaga,
+    getAllActiveHotelCateogrySaga,
     getAllHotelCateogrySaga,
     getHotelCateogryByIdSaga,
     saveHotelCateogrySaga,
@@ -278,7 +280,11 @@ import {
     SAVE_HOTEL_FACILITY_DATA,
     UPDATE_HOTEL_FACILITY_DATA,
     GET_ALL_HOTEL_FACILITY_TYPES_DATA,
-    CHECK_HOTEL_FACILITY_DUPLICATE
+    CHECK_HOTEL_FACILITY_DUPLICATE,
+    GET_ALL_ACTIVE_ROOM_RECREATION_DATA,
+    GET_ALL_ACTIVE_SERVICE_OFFERED_DATA,
+    GET_ALL_ACTIVE_CHILDREN_FACILITIES_DATA,
+    GET_ALL_ACTIVE_FACILITIES_OFFERED_DATA
 } from 'store/constant/master/HotelFacilityConstant';
 
 import {
@@ -288,7 +294,11 @@ import {
     getFacilityByIdSaga,
     updateHotelFacilitySaga,
     checkLatestHotelFacilityModifiedDateSaga,
-    getAllHotelFacilityTypesSaga
+    getAllHotelFacilityTypesSaga,
+    getAllActiveRoomRecreationSaga,
+    getAllActiveFacilitiesOfferedSaga,
+    getAllActiveChildrenFacilitiesSaga,
+    getAllActiveServiceOfferedSaga
 } from './mastersaga/HotelFacilitySaga';
 
 import {
@@ -510,6 +520,25 @@ import {
     saveActivity_SupplimentDataHandler,
     updateActivity_SupplimentDataSaga
 } from './mastersaga/Activity_SupplimentSage';
+import { getAllActiveRecreationData } from 'store/actions/masterActions/HotelFacilityAction';
+import {
+    checkDupicateHotelMainCodeSaga,
+    checkLatestHotelMainModifiedDateSaga,
+    getAllActiveHotelMainSaga,
+    getAllHotelMainSaga,
+    getHotelMainByIdSaga,
+    saveHotelMainSaga,
+    updateHotelMainSaga
+} from './mastersaga/HotelMainSaga';
+import {
+    CHECK_HOTEL_MAIN_DUPLICATE,
+    GET_ALL_ACTIVE_HOTEL_MAIN_DATA,
+    GET_ALL_HOTEL_MAIN_DATA,
+    GET_HOTEL_MAIN_DATA_BY_ID,
+    GET_LAST_MODIFIED_DATE_TIME_HOTEL_MAIN,
+    SAVE_HOTEL_MAIN_DATA,
+    UPDATE_HOTEL_MAIN_DATA
+} from 'store/constant/master/HotelMasterConstant';
 
 import {
     CHECK_BRANCH_DUPLICATE,
@@ -614,7 +643,7 @@ export function* wacherSaga() {
     yield takeLatest(UPDATE_HOTEL_CATEGORY_DATA, updateHotelCateogrySaga);
     yield takeLatest(CHECK_HOTEL_CATEGORY_DUPLICATE, checkDupicateHotelCateogryCodeSaga);
     yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_HOTEL_CATEGORY, checkLatestHotelCateogryModifiedDateSaga);
-
+    yield takeLatest(GET_ALL_ACTIVE_HOTEL_CATEGORY_DATA, getAllActiveHotelCateogrySaga);
     // //room recreation
     // yield takeLatest(SAVE_ROOM_RECREATION_DATA, saveRoomRecreationSaga);
     // yield takeLatest(GET_ROOM_RECREATION_DATA_BY_ID, getRoomRecreationByIdSaga);
@@ -827,4 +856,19 @@ export function* wacherSaga() {
     yield takeLatest(CHECK_BRANCH_DUPLICATE, checkDupicateBranchesSaga);
     yield takeLatest(UPDATE_BRANCH_DATA, updateBranchSaga);
     // yield takeLatest(GET_ALL_ACTIVE_BRANCH, getAllActiveActivity_SupplimentDataSaga);
+    
+    // active facilies
+    yield takeLatest(GET_ALL_ACTIVE_ROOM_RECREATION_DATA, getAllActiveRoomRecreationSaga);
+    yield takeLatest(GET_ALL_ACTIVE_FACILITIES_OFFERED_DATA, getAllActiveFacilitiesOfferedSaga);
+    yield takeLatest(GET_ALL_ACTIVE_CHILDREN_FACILITIES_DATA, getAllActiveChildrenFacilitiesSaga);
+    yield takeLatest(GET_ALL_ACTIVE_SERVICE_OFFERED_DATA, getAllActiveServiceOfferedSaga);
+
+    //hotel main
+    yield takeLatest(SAVE_HOTEL_MAIN_DATA, saveHotelMainSaga);
+    yield takeLatest(GET_HOTEL_MAIN_DATA_BY_ID, getHotelMainByIdSaga);
+    yield takeLatest(GET_ALL_HOTEL_MAIN_DATA, getAllHotelMainSaga);
+    yield takeLatest(UPDATE_HOTEL_MAIN_DATA, updateHotelMainSaga);
+    yield takeLatest(CHECK_HOTEL_MAIN_DUPLICATE, checkDupicateHotelMainCodeSaga);
+    yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_HOTEL_MAIN, checkLatestHotelMainModifiedDateSaga);
+    yield takeLatest(GET_ALL_ACTIVE_HOTEL_MAIN_DATA, getAllActiveHotelMainSaga);
 }

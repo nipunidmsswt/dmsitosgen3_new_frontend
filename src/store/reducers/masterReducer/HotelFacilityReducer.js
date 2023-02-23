@@ -11,7 +11,15 @@ import {
     FAILED_LAST_MODIFIED_DATE_HOTEL_FACILITY,
     SUCCESS_LAST_MODIFIED_DATE_HOTEL_FACILITY,
     SUCCESS_HOTEL_FACILITY_TYPES_LIST_DATA,
-    FAILED_HOTEL_FACILITY_TYPES_LIST_DATA
+    FAILED_HOTEL_FACILITY_TYPES_LIST_DATA,
+    SUCCESS_ACTIVE_ROOM_RECREATION_LIST_DATA,
+    FAILED_ACTIVE_ROOM_RECREATION_LIST_DATA,
+    SUCCESS_ACTIVE_FACILITIES_OFFERED_LIST_DATA,
+    FAILED_ACTIVE_FACILITIES_OFFERED_LIST_DATA,
+    FAILED_ACTIVE_CHILDREN_FACILITIES_LIST_DATA,
+    SUCCESS_ACTIVE_CHILDREN_FACILITIES_LIST_DATA,
+    SUCCESS_ACTIVE_SERVICE_OFFERED_LIST_DATA,
+    FAILED_ACTIVE_SERVICE_OFFERED_LIST_DATA
 } from '../../constant/master/HotelFacilityConstant';
 
 const initialState = {
@@ -21,7 +29,11 @@ const initialState = {
     errorMsg: null,
     duplicateHotelFacility: null,
     lastModifiedDateTime: null,
-    hotelFacilityTypes: []
+    hotelFacilityTypes: [],
+    activeRoomRecreationList: [],
+    activeFacilityOfferedList: [],
+    activeChildrenFacilitiesList: [],
+    activeServiceOfferedList: []
 };
 
 export const hotelFacilityReducer = (state = initialState, action) => {
@@ -78,6 +90,35 @@ export const hotelFacilityReducer = (state = initialState, action) => {
 
         case FAILED_HOTEL_FACILITY_TYPES_LIST_DATA:
             return { ...state, hotelFacilityTypes: data };
+
+        case SUCCESS_ACTIVE_ROOM_RECREATION_LIST_DATA:
+            console.log(data.payload[0].Rec);
+            return { ...state, activeRoomRecreationList: data.payload[0].Rec };
+
+        case FAILED_ACTIVE_ROOM_RECREATION_LIST_DATA:
+            // console.log(data.payload[0].facility);
+            return { ...state, activeRoomRecreationList: data.payload[0].Rec };
+
+        case SUCCESS_ACTIVE_FACILITIES_OFFERED_LIST_DATA:
+            // console.log(data.payload[0].facility);
+            return { ...state, activeFacilityOfferedList: data.payload[0].FO };
+
+        case FAILED_ACTIVE_FACILITIES_OFFERED_LIST_DATA:
+            return { ...state, activeFacilityOfferedList: data.payload[0].FO };
+
+        case SUCCESS_ACTIVE_CHILDREN_FACILITIES_LIST_DATA:
+            // console.log(data.payload[0].facility);
+            return { ...state, activeChildrenFacilitiesList: data.payload[0].CF };
+
+        case FAILED_ACTIVE_CHILDREN_FACILITIES_LIST_DATA:
+            return { ...state, activeChildrenFacilitiesList: data.payload[0].CF };
+
+        case SUCCESS_ACTIVE_SERVICE_OFFERED_LIST_DATA:
+            // console.log(data.payload[0].facility);
+            return { ...state, activeServiceOfferedList: data.payload[0].SO };
+
+        case FAILED_ACTIVE_SERVICE_OFFERED_LIST_DATA:
+            return { ...state, activeServiceOfferedList: data.payload[0].SO };
 
         default:
             return state;
