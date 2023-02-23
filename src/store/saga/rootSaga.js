@@ -856,7 +856,7 @@ export function* wacherSaga() {
     yield takeLatest(CHECK_BRANCH_DUPLICATE, checkDupicateBranchesSaga);
     yield takeLatest(UPDATE_BRANCH_DATA, updateBranchSaga);
     // yield takeLatest(GET_ALL_ACTIVE_BRANCH, getAllActiveActivity_SupplimentDataSaga);
-    
+
     // active facilies
     yield takeLatest(GET_ALL_ACTIVE_ROOM_RECREATION_DATA, getAllActiveRoomRecreationSaga);
     yield takeLatest(GET_ALL_ACTIVE_FACILITIES_OFFERED_DATA, getAllActiveFacilitiesOfferedSaga);
