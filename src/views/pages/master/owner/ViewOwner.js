@@ -7,9 +7,7 @@ import tableIcons from 'utils/MaterialTableIcons';
 import { gridSpacing } from 'store/constant';
 import { styled } from '@mui/material/styles';
 import { Typography, TextField } from '@mui/material';
-import Box from '@mui/material/Box';
-import Paper from '@mui/material/Paper';
-import Grid from '@mui/material/Grid';
+import { Grid, FormGroup, FormControlLabel, Switch } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAllOwnerData, getLatestModifiedDetails } from 'store/actions/masterActions/OwnerAction';
 import Owner from './Owner';
@@ -106,21 +104,30 @@ function ViewOwner() {
         {
             title: 'Status',
             field: 'status',
-            filterPlaceholder: 'True || False',
             align: 'center',
-            emptyValue: () => <em>null</em>,
+            lookup: {
+                true: 'Active',
+                false: 'Inactive'
+            },
             render: (rowData) => (
                 <div
                     style={{
-                        color: rowData.status === true ? '#008000aa' : '#f90000aa',
-                        fontWeight: 'bold',
-                        // background: rowData.status === true ? "#008000aa" : "#f90000aa",
-                        borderRadius: '4px',
-                        paddingLeft: 5,
-                        paddingRight: 5
+                        alignItems: 'center',
+                        align: 'center',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center'
                     }}
                 >
-                    {rowData.status === true ? 'Active' : 'Inactive'}
+                    {rowData.status === true ? (
+                        <FormGroup>
+                            <FormControlLabel control={<Switch size="small" />} checked={true} />
+                        </FormGroup>
+                    ) : (
+                        <FormGroup>
+                            <FormControlLabel control={<Switch color="error" size="small" />} checked={false} />
+                        </FormGroup>
+                    )}
                 </div>
             )
         }

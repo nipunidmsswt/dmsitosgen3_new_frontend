@@ -1,25 +1,21 @@
-import { useEffect, useState, forwardRef } from 'react';
+import { useEffect, useState } from 'react';
 import MaterialTable from 'material-table';
-
-import SuccessMsg from 'messages/SuccessMsg';
-import ErrorMsg from 'messages/ErrorMsg';
 import tableIcons from 'utils/MaterialTableIcons';
-import { gridSpacing } from 'store/constant';
+import BankDetail from './BankDetail';
+import SuccessMsg from '../../../../messages/SuccessMsg';
+import ErrorMsg from '../../../../messages/ErrorMsg';
 import { useSelector, useDispatch } from 'react-redux';
-import { getAllLocationDetails, getLatestModifiedLocationDetails } from 'store/actions/masterActions/LocationAction';
+import { getAllTaxData } from '../../../../store/actions/masterActions/TaxActions/TaxAction';
+import { getAllCompanyProfileData, getLatestModifiedDetails } from '../../../../store/actions/masterActions/CompanyProfileAction';
 import Grid from '@mui/material/Grid';
 import MainCard from 'ui-component/cards/MainCard';
-import { getAllGuideClassData } from 'store/actions/masterActions/GuideClassAction';
+import { gridSpacing } from 'store/constant';
 import { FormControlLabel, FormGroup, Switch } from '@mui/material';
-import ActivitySupplement from './ActivitySupplement';
-import {
-    getActivity_SupplementLatestModifiedDetails,
-    getAllActivity_SupplimentData
-} from 'store/actions/masterActions/Activity_SupplimentAction';
+import { getAllBranchData } from 'store/actions/masterActions/BankAction';
 
-function ViewActivitySupplement() {
+function ViewBankDetail() {
     const [open, setOpen] = useState(false);
-    const [activitySupplimentId, setActivitySupplimentId] = useState('');
+    const [code, setCode] = useState('');
     const [mode, setMode] = useState('INSERT');
     const [openToast, setHandleToast] = useState(false);
     const [openErrorToast, setOpenErrorToast] = useState(false);
@@ -28,44 +24,46 @@ function ViewActivitySupplement() {
 
     const columns = [
         {
-            title: 'Type',
-            field: 'type',
+            title: 'Company ID',
+            field: 'companyId',
             filterPlaceholder: 'filter',
-            align: 'center'
+            align: 'left'
         },
         {
-            title: 'Type Of Activity',
-            field: 'typeOfActivity',
+            title: 'Name',
+            field: 'companyName',
             filterPlaceholder: 'filter',
-            align: 'center'
+            align: 'left'
         },
-
         {
-            title: 'Code',
-            field: 'code',
-            filterPlaceholder: 'filter',
-            align: 'center'
+            title: 'Email',
+            field: 'email',
+            align: 'left',
+            grouping: false,
+            filterPlaceholder: 'filter'
         },
-
-        // {
-        //     title: 'Location Code',
-        //     field: 'locationCode',
-        //     filterPlaceholder: 'filter',
-        //     align: 'center'
-        // },
         {
-            title: 'Max Pax',
-            field: 'maxPax',
-            filterPlaceholder: 'filter',
-            align: 'center'
+            title: 'Website',
+            field: 'website',
+            align: 'left',
+            grouping: false,
+            filterPlaceholder: 'filter'
         },
-
+        {
+            title: 'Tax Registration',
+            field: 'taxRegistration',
+            align: 'right',
+            grouping: false,
+            filterPlaceholder: 'filter'
+        },
         {
             title: 'Status',
             field: 'status',
-            filterPlaceholder: 'True || False',
             align: 'center',
-            emptyValue: () => <em>null</em>,
+            lookup: {
+                true: 'Active',
+                false: 'Inactive'
+            },
             render: (rowData) => (
                 <div
                     style={{
@@ -78,11 +76,11 @@ function ViewActivitySupplement() {
                 >
                     {rowData.status === true ? (
                         <FormGroup>
-                            <FormControlLabel control={<Switch size="small" />} checked={true} />
+                            <FormControlLabel control={<Switch color="success" size="small" />} checked={true} />
                         </FormGroup>
                     ) : (
                         <FormGroup>
-                            <FormControlLabel control={<Switch size="small" />} checked={false} />
+                            <FormControlLabel control={<Switch color="error" size="small" />} checked={false} />
                         </FormGroup>
                     )}
                 </div>
@@ -91,50 +89,69 @@ function ViewActivitySupplement() {
     ];
 
     const dispatch = useDispatch();
-    const error = useSelector((state) => state.activity_supplimentReducer.errorMsg);
-    const activity_suppliment = useSelector((state) => state.activity_supplimentReducer.activity_suppliment);
-    const activity_supplimentList = useSelector((state) => state.activity_supplimentReducer.activity_supplimentList);
-    const lastModifiedDate = useSelector((state) => state.activity_supplimentReducer.lastModifiedDateTime);
+    const error = useSelector((state) => state.taxReducer.errorMsg);
+
+    const branchList = useSelector((state) => state.bankReducer.branches);
+    const companyProfileData = useSelector((state) => state.companyProfileReducer.companyProfile);
+    const lastModifiedDate = useSelector((state) => state.companyProfileReducer.lastModifiedDateTime);
 
     useEffect(() => {
-        setLastModifiedTimeDate(lastModifiedDate);
-    }, [lastModifiedDate]);
-
-    useEffect(() => {
-        if (activity_supplimentList?.length > 0) {
-            setTableData(activity_supplimentList);
+        console.log(branchList);
+        if (branchList?.payload?.length > 0) {
+            setTableData(branchList?.payload[0]);
         }
-    }, [activity_supplimentList]);
+    }, [branchList]);
 
     useEffect(() => {
+        console.log(error);
         if (error != null) {
+            console.log('failed Toast');
             setOpenErrorToast(true);
         }
     }, [error]);
 
     useEffect(() => {
-        if (activity_suppliment) {
+        console.log(companyProfileData);
+        console.log(typeof companyProfileData);
+        if (companyProfileData) {
             setHandleToast(true);
-            dispatch(getAllActivity_SupplimentData());
-            dispatch(getActivity_SupplementLatestModifiedDetails());
+            dispatch(getAllCompanyProfileData());
+            dispatch(getLatestModifiedDetails());
         }
-    }, [activity_suppliment]);
+    }, [companyProfileData]);
 
     useEffect(() => {
-        dispatch(getAllActivity_SupplimentData());
-        dispatch(getActivity_SupplementLatestModifiedDetails());
+        dispatch(getAllBranchData());
+        dispatch(getLatestModifiedDetails());
     }, []);
 
+    useEffect(() => {
+        setLastModifiedTimeDate(
+            lastModifiedDate === null
+                ? ''
+                : new Date(lastModifiedDate).toLocaleString('en-GB', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: '2-digit',
+                      hour: 'numeric',
+                      minute: 'numeric',
+                      hour12: true
+                  })
+        );
+    }, [lastModifiedDate]);
+
     const handleClickOpen = (type, data) => {
+        console.log(type);
+        console.log(data);
         if (type === 'VIEW_UPDATE') {
             setMode(type);
-            setActivitySupplimentId(data.id);
+            setCode(data.companyName);
         } else if (type === 'INSERT') {
-            setActivitySupplimentId('');
+            setCode('');
             setMode(type);
         } else {
             setMode(type);
-            setActivitySupplimentId(data.guideCode);
+            setCode(data.companyName);
         }
         setOpen(true);
     };
@@ -151,7 +168,7 @@ function ViewActivitySupplement() {
     };
     return (
         <div>
-            <MainCard title="Activity / Supplement">
+            <MainCard title="Company Profile Setup">
                 <div style={{ textAlign: 'right' }}> Last Modified Date : {lastModifiedTimeDate}</div>
                 <br />
                 <Grid container spacing={gridSpacing}>
@@ -175,7 +192,7 @@ function ViewActivitySupplement() {
                                         }),
                                         (rowData) => ({
                                             icon: tableIcons.VisibilityIcon,
-                                            tooltip: 'Edit',
+                                            tooltip: 'View',
                                             onClick: () => handleClickOpen('VIEW', rowData)
                                         })
                                     ]}
@@ -201,35 +218,29 @@ function ViewActivitySupplement() {
 
                                         headerStyle: {
                                             whiteSpace: 'nowrap',
-                                            height: 20,
-                                            maxHeight: 20,
+                                            height: 30,
+                                            maxHeight: 30,
                                             padding: 2,
                                             fontSize: '14px',
-                                            background: '-moz-linear-gradient(top, #0790E8, #3180e6)',
+                                            backgroundColor: '#2196F3',
                                             background: '-ms-linear-gradient(top, #0790E8, #3180e6)',
                                             background: '-webkit-linear-gradient(top, #0790E8, #3180e6)',
-                                            // textAlign: 'center',
-                                            color: '#FFF'
+                                            textAlign: 'center',
+                                            color: '#FFF',
+                                            textAlign: 'center'
                                         },
                                         rowStyle: {
                                             whiteSpace: 'nowrap',
                                             height: 20,
+                                            align: 'left',
+                                            // maxHeight: 20,
                                             fontSize: '13px',
                                             padding: 0
                                         }
                                     }}
                                 />
 
-                                {open ? (
-                                    <ActivitySupplement
-                                        open={open}
-                                        handleClose={handleClose}
-                                        activitySupplimentId={activitySupplimentId}
-                                        mode={mode}
-                                    />
-                                ) : (
-                                    ''
-                                )}
+                                {open ? <BankDetail open={open} handleClose={handleClose} code={code} mode={mode} /> : ''}
                                 {openToast ? <SuccessMsg openToast={openToast} handleToast={handleToast} mode={mode} /> : null}
                                 {openErrorToast ? (
                                     <ErrorMsg openToast={openErrorToast} handleToast={setOpenErrorToast} mode={mode} />
@@ -244,4 +255,4 @@ function ViewActivitySupplement() {
     );
 }
 
-export default ViewActivitySupplement;
+export default ViewBankDetail;

@@ -31,6 +31,8 @@ import { departmentDesignationReducer } from './reducers/masterReducer/Departmen
 import { actualGuideReducer } from './reducers/masterReducer/ActualGuideReducer';
 import { agentReducer } from './reducers/masterReducer/AgentReducer';
 import { activity_supplimentReducer } from './reducers/masterReducer/Activity_SupplimentReducer';
+import { bankReducer } from './reducers/masterReducer/BankReducer';
+import { branchReducer } from './reducers/masterReducer/BranchReducer';
 // ==============================|| COMBINE REDUCER ||============================== //
 
 const reducer = combineReducers({
@@ -66,7 +68,9 @@ const reducer = combineReducers({
     departmentDesignationReducer,
     actualGuideReducer,
     agentReducer,
-    activity_supplimentReducer
+    activity_supplimentReducer,
+    bankReducer,
+    branchReducer
 });
 
 export default reducer;
