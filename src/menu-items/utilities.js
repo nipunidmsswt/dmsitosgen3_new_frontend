@@ -359,6 +359,20 @@ const utilities = {
                     type: 'item',
                     url: '/master/activitysupplementview',
                     breadcrumbs: false
+                },
+                {
+                    id: 'bank-branch-id',
+                    title: 'Bank & Branches',
+                    type: 'item',
+                    url: '/master/bankbranches',
+                    breadcrumbs: false
+                },
+                {
+                    id: 'bank-detail-id',
+                    title: 'Bank Details',
+                    type: 'item',
+                    url: '/master/bankDetails',
+                    breadcrumbs: false
                 }
             ]
         }

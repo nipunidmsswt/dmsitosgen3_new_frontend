@@ -280,6 +280,7 @@ import {
     SAVE_HOTEL_FACILITY_DATA,
     UPDATE_HOTEL_FACILITY_DATA,
     GET_ALL_HOTEL_FACILITY_TYPES_DATA,
+    CHECK_HOTEL_FACILITY_DUPLICATE,
     GET_ALL_ACTIVE_ROOM_RECREATION_DATA,
     GET_ALL_ACTIVE_SERVICE_OFFERED_DATA,
     GET_ALL_ACTIVE_CHILDREN_FACILITIES_DATA,
@@ -539,6 +540,26 @@ import {
     UPDATE_HOTEL_MAIN_DATA
 } from 'store/constant/master/HotelMasterConstant';
 
+import {
+    CHECK_BRANCH_DUPLICATE,
+    GET_ALL_BANK_DATA,
+    GET_ALL_BRANCH_DATA,
+    GET_BRANCH_DATA_BY_ID,
+    GET_LAST_MODIFIED_DATE_TIME_BRANCH,
+    SAVE_BANK_DATA,
+    SAVE_BRANCH_DATA,
+    UPDATE_BRANCH_DATA
+} from 'store/constant/master/BankConstant';
+import {
+    saveBankSaga,
+    getAllBankSaga,
+    saveBranchSaga,
+    getAllBranchesSaga,
+    checkDupicateBranchesSaga,
+    updateBranchSaga,
+    getBranchByIdSaga,
+    checkLatestBranchModifiedDateSaga
+} from './mastersaga/Bank&BranchSaga';
 export function* wacherSaga() {
     // tax setup
     yield takeLatest(SAVE_TAX_DATA, saveTaxSaga);
@@ -705,8 +726,7 @@ export function* wacherSaga() {
     yield takeLatest(GET_HOTEL_FACILITY_DATA_BY_ID, getFacilityByIdSaga);
     yield takeLatest(GET_ALL_HOTEL_FACILITY_DATA, getAllHotelFacilitySaga);
     yield takeLatest(UPDATE_HOTEL_FACILITY_DATA, updateHotelFacilitySaga);
-    yield takeLatest(CHECK_HOTEL_CATEGORY_DUPLICATE, checkDupicateHotelFacilitySaga);
-
+    yield takeLatest(CHECK_HOTEL_FACILITY_DUPLICATE, checkDupicateHotelFacilitySaga);
     yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_HOTEL_FACILITY, checkLatestHotelFacilityModifiedDateSaga);
 
     //hotel facility types
@@ -823,6 +843,19 @@ export function* wacherSaga() {
     yield takeLatest(CHECK_ACTIVITY_SUPPLIMENT_CODE_DUPLICATE, checkActivity_SupplimentDupicateCodeSaga);
     yield takeLatest(UPDATE_ACTIVITY_SUPPLIMENT_DATA, updateActivity_SupplimentDataSaga);
     yield takeLatest(GET_ALL_ACTIVE_ACTIVITY_SUPPLIMENT_DATA, getAllActiveActivity_SupplimentDataSaga);
+
+    //bank
+    yield takeLatest(SAVE_BANK_DATA, saveBankSaga);
+    yield takeLatest(GET_ALL_BANK_DATA, getAllBankSaga);
+
+    // branch
+    yield takeLatest(SAVE_BRANCH_DATA, saveBranchSaga);
+    yield takeLatest(GET_ALL_BRANCH_DATA, getAllBranchesSaga);
+    yield takeLatest(GET_BRANCH_DATA_BY_ID, getBranchByIdSaga);
+    yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_BRANCH, checkLatestBranchModifiedDateSaga);
+    yield takeLatest(CHECK_BRANCH_DUPLICATE, checkDupicateBranchesSaga);
+    yield takeLatest(UPDATE_BRANCH_DATA, updateBranchSaga);
+    // yield takeLatest(GET_ALL_ACTIVE_BRANCH, getAllActiveActivity_SupplimentDataSaga);
 
     // active facilies
     yield takeLatest(GET_ALL_ACTIVE_ROOM_RECREATION_DATA, getAllActiveRoomRecreationSaga);

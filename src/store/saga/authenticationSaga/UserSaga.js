@@ -111,7 +111,7 @@ export function* getProfileDataByIdSaga(action) {
 export function* updateUserSaga(action) {
     console.log('updateTaxSaga tax saga');
     console.log(action);
-    action.data.path = `${process.env.REACT_APP_USER_MANAGEMENT_URL}/userByAdmin/`;
+    action.data.path = `${process.env.REACT_APP_USER_MANAGEMENT_URL}/userByAdmin`;
     let responseData = [];
     let responseData2 = [];
     try {

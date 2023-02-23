@@ -14,6 +14,7 @@ import {
     FAILED_LAST_MODIFIED_DATE_HOTEL_FACILITY,
     SUCCESS_HOTEL_FACILITY_TYPES_LIST_DATA,
     FAILED_HOTEL_FACILITY_TYPES_LIST_DATA,
+    HOTEL_FACILITY_DUPLICATE,
     SUCCESS_ACTIVE_ROOM_RECREATION_LIST_DATA,
     FAILED_ACTIVE_ROOM_RECREATION_LIST_DATA,
     SUCCESS_ACTIVE_FACILITIES_OFFERED_LIST_DATA,
@@ -112,15 +113,15 @@ export function* checkDupicateHotelFacilitySaga(action) {
 
     let responseData = [];
     try {
-        responseData = yield call(getById, `${process.env.REACT_APP_ACCOMODATION_URL}/sessionCheck/${action.data.taxCode}`);
+        responseData = yield call(getById, `${process.env.REACT_APP_ACCOMODATION_URL}/hotelfacility/hotelFacilityCheck/{code}`);
         console.log(responseData);
         yield put({
-            type: CHECK_HOTEL_FACILITY_DUPLICATE,
+            type: HOTEL_FACILITY_DUPLICATE,
             data: responseData.data
         });
     } catch (e) {
         console.log(responseData);
-        yield put({ type: CHECK_HOTEL_FACILITY_DUPLICATE, data: responseData });
+        yield put({ type: HOTEL_FACILITY_DUPLICATE, data: responseData });
     }
 }
 
