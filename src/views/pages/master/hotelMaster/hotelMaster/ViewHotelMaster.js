@@ -1,6 +1,6 @@
 import { useEffect, useState, forwardRef } from 'react';
 import MaterialTable from 'material-table';
-
+import SendIcon from '@mui/icons-material/Send';
 import SuccessMsg from 'messages/SuccessMsg';
 import ErrorMsg from 'messages/ErrorMsg';
 import tableIcons from 'utils/MaterialTableIcons';
@@ -9,15 +9,15 @@ import { useSelector, useDispatch } from 'react-redux';
 import { getAllLocationDetails, getLatestModifiedLocationDetails } from 'store/actions/masterActions/LocationAction';
 import Grid from '@mui/material/Grid';
 import MainCard from 'ui-component/cards/MainCard';
-
-import { FormControlLabel, FormGroup, Switch } from '@mui/material';
+import { useNavigate } from 'react-router';
+import { Button, FormControlLabel, FormGroup, Switch } from '@mui/material';
 
 import {
     getActivity_SupplementLatestModifiedDetails,
     getAllActivity_SupplimentData
 } from 'store/actions/masterActions/Activity_SupplimentAction';
 import HotelMaster from './HotelMaster';
-import { getAllHotelMainData } from 'store/actions/masterActions/HotelMasterAction';
+import { getAllHotelMainData, getHotelLatestModifiedDetails } from 'store/actions/masterActions/HotelMasterAction';
 
 function ViewHotelMaster() {
     const [open, setOpen] = useState(false);
@@ -27,25 +27,25 @@ function ViewHotelMaster() {
     const [openErrorToast, setOpenErrorToast] = useState(false);
     const [tableData, setTableData] = useState([]);
     const [lastModifiedTimeDate, setLastModifiedTimeDate] = useState(null);
-
+    const navigate = useNavigate();
     const columns = [
         {
             title: 'Hotel Code',
             field: 'hotelCode',
             filterPlaceholder: 'filter',
-            align: 'center'
+            align: 'left'
         },
         {
             title: 'Property Code',
             field: 'propertyCode',
             filterPlaceholder: 'filter',
-            align: 'center'
+            align: 'left'
         },
         {
             title: 'Hotel Name',
             field: 'longName',
             filterPlaceholder: 'filter',
-            align: 'center'
+            align: 'left'
         },
 
         {
@@ -59,20 +59,20 @@ function ViewHotelMaster() {
             title: 'Email',
             field: 'email',
             filterPlaceholder: 'filter',
-            align: 'center'
+            align: 'left'
         },
         // {
         //     title: 'Max Pax',
         //     field: 'maxPax',
         //     filterPlaceholder: 'filter',
-        //     align: 'center'
+        //     align: 'left'
         // },
 
         {
             title: 'Status',
             field: 'status',
             filterPlaceholder: 'True || False',
-            align: 'center',
+            align: 'left',
             emptyValue: () => <em>null</em>,
             render: (rowData) => (
                 <div
@@ -95,21 +95,121 @@ function ViewHotelMaster() {
                     )}
                 </div>
             )
+        },
+        {
+            title: 'Room Buying Rate',
+            field: 'status',
+            filterPlaceholder: 'True || False',
+            align: 'center',
+            emptyValue: () => <em>null</em>,
+            render: (rowData) => (
+                <div>
+                    <div
+                        style={{
+                            alignItems: 'center',
+                            align: 'center',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center'
+                        }}
+                    >
+                        {/* {rowData.status === true ? ( */}
+                        <FormGroup>
+                            <Button variant="outlined" endIcon={<SendIcon />}>
+                                Buying Rates
+                            </Button>
+                            {/* <FormControlLabel control={<Switch size="small" />} checked={true} /> */}
+                        </FormGroup>
+                    </div>
+                </div>
+            )
+        },
+
+        {
+            title: 'Room Count',
+            field: 'status',
+            filterPlaceholder: 'True || False',
+            align: 'center',
+            emptyValue: () => <em>null</em>,
+            render: (rowData) => (
+                <div>
+                    <div
+                        style={{
+                            alignItems: 'center',
+                            align: 'center',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center'
+                        }}
+                    >
+                        {/* {rowData.status === true ? ( */}
+                        <FormGroup>
+                            <Button variant="outlined" endIcon={<SendIcon />}>
+                                Room Count
+                            </Button>
+                            {/* <FormControlLabel control={<Switch size="small" />} checked={true} /> */}
+                        </FormGroup>
+                    </div>
+                </div>
+            )
+        },
+
+        {
+            title: 'Hotel Facility Count',
+            field: 'hotelCode',
+            filterPlaceholder: 'True || False',
+            align: 'center',
+            emptyValue: () => <em>null</em>,
+            render: (rowData) => (
+                <div>
+                    <div
+                        style={{
+                            alignItems: 'center',
+                            align: 'center',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center'
+                        }}
+                    >
+                        {/* {rowData.status === true ? ( */}
+                        <FormGroup>
+                            <Button variant="outlined" endIcon={<SendIcon />} onClick={loadRoomCountView}>
+                                Hotel Facility Count
+                            </Button>
+                            {/* <FormControlLabel control={<Switch size="small" />} checked={true} /> */}
+                        </FormGroup>
+                    </div>
+                </div>
+            )
         }
     ];
 
+    const loadRoomCountView = () => {
+        navigate('/master/facilitycountview', { replace: true });
+        // setHandleToast(false);
+    };
     const dispatch = useDispatch();
     const error = useSelector((state) => state.activity_supplimentReducer.errorMsg);
     const hotelMainData = useSelector((state) => state.hotelMainReducer.hotelMain);
     const hotelMainList = useSelector((state) => state.hotelMainReducer.hotelMainList);
-    const lastModifiedDate = useSelector((state) => state.activity_supplimentReducer.lastModifiedDateTime);
+    const lastModifiedDate = useSelector((state) => state.hotelMainReducer.lastModifiedDateTime);
 
     useEffect(() => {
-        setLastModifiedTimeDate(lastModifiedDate);
+        setLastModifiedTimeDate(
+            lastModifiedDate === null
+                ? ''
+                : new Date(lastModifiedDate).toLocaleString('en-GB', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: '2-digit',
+                      hour: 'numeric',
+                      minute: 'numeric',
+                      hour12: true
+                  })
+        );
     }, [lastModifiedDate]);
 
     useEffect(() => {
-        console.log(hotelMainList);
         if (hotelMainList?.payload?.length > 0) {
             setTableData(hotelMainList.payload[0]);
         }
@@ -126,24 +226,22 @@ function ViewHotelMaster() {
             setHandleToast(true);
 
             dispatch(getAllHotelMainData());
+            dispatch(getHotelLatestModifiedDetails());
         }
     }, [hotelMainData]);
 
     useEffect(() => {
         dispatch(getAllHotelMainData());
-        // dispatch(getActivity_SupplementLatestModifiedDetails());
+        dispatch(getHotelLatestModifiedDetails());
     }, []);
 
     const handleClickOpen = (type, data) => {
-        if (type === 'VIEW_UPDATE') {
+        if (type === 'VIEW_UPDATE' || type == 'VIEW') {
             setMode(type);
             setActivitySupplimentId(data.id);
         } else if (type === 'INSERT') {
             setActivitySupplimentId('');
             setMode(type);
-        } else {
-            setMode(type);
-            setActivitySupplimentId(data.guideCode);
         }
         setOpen(true);
     };
@@ -217,8 +315,9 @@ function ViewHotelMaster() {
                                             background: '-moz-linear-gradient(top, #0790E8, #3180e6)',
                                             background: '-ms-linear-gradient(top, #0790E8, #3180e6)',
                                             background: '-webkit-linear-gradient(top, #0790E8, #3180e6)',
-                                            // textAlign: 'center',
+                                            textAlign: 'center',
                                             color: '#FFF'
+                                            // alignItems: 'center'
                                         },
                                         rowStyle: {
                                             whiteSpace: 'nowrap',
@@ -230,12 +329,7 @@ function ViewHotelMaster() {
                                 />
 
                                 {open ? (
-                                    <HotelMaster
-                                        open={open}
-                                        handleClose={handleClose}
-                                        activitySupplimentId={activitySupplimentId}
-                                        mode={mode}
-                                    />
+                                    <HotelMaster open={open} handleClose={handleClose} hotelId={activitySupplimentId} mode={mode} />
                                 ) : (
                                     ''
                                 )}

@@ -92,33 +92,33 @@ export const hotelFacilityReducer = (state = initialState, action) => {
             return { ...state, hotelFacilityTypes: data };
 
         case SUCCESS_ACTIVE_ROOM_RECREATION_LIST_DATA:
-            console.log(data.payload[0].Rec);
-            return { ...state, activeRoomRecreationList: data.payload[0].Rec };
+            console.log(data.payload[0]);
+            return { ...state, activeRoomRecreationList: data.payload[0] };
 
         case FAILED_ACTIVE_ROOM_RECREATION_LIST_DATA:
-            // console.log(data.payload[0].facility);
-            return { ...state, activeRoomRecreationList: data.payload[0].Rec };
+            console.log(data.payload[0]);
+            return { ...state, activeRoomRecreationList: data.payload[0] };
 
         case SUCCESS_ACTIVE_FACILITIES_OFFERED_LIST_DATA:
             // console.log(data.payload[0].facility);
-            return { ...state, activeFacilityOfferedList: data.payload[0].FO };
+            return { ...state, activeFacilityOfferedList: data.payload[0] };
 
         case FAILED_ACTIVE_FACILITIES_OFFERED_LIST_DATA:
-            return { ...state, activeFacilityOfferedList: data.payload[0].FO };
+            return { ...state, activeFacilityOfferedList: data.payload[0] };
 
         case SUCCESS_ACTIVE_CHILDREN_FACILITIES_LIST_DATA:
             // console.log(data.payload[0].facility);
-            return { ...state, activeChildrenFacilitiesList: data.payload[0].CF };
+            return { ...state, activeChildrenFacilitiesList: data.payload[0] };
 
         case FAILED_ACTIVE_CHILDREN_FACILITIES_LIST_DATA:
-            return { ...state, activeChildrenFacilitiesList: data.payload[0].CF };
+            return { ...state, activeChildrenFacilitiesList: data.payload[0] };
 
         case SUCCESS_ACTIVE_SERVICE_OFFERED_LIST_DATA:
             // console.log(data.payload[0].facility);
-            return { ...state, activeServiceOfferedList: data.payload[0].SO };
+            return { ...state, activeServiceOfferedList: data.payload[0] };
 
         case FAILED_ACTIVE_SERVICE_OFFERED_LIST_DATA:
-            return { ...state, activeServiceOfferedList: data.payload[0].SO };
+            return { ...state, activeServiceOfferedList: data.payload[0] };
 
         default:
             return state;
