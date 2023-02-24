@@ -47,7 +47,7 @@ export function* getHotelMainByIdSaga(action) {
 
     let responseData = [];
     try {
-        responseData = yield call(getById, `${process.env.REACT_APP_ACCOMODATION_URL}/hotelcategory/${action.data.id}`);
+        responseData = yield call(getById, `${process.env.REACT_APP_ACCOMODATION_URL}/hotel/${action.data.id}`);
         console.log(responseData.data.payload);
         yield put({ type: SUCCESS_GET_HOTEL_MAIN_DATA_BY_ID, data: responseData.data });
     } catch (e) {
@@ -59,7 +59,7 @@ export function* getHotelMainByIdSaga(action) {
 export function* updateHotelMainSaga(action) {
     console.log('update Tax groupSaga tax saga');
     console.log(action);
-    action.data.path = `${process.env.REACT_APP_ACCOMODATION_URL}/hotelcategory/${action.data.code}`;
+    action.data.path = `${process.env.REACT_APP_ACCOMODATION_URL}/hotel`;
     let responseData = [];
     try {
         responseData = yield call(update, action.data);
@@ -72,12 +72,9 @@ export function* updateHotelMainSaga(action) {
 }
 
 export function* checkDupicateHotelMainCodeSaga(action) {
-    console.log('checkDupicateHotelMainCodeSaga tax saga');
-    console.log(action.data.code);
-
     let responseData = [];
     try {
-        responseData = yield call(getById, `${process.env.REACT_APP_ACCOMODATION_URL}/hotelcategory/codeDuplicate/${action.data.code}`);
+        responseData = yield call(getById, `${process.env.REACT_APP_ACCOMODATION_URL}/hotelDuplicate/${action.data.code}`);
         console.log(responseData);
         yield put({ type: HOTEL_MAIN_DUPLICATE, data: responseData.data });
     } catch (e) {
@@ -89,8 +86,7 @@ export function* checkDupicateHotelMainCodeSaga(action) {
 export function* checkLatestHotelMainModifiedDateSaga() {
     let responseData = [];
     try {
-        responseData = yield call(get, `${process.env.REACT_APP_FINANCE_URL}/hotelcategory/lastModifiedDateTime`);
-        console.log('response data last:' + responseData);
+        responseData = yield call(get, `${process.env.REACT_APP_ACCOMODATION_URL}/hotels/lastModified`);
         yield put({ type: SUCCESS_LAST_MODIFIED_DATE_HOTEL_MAIN, data: responseData.data });
     } catch (e) {
         console.log('Error:' + e);
