@@ -1,45 +1,61 @@
-import { FormControlLabel, FormGroup, Grid, Switch } from '@mui/material';
-import MaterialTable from 'material-table';
+import { FormControlLabel, FormGroup, Grid, Switch, Paper, Button } from '@mui/material';
+import MaterialTable, { MTableToolbar } from 'material-table';
 import React from 'react';
 import MainCard from 'ui-component/cards/MainCard';
 import tableIcons from 'utils/MaterialTableIcons';
 import { gridSpacing } from 'store/constant';
-import { useEffect, useState, forwardRef } from 'react';
-import Tax from './Tax';
+import { useEffect, useState } from 'react';
+import Branch from './Branch';
+import Bank from './Bank';
 import { useSelector, useDispatch } from 'react-redux';
 import { getAllTaxData, getLatestModifiedTaxDetails } from 'store/actions/masterActions/TaxActions/TaxAction';
+import { getAllBranchData, getLatestModifiedBranchDetails } from 'store/actions/masterActions/BankAction';
 import SuccessMsg from 'messages/SuccessMsg';
 import ErrorMsg from 'messages/ErrorMsg';
 
-const ViewTax = () => {
+const ViewBranchDetails = () => {
     const columns = [
         {
-            title: 'Tax Code',
-            field: 'taxCode',
-            filterPlaceholder: 'Tax Code',
+            title: 'Bank Name',
+            field: 'bankCode.bankName',
+            filterPlaceholder: 'Bank Name',
             align: 'left'
         },
         {
-            title: 'Tax Description',
-            field: 'taxDescription',
+            title: 'Branch Code',
+            field: 'branchCode',
+            filterPlaceholder: 'Branch Code',
+            align: 'left'
+        },
+        {
+            title: 'Branch Name',
+            field: 'branchName',
             filterPlaceholder: 'Tax Description',
             align: 'left'
         },
         {
-            title: 'Percentage %',
-            field: 'percentage',
-            align: 'right',
-            grouping: false,
-            filterPlaceholder: 'Percentage'
+            title: 'Branch Description',
+            field: 'branchDesc',
+            filterPlaceholder: 'Branch Description',
+            align: 'left'
+        },
+        {
+            title: 'Branch Prefix',
+            field: 'branchPrefix',
+            filterPlaceholder: 'Branch Prefix',
+            align: 'left'
         },
         {
             title: 'Status',
             field: 'status',
+            // filterPlaceholder: "True || False",
             align: 'center',
             lookup: {
                 true: 'Active',
                 false: 'Inactive'
             },
+
+            // emptyValue: () => <em>null</em>,
             render: (rowData) => (
                 <div
                     style={{
@@ -68,20 +84,33 @@ const ViewTax = () => {
         }
     ];
     const [open, setOpen] = useState(false);
-    const [rowTaxCode, setTaxCode] = useState('');
+    const [id, setId] = useState('');
     const [mode, setMode] = useState('INSERT');
     const [tableData, setTableData] = useState([]);
     const [openToast, setHandleToast] = useState(false);
     const [openErrorToast, setOpenErrorToast] = useState(false);
     const [lastModifiedTimeDate, setLastModifiedTimeDate] = useState(null);
+    const [openBankDialog, setOpenBankDialog] = useState(false);
     const dispatch = useDispatch();
-    const error = useSelector((state) => state.taxReducer.errorMsg);
-    const taxListData = useSelector((state) => state.taxReducer.taxes);
-    const taxData = useSelector((state) => state.taxReducer.tax);
-    const lastModifiedDate = useSelector((state) => state.taxReducer.lastModifiedDateTime);
+    const error = useSelector((state) => state.branchReducer.errorMsg);
+
+    const bankData = useSelector((state) => state.bankReducer.bank);
+    const branchData = useSelector((state) => state.branchReducer.branch);
+    const branchList = useSelector((state) => state.branchReducer.branches);
+    const lastModifiedDate = useSelector((state) => state.branchReducer.lastModifiedDateTime);
+
+    useEffect(() => {
+        console.log(branchList);
+        if (branchList?.payload?.length > 0) {
+            setTableData(branchList?.payload[0]);
+        }
+    }, [branchList]);
 
     const handleClose = () => {
         setOpen(false);
+    };
+    const handleBankClose = () => {
+        setOpenBankDialog(false);
     };
     useEffect(() => {
         if (error != null) {
@@ -90,29 +119,30 @@ const ViewTax = () => {
     }, [error]);
 
     useEffect(() => {
-        if (taxData) {
+        if (bankData) {
+            setMode('INSERT');
             setHandleToast(true);
-
-            dispatch(getAllTaxData());
-            dispatch(getLatestModifiedTaxDetails());
         }
-    }, [taxData]);
+    }, [bankData]);
 
     useEffect(() => {
-        dispatch(getAllTaxData());
-        dispatch(getLatestModifiedTaxDetails());
+        console.log(branchData);
+        if (branchData) {
+            setHandleToast(true);
+            dispatch(getAllBranchData());
+            dispatch(getLatestModifiedBranchDetails());
+        }
+    }, [branchData]);
+
+    useEffect(() => {
+        dispatch(getAllBranchData());
+        dispatch(getLatestModifiedBranchDetails());
     }, []);
 
     useEffect(() => {
-        console.log(taxListData);
-        if (taxListData?.length > 0) {
-            setTableData(taxListData);
-        }
-    }, [taxListData]);
-
-    useEffect(() => {
+        console.log(lastModifiedDate);
         setLastModifiedTimeDate(
-            lastModifiedDate === ''
+            lastModifiedDate === null
                 ? ''
                 : new Date(lastModifiedDate).toLocaleString('en-GB', {
                       year: 'numeric',
@@ -128,26 +158,29 @@ const ViewTax = () => {
     const handleClickOpen = (type, data) => {
         if (type === 'VIEW_UPDATE') {
             setMode(type);
-            setTaxCode(data.taxCode);
+            setId(data.branchId);
+            setOpen(true);
         } else if (type === 'INSERT') {
-            setTaxCode('');
+            setId('');
             setMode(type);
+            setOpen(true);
+        } else if (type === 'BANK') {
+            setMode(type);
+            setOpenBankDialog(true);
         } else {
             setMode(type);
-            setTaxCode(data.taxCode);
+            setId(data.branchId);
+            setOpen(true);
         }
-        setOpen(true);
     };
 
     const handleToast = () => {
         setHandleToast(false);
     };
-    const handleErrorToast = () => {
-        setOpenErrorToast(false);
-    };
+
     return (
         <div>
-            <MainCard title="Tax Setup">
+            <MainCard title="Bank & Branch Setup">
                 <div style={{ textAlign: 'right' }}> Last Modified Date : {lastModifiedTimeDate}</div>
                 <br />
                 <Grid container spacing={gridSpacing}>
@@ -160,8 +193,14 @@ const ViewTax = () => {
                                     data={tableData}
                                     actions={[
                                         {
+                                            icon: tableIcons.AccountBalanceIcon,
+                                            tooltip: 'Add New Bank',
+                                            isFreeAction: true,
+                                            onClick: () => handleClickOpen('BANK', null)
+                                        },
+                                        {
                                             icon: tableIcons.Add,
-                                            tooltip: 'Add New',
+                                            tooltip: 'Add New Branch',
                                             isFreeAction: true,
                                             onClick: () => handleClickOpen('INSERT', null)
                                         },
@@ -221,8 +260,75 @@ const ViewTax = () => {
                                         }
                                     }}
                                 />
+                                {/* <MaterialTable
+                                    components={{
+                                        Toolbar: (props) => (
+                                            <div
+                                                style={{
+                                                    display: 'flex',
+                                                    justifyContent: 'flex-end',
+                                                    alignItems: 'center'
+                                                }}
+                                            >
+                                                <Button style={{ height: 'fit-content' }} color="primary" variant="contained">
+                                                    Quotations
+                                                </Button>
+                                                <div style={{ width: '13rem' }}>
+                                                    <MTableToolbar {...props} />
+                                                </div>
+                                            </div>
+                                        ),
+                                        Container: (props) => <Paper {...props} elevation={8} />
+                                    }}
+                                    title={lastModifiedTimeDate}
+                                    columns={columns}
+                                    data={tableData}
+                                    options={{
+                                        padding: 'dense',
+                                        showTitle: false,
+                                        sorting: true,
+                                        search: true,
+                                        searchFieldAlignment: 'right',
+                                        searchAutoFocus: true,
+                                        searchFieldVariant: 'standard',
+                                        filtering: true,
+                                        paging: true,
+                                        pageSizeOptions: [5, 10, 20, 50, 100],
+                                        pageSize: 5,
+                                        paginationType: 'stepped',
+                                        showFirstLastPageButtons: false,
+                                        exportButton: true,
+                                        exportAllData: true,
+                                        exportFileName: 'Tax Data',
+                                        actionsColumnIndex: -1,
+                                        columnsButton: true,
+                                        color: 'primary',
 
-                                {open ? <Tax open={open} handleClose={handleClose} rowTaxCode={rowTaxCode} mode={mode} /> : ''}
+                                        headerStyle: {
+                                            whiteSpace: 'nowrap',
+                                            height: 30,
+                                            maxHeight: 30,
+                                            padding: 2,
+                                            fontSize: '14px',
+                                            backgroundColor: '#2196F3',
+                                            background: '-ms-linear-gradient(top, #0790E8, #3180e6)',
+                                            background: '-webkit-linear-gradient(top, #0790E8, #3180e6)',
+                                            textAlign: 'center',
+                                            color: '#FFF',
+                                            textAlign: 'center'
+                                        },
+                                        rowStyle: {
+                                            whiteSpace: 'nowrap',
+                                            height: 20,
+                                            align: 'left',
+                                            // maxHeight: 20,
+                                            fontSize: '13px',
+                                            padding: 0
+                                        }
+                                    }}
+                                /> */}
+                                {openBankDialog ? <Bank open={openBankDialog} handleClose={handleBankClose} id={id} mode={mode} /> : ''}
+                                {open ? <Branch open={open} handleClose={handleClose} id={id} mode={mode} /> : ''}
                                 {openToast ? <SuccessMsg openToast={openToast} handleToast={handleToast} mode={mode} /> : null}
                                 {openErrorToast ? (
                                     <ErrorMsg openToast={openErrorToast} handleToast={setOpenErrorToast} mode={mode} />
@@ -237,4 +343,4 @@ const ViewTax = () => {
     );
 };
 
-export default ViewTax;
+export default ViewBranchDetails;

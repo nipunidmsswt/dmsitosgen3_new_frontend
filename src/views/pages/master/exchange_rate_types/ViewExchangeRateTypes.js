@@ -1,4 +1,4 @@
-import { useEffect, useState, forwardRef } from 'react';
+import { useEffect, useState } from 'react';
 import MaterialTable from 'material-table';
 import ExchangeRateTypes from './ExchangeRateTypes';
 import SuccessMsg from 'messages/SuccessMsg';
@@ -7,7 +7,7 @@ import tableIcons from 'utils/MaterialTableIcons';
 import { useSelector, useDispatch } from 'react-redux';
 import { getAllExChangeRateData, getLatestModifiedDetails } from 'store/actions/masterActions/exchangeRateActions/ExchangeRateActions';
 import MainCard from 'ui-component/cards/MainCard';
-import { Grid } from '@mui/material';
+import { Grid, FormGroup, FormControlLabel, Switch } from '@mui/material';
 import { gridSpacing } from 'store/constant';
 
 function ViewExchangeRateTypes() {
@@ -39,23 +39,32 @@ function ViewExchangeRateTypes() {
             filterPlaceholder: 'filter'
         },
         {
-            title: 'Active',
+            title: 'Status',
             field: 'status',
-            filterPlaceholder: 'True || False',
             align: 'center',
-            emptyValue: () => <em>null</em>,
+            lookup: {
+                true: 'Active',
+                false: 'Inactive'
+            },
             render: (rowData) => (
                 <div
                     style={{
-                        color: rowData.status === true ? '#008000aa' : '#f90000aa',
-                        fontWeight: 'bold',
-                        // background: rowData.status === true ? "#008000aa" : "#f90000aa",
-                        borderRadius: '4px',
-                        paddingLeft: 5,
-                        paddingRight: 5
+                        alignItems: 'center',
+                        align: 'center',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center'
                     }}
                 >
-                    {rowData.status === true ? 'Active' : 'Inactive'}
+                    {rowData.status === true ? (
+                        <FormGroup>
+                            <FormControlLabel control={<Switch size="small" />} checked={true} />
+                        </FormGroup>
+                    ) : (
+                        <FormGroup>
+                            <FormControlLabel control={<Switch color="error" size="small" />} checked={false} />
+                        </FormGroup>
+                    )}
                 </div>
             )
         }

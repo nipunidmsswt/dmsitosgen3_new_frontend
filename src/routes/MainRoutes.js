@@ -32,6 +32,9 @@ import ViewActivitySupplement from 'views/pages/master/activity_supplement/ViewA
 import VIewActualGuide from 'views/pages/master/guideMaster/actual_guide/VIewActualGuide';
 import ViewHotelMaster from 'views/pages/master/hotelMaster/hotelMaster/ViewHotelMaster';
 import ViewManagingComapany from 'views/pages/master/managing_company/ViewManagingCompnay';
+import RoomBuyingRates from 'views/pages/master/hotelMaster/RoomBuyingRates/RoomBuyingRates';
+import ViewBankDetail from 'views/pages/master/bank_detail/ViewBankDetail';
+import ViewBranchDetails from 'views/pages/master/bank/ViewBranchDetails';
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
 
@@ -229,6 +232,18 @@ const MainRoutes = {
                 {
                     path: 'managingCompanyview',
                     element: <ViewManagingComapany />
+                },
+                {
+                    path: 'roomBuyingrates',
+                    element: <RoomBuyingRates />
+                },
+                {
+                    path: 'bankDetails',
+                    element: <ViewBankDetail />
+                },
+                {
+                    path: 'bankbranches',
+                    element: <ViewBranchDetails />
                 }
             ]
         }

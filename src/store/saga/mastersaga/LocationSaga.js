@@ -1,5 +1,5 @@
 import { put, call } from 'redux-saga/effects';
-import { create, getById, updateWithUpload, get, createWithUpload } from '../../../apis/Apis';
+import { create, getById, updateWithUpload, get, createWithUpload, update } from '../../../apis/Apis';
 import {
     ADD_SUCCESS_LOCATION_DATA,
     ADD_FAILED_LOCATION_DATA,
@@ -84,36 +84,36 @@ export function* updateLocationSaga(action) {
     try {
         responseData = yield call(update, action.data);
         console.log(responseData);
-        // if (responseData.data.errorMessages.length === 0) {
-        //     console.log('in side hfcsfsek');
-        //     let formData = new FormData();
-        //     console.log(action.data.files);
-        //     if (action.data.files.length !== 0) {
-        //         console.log('in side gdywetwytwu');
-        //         // formData.append(`files`, JSON.stringify(action.data.files));
-        //         formData.append(`id`, responseData.data.payload[0].UpdateLocation.location_id);
-        //         if (action.data.files != undefined) {
-        //             for (let i = 0; i < action.data.files.length; i++) {
-        //                 formData.append(`files`, action.data.files[i]);
-        //             }
-        //         }
-        //         const requestOptions = {
-        //             method: 'POST',
-        //             body: formData
-        //         };
-        //         requestOptions.path = `${process.env.REACT_APP_ACCOMODATION_URL}/location/locationImg/`;
-        //         responseData2 = yield call(createWithUpload, requestOptions);
-        //         console.log(responseData2);
-        //         if (responseData2.status == 201 || responseData2.status == 200) {
-        //             console.log('responseData2');
-        //             yield put({ type: UPDATE_SUCCESS_LOCATION_DATA, data: responseData.data });
-        //         } else {
-        //             yield put({ type: UPDATE_FAILED_LOCATION_DATA, data: 'error' });
-        //         }
-        //     } else {
-        //         yield put({ type: UPDATE_SUCCESS_LOCATION_DATA, data: responseData.data });
-        //     }
-        // }
+        if (responseData.data.errorMessages.length === 0) {
+            console.log('in side hfcsfsek');
+            let formData = new FormData();
+            console.log(action.data.files);
+            if (action.data.files.length !== 0) {
+                console.log('in side gdywetwytwu');
+                // formData.append(`files`, JSON.stringify(action.data.files));
+                formData.append(`id`, responseData.data.payload[0].UpdateLocation.location_id);
+                if (action.data.files != undefined) {
+                    for (let i = 0; i < action.data.files.length; i++) {
+                        formData.append(`files`, action.data.files[i]);
+                    }
+                }
+                const requestOptions = {
+                    method: 'POST',
+                    body: formData
+                };
+                requestOptions.path = `${process.env.REACT_APP_ACCOMODATION_URL}/location/locationImg/`;
+                responseData2 = yield call(createWithUpload, requestOptions);
+                console.log(responseData2);
+                if (responseData2.status == 201 || responseData2.status == 200) {
+                    console.log('responseData2');
+                    yield put({ type: UPDATE_SUCCESS_LOCATION_DATA, data: responseData.data });
+                } else {
+                    yield put({ type: UPDATE_FAILED_LOCATION_DATA, data: 'error' });
+                }
+            } else {
+                yield put({ type: UPDATE_SUCCESS_LOCATION_DATA, data: responseData.data });
+            }
+        }
     } catch (e) {
         console.log(e);
         yield put({ type: UPDATE_FAILED_LOCATION_DATA, data: responseData.data });

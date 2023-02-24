@@ -956,7 +956,7 @@ function User({ open, handleClose, mode, userCode, component }) {
                                                                                 }
                                                                                 onChange={handleChange}
                                                                                 value={values.status}
-                                                                                control={<Switch color="success" />}
+                                                                                control={<Switch />}
                                                                                 label="Status"
                                                                                 checked={values.status}
                                                                             />

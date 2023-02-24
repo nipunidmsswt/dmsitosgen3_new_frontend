@@ -8,7 +8,7 @@ import { gridSpacing } from 'store/constant';
 import MainCard from 'ui-component/cards/MainCard';
 import { useSelector, useDispatch } from 'react-redux';
 import { getAllHotelFacilityData } from 'store/actions/masterActions/HotelFacilityAction';
-import { Grid } from '@mui/material';
+import { Grid, FormGroup, FormControlLabel, Switch } from '@mui/material';
 
 function ViewHotelFacility() {
     const [open, setOpen] = useState(false);
@@ -22,19 +22,19 @@ function ViewHotelFacility() {
             title: 'Code',
             field: 'code',
             filterPlaceholder: 'filter',
-            align: 'center'
+            align: 'left'
         },
         {
             title: 'Name',
             field: 'name',
             filterPlaceholder: 'filter',
-            align: 'center'
+            align: 'left'
         },
         {
             title: 'Type',
             field: 'hotelFacilityType.hotelFacilityType',
             filterPlaceholder: 'filter',
-            align: 'center'
+            align: 'left'
         },
         {
             title: 'Active',
@@ -45,15 +45,22 @@ function ViewHotelFacility() {
             render: (rowData) => (
                 <div
                     style={{
-                        color: rowData.status === true ? '#008000aa' : '#f90000aa',
-                        fontWeight: 'bold',
-                        // background: rowData.status === true ? "#008000aa" : "#f90000aa",
-                        borderRadius: '4px',
-                        paddingLeft: 5,
-                        paddingRight: 5
+                        alignItems: 'center',
+                        align: 'center',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center'
                     }}
                 >
-                    {rowData.status === true ? 'Active' : 'Inactive'}
+                    {rowData.status === true ? (
+                        <FormGroup>
+                            <FormControlLabel control={<Switch color="success" size="small" />} checked={true} />
+                        </FormGroup>
+                    ) : (
+                        <FormGroup>
+                            <FormControlLabel control={<Switch color="error" size="small" />} checked={false} />
+                        </FormGroup>
+                    )}
                 </div>
             )
         }
@@ -161,7 +168,7 @@ function ViewHotelFacility() {
                                         exportFileName: 'TableData',
                                         actionsColumnIndex: -1,
                                         columnsButton: true,
-
+                                        grouping: true,
                                         headerStyle: {
                                             whiteSpace: 'nowrap',
                                             height: 20,

@@ -11,7 +11,8 @@ import {
     FormGroup,
     Button,
     DialogContentText,
-    Switch
+    Switch,
+    Autocomplete
 } from '@mui/material';
 
 import IconButton from '@mui/material/IconButton';
@@ -27,38 +28,50 @@ import { Formik, Form } from 'formik';
 import Grid from '@mui/material/Grid';
 import * as yup from 'yup';
 import CreatedUpdatedUserDetailsWithTableFormat from '../userTimeDetails/CreatedUpdatedUserDetailsWithTableFormat';
-import HighlightOffIcon from '@mui/icons-material/HighlightOff';
+import { getAllbankData } from 'store/actions/masterActions/BankAction';
 
-function CompanyProfile({ open, handleClose, mode, code }) {
+function BankDetail({ open, handleClose, mode, code }) {
     const initialValues = {
-        companyName: '',
-        companyId: '',
-        version: '',
-        status: true,
+        bankCode: null,
+        branchCode: '',
+        swiftCode: '',
         address: '',
-        email: '',
-        fax: '',
-        phone: '',
-        website: '',
-        taxRegistration: '',
-        availableLicenceCount: '',
-        allocatedLicenceCount: '',
+        currency: '',
+        accNo: '',
+        accDescription: '',
+        intermediaryBank: '',
+        intermediaryBranch: '',
+        country: '',
+        market: null,
         remark: '',
-        files: '',
-        avatars: [],
-        docPath: ''
+        status: true
     };
 
-    //get data from reducers
     const [loadValues, setLoadValues] = useState(null);
-    const [previewImages, setPreviewImages] = useState([]);
-    const [savedAlllocatedLicesnce, setSavedAllocateLicense] = useState();
-    const [savedAvalableLicesnce, setSavedAvalableLicesnce] = useState();
     const [openDialogBox, setOpenDialogBox] = useState(false);
+    const [bankList, setbankList] = useState([]);
+
+    //get data from reducers
+
     const duplicatecompanyProfileGroup = useSelector((state) => state.companyProfileReducer.duplicatecompanyProfileGroup);
     const companyProfileToUpdate = useSelector((state) => state.companyProfileReducer.companyProfileToUpdate);
+    const bankListData = useSelector((state) => state.bankReducer.bankList);
 
     const dispatch = useDispatch();
+
+    useEffect(() => {
+        if (bankListData.length != 0) {
+            console.log(bankListData);
+            if (bankListData.payload.length === 1) {
+                console.log(bankListData.payload[0]);
+                setbankList(bankListData.payload[0]);
+            }
+        }
+    }, [bankListData]);
+
+    useEffect(() => {
+        dispatch(getAllbankData());
+    }, []);
 
     yup.addMethod(yup.string, 'checkDuplicateCompanyName', function (message) {
         return this.test('checkDuplicateCompanyName', message, async function validateValue(value) {
@@ -79,27 +92,16 @@ function CompanyProfile({ open, handleClose, mode, code }) {
         });
     });
 
-    function numberOfFiles(files) {
-        let valid = true;
-        console.log(previewImages.length);
-        console.log(previewImages);
-        if (previewImages.length > 1) {
-            valid = false;
-        }
-        console.log(valid);
-        return valid;
-    }
-
     const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
 
     const validationSchema = yup.object().shape({
-        companyName: yup.string().required('Required field').checkDuplicateCompanyName('Duplicate Code'),
-        version: yup.string().required('Required field'),
-        address: yup.string().required('Required field'),
-        email: yup.string().required('Required field').email(),
-        phone: yup.string().required('Required field').matches(phoneRegExp, 'Phone number is not valid'),
-        website: yup.string().required('Required field'),
-        allocatedLicenceCount: yup.number().required('Required field').positive('Must be greater than zero')
+        // companyName: yup.string().required('Required field').checkDuplicateCompanyName('Duplicate Code'),
+        // version: yup.string().required('Required field'),
+        // address: yup.string().required('Required field'),
+        // email: yup.string().required('Required field').email(),
+        // phone: yup.string().required('Required field').matches(phoneRegExp, 'Phone number is not valid'),
+        // website: yup.string().required('Required field'),
+        // allocatedLicenceCount: yup.number().required('Required field').positive('Must be greater than zero')
         // files: yup
         //     .mixed()
         //     .test('fileSize', 'The file is too large', (value) => {
@@ -123,22 +125,7 @@ function CompanyProfile({ open, handleClose, mode, code }) {
 
     useEffect(() => {
         if ((mode === 'VIEW_UPDATE' && companyProfileToUpdate != null) || (mode === 'VIEW' && companyProfileToUpdate != null)) {
-            setSavedAllocateLicense(companyProfileToUpdate.allocatedLicenceCount);
-            setSavedAvalableLicesnce(companyProfileToUpdate.availableLicenceCount);
-            let images = [];
-            const contentType = 'image/png';
-            const byteCharacters = atob(companyProfileToUpdate.docPath);
-            const byteNumbers = new Array(byteCharacters.length);
-            for (let i = 0; i < byteCharacters.length; i++) {
-                byteNumbers[i] = byteCharacters.charCodeAt(i);
-            }
-            const byteArray = new Uint8Array(byteNumbers);
-            const blob1 = new Blob([byteArray], { type: contentType });
-            images.push(URL.createObjectURL(blob1));
-            let fileData = new File([blob1], 'name');
-            companyProfileToUpdate.files = [fileData];
             setLoadValues(companyProfileToUpdate);
-            setPreviewImages([images]);
         }
     }, [companyProfileToUpdate]);
 
@@ -150,20 +137,6 @@ function CompanyProfile({ open, handleClose, mode, code }) {
         }
         handleClose();
     };
-
-    const showImages = (event) => {
-        let images = [];
-        console.log(event);
-        for (let i = 0; i < event.target.files.length; i++) {
-            images.push(URL.createObjectURL(event.target.files[i]));
-        }
-        setPreviewImages(images);
-    };
-
-    function deleteHandler(image) {
-        setPreviewImages(previewImages.filter((e) => e !== image));
-        URL.revokeObjectURL(image);
-    }
 
     return (
         <div>
@@ -198,28 +171,45 @@ function CompanyProfile({ open, handleClose, mode, code }) {
                                         <Box sx={{ width: '100%' }}>
                                             <Grid container rowSpacing={2} style={{ marginTop: '2px' }}>
                                                 <Grid item xs={3}>
-                                                    <TextField
-                                                        sx={{
-                                                            width: { xs: 100, sm: 200 },
-                                                            '& .MuiInputBase-root': {
-                                                                height: 40
-                                                            }
-                                                        }}
-                                                        InputLabelProps={{
-                                                            shrink: true
-                                                        }}
-                                                        disabled={mode == 'VIEW_UPDATE'}
-                                                        label="Company Name"
-                                                        name="companyName"
-                                                        onChange={(e) => {
-                                                            console.log(e.target.value);
-                                                            setFieldValue('companyName', e.target.value);
-                                                        }}
-                                                        onBlur={handleBlur}
-                                                        value={values.companyName}
-                                                        error={Boolean(touched.companyName && errors.companyName)}
-                                                        helperText={touched.companyName && errors.companyName ? errors.companyName : ''}
-                                                    ></TextField>
+                                                    <Grid item>
+                                                        <Autocomplete
+                                                            value={values.bankCode}
+                                                            name="bankCode"
+                                                            onChange={(_, value) => {
+                                                                console.log(value);
+                                                                setFieldValue(`bankCode`, value);
+                                                            }}
+                                                            options={bankList}
+                                                            disabled={mode == 'VIEW_UPDATE'}
+                                                            getOptionLabel={(option) => `${option.bankCode}-${option.bankName}`}
+                                                            isOptionEqualToValue={(option, value) => {
+                                                                console.log(option);
+                                                                console.log(value);
+                                                                return option.bankId === value.bankId;
+                                                            }}
+                                                            renderInput={(params) => (
+                                                                <TextField
+                                                                    {...params}
+                                                                    // label="tax"
+                                                                    sx={{
+                                                                        width: { sm: 200 },
+                                                                        '& .MuiInputBase-root': {
+                                                                            height: 40
+                                                                        }
+                                                                    }}
+                                                                    InputLabelProps={{
+                                                                        shrink: true
+                                                                    }}
+                                                                    label="Bank"
+                                                                    variant="outlined"
+                                                                    name="bankCode"
+                                                                    onBlur={handleBlur}
+                                                                    error={Boolean(touched.bankCode && errors.bankCode)}
+                                                                    helperText={touched.bankCode && errors.bankCode ? errors.bankCode : ''}
+                                                                />
+                                                            )}
+                                                        />
+                                                    </Grid>
                                                 </Grid>
                                                 <Grid item xs={3} hidden={mode == 'INSERT' ? true : false}>
                                                     <TextField
@@ -268,7 +258,7 @@ function CompanyProfile({ open, handleClose, mode, code }) {
                                                             name="status"
                                                             onChange={handleChange}
                                                             value={values.status}
-                                                            control={<Switch />}
+                                                            control={<Switch color="success" />}
                                                             label="Status"
                                                             checked={values.status}
                                                             disabled={mode == 'VIEW'}
@@ -461,197 +451,6 @@ function CompanyProfile({ open, handleClose, mode, code }) {
                                                         }
                                                     ></TextField>
                                                 </Grid>
-                                                <Grid item xs={8}>
-                                                    <input
-                                                        type="file"
-                                                        multiple
-                                                        accept="image/*"
-                                                        name="files"
-                                                        //  onChange={this.selectFiles}
-                                                        onChange={(event) => {
-                                                            // console.log("file", event.currentTarget.files);
-                                                            showImages(event);
-                                                            handleChange;
-                                                            setFieldValue('files', event.currentTarget.files);
-                                                        }}
-                                                        error={Boolean(errors.files)}
-                                                        helperText={errors.files ? errors.files : ''}
-                                                    />
-                                                    {errors.files}
-                                                    {previewImages && (
-                                                        <div>
-                                                            {previewImages.map((img, i) => {
-                                                                return (
-                                                                    <div
-                                                                        style={{
-                                                                            display: 'inline-block',
-                                                                            position: 'relative'
-                                                                        }}
-                                                                    >
-                                                                        <img
-                                                                            width="100"
-                                                                            height="100"
-                                                                            style={{
-                                                                                marginRight: '10px',
-                                                                                marginTop: '10px'
-                                                                            }}
-                                                                            className="preview"
-                                                                            src={img}
-                                                                            alt={'image-' + i}
-                                                                            key={i + 'ke'}
-                                                                        />
-                                                                        <IconButton
-                                                                            aria-label="add an alarm"
-                                                                            onClick={() => deleteHandler(img)}
-                                                                        >
-                                                                            <HighlightOffIcon
-                                                                                key={i}
-                                                                                style={{
-                                                                                    position: 'absolute',
-                                                                                    top: -100,
-                                                                                    right: 0,
-                                                                                    width: '25px',
-                                                                                    height: '25px'
-                                                                                    // marginRight: "10px",
-                                                                                }}
-                                                                                // src="https://png.pngtree.com/png-vector/20190603/ourmid/pngtree-icon-close-button-png-image_1357822.jpg"
-                                                                            />
-                                                                        </IconButton>
-                                                                    </div>
-                                                                );
-                                                            })}
-                                                        </div>
-                                                    )}
-                                                    {/* {updatePreviewImages && (
-                                                        <div>
-                                                            {updatePreviewImages.map((img, i) => {
-                                                                return (
-                                                                    // <img
-                                                                    //     width="100"
-                                                                    //     height="100"
-                                                                    //     style={{
-                                                                    //         marginRight: '10px',
-                                                                    //         marginTop: '10px'
-                                                                    //     }}
-                                                                    //     src={`data:image/;base64,${img}`}
-                                                                    //     className="preview"
-                                                                    //     // src={img}
-                                                                    //     alt={'image-' + i}
-                                                                    //     key={i}
-                                                                    // />
-                                                                    <div
-                                                                        style={{
-                                                                            display: 'inline-block',
-                                                                            position: 'relative'
-                                                                        }}
-                                                                    >
-                                                                        <img
-                                                                            width="100"
-                                                                            height="100"
-                                                                            style={{
-                                                                                marginRight: '10px',
-                                                                                marginTop: '10px'
-                                                                            }}
-                                                                            className="preview"
-                                                                            src={img}
-                                                                            // src={`data:image/;base64,${img}`}
-                                                                            // src={URL.createObjectURL(`data:image/;base64,${img}`)}
-                                                                            alt={'image-' + i}
-                                                                            key={i + 'ke'}
-                                                                        />
-                                                                        <IconButton
-                                                                            aria-label="add an alarm"
-                                                                            onClick={() => deleteHandler(img)}
-                                                                        >
-                                                                            <HighlightOffIcon
-                                                                                key={i}
-                                                                                style={{
-                                                                                    position: 'absolute',
-                                                                                    top: -100,
-                                                                                    right: 0,
-                                                                                    width: '25px',
-                                                                                    height: '25px'
-                                                                                    // marginRight: "10px",
-                                                                                }}
-                                                                                // src="https://png.pngtree.com/png-vector/20190603/ourmid/pngtree-icon-close-button-png-image_1357822.jpg"
-                                                                            />
-                                                                        </IconButton>
-                                                                    </div>
-                                                                );
-                                                            })}
-                                                        </div>
-                                                    )} */}
-                                                </Grid>
-                                                {/* <Grid item xs={12}>
-                                                    <Previews setFieldValue={setFieldValue} files={values.files} />
-                                                    <ErrorMessage style={{ color: 'red' }} component="p" name="files" />
-                                                </Grid> */}
-                                                {/* <Grid item xs={12}>
-                                                    <>
-                                                        {files.map((file) => {
-                                                            const { name, preview } = file;
-                                                            const key = isString(file) ? file : name;
-
-                                                            return (
-                                                                <Box
-                                                                    key={key}
-                                                                    sx={{
-                                                                        p: 0,
-                                                                        m: 0.5,
-                                                                        width: 64,
-                                                                        height: 64,
-                                                                        borderRadius: 0.25,
-                                                                        overflow: 'hidden',
-                                                                        position: 'relative'
-                                                                    }}
-                                                                >
-                                                                    <Paper
-                                                                        variant="outlined"
-                                                                        component="img"
-                                                                        src={isString(file) ? file : preview}
-                                                                        sx={{
-                                                                            width: '100%',
-                                                                            height: '100%',
-                                                                            objectFit: 'cover',
-                                                                            position: 'absolute',
-                                                                            borderRadius: 1
-                                                                        }}
-                                                                    />
-                                                                    <Box sx={{ top: 6, right: 6, position: 'absolute' }}>
-                                                                        <IconButton
-                                                                            size="small"
-                                                                            onClick={() => handleRemove(file)}
-                                                                            sx={{
-                                                                                p: '1px',
-                                                                                color: 'common.white',
-                                                                                bgcolor: (theme) => alpha(theme.palette.grey[900], 0.72),
-                                                                                '&:hover': {
-                                                                                    bgcolor: (theme) => alpha(theme.palette.grey[900], 0.48)
-                                                                                }
-                                                                            }}
-                                                                        >
-                                                                            <CancelIcon />
-                                                                        </IconButton>
-                                                                    </Box>
-                                                                </Box>
-                                                            );
-                                                        })}
-
-                                                        <div
-                                                            className="styleIT"
-                                                            {...getRootProps()}
-                                                            sx={{
-                                                                ...(isDragActive && { opacity: 0.72 })
-                                                            }}
-                                                        >
-                                                            <input {...getInputProps()} />
-
-                                                            <Button variant="outlined" size="large" sx={{ p: 2.25 }}>
-                                                                <AddRoundedIcon />
-                                                            </Button>
-                                                        </div>
-                                                    </>
-                                                </Grid> */}
                                             </Grid>
                                         </Box>
                                         {openDialogBox ? (
@@ -726,4 +525,4 @@ function CompanyProfile({ open, handleClose, mode, code }) {
     );
 }
 
-export default CompanyProfile;
+export default BankDetail;

@@ -73,6 +73,7 @@ function ActivitySupplement({ open, handleClose, mode, activitySupplimentId }) {
         maxPax: '',
         status: true,
         advanceType: true,
+        files: '',
         youtubeLinks: [
             {
                 id: '',
@@ -106,7 +107,7 @@ function ActivitySupplement({ open, handleClose, mode, activitySupplimentId }) {
     const [appearing, setAppearing] = useState(false);
     const [activeLocationList, setActiveLocationList] = useState([]);
     const [previewImages, setPreviewImages] = useState([]);
-    const [updatePreviewImages, setupdatePreviewImages] = useState([]);
+
     // const handleChangeStatus = (event) => {
     //     console.log(event.target.checked);
     //     // this.setState({ checked: event.target.checked });
@@ -168,10 +169,35 @@ function ActivitySupplement({ open, handleClose, mode, activitySupplimentId }) {
                     maxPax: activity_supplimentToUpdate.maxPax,
                     status: activity_supplimentToUpdate.status,
                     advanceType: activity_supplimentToUpdate.advanceType,
-                    // files: data.files,AS
+                    docPath: activity_supplimentToUpdate.docPath,
                     youtubeLinks: dataArrayYoutube,
                     activityWithTaxes: dataArray
                 };
+
+                let images = [];
+                let files = [];
+                const contentType = 'image/png';
+                console.log(saveValues);
+                for (let i in saveValues.docPath) {
+                    let byteCharacters = '';
+                    byteCharacters = atob(saveValues.docPath[i]);
+                    let byteNumbers = '';
+                    byteNumbers = new Array(byteCharacters.length);
+                    for (let i = 0; i < byteCharacters.length; i++) {
+                        byteNumbers[i] = byteCharacters.charCodeAt(i);
+                    }
+                    let byteArray = '';
+                    byteArray = new Uint8Array(byteNumbers);
+                    let blob1 = '';
+                    blob1 = new Blob([byteArray], { type: contentType });
+                    images.push(URL.createObjectURL(blob1));
+                    let fileData = new File([blob1], 'name');
+                    files.push(fileData);
+                }
+                saveValues.files = files;
+                console.log(images);
+                setPreviewImages(images);
+
                 setLoadValues(saveValues);
                 activity_supplimentToUpdate.type == 'Supplement' ? setCategoryType('Supplement') : setCategoryType('Activity');
                 activity_supplimentToUpdate.type == 'Supplement' ? setTypeOfActivity(false) : setTypeOfActivity(true);
@@ -210,7 +236,7 @@ function ActivitySupplement({ open, handleClose, mode, activitySupplimentId }) {
         code: yup.string().required('Required field').checkDuplicateActivitySupplementCode('Duplicate Code'),
         activityDescription: yup.string().required('Required field'),
         maxPax: yup.number().required('Required field'),
-        email: yup.string().email(),
+        email: yup.string().email().required('Required field'),
         phone: yup.string().matches(phoneRegExp, 'Not valid').min(10, 'Must be exactly 10 digits').max(10, 'Must be 10 digits'),
 
         activityWithTaxes: yup.array().of(
@@ -253,10 +279,15 @@ function ActivitySupplement({ open, handleClose, mode, activitySupplimentId }) {
         }
 
         setPreviewImages(images);
-        setupdatePreviewImages([]);
     };
 
+    function deleteHandler(image) {
+        setPreviewImages(previewImages.filter((e) => e !== image));
+        URL.revokeObjectURL(image);
+    }
+
     const handleSubmitForm = (data) => {
+        console.log(data);
         if (mode === 'INSERT') {
             const dataArray = [];
             const dataArrayYoutube = [];
@@ -299,7 +330,7 @@ function ActivitySupplement({ open, handleClose, mode, activitySupplimentId }) {
                     maxPax: data.maxPax,
                     status: data.status,
                     advanceType: data.advanceType,
-                    // files: data.files,AS
+                    files: data.files,
                     youtubeLinks: dataArrayYoutube,
                     activityWithTaxes: dataArray
                 };
@@ -349,7 +380,7 @@ function ActivitySupplement({ open, handleClose, mode, activitySupplimentId }) {
                 maxPax: data.maxPax,
                 status: data.status,
                 advanceType: data.advanceType,
-                // files: data.files,AS
+                files: data.files,
                 youtubeLinks: dataArrayYoutube,
                 activityWithTaxes: dataArray
             };
@@ -867,7 +898,10 @@ function ActivitySupplement({ open, handleClose, mode, activitySupplimentId }) {
                                                                                         alt={'image-' + i}
                                                                                         key={i + 'ke'}
                                                                                     />
-                                                                                    <IconButton aria-label="add an alarm">
+                                                                                    <IconButton
+                                                                                        aria-label="add an alarm"
+                                                                                        onClick={() => deleteHandler(img)}
+                                                                                    >
                                                                                         <HighlightOffIcon
                                                                                             key={i}
                                                                                             style={{
@@ -876,33 +910,10 @@ function ActivitySupplement({ open, handleClose, mode, activitySupplimentId }) {
                                                                                                 right: 0,
                                                                                                 width: '25px',
                                                                                                 height: '25px'
-                                                                                                // marginRight: "10px",
                                                                                             }}
-                                                                                            // src="https://png.pngtree.com/png-vector/20190603/ourmid/pngtree-icon-close-button-png-image_1357822.jpg"
                                                                                         />
                                                                                     </IconButton>
                                                                                 </div>
-                                                                            );
-                                                                        })}
-                                                                    </div>
-                                                                )}
-                                                                {updatePreviewImages && (
-                                                                    <div>
-                                                                        {updatePreviewImages.map((img, i) => {
-                                                                            return (
-                                                                                <img
-                                                                                    width="100"
-                                                                                    height="100"
-                                                                                    style={{
-                                                                                        marginRight: '10px',
-                                                                                        marginTop: '10px'
-                                                                                    }}
-                                                                                    src={`data:image/;base64,${img}`}
-                                                                                    className="preview"
-                                                                                    // src={img}
-                                                                                    alt={'image-' + i}
-                                                                                    key={i}
-                                                                                />
                                                                             );
                                                                         })}
                                                                     </div>
