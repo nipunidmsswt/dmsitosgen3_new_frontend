@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
     Dialog,
@@ -18,31 +18,33 @@ import {
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import {
-    saveCompanyProfileData,
-    getCompanyProfileDataById,
-    updateCompanyProfileData,
-    checkDuplicateCompanyProfileCode
-} from '../../../../store/actions/masterActions/CompanyProfileAction';
-
+    saveBankDetailsData,
+    updateBankDetailsData,
+    checkedSavedBankandBranch,
+    getBankDetailsDataById
+} from '../../../../store/actions/masterActions/BankAction';
+import { getAllCurrencyListData } from '../../../../store/actions/masterActions/ExpenseTypeAction';
 import { Formik, Form } from 'formik';
 import Grid from '@mui/material/Grid';
 import * as yup from 'yup';
 import CreatedUpdatedUserDetailsWithTableFormat from '../userTimeDetails/CreatedUpdatedUserDetailsWithTableFormat';
-import { getAllbankData } from 'store/actions/masterActions/BankAction';
+import { getAllbankData, getBranchesByBankId } from 'store/actions/masterActions/BankAction';
+import countryList from 'react-select-country-list';
+import { getAllActiveMarketData } from 'store/actions/masterActions/operatorActions/MarketAction';
 
 function BankDetail({ open, handleClose, mode, code }) {
     const initialValues = {
-        bankCode: null,
-        branchCode: '',
+        bank: null,
+        branch: null,
         swiftCode: '',
-        address: '',
-        currency: '',
-        accNo: '',
-        accDescription: '',
+        bankAddress: '',
+        currency: null,
+        accountNumber: '',
+        accountDesc: '',
         intermediaryBank: '',
         intermediaryBranch: '',
         country: '',
-        market: null,
+        market: [],
         remark: '',
         status: true
     };
@@ -50,14 +52,43 @@ function BankDetail({ open, handleClose, mode, code }) {
     const [loadValues, setLoadValues] = useState(null);
     const [openDialogBox, setOpenDialogBox] = useState(false);
     const [bankList, setbankList] = useState([]);
+    const [branchList, setBranchList] = useState([]);
+    const [currencyListOptions, setCurrencyListOptions] = useState([]);
 
     //get data from reducers
 
-    const duplicatecompanyProfileGroup = useSelector((state) => state.companyProfileReducer.duplicatecompanyProfileGroup);
-    const companyProfileToUpdate = useSelector((state) => state.companyProfileReducer.companyProfileToUpdate);
+    const duplicateBankDetail = useSelector((state) => state.bankDetailReducer.duplicateBankDetail);
+    const bankDetailToUpdate = useSelector((state) => state.bankDetailReducer.bankDetailToUpdate);
     const bankListData = useSelector((state) => state.bankReducer.bankList);
+    const currencyListData = useSelector((state) => state.expenseTypesReducer.currencyList);
+    const marketListData = useSelector((state) => state.marketReducer.marketActiveList);
+    const branchesByBankId = useSelector((state) => state.branchReducer.branchesByBank);
+
+    const options = useMemo(() => countryList().getData(), []);
+    const [marketListOptions, setMarketListOptions] = useState([]);
 
     const dispatch = useDispatch();
+
+    useEffect(() => {
+        if (currencyListData != null) {
+            setCurrencyListOptions(currencyListData);
+        }
+    }, [currencyListData]);
+
+    useEffect(() => {
+        if (branchesByBankId != null) {
+            setBranchList(branchesByBankId);
+        }
+    }, [branchesByBankId]);
+    useEffect(() => {
+        if (bankListData.length != 0) {
+            console.log(bankListData);
+            if (bankListData.payload.length === 1) {
+                console.log(bankListData.payload[0]);
+                setbankList(bankListData.payload[0]);
+            }
+        }
+    }, [bankListData]);
 
     useEffect(() => {
         if (bankListData.length != 0) {
@@ -70,17 +101,28 @@ function BankDetail({ open, handleClose, mode, code }) {
     }, [bankListData]);
 
     useEffect(() => {
+        dispatch(getAllActiveMarketData());
+        dispatch(getAllCurrencyListData());
         dispatch(getAllbankData());
     }, []);
 
-    yup.addMethod(yup.string, 'checkDuplicateCompanyName', function (message) {
-        return this.test('checkDuplicateCompanyName', message, async function validateValue(value) {
+    useEffect(() => {
+        console.log(marketListData);
+        setMarketListOptions(marketListData);
+    }, [marketListData]);
+
+    yup.addMethod(yup.object, 'checkDuplicateBankandBranch', function (message) {
+        return this.test('checkDuplicateBankandBranch', message, async function validateValue(value) {
             if (mode === 'INSERT') {
                 try {
-                    console.log('sjhgchs');
-                    await dispatch(checkDuplicateCompanyProfileCode(value));
-
-                    if (duplicatecompanyProfileGroup != null && duplicatecompanyProfileGroup.errorMessages.length != 0) {
+                    console.log(value);
+                    if (value != null) {
+                        console.log('sjhgchs');
+                    }
+                    let data = { bank: value.bankCode.bankId, branch: value.branchId };
+                    await dispatch(checkedSavedBankandBranch(data));
+                    console.log(duplicateBankDetail);
+                    if (duplicateBankDetail != null && duplicateBankDetail.errorMessages.length != 0) {
                         return false;
                     } else {
                         return true;
@@ -92,48 +134,38 @@ function BankDetail({ open, handleClose, mode, code }) {
         });
     });
 
-    const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
-
     const validationSchema = yup.object().shape({
-        // companyName: yup.string().required('Required field').checkDuplicateCompanyName('Duplicate Code'),
-        // version: yup.string().required('Required field'),
-        // address: yup.string().required('Required field'),
-        // email: yup.string().required('Required field').email(),
-        // phone: yup.string().required('Required field').matches(phoneRegExp, 'Phone number is not valid'),
-        // website: yup.string().required('Required field'),
-        // allocatedLicenceCount: yup.number().required('Required field').positive('Must be greater than zero')
-        // files: yup
-        //     .mixed()
-        //     .test('fileSize', 'The file is too large', (value) => {
-        //         if (!value.length) return true; // attachment is optional
-        //         return value[0].size <= 2000000;
-        //     })
-        //     .test('type', 'Only the following formats are accepted: .jpeg, .jpg, .png', (value) => {
-        //         return value && (value[0].type === 'image/jpeg' || value[0].type === 'image/jpg' || value[0].type === 'image/png');
-        //     })
-        // .test('is-num-files', 'NUMBER_OF_FILES', numberOfFiles)
-        // .test('type', 'Only the following formats are accepted: .jpeg, .jpg, .png', (value) => {
-        //     return value && (value[0].type === 'image/jpeg' || value[0].type === 'image/jpg' || value[0].type === 'image/png');
-        // })
+        bank: yup.object().nullable().required('Required field'),
+        branch: yup
+            .object()
+            .nullable()
+            .required('Required field')
+            .checkDuplicateBankandBranch('Branch Code is duplicated for the selected bank'),
+        accountNumber: yup.string().required('Required field')
     });
 
     useEffect(() => {
         if (mode === 'VIEW_UPDATE' || mode === 'VIEW') {
-            dispatch(getCompanyProfileDataById(code));
+            dispatch(getBankDetailsDataById(code));
         }
     }, [mode]);
 
     useEffect(() => {
-        if ((mode === 'VIEW_UPDATE' && companyProfileToUpdate != null) || (mode === 'VIEW' && companyProfileToUpdate != null)) {
-            setLoadValues(companyProfileToUpdate);
+        if ((mode === 'VIEW_UPDATE' && bankDetailToUpdate != null) || (mode === 'VIEW' && bankDetailToUpdate != null)) {
+            setLoadValues(bankDetailToUpdate);
         }
-    }, [companyProfileToUpdate]);
+    }, [bankDetailToUpdate]);
+
+    const loadBranches = (data) => {
+        console.log(data.bankId);
+        dispatch(getBranchesByBankId(data.bankId));
+    };
 
     const handleSubmitForm = (data) => {
         if (mode === 'INSERT') {
-            dispatch(saveCompanyProfileData(data));
+            dispatch(saveBankDetailsData(data));
         } else if (mode === 'VIEW_UPDATE') {
-            dispatch(updateCompanyProfileData(data));
+            dispatch(updateBankDetailsData(data));
         }
         handleClose();
     };
@@ -144,8 +176,8 @@ function BankDetail({ open, handleClose, mode, code }) {
                 <DialogTitle>
                     <Box display="flex" className="dialog-title">
                         <Box flexGrow={1}>
-                            {mode === 'INSERT' ? 'Add' : ''} {mode === 'VIEW_UPDATE' ? 'Update' : ''} {mode === 'VIEW' ? 'View' : ''}Company
-                            Profile
+                            {mode === 'INSERT' ? 'Add' : ''} {mode === 'VIEW_UPDATE' ? 'Update' : ''} {mode === 'VIEW' ? 'View' : ''}Bank
+                            Detail
                         </Box>
                         <Box>
                             <IconButton onClick={handleClose}>
@@ -171,47 +203,83 @@ function BankDetail({ open, handleClose, mode, code }) {
                                         <Box sx={{ width: '100%' }}>
                                             <Grid container rowSpacing={2} style={{ marginTop: '2px' }}>
                                                 <Grid item xs={3}>
-                                                    <Grid item>
-                                                        <Autocomplete
-                                                            value={values.bankCode}
-                                                            name="bankCode"
-                                                            onChange={(_, value) => {
-                                                                console.log(value);
-                                                                setFieldValue(`bankCode`, value);
-                                                            }}
-                                                            options={bankList}
-                                                            disabled={mode == 'VIEW_UPDATE'}
-                                                            getOptionLabel={(option) => `${option.bankCode}-${option.bankName}`}
-                                                            isOptionEqualToValue={(option, value) => {
-                                                                console.log(option);
-                                                                console.log(value);
-                                                                return option.bankId === value.bankId;
-                                                            }}
-                                                            renderInput={(params) => (
-                                                                <TextField
-                                                                    {...params}
-                                                                    // label="tax"
-                                                                    sx={{
-                                                                        width: { sm: 200 },
-                                                                        '& .MuiInputBase-root': {
-                                                                            height: 40
-                                                                        }
-                                                                    }}
-                                                                    InputLabelProps={{
-                                                                        shrink: true
-                                                                    }}
-                                                                    label="Bank"
-                                                                    variant="outlined"
-                                                                    name="bankCode"
-                                                                    onBlur={handleBlur}
-                                                                    error={Boolean(touched.bankCode && errors.bankCode)}
-                                                                    helperText={touched.bankCode && errors.bankCode ? errors.bankCode : ''}
-                                                                />
-                                                            )}
-                                                        />
-                                                    </Grid>
+                                                    <Autocomplete
+                                                        value={values.bank}
+                                                        name="bank"
+                                                        onChange={(_, value) => {
+                                                            loadBranches(value);
+                                                            setFieldValue(`bank`, value);
+                                                        }}
+                                                        options={bankList}
+                                                        disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                        getOptionLabel={(option) => `${option.bankCode}-${option.bankName}`}
+                                                        isOptionEqualToValue={(option, value) => {
+                                                            return option.bankId === value.bankId;
+                                                        }}
+                                                        renderInput={(params) => (
+                                                            <TextField
+                                                                {...params}
+                                                                // label="tax"
+                                                                sx={{
+                                                                    width: { sm: 200 },
+                                                                    '& .MuiInputBase-root': {
+                                                                        height: 40
+                                                                    }
+                                                                }}
+                                                                InputLabelProps={{
+                                                                    shrink: true
+                                                                }}
+                                                                label="bank"
+                                                                variant="outlined"
+                                                                name="branch"
+                                                                onBlur={handleBlur}
+                                                                error={Boolean(touched.bank && errors.bank)}
+                                                                helperText={touched.bank && errors.bank ? errors.bank : ''}
+                                                            />
+                                                        )}
+                                                    />
                                                 </Grid>
-                                                <Grid item xs={3} hidden={mode == 'INSERT' ? true : false}>
+
+                                                <Grid item xs={3}>
+                                                    <Autocomplete
+                                                        value={values.branch}
+                                                        name="branch"
+                                                        onChange={(_, value) => {
+                                                            console.log(value);
+                                                            setFieldValue(`branch`, value);
+                                                        }}
+                                                        options={branchList}
+                                                        disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                        getOptionLabel={(option) => `${option.branchCode}-${option.branchName}`}
+                                                        isOptionEqualToValue={(option, value) => {
+                                                            console.log(option);
+                                                            console.log(value);
+                                                            return option.branchId === value.branchId;
+                                                        }}
+                                                        renderInput={(params) => (
+                                                            <TextField
+                                                                {...params}
+                                                                // label="tax"
+                                                                sx={{
+                                                                    width: { sm: 200 },
+                                                                    '& .MuiInputBase-root': {
+                                                                        height: 40
+                                                                    }
+                                                                }}
+                                                                InputLabelProps={{
+                                                                    shrink: true
+                                                                }}
+                                                                label="Branch"
+                                                                variant="outlined"
+                                                                name="branch"
+                                                                onBlur={handleBlur}
+                                                                error={Boolean(touched.branch && errors.branch)}
+                                                                helperText={touched.branch && errors.branch ? errors.branch : ''}
+                                                            />
+                                                        )}
+                                                    />
+                                                </Grid>
+                                                <Grid item xs={3}>
                                                     <TextField
                                                         sx={{
                                                             width: { xs: 100, sm: 200 },
@@ -222,17 +290,16 @@ function BankDetail({ open, handleClose, mode, code }) {
                                                         InputLabelProps={{
                                                             shrink: true
                                                         }}
-                                                        disabled={true}
-                                                        label="Company Id"
-                                                        name="companyId"
+                                                        label="Swift Code"
+                                                        name="swiftCode"
                                                         onChange={handleChange}
                                                         onBlur={handleBlur}
-                                                        value={values.companyId}
-                                                        error={Boolean(touched.companyId && errors.companyId)}
-                                                        helperText={touched.companyId && errors.companyId ? errors.companyId : ''}
+                                                        value={values.swiftCode}
+                                                        error={Boolean(touched.swiftCode && errors.swiftCode)}
+                                                        helperText={touched.swiftCode && errors.swiftCode ? errors.swiftCode : ''}
                                                     ></TextField>
                                                 </Grid>
-                                                <Grid item xs={mode == 'INSERT' ? 4 : 3}>
+                                                <Grid item>
                                                     <TextField
                                                         sx={{
                                                             width: { xs: 100, sm: 200 },
@@ -243,13 +310,197 @@ function BankDetail({ open, handleClose, mode, code }) {
                                                         InputLabelProps={{
                                                             shrink: true
                                                         }}
-                                                        label="Version"
-                                                        name="version"
+                                                        label="Bank Address"
+                                                        name="bankAddress"
                                                         onChange={handleChange}
                                                         onBlur={handleBlur}
-                                                        value={values.version}
-                                                        error={Boolean(touched.version && errors.version)}
-                                                        helperText={touched.version && errors.version ? errors.version : ''}
+                                                        value={values.bankAddress}
+                                                        error={Boolean(touched.bankAddress && errors.bankAddress)}
+                                                        helperText={touched.bankAddress && errors.bankAddress ? errors.bankAddress : ''}
+                                                    ></TextField>
+                                                </Grid>
+                                                <Grid item xs={3}>
+                                                    <Autocomplete
+                                                        value={values.currency}
+                                                        name="currency"
+                                                        onChange={(_, value) => {
+                                                            console.log(value);
+                                                            setFieldValue(`currency`, value);
+                                                        }}
+                                                        disabled={mode == 'VIEW_UPDATE'}
+                                                        options={currencyListOptions}
+                                                        getOptionLabel={(option) =>
+                                                            `${option.currencyCode} - ${option.currencyDescription}`
+                                                        }
+                                                        isOptionEqualToValue={(option, value) =>
+                                                            option.currencyListId === value.currencyListId
+                                                        }
+                                                        renderInput={(params) => (
+                                                            <TextField
+                                                                {...params}
+                                                                // label="tax"
+                                                                sx={{
+                                                                    width: { sm: 200 },
+                                                                    '& .MuiInputBase-root': {
+                                                                        height: 40
+                                                                    }
+                                                                }}
+                                                                InputLabelProps={{
+                                                                    shrink: true
+                                                                }}
+                                                                label="Currency"
+                                                                variant="outlined"
+                                                                name="currency"
+                                                                onBlur={handleBlur}
+                                                                error={Boolean(touched.currency && errors.currency)}
+                                                                helperText={touched.currency && errors.currency ? errors.currency : ''}
+                                                            />
+                                                        )}
+                                                    />
+                                                </Grid>
+
+                                                <Grid item xs={3}>
+                                                    <TextField
+                                                        sx={{
+                                                            width: { xs: 100, sm: 200 },
+                                                            '& .MuiInputBase-root': {
+                                                                height: 40
+                                                            }
+                                                        }}
+                                                        InputLabelProps={{
+                                                            shrink: true
+                                                        }}
+                                                        label="Account Number"
+                                                        name="accountNumber"
+                                                        onChange={handleChange}
+                                                        onBlur={handleBlur}
+                                                        value={values.accountNumber}
+                                                        error={Boolean(touched.accountNumber && errors.accountNumber)}
+                                                        helperText={
+                                                            touched.accountNumber && errors.accountNumber ? errors.accountNumber : ''
+                                                        }
+                                                    ></TextField>
+                                                </Grid>
+
+                                                <Grid item xs={3}>
+                                                    <TextField
+                                                        sx={{
+                                                            width: { xs: 100, sm: 200 },
+                                                            '& .MuiInputBase-root': {
+                                                                height: 40
+                                                            }
+                                                        }}
+                                                        InputLabelProps={{
+                                                            shrink: true
+                                                        }}
+                                                        label="Account Description"
+                                                        name="accountDesc"
+                                                        onChange={handleChange}
+                                                        onBlur={handleBlur}
+                                                        value={values.accountDesc}
+                                                        error={Boolean(touched.accountDesc && errors.accountDesc)}
+                                                        helperText={touched.accountDesc && errors.accountDesc ? errors.accountDesc : ''}
+                                                    ></TextField>
+                                                </Grid>
+
+                                                <Grid item xs={3}>
+                                                    <TextField
+                                                        sx={{
+                                                            width: { xs: 100, sm: 200 },
+                                                            '& .MuiInputBase-root': {
+                                                                height: 40
+                                                            }
+                                                        }}
+                                                        InputLabelProps={{
+                                                            shrink: true
+                                                        }}
+                                                        label="Intermediary Bank"
+                                                        name="intermediaryBank"
+                                                        onChange={handleChange}
+                                                        onBlur={handleBlur}
+                                                        value={values.intermediaryBank}
+                                                        error={Boolean(touched.intermediaryBank && errors.intermediaryBank)}
+                                                        helperText={
+                                                            touched.intermediaryBank && errors.intermediaryBank
+                                                                ? errors.intermediaryBank
+                                                                : ''
+                                                        }
+                                                    ></TextField>
+                                                </Grid>
+
+                                                <Grid item xs={3}>
+                                                    <TextField
+                                                        sx={{
+                                                            width: { xs: 100, sm: 200 },
+                                                            '& .MuiInputBase-root': {
+                                                                height: 40
+                                                            }
+                                                        }}
+                                                        InputLabelProps={{
+                                                            shrink: true
+                                                        }}
+                                                        label="Intermediary Branch"
+                                                        name="intermediaryBranch"
+                                                        onChange={handleChange}
+                                                        onBlur={handleBlur}
+                                                        value={values.intermediaryBranch}
+                                                        error={Boolean(touched.intermediaryBranch && errors.intermediaryBranch)}
+                                                        helperText={
+                                                            touched.intermediaryBranch && errors.intermediaryBranch
+                                                                ? errors.intermediaryBranch
+                                                                : ''
+                                                        }
+                                                    ></TextField>
+                                                </Grid>
+                                                <Grid item xs={3}>
+                                                    <Autocomplete
+                                                        value={values.country}
+                                                        name="country"
+                                                        onChange={(_, value) => {
+                                                            console.log(values.label);
+                                                            setFieldValue(`country`, value.label);
+                                                        }}
+                                                        options={options}
+                                                        renderInput={(params) => (
+                                                            <TextField
+                                                                {...params}
+                                                                label="Country"
+                                                                InputLabelProps={{
+                                                                    shrink: true
+                                                                }}
+                                                                sx={{
+                                                                    width: { sm: 200 },
+                                                                    '& .MuiInputBase-root': {
+                                                                        height: 41
+                                                                    }
+                                                                }}
+                                                                disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                variant="outlined"
+                                                                name="country"
+                                                                onBlur={handleBlur}
+                                                            />
+                                                        )}
+                                                    />
+                                                </Grid>
+
+                                                <Grid item xs={3}>
+                                                    <TextField
+                                                        sx={{
+                                                            width: { xs: 100, sm: 200 },
+                                                            '& .MuiInputBase-root': {
+                                                                height: 40
+                                                            }
+                                                        }}
+                                                        InputLabelProps={{
+                                                            shrink: true
+                                                        }}
+                                                        label="Remarks"
+                                                        name="remarks"
+                                                        onChange={handleChange}
+                                                        onBlur={handleBlur}
+                                                        value={values.remarks}
+                                                        error={Boolean(touched.remarks && errors.remarks)}
+                                                        helperText={touched.remarks && errors.remarks ? errors.remarks : ''}
                                                     ></TextField>
                                                 </Grid>
                                                 <Grid item xs={3}>
@@ -265,191 +516,37 @@ function BankDetail({ open, handleClose, mode, code }) {
                                                         />
                                                     </FormGroup>
                                                 </Grid>
-                                                <Grid item xs={6}>
-                                                    <TextField
-                                                        sx={{
-                                                            width: { sm: 400 },
-                                                            '& .MuiInputBase-root': {
-                                                                height: 40
-                                                            }
+                                                <Grid item xs={9}>
+                                                    <Autocomplete
+                                                        value={values.market}
+                                                        multiple
+                                                        fullWidth
+                                                        name="market"
+                                                        onChange={(_, value) => {
+                                                            setFieldValue(`market`, value);
                                                         }}
-                                                        InputLabelProps={{
-                                                            shrink: true
-                                                        }}
-                                                        label="Address"
-                                                        name="address"
-                                                        onChange={handleChange}
-                                                        onBlur={handleBlur}
-                                                        value={values.address}
-                                                        error={Boolean(touched.address && errors.address)}
-                                                        helperText={touched.address && errors.address ? errors.address : ''}
-                                                    ></TextField>
-                                                </Grid>
-                                                <Grid item xs={3}>
-                                                    <TextField
-                                                        sx={{
-                                                            width: { xs: 100, sm: 200 },
-                                                            '& .MuiInputBase-root': {
-                                                                height: 40
-                                                            }
-                                                        }}
-                                                        InputLabelProps={{
-                                                            shrink: true
-                                                        }}
-                                                        label="Email"
-                                                        name="email"
-                                                        onChange={handleChange}
-                                                        onBlur={handleBlur}
-                                                        value={values.email}
-                                                        error={Boolean(touched.email && errors.email)}
-                                                        helperText={touched.email && errors.email ? errors.email : ''}
-                                                    ></TextField>
-                                                </Grid>
-                                                <Grid item xs={3}>
-                                                    <TextField
-                                                        sx={{
-                                                            width: { xs: 100, sm: 200 },
-                                                            '& .MuiInputBase-root': {
-                                                                height: 40
-                                                            }
-                                                        }}
-                                                        label="Fax"
-                                                        name="fax"
-                                                        InputLabelProps={{
-                                                            shrink: true
-                                                        }}
-                                                        onChange={handleChange}
-                                                        onBlur={handleBlur}
-                                                        value={values.fax}
-                                                    ></TextField>
-                                                </Grid>
-                                                <Grid item xs={3}>
-                                                    <TextField
-                                                        sx={{
-                                                            width: { xs: 100, sm: 200 },
-                                                            '& .MuiInputBase-root': {
-                                                                height: 40
-                                                            }
-                                                        }}
-                                                        label="Phone"
-                                                        name="phone"
-                                                        InputLabelProps={{
-                                                            shrink: true
-                                                        }}
-                                                        onChange={handleChange}
-                                                        onBlur={handleBlur}
-                                                        value={values.phone}
-                                                        error={Boolean(touched.phone && errors.phone)}
-                                                        helperText={touched.phone && errors.phone ? errors.phone : ''}
-                                                    ></TextField>
-                                                </Grid>
-                                                <Grid item xs={3}>
-                                                    <TextField
-                                                        sx={{
-                                                            width: { xs: 100, sm: 200 },
-                                                            '& .MuiInputBase-root': {
-                                                                height: 40
-                                                            }
-                                                        }}
-                                                        label="Website"
-                                                        name="website"
-                                                        InputLabelProps={{
-                                                            shrink: true
-                                                        }}
-                                                        onChange={handleChange}
-                                                        onBlur={handleBlur}
-                                                        value={values.website}
-                                                        error={Boolean(touched.website && errors.website)}
-                                                        helperText={touched.website && errors.website ? errors.website : ''}
-                                                    ></TextField>
-                                                </Grid>
-                                                <Grid item xs={3}>
-                                                    <TextField
-                                                        sx={{
-                                                            width: { xs: 100, sm: 200 },
-                                                            '& .MuiInputBase-root': {
-                                                                height: 40
-                                                            }
-                                                        }}
-                                                        InputLabelProps={{
-                                                            shrink: true
-                                                        }}
-                                                        label="Tax Registration"
-                                                        name="taxRegistration"
-                                                        onChange={handleChange}
-                                                        onBlur={handleBlur}
-                                                        value={values.taxRegistration}
-                                                    ></TextField>
-                                                </Grid>
-
-                                                <Grid item xs={2}>
-                                                    <TextField
-                                                        sx={{
-                                                            width: { sm: 100 },
-                                                            '& .MuiInputBase-root': {
-                                                                height: 40
-                                                            }
-                                                        }}
-                                                        disabled={true}
-                                                        label="Available LicenceCount"
-                                                        name="availableLicenceCount"
-                                                        InputLabelProps={{
-                                                            shrink: true
-                                                        }}
-                                                        onChange={handleChange}
-                                                        onBlur={handleBlur}
-                                                        value={values.availableLicenceCount}
-                                                    ></TextField>
-                                                </Grid>
-                                                <Grid item xs={2}>
-                                                    <TextField
-                                                        sx={{
-                                                            width: { sm: 100 },
-                                                            '& .MuiInputBase-root': {
-                                                                height: 40
-                                                            }
-                                                        }}
-                                                        label="Allocated Licence Count"
-                                                        name="allocatedLicenceCount"
-                                                        onChange={(e) => {
-                                                            setFieldValue(`allocatedLicenceCount`, e.target.value);
-
-                                                            if (mode === 'INSERT') {
-                                                                setFieldValue('availableLicenceCount', e.target.value);
-                                                            } else if (mode === 'VIEW_UPDATE') {
-                                                                if (e.target.value == 0) {
-                                                                    setFieldValue('availableLicenceCount', 0);
-                                                                } else if (e.target.value >= savedAlllocatedLicesnce) {
-                                                                    let result =
-                                                                        e.target.value - savedAlllocatedLicesnce + savedAvalableLicesnce;
-
-                                                                    setFieldValue('availableLicenceCount', result);
-                                                                } else if (e.target.value < savedAlllocatedLicesnce) {
-                                                                    let diff = savedAlllocatedLicesnce - e.target.value;
-                                                                    if (diff <= e.target.value) {
-                                                                        setFieldValue(
-                                                                            'availableLicenceCount',
-                                                                            savedAvalableLicesnce - diff
-                                                                        );
-                                                                    } else {
-                                                                        console.log('result 3');
-                                                                        setOpenDialogBox(true);
+                                                        options={marketListOptions}
+                                                        getOptionLabel={(option) => `${option.code} - (${option.name})`}
+                                                        isOptionEqualToValue={(option, value) => option.marketId === value.marketId}
+                                                        renderInput={(params) => (
+                                                            <TextField
+                                                                {...params}
+                                                                label="Market"
+                                                                sx={{
+                                                                    width: { sm: 620, md: 620 },
+                                                                    '& .MuiInputBase-root': {
+                                                                        height: 40
                                                                     }
-                                                                }
-                                                            }
-                                                        }}
-                                                        onBlur={handleBlur}
-                                                        InputLabelProps={{
-                                                            shrink: true
-                                                        }}
-                                                        value={values.allocatedLicenceCount}
-                                                        error={Boolean(touched.allocatedLicenceCount && errors.allocatedLicenceCount)}
-                                                        helperText={
-                                                            touched.allocatedLicenceCount && errors.allocatedLicenceCount
-                                                                ? errors.allocatedLicenceCount
-                                                                : ''
-                                                        }
-                                                    ></TextField>
+                                                                }}
+                                                                variant="outlined"
+                                                                InputLabelProps={{
+                                                                    shrink: true
+                                                                }}
+                                                                name="market"
+                                                                onBlur={handleBlur}
+                                                            />
+                                                        )}
+                                                    />
                                                 </Grid>
                                             </Grid>
                                         </Box>

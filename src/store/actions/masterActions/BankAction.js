@@ -14,7 +14,9 @@ import {
     CHECK_BRANCH_DUPLICATE,
     GET_LAST_MODIFIED_DATE_TIME_BANK,
     GET_LAST_MODIFIED_DATE_TIME_BRANCH,
-    GET_LAST_MODIFIED_DATE_TIME_BANK_DETAILS
+    GET_LAST_MODIFIED_DATE_TIME_BANK_DETAILS,
+    GET_BRANCHES_BY_BANK_ID,
+    CHECKED_SAVED_BANK_AND_BRANCH
 } from '../../constant/master/BankConstant';
 
 // bank actions
@@ -83,6 +85,20 @@ export const checkDuplicateBranchCode = (code) => {
     return {
         type: CHECK_BRANCH_DUPLICATE,
         data: { code }
+    };
+};
+
+export const getBranchesByBankId = (id) => {
+    return {
+        type: GET_BRANCHES_BY_BANK_ID,
+        id
+    };
+};
+
+export const checkedSavedBankandBranch = (data) => {
+    return {
+        type: CHECKED_SAVED_BANK_AND_BRANCH,
+        data
     };
 };
 

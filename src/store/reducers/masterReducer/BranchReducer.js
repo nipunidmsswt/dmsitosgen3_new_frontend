@@ -9,7 +9,9 @@ import {
     UPDATE_SUCCESS_BRANCH_DATA,
     BRANCH_DUPLICATE,
     FAILED_LAST_MODIFIED_DATE_BRANCH,
-    SUCCESS_LAST_MODIFIED_DATE_BRANCH
+    SUCCESS_LAST_MODIFIED_DATE_BRANCH,
+    SUCCESS_GET_BRANCHES_BY_BANK_ID,
+    FAILED_GET_BRANCHES_BY_BANK_ID
 } from '../../constant/master/BankConstant';
 
 const initialState = {
@@ -18,7 +20,8 @@ const initialState = {
     branchToUpdate: null,
     errorMsg: null,
     duplicateBranch: null,
-    lastModifiedDateTime: null
+    lastModifiedDateTime: null,
+    branchesByBank: []
 };
 
 export const branchReducer = (state = initialState, action) => {
@@ -70,6 +73,12 @@ export const branchReducer = (state = initialState, action) => {
 
         case FAILED_LAST_MODIFIED_DATE_BRANCH:
             return { ...state, lastModifiedDateTime: data };
+
+        case SUCCESS_GET_BRANCHES_BY_BANK_ID:
+            return { ...state, branchesByBank: data.payload[0] };
+
+        case FAILED_GET_BRANCHES_BY_BANK_ID:
+            return { ...state, branchesByBank: [] };
 
         default:
             return state;
