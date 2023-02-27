@@ -382,7 +382,7 @@ function GuideClass({ open, handleClose, mode, guideCode }) {
                 dispatch(updateGuideClassData(saveValues));
             }
         }
-        // handleClose();
+        handleClose();
     };
 
     useEffect(() => {

@@ -548,7 +548,15 @@ import {
     GET_LAST_MODIFIED_DATE_TIME_BRANCH,
     SAVE_BANK_DATA,
     SAVE_BRANCH_DATA,
-    UPDATE_BRANCH_DATA
+    UPDATE_BRANCH_DATA,
+    SAVE_BANK_DETAILS_DATA,
+    UPDATE_BANK_DETAILS_DATA,
+    GET_ALL_BANK_DETAILS_DATA,
+    CHECK_BANK_DETAILS_DUPLICATE,
+    GET_LAST_MODIFIED_DATE_TIME_BANK_DETAILS,
+    GET_BANK_DETAILS_DATA_BY_ID,
+    GET_BRANCHES_BY_BANK_ID,
+    CHECKED_SAVED_BANK_AND_BRANCH
 } from 'store/constant/master/BankConstant';
 import {
     saveBankSaga,
@@ -558,7 +566,16 @@ import {
     checkDupicateBranchesSaga,
     updateBranchSaga,
     getBranchByIdSaga,
-    checkLatestBranchModifiedDateSaga
+    checkLatestBranchModifiedDateSaga,
+    saveBankDetailsSaga,
+    updateBankDetailsSaga,
+    checkLatestBankDetailsModifiedDateSaga,
+    checkDupicateBankDetailsSaga,
+    getAllBankDetailsSaga,
+    checkDupicateBankSaga,
+    getBranchesByBankId,
+    getSavedBankBrachData,
+    getBankDetailsByIdSaga
 } from './mastersaga/Bank&BranchSaga';
 export function* wacherSaga() {
     // tax setup
@@ -855,6 +872,8 @@ export function* wacherSaga() {
     yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_BRANCH, checkLatestBranchModifiedDateSaga);
     yield takeLatest(CHECK_BRANCH_DUPLICATE, checkDupicateBranchesSaga);
     yield takeLatest(UPDATE_BRANCH_DATA, updateBranchSaga);
+    yield takeLatest(GET_BRANCHES_BY_BANK_ID, getBranchesByBankId);
+    yield takeLatest(CHECKED_SAVED_BANK_AND_BRANCH, getSavedBankBrachData);
     // yield takeLatest(GET_ALL_ACTIVE_BRANCH, getAllActiveActivity_SupplimentDataSaga);
 
     // active facilies
@@ -871,4 +890,12 @@ export function* wacherSaga() {
     yield takeLatest(CHECK_HOTEL_MAIN_DUPLICATE, checkDupicateHotelMainCodeSaga);
     yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_HOTEL_MAIN, checkLatestHotelMainModifiedDateSaga);
     yield takeLatest(GET_ALL_ACTIVE_HOTEL_MAIN_DATA, getAllActiveHotelMainSaga);
+
+    //bank Details
+    yield takeLatest(SAVE_BANK_DETAILS_DATA, saveBankDetailsSaga);
+    yield takeLatest(GET_BANK_DETAILS_DATA_BY_ID, getBankDetailsByIdSaga);
+    yield takeLatest(GET_ALL_BANK_DETAILS_DATA, getAllBankDetailsSaga);
+    yield takeLatest(UPDATE_BANK_DETAILS_DATA, updateBankDetailsSaga);
+    yield takeLatest(CHECK_BANK_DETAILS_DUPLICATE, checkDupicateBankSaga);
+    yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_BANK_DETAILS, checkLatestBankDetailsModifiedDateSaga);
 }

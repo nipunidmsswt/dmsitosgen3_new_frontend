@@ -3,7 +3,6 @@ import { useEffect, forwardRef, useState } from 'react';
 import {
     Dialog,
     Slide,
-    DialogActions,
     FormControlLabel,
     Box,
     DialogContent,
@@ -12,8 +11,7 @@ import {
     FormGroup,
     Button,
     Grid,
-    Switch,
-    Typography
+    Switch
 } from '@mui/material';
 
 import IconButton from '@mui/material/IconButton';
@@ -22,6 +20,7 @@ import 'assets/scss/style.scss';
 import { useDispatch, useSelector } from 'react-redux';
 import { checkDuplicateTaxCode, getTaxDataById, saveTaxData, updateTaxData } from 'store/actions/masterActions/TaxActions/TaxAction';
 import CreatedUpdatedUserDetails from '../userTimeDetails/CreatedUpdatedUserDetails';
+import CreatedUpdatedUserDetailsWithTableFormat from '../userTimeDetails/CreatedUpdatedUserDetailsWithTableFormat';
 import * as yup from 'yup';
 import { Formik, Form } from 'formik';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';

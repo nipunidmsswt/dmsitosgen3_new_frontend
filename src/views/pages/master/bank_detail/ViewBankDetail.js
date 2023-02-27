@@ -5,13 +5,11 @@ import BankDetail from './BankDetail';
 import SuccessMsg from '../../../../messages/SuccessMsg';
 import ErrorMsg from '../../../../messages/ErrorMsg';
 import { useSelector, useDispatch } from 'react-redux';
-import { getAllTaxData } from '../../../../store/actions/masterActions/TaxActions/TaxAction';
-import { getAllCompanyProfileData, getLatestModifiedDetails } from '../../../../store/actions/masterActions/CompanyProfileAction';
 import Grid from '@mui/material/Grid';
 import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
 import { FormControlLabel, FormGroup, Switch } from '@mui/material';
-import { getAllBranchData } from 'store/actions/masterActions/BankAction';
+import { getAllBankDetailsData, getAllBranchData, getLatestModifiedDetails } from 'store/actions/masterActions/BankAction';
 
 function ViewBankDetail() {
     const [open, setOpen] = useState(false);
@@ -24,34 +22,34 @@ function ViewBankDetail() {
 
     const columns = [
         {
-            title: 'Company ID',
-            field: 'companyId',
+            title: 'Bank Name',
+            field: 'bank.bankName',
             filterPlaceholder: 'filter',
             align: 'left'
         },
         {
-            title: 'Name',
+            title: 'Bank Branch',
             field: 'companyName',
             filterPlaceholder: 'filter',
             align: 'left'
         },
         {
-            title: 'Email',
-            field: 'email',
+            title: 'Account Number',
+            field: 'accountNumber',
             align: 'left',
             grouping: false,
             filterPlaceholder: 'filter'
         },
         {
-            title: 'Website',
-            field: 'website',
+            title: 'Descrition',
+            field: 'accountDesc',
             align: 'left',
             grouping: false,
             filterPlaceholder: 'filter'
         },
         {
-            title: 'Tax Registration',
-            field: 'taxRegistration',
+            title: 'Intermediary Bank',
+            field: 'intermediaryBank',
             align: 'right',
             grouping: false,
             filterPlaceholder: 'filter'
@@ -89,18 +87,27 @@ function ViewBankDetail() {
     ];
 
     const dispatch = useDispatch();
-    const error = useSelector((state) => state.taxReducer.errorMsg);
+    const error = useSelector((state) => state.bankDetailReducer.errorMsg);
 
     const branchList = useSelector((state) => state.bankReducer.branches);
-    const companyProfileData = useSelector((state) => state.companyProfileReducer.companyProfile);
-    const lastModifiedDate = useSelector((state) => state.companyProfileReducer.lastModifiedDateTime);
+    const bankDetailData = useSelector((state) => state.bankDetailReducer.bankDetail);
+    const lastModifiedDate = useSelector((state) => state.bankDetailReducer.lastModifiedDateTime);
+    const bankDetailsList = useSelector((state) => state.bankDetailReducer.bankDetails);
+
+    // useEffect(() => {
+    //     console.log(branchList);
+    //     if (branchList?.payload?.length > 0) {
+    //         setTableData(branchList?.payload[0]);
+    //     }
+    // }, [branchList]);
 
     useEffect(() => {
-        console.log(branchList);
-        if (branchList?.payload?.length > 0) {
-            setTableData(branchList?.payload[0]);
+        console.log('dfghjkfdl;ghgfuytrwdetyiyopl;kjbvbsnd');
+        console.log(bankDetailsList);
+        if (bankDetailsList?.payload?.length > 0) {
+            setTableData(bankDetailsList?.payload[0]);
         }
-    }, [branchList]);
+    }, [bankDetailsList]);
 
     useEffect(() => {
         console.log(error);
@@ -111,21 +118,22 @@ function ViewBankDetail() {
     }, [error]);
 
     useEffect(() => {
-        console.log(companyProfileData);
-        console.log(typeof companyProfileData);
-        if (companyProfileData) {
+        console.log(bankDetailData);
+
+        if (bankDetailData) {
             setHandleToast(true);
-            dispatch(getAllCompanyProfileData());
+            dispatch(getAllBankDetailsData());
             dispatch(getLatestModifiedDetails());
         }
-    }, [companyProfileData]);
+    }, [bankDetailData]);
 
     useEffect(() => {
-        dispatch(getAllBranchData());
+        dispatch(getAllBankDetailsData());
         dispatch(getLatestModifiedDetails());
     }, []);
 
     useEffect(() => {
+        console.log(lastModifiedDate);
         setLastModifiedTimeDate(
             lastModifiedDate === null
                 ? ''
@@ -168,7 +176,7 @@ function ViewBankDetail() {
     };
     return (
         <div>
-            <MainCard title="Company Profile Setup">
+            <MainCard title="Bank Detail Setup">
                 <div style={{ textAlign: 'right' }}> Last Modified Date : {lastModifiedTimeDate}</div>
                 <br />
                 <Grid container spacing={gridSpacing}>
