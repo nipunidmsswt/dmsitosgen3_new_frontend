@@ -35,7 +35,7 @@ export const updateHotelMainData = (data) => {
     };
 };
 
-export const getLatestModifiedDetails = () => {
+export const getHotelLatestModifiedDetails = () => {
     return {
         type: GET_LAST_MODIFIED_DATE_TIME_HOTEL_MAIN
     };
