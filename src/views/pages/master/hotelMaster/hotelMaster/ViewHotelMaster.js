@@ -18,6 +18,7 @@ import {
 } from 'store/actions/masterActions/Activity_SupplimentAction';
 import HotelMaster from './HotelMaster';
 import { getAllHotelMainData, getHotelLatestModifiedDetails } from 'store/actions/masterActions/HotelMasterAction';
+import RoomBuyingRates from '../RoomBuyingRates/RoomBuyingRates';
 
 function ViewHotelMaster() {
     const [open, setOpen] = useState(false);
@@ -27,6 +28,7 @@ function ViewHotelMaster() {
     const [openErrorToast, setOpenErrorToast] = useState(false);
     const [tableData, setTableData] = useState([]);
     const [lastModifiedTimeDate, setLastModifiedTimeDate] = useState(null);
+    const [openBuyingRateView, setOpenBuyingRateView] = useState(false);
     const navigate = useNavigate();
     const columns = [
         {
@@ -115,7 +117,7 @@ function ViewHotelMaster() {
                     >
                         {/* {rowData.status === true ? ( */}
                         <FormGroup>
-                            <Button variant="outlined" endIcon={<SendIcon />}>
+                            <Button variant="outlined" endIcon={<SendIcon />} onClick={loadBuyingRatesView}>
                                 Buying Rates
                             </Button>
                             {/* <FormControlLabel control={<Switch size="small" />} checked={true} /> */}
@@ -186,6 +188,14 @@ function ViewHotelMaster() {
 
     const loadRoomCountView = () => {
         navigate('/master/facilitycountview', { replace: true });
+        // setHandleToast(false);
+    };
+
+    const loadBuyingRatesView = () => {
+        setActivitySupplimentId('');
+        setMode('INSERT');
+        setOpenBuyingRateView(true);
+        // navigate('/master/facilitycountview', { replace: true });
         // setHandleToast(false);
     };
     const dispatch = useDispatch();
@@ -330,6 +340,16 @@ function ViewHotelMaster() {
 
                                 {open ? (
                                     <HotelMaster open={open} handleClose={handleClose} hotelId={activitySupplimentId} mode={mode} />
+                                ) : (
+                                    ''
+                                )}
+                                {openBuyingRateView ? (
+                                    <RoomBuyingRates
+                                        open={openBuyingRateView}
+                                        handleClose={handleClose}
+                                        code={activitySupplimentId}
+                                        mode={mode}
+                                    />
                                 ) : (
                                     ''
                                 )}
