@@ -794,7 +794,7 @@ function HotelMaster({ open, handleClose, mode, hotelId }) {
                                                                         renderInput={(params) => (
                                                                             <TextField
                                                                                 {...params}
-                                                                                label="Re Creation"
+                                                                                label="Recreation"
                                                                                 InputLabelProps={{
                                                                                     shrink: true
                                                                                 }}
