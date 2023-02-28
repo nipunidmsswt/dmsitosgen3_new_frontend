@@ -76,7 +76,8 @@ function Product({ open, mode, handleClose, rowProductCode }) {
             .test('Unique', 'Product Code Already Exists', async (value) => {
                 if (mode === 'INSERT') {
                     const res = await checkDuplicateProductCode(value);
-                    if (duplicateProduct.length != 0) {
+
+                    if (duplicateProduct != null && duplicateProduct.errorMessages.length != 0) {
                         return false;
                     } else {
                         return true;
