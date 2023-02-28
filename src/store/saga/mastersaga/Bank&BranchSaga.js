@@ -29,7 +29,10 @@ import {
     FAILED_LAST_MODIFIED_DATE_BRANCH,
     FAILED_GET_BRANCH_DATA_BY_ID,
     FAILED_GET_BANK_DETAILS_DATA_BY_ID,
-    UPDATE_SUCCESS_BRANCH_DATA
+    UPDATE_SUCCESS_BRANCH_DATA,
+    SUCCESS_GET_BRANCHES_BY_BANK_ID,
+    FAILED_GET_BRANCHES_BY_BANK_ID,
+    SAVED_BANK_AND_BRANCH
 } from 'store/constant/master/BankConstant';
 
 //bank saga
@@ -182,10 +185,46 @@ export function* checkLatestBranchModifiedDateSaga() {
     }
 }
 
+export function* getBranchesByBankId(action) {
+    console.log(action);
+    let responseData = [];
+    try {
+        responseData = yield call(get, `${process.env.REACT_APP_FINANCE_URL}/branch/branchList/${action.id}`);
+        console.log('response data last:' + responseData);
+        yield put({
+            type: SUCCESS_GET_BRANCHES_BY_BANK_ID,
+            data: responseData.data
+        });
+    } catch (e) {
+        console.log('Error:' + e);
+        yield put({ type: FAILED_GET_BRANCHES_BY_BANK_ID, data: '' });
+    }
+}
+
+export function* getSavedBankBrachData(action) {
+    console.log('dfhjkfghl;gkfjdhscxzccbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb');
+    console.log(action);
+    let responseData = [];
+    try {
+        responseData = yield call(
+            get,
+            `${process.env.REACT_APP_FINANCE_URL}/bankDetails/codeDuplicate/${action.data.bank}/${action.data.branch}`
+        );
+        console.log('response data last:' + responseData);
+        yield put({
+            type: SAVED_BANK_AND_BRANCH,
+            data: responseData.data
+        });
+    } catch (e) {
+        console.log('Error:' + e);
+        yield put({ type: SAVED_BANK_AND_BRANCH, data: '' });
+    }
+}
+
 //bank details saga
 
 export function* saveBankDetailsSaga(action) {
-    action.data.path = `${process.env.REACT_APP_FINANCE_URL}/season/`;
+    action.data.path = `${process.env.REACT_APP_FINANCE_URL}/bankDetails/`;
     let responseData = [];
     try {
         responseData = yield call(create, action.data);
@@ -203,7 +242,7 @@ export function* getBankDetailsByIdSaga(action) {
 
     let responseData = [];
     try {
-        responseData = yield call(getById, `${process.env.REACT_APP_FINANCE_URL}/season/${action.data.id}`);
+        responseData = yield call(getById, `${process.env.REACT_APP_FINANCE_URL}/bankDetails/${action.data.id}`);
         console.log(responseData);
         yield put({
             type: SUCCESS_GET_BANK_DETAILS_DATA_BY_ID,
@@ -237,7 +276,7 @@ export function* updateBankDetailsSaga(action) {
 export function* getAllBankDetailsSaga() {
     let responseData = [];
     try {
-        responseData = yield call(get, process.env.REACT_APP_FINANCE_URL + '/season/');
+        responseData = yield call(get, process.env.REACT_APP_FINANCE_URL + '/bankDetails/');
         console.log(responseData.data.payload);
         yield put({ type: SUCCESS_BANK_DETAILS_LIST_DATA, data: responseData.data });
     } catch (e) {
@@ -263,7 +302,7 @@ export function* checkDupicateBankDetailsSaga(action) {
 export function* checkLatestBankDetailsModifiedDateSaga() {
     let responseData = [];
     try {
-        responseData = yield call(get, `${process.env.REACT_APP_FINANCE_URL}/season/lastModifiedTime`);
+        responseData = yield call(get, `${process.env.REACT_APP_FINANCE_URL}/bankDetails/lastModifiedDateTime`);
         console.log('response data last:' + responseData);
         yield put({
             type: SUCCESS_LAST_MODIFIED_DATE_BANK_DETAILS,

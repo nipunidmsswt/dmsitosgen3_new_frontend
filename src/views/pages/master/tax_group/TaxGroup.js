@@ -180,7 +180,7 @@ function TaxGroup({ open, handleClose, mode, taxGroupCode }) {
         console.log(data);
         let arry = [];
         data.taxGroupDetails.map((data) => {
-            arry.push(data.taxOrder);
+            arry.push(+data.taxOrder);
         });
         const result = checkValidArray(arry);
         console.log(result);
