@@ -24,7 +24,6 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Formik, Form, FieldArray, useFormikContext } from 'formik';
-import { useRef } from 'react';
 import * as yup from 'yup';
 import { Box } from '@mui/system';
 import { getAllActiveMarketData } from 'store/actions/masterActions/operatorActions/MarketAction';
@@ -36,9 +35,9 @@ const useStyles = makeStyles({
     }
 });
 
-function ViewCodeAndName() {
+function TransportMainScreen() {
     const classes = useStyles();
-    const ref = useRef(null);
+
     const initialMarketOperator = {
         market: null,
         operatorList: []
@@ -334,7 +333,6 @@ function ViewCodeAndName() {
                                             <Grid container spacing={2}>
                                                 <Grid item xs={6}>
                                                     <Formik
-                                                        // innerRef={ref}
                                                         enableReinitialize={true}
                                                         initialValues={{ ...initialValuesClusterMarketMapping }}
                                                         onSubmit={(values, { resetForm }) => {
@@ -492,7 +490,6 @@ function ViewCodeAndName() {
                                                 </Grid>
                                                 <Grid item xs={6}>
                                                     <Formik
-                                                        innerRef={ref}
                                                         enableReinitialize={true}
                                                         initialValues={{ ...initialMarketOperator }}
                                                         onSubmit={(values, { resetForm }) => {
@@ -834,4 +831,4 @@ function ViewCodeAndName() {
     );
 }
 
-export default ViewCodeAndName;
+export default TransportMainScreen;

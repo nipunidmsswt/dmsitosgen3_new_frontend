@@ -126,19 +126,24 @@ function CompanyProfile({ open, handleClose, mode, code }) {
             setSavedAllocateLicense(companyProfileToUpdate.allocatedLicenceCount);
             setSavedAvalableLicesnce(companyProfileToUpdate.availableLicenceCount);
             let images = [];
-            const contentType = 'image/png';
-            const byteCharacters = atob(companyProfileToUpdate.docPath);
-            const byteNumbers = new Array(byteCharacters.length);
-            for (let i = 0; i < byteCharacters.length; i++) {
-                byteNumbers[i] = byteCharacters.charCodeAt(i);
+
+            if (companyProfileToUpdate.docPath !== '') {
+                const contentType = 'image/png';
+                const byteCharacters = atob(companyProfileToUpdate.docPath);
+                const byteNumbers = new Array(byteCharacters.length);
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+                const byteArray = new Uint8Array(byteNumbers);
+                const blob1 = new Blob([byteArray], { type: contentType });
+                images.push(URL.createObjectURL(blob1));
+                let fileData = new File([blob1], 'name');
+                companyProfileToUpdate.files = [fileData];
+
+                setPreviewImages([images]);
             }
-            const byteArray = new Uint8Array(byteNumbers);
-            const blob1 = new Blob([byteArray], { type: contentType });
-            images.push(URL.createObjectURL(blob1));
-            let fileData = new File([blob1], 'name');
-            companyProfileToUpdate.files = [fileData];
+
             setLoadValues(companyProfileToUpdate);
-            setPreviewImages([images]);
         }
     }, [companyProfileToUpdate]);
 

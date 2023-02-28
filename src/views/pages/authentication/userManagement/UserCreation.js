@@ -178,23 +178,24 @@ function User({ open, handleClose, mode, userCode, component }) {
 
             let images = [];
             const contentType = 'image/png';
-            const byteCharacters = atob(userToUpdate.docPath);
+            console.log(userToUpdate.docPath);
+            if (userToUpdate.docPath !== '' && userToUpdate.docPath !== null) {
+                console.log('dftyuiopghfxcvjklkb hhhhhhhhhhhhhhhhh');
+                const byteCharacters = atob(userToUpdate.docPath);
 
-            const byteNumbers = new Array(byteCharacters.length);
-            for (let i = 0; i < byteCharacters.length; i++) {
-                byteNumbers[i] = byteCharacters.charCodeAt(i);
+                const byteNumbers = new Array(byteCharacters.length);
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+                const byteArray = new Uint8Array(byteNumbers);
+                const blob1 = new Blob([byteArray], { type: contentType });
+                images.push(URL.createObjectURL(blob1));
+                let fileData = new File([blob1], 'name');
+                userToUpdate.files = [fileData];
             }
-            const byteArray = new Uint8Array(byteNumbers);
-            const blob1 = new Blob([byteArray], { type: contentType });
-            images.push(URL.createObjectURL(blob1));
-            let fileData = new File([blob1], 'name');
-            userToUpdate.files = [fileData];
-
+            console.log([images]);
             setLoadValues(userToUpdate);
-            setPreviewImages([images]);
-
-            // setLoadValues(userToUpdate);
-            // formikRef.current.setFieldValue('disablePassowrdField', false);
+            setPreviewImages(images);
         }
     }, [userToUpdate]);
 
@@ -206,16 +207,19 @@ function User({ open, handleClose, mode, userCode, component }) {
             // setFieldValue('disablePassowrdField', false);
             let images = [];
             const contentType = 'image/png';
-            const byteCharacters = atob(profileToUpdate.docPath);
-            const byteNumbers = new Array(byteCharacters.length);
-            for (let i = 0; i < byteCharacters.length; i++) {
-                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            if (profileToUpdate.docPath !== '') {
+                const byteCharacters = atob(profileToUpdate.docPath);
+                const byteNumbers = new Array(byteCharacters.length);
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+                const byteArray = new Uint8Array(byteNumbers);
+                const blob1 = new Blob([byteArray], { type: contentType });
+                images.push(URL.createObjectURL(blob1));
+                let fileData = new File([blob1], 'name');
+                profileToUpdate.files = [fileData];
             }
-            const byteArray = new Uint8Array(byteNumbers);
-            const blob1 = new Blob([byteArray], { type: contentType });
-            images.push(URL.createObjectURL(blob1));
-            let fileData = new File([blob1], 'name');
-            profileToUpdate.files = [fileData];
+            profileToUpdate.files = [];
             setLoadValues(profileToUpdate);
             // formikRef.current.setFieldValue('disablePassowrdField', false);
         }

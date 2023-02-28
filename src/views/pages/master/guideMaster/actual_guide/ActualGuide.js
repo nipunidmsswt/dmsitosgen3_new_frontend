@@ -144,16 +144,18 @@ function ActualGuide({ open, handleClose, mode, id }) {
 
             let images = [];
             const contentType = 'image/png';
-            const byteCharacters = atob(actualGuideToUpdate.docPath);
-            const byteNumbers = new Array(byteCharacters.length);
-            for (let i = 0; i < byteCharacters.length; i++) {
-                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            if (actualGuideToUpdate.docPath !== '') {
+                const byteCharacters = atob(actualGuideToUpdate.docPath);
+                const byteNumbers = new Array(byteCharacters.length);
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+                const byteArray = new Uint8Array(byteNumbers);
+                const blob1 = new Blob([byteArray], { type: contentType });
+                images.push(URL.createObjectURL(blob1));
+                let fileData = new File([blob1], 'name');
+                actualGuideToUpdate.files = [fileData];
             }
-            const byteArray = new Uint8Array(byteNumbers);
-            const blob1 = new Blob([byteArray], { type: contentType });
-            images.push(URL.createObjectURL(blob1));
-            let fileData = new File([blob1], 'name');
-            actualGuideToUpdate.files = [fileData];
             setPreviewImages(images);
             setLoadValues(actualGuideToUpdate);
         }
