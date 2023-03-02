@@ -167,6 +167,7 @@ function ViewUserCreation() {
                         <Grid container spacing={gridSpacing}>
                             <Grid item xs={12}>
                                 <MaterialTable
+                                    title={lastModifiedTimeDate}
                                     columns={columns}
                                     data={tableData}
                                     actions={[
@@ -206,7 +207,6 @@ function ViewUserCreation() {
                                         exportFileName: 'TableData',
                                         actionsColumnIndex: -1,
                                         columnsButton: true,
-
                                         headerStyle: {
                                             whiteSpace: 'nowrap',
                                             height: 20,
