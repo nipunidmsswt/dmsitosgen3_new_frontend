@@ -209,7 +209,7 @@ export default function Login() {
 
                                             <Grid container>
                                                 <Grid item xs>
-                                                    <Link href="/iTos3/pages/forgotpassword" variant="body2">
+                                                    <Link href="/itos/pages/forgotpassword" variant="body2">
                                                         Forgot password?
                                                     </Link>
                                                 </Grid>
