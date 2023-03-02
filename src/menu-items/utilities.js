@@ -13,7 +13,7 @@ const icons = {
 
 const utilities = {
     id: 'utilities',
-    title: 'Master Setup',
+    // title: 'Master Setup',
     type: 'group',
     children: [
         // {
@@ -326,6 +326,15 @@ const utilities = {
                             breadcrumbs: false
                             // icon: "bi bi-journal-code",
                             // path: "/master/codeAndName",
+                        },
+                        {
+                            id: 'main-transport-category',
+                            title: 'Transport Main',
+                            type: 'item',
+                            url: '/master/transportmain',
+                            breadcrumbs: false
+                            // icon: "bi bi-journal-code",
+                            // path: "/master/codeAndName",
                         }
                     ]
                 },
@@ -365,6 +374,13 @@ const utilities = {
                     title: 'Bank & Branches',
                     type: 'item',
                     url: '/master/bankbranches',
+                    breadcrumbs: false
+                },
+                {
+                    id: 'bank-detail-id',
+                    title: 'Bank Details',
+                    type: 'item',
+                    url: '/master/bankDetails',
                     breadcrumbs: false
                 },
                 {
