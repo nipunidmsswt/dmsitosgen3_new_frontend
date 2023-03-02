@@ -638,7 +638,7 @@ function ActivitySupplement({ open, handleClose, mode, activitySupplimentId }) {
                                                                                 onChange={handleChange}
                                                                                 disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
                                                                                 value={values.advanceType}
-                                                                                control={<Switch />}
+                                                                                control={<Switch color="success" />}
                                                                                 label="Advance Type"
                                                                                 checked={values.advanceType}
                                                                                 // disabled={mode == 'VIEW'}
@@ -852,7 +852,7 @@ function ActivitySupplement({ open, handleClose, mode, activitySupplimentId }) {
                                                                             disabled={mode == 'VIEW'}
                                                                             onChange={handleChange}
                                                                             value={values.status}
-                                                                            control={<Switch />}
+                                                                            control={<Switch color="success" />}
                                                                             label="Status"
                                                                             checked={values.status}
                                                                             // disabled={mode == 'VIEW'}
@@ -998,7 +998,7 @@ function ActivitySupplement({ open, handleClose, mode, activitySupplimentId }) {
                                                                                                             values.youtubeLinks[idx] &&
                                                                                                             values.youtubeLinks[idx].status
                                                                                                         }
-                                                                                                        control={<Switch />}
+                                                                                                        control={<Switch color="success" />}
                                                                                                         onChange={(_, value) => {
                                                                                                             checkStatus();
                                                                                                             // console.log(value.currencyListId);
@@ -1554,7 +1554,7 @@ function ActivitySupplement({ open, handleClose, mode, activitySupplimentId }) {
                                                                                                             values.activityWithTaxes[idx]
                                                                                                                 .status
                                                                                                         }
-                                                                                                        control={<Switch />}
+                                                                                                        control={<Switch color="success" />}
                                                                                                         error={Boolean(
                                                                                                             touched.activityWithTaxes &&
                                                                                                                 touched.activityWithTaxes[

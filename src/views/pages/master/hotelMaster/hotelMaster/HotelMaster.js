@@ -931,7 +931,7 @@ function HotelMaster({ open, handleClose, mode, hotelId }) {
                                                                     <FormGroup>
                                                                         <FormControlLabel
                                                                             name="status"
-                                                                            control={<Switch />}
+                                                                            control={<Switch color="success" />}
                                                                             label="Status"
                                                                             disabled={mode == 'VIEW'}
                                                                             onChange={handleChange}

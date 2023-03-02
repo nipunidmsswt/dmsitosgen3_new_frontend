@@ -332,14 +332,14 @@ function TourCategory({ open, handleClose, mode, rowTourCategoryCode }) {
 
                                 <Grid item>
                                     <Grid item>
-                                        <Typography variant="subtitle1" component="h2">
-                                            Active
-                                        </Typography>
+                                        {/* <Typography variant="subtitle1" component="h2">
+                                            Status
+                                        </Typography> */}
 
                                         <FormGroup>
                                             <FormControlLabel
                                                 name="status"
-                                                control={<Switch />}
+                                                control={<Switch color="success" />}
                                                 label="Status"
                                                 disabled={mode == 'VIEW'}
                                                 onChange={handleInputChange}

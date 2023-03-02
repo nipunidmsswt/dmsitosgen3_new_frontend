@@ -11,6 +11,7 @@ import {
     Grid,
     IconButton,
     Slide,
+    Switch,
     TextField,
     Typography
 } from '@mui/material';
@@ -50,6 +51,15 @@ function Product({ open, mode, handleClose, rowProductCode }) {
 
     const duplicateProduct = useSelector((state) => state.productDataReducer.duplicateProduct);
 
+    const handleChange = (e) => {
+        const target = e.target;
+        const value = target.type === 'checkbox' ? target.checked : target.value;
+        const name = target.name;
+        setFormValues({
+            ...formValues,
+            [name]: value
+        });
+    };
     // useEffect(() => {
     //   if (duplicateProduct != null) {
     //     if (duplicateProduct.length != 0) {
@@ -227,13 +237,16 @@ function Product({ open, mode, handleClose, rowProductCode }) {
                                         </Grid>
 
                                         {/* <Grid item> */}
-                                        <Grid item>
-                                            <Typography variant="subtitle1" component="h2">
-                                                Active
-                                            </Typography>
+                                        <Grid item xs={6}>
                                             <FormGroup>
                                                 <FormControlLabel
-                                                    control={<Field as={Checkbox} name="status" checked={props.values.status} />}
+                                                    name="status"
+                                                    control={<Switch color="success" />}
+                                                    label="Status"
+                                                    disabled={mode == 'VIEW'}
+                                                    onChange={handleChange}
+                                                    checked={formValues.status}
+                                                    value={formValues.status}
                                                 />
                                             </FormGroup>
                                         </Grid>

@@ -496,7 +496,7 @@ function ActualGuide({ open, handleClose, mode, id }) {
                                                     <FormGroup>
                                                         <FormControlLabel
                                                             name="status"
-                                                            control={<Switch />}
+                                                            control={<Switch color="success" />}
                                                             label="Status"
                                                             disabled={mode == 'VIEW'}
                                                             onChange={handleChange}
@@ -835,7 +835,7 @@ function ActualGuide({ open, handleClose, mode, id }) {
                                                                                     <FormGroup>
                                                                                         <FormControlLabel
                                                                                             name={`actualGuideSkills.${idx}.status`}
-                                                                                            control={<Switch />}
+                                                                                            control={<Switch color="success" />}
                                                                                             label="Status"
                                                                                             disabled={mode == 'VIEW'}
                                                                                             onChange={handleChange}

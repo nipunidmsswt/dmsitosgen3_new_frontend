@@ -7,7 +7,7 @@ import ErrorMsg from 'messages/ErrorMsg';
 import tableIcons from 'utils/MaterialTableIcons';
 import { gridSpacing } from 'store/constant';
 import { styled } from '@mui/material/styles';
-import { Typography, TextField } from '@mui/material';
+import { Typography, TextField, Switch, FormControlLabel, FormGroup } from '@mui/material';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
@@ -104,7 +104,7 @@ function ViewProduct() {
         },
 
         {
-            title: 'Active',
+            title: 'Status',
             field: 'status',
             filterPlaceholder: 'True || False',
             align: 'center',
@@ -112,15 +112,22 @@ function ViewProduct() {
             render: (rowData) => (
                 <div
                     style={{
-                        color: rowData.status === true ? '#008000aa' : '#f90000aa',
-                        fontWeight: 'bold',
-                        // background: rowData.status === true ? "#008000aa" : "#f90000aa",
-                        borderRadius: '4px',
-                        paddingLeft: 5,
-                        paddingRight: 5
+                        alignItems: 'center',
+                        align: 'center',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center'
                     }}
                 >
-                    {rowData.status === true ? 'Active' : 'Inactive'}
+                    {rowData.status === true ? (
+                        <FormGroup>
+                            <FormControlLabel control={<Switch color="success" size="small" />} checked={true} />
+                        </FormGroup>
+                    ) : (
+                        <FormGroup>
+                            <FormControlLabel control={<Switch color="error" size="small" />} checked={false} />
+                        </FormGroup>
+                    )}
                 </div>
             )
         }
