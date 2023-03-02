@@ -138,7 +138,7 @@ function ViewExpenseTypes() {
     };
     return (
         <div>
-            <MainCard>
+            <MainCard title="Expense Types">
                 <div style={{ textAlign: 'right' }}> Last Modified Date : {lastModifiedTimeDate}</div>
                 <br />
                 <Grid container spacing={gridSpacing}>

@@ -119,31 +119,32 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
     useEffect(() => {
         if (expenseTypeToUpdate != null) {
             const dataArray = [];
-            // if ((mode === 'VIEW_UPDATE' && expenseTypeToUpdate != null) || (mode === 'VIEW' && expenseTypeToUpdate != null)) {
-            expenseTypeToUpdate.expenseTypeDetails.map((item) => {
-                const expenseTypeDetails = {
-                    enableRow: true,
-                    fromDate: item.fromDate,
-                    toDate: item.toDate,
-                    currencyList: item.currencyList,
+            if ((mode === 'VIEW_UPDATE' && expenseTypeToUpdate != null) || (mode === 'VIEW' && expenseTypeToUpdate != null)) {
+                expenseTypeToUpdate.expenseTypeDetails.map((item) => {
+                    const expenseTypeDetails = {
+                        enableRow: true,
+                        fromDate: item.fromDate,
+                        toDate: item.toDate,
+                        currencyList: item.currencyList,
 
-                    tax: item.tax,
-                    expenseRate: item.expenseRate,
-                    rateWithoutTax: '',
-                    rateWithTax: '',
-                    status: item.status
+                        tax: item.tax,
+                        expenseRate: item.expenseRate,
+                        rateWithoutTax: '',
+                        rateWithTax: '',
+                        status: item.status
+                    };
+                    dataArray.push(expenseTypeDetails);
+                });
+
+                const saveValues = {
+                    expenseCode: expenseTypeToUpdate.expenseCode,
+                    description: expenseTypeToUpdate.description,
+                    status: expenseTypeToUpdate.status,
+                    expenseTypeDetails: dataArray
                 };
-                dataArray.push(expenseTypeDetails);
-            });
 
-            const saveValues = {
-                expenseCode: expenseTypeToUpdate.expenseCode,
-                description: expenseTypeToUpdate.description,
-                status: expenseTypeToUpdate.status,
-                expenseTypeDetails: dataArray
-            };
-
-            setLoadValues(saveValues);
+                setLoadValues(saveValues);
+            }
         }
     }, [expenseTypeToUpdate]);
 

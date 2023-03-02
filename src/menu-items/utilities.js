@@ -316,7 +316,8 @@ const utilities = {
                             id: 'expensetypes',
                             title: 'Expense Types',
                             type: 'item',
-                            url: '/master/expensetypesview'
+                            url: '/master/expensetypesview',
+                            breadcrumbs: false
                         },
                         {
                             id: 'transport-rate',
