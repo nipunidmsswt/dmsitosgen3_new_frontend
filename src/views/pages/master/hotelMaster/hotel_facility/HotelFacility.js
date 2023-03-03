@@ -478,7 +478,9 @@ function HotelFacility({ open, handleClose, mode, hotelFacilityId }) {
                                                                                                         <FormGroup>
                                                                                                             <FormControlLabel
                                                                                                                 name={`hotelFacilityDetails.${idx}.status`}
-                                                                                                                control={<Switch />}
+                                                                                                                control={
+                                                                                                                    <Switch color="success" />
+                                                                                                                }
                                                                                                                 label="Status"
                                                                                                                 disabled={mode == 'VIEW'}
                                                                                                                 onChange={handleChange}

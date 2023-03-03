@@ -13,7 +13,8 @@ import {
     FormGroup,
     Checkbox,
     Button,
-    MenuItem
+    MenuItem,
+    Switch
 } from '@mui/material';
 
 import IconButton from '@mui/material/IconButton';
@@ -435,21 +436,16 @@ function Location({ open, handleClose, mode, locationCode }) {
                                                                     </Grid>
 
                                                                     <Grid item display="flex">
-                                                                        <Grid item style={{ paddingTop: '10px' }}>
-                                                                            Active
-                                                                        </Grid>
-
                                                                         <Grid item>
                                                                             <FormGroup>
                                                                                 <FormControlLabel
-                                                                                    control={
-                                                                                        <Checkbox
-                                                                                            name="status"
-                                                                                            onChange={handleChange}
-                                                                                            checked={values.status}
-                                                                                            value={values.status}
-                                                                                        />
-                                                                                    }
+                                                                                    name="status"
+                                                                                    control={<Switch color="success" />}
+                                                                                    label="Status"
+                                                                                    disabled={mode == 'VIEW'}
+                                                                                    onChange={handleChange}
+                                                                                    checked={values.status}
+                                                                                    value={values.status}
                                                                                 />
                                                                             </FormGroup>
                                                                         </Grid>

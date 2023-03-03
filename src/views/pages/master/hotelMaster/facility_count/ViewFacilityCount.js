@@ -33,7 +33,7 @@ function ViewFacilityCounter() {
             align: 'center'
         },
         {
-            title: 'Active',
+            title: 'Status',
             field: 'status',
             filterPlaceholder: 'True || False',
             align: 'center',

@@ -334,7 +334,7 @@ function Tax({ open, handleClose, mode, rowTaxCode }) {
                                                     <FormGroup>
                                                         <FormControlLabel
                                                             name="status"
-                                                            control={<Switch />}
+                                                            control={<Switch color="success" />}
                                                             label="Status"
                                                             disabled={mode == 'VIEW'}
                                                             onChange={handleChange}

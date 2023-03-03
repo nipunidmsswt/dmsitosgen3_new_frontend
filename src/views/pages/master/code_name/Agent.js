@@ -485,7 +485,7 @@ const Agent = ({ open, handleClose, operatorCode, marketCode }) => {
                                                                                 disabled={mode == 'VIEW'}
                                                                                 onChange={handleChange}
                                                                                 value={values.status}
-                                                                                control={<Switch />}
+                                                                                control={<Switch color="success" />}
                                                                                 label="Status"
                                                                                 checked={values.status}
 
@@ -713,7 +713,9 @@ const Agent = ({ open, handleClose, operatorCode, marketCode }) => {
                                                                                                                 values.agentDetails[idx]
                                                                                                                     .status
                                                                                                             }
-                                                                                                            control={<Switch />}
+                                                                                                            control={
+                                                                                                                <Switch color="success" />
+                                                                                                            }
                                                                                                             // label="Status"
                                                                                                             checked={
                                                                                                                 values.agentDetails[idx]

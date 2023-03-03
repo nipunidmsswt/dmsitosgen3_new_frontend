@@ -419,21 +419,19 @@ function ExchangeRateTypes({ open, handleClose, mode, code }) {
                                                                     </Grid>
                                                                 </Grid>
 
-                                                                <Typography variant="" component="p">
-                                                                    Active
-                                                                </Typography>
-
-                                                                <FormGroup>
-                                                                    <FormControlLabel
-                                                                        name="status"
-                                                                        control={<Switch />}
-                                                                        label="Status"
-                                                                        disabled={mode == 'VIEW'}
-                                                                        onChange={handleChange}
-                                                                        checked={values.status}
-                                                                        value={values.status}
-                                                                    />
-                                                                </FormGroup>
+                                                                <Grid>
+                                                                    <FormGroup>
+                                                                        <FormControlLabel
+                                                                            name="status"
+                                                                            control={<Switch color="success" />}
+                                                                            label="Status"
+                                                                            disabled={mode == 'VIEW'}
+                                                                            onChange={handleChange}
+                                                                            checked={values.status}
+                                                                            value={values.status}
+                                                                        />
+                                                                    </FormGroup>
+                                                                </Grid>
                                                             </div>
 
                                                             <FieldArray name="exchangeRates">

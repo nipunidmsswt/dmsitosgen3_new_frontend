@@ -231,7 +231,7 @@ function Owner({ open, mode, handleClose, ownerCode }) {
                                             <FormGroup>
                                                 <FormControlLabel
                                                     name="status"
-                                                    control={<Switch />}
+                                                    control={<Switch color="success" />}
                                                     label="Status"
                                                     disabled={mode == 'VIEW'}
                                                     onChange={props.handleChange}

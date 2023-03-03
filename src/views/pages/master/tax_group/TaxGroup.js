@@ -334,7 +334,7 @@ function TaxGroup({ open, handleClose, mode, taxGroupCode }) {
                                                                 <FormGroup>
                                                                     <FormControlLabel
                                                                         name="status"
-                                                                        control={<Switch />}
+                                                                        control={<Switch color="success" />}
                                                                         label="Status"
                                                                         disabled={mode == 'VIEW'}
                                                                         onChange={handleChange}
@@ -595,7 +595,9 @@ function TaxGroup({ open, handleClose, mode, taxGroupCode }) {
                                                                                                     <FormGroup>
                                                                                                         <FormControlLabel
                                                                                                             name={`taxGroupDetails.${idx}.status`}
-                                                                                                            control={<Switch />}
+                                                                                                            control={
+                                                                                                                <Switch color="success" />
+                                                                                                            }
                                                                                                             label="Status"
                                                                                                             disabled={mode == 'VIEW'}
                                                                                                             onChange={handleChange}
