@@ -173,8 +173,9 @@
     /* background: linear-gradient(-180deg, rgba(255,255,255,0.50) 0%, rgba(0,0,0,0.50) 100%); */
 }
 
-#zoomedElement {
-    zoom: 1;
-    -moz-transform: scale(1);
-    -webkit-transform: scale(1);
+
+.css-1nvdc5e-MuiCardHeader-root {
+    padding: 5px !important;
+    margin-left: 20px !important;
 }
+

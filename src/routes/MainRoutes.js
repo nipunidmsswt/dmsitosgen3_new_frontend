@@ -35,6 +35,7 @@ import ViewManagingComapany from 'views/pages/master/managing_company/ViewManagi
 import RoomBuyingRates from 'views/pages/master/hotelMaster/RoomBuyingRates/RoomBuyingRates';
 import ViewBankDetail from 'views/pages/master/bank_detail/ViewBankDetail';
 import ViewBranchDetails from 'views/pages/master/bank/ViewBranchDetails';
+import TransportMainScreen from 'views/pages/master/transportMaster/transportMainScreen/TransportMainScreen';
 import AuthGuard from 'utils/route-guard/AuthGuard';
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
@@ -250,6 +251,10 @@ const MainRoutes = {
                 {
                     path: 'bankbranches',
                     element: <ViewBranchDetails />
+                },
+                {
+                    path: 'transportmain',
+                    element: <TransportMainScreen />
                 }
             ]
         }
