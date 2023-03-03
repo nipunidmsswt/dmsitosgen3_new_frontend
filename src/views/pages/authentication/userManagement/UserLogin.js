@@ -72,7 +72,7 @@ export default function Login() {
         console.log(loggedUserData);
 
         if (loggedUserData !== null) {
-            // localStorage.setItem('userData', JSON.stringify(loggedUserData.user));
+            localStorage.setItem('userData', JSON.stringify(loggedUserData.user));
             localStorage.setItem('token', JSON.stringify(loggedUserData.token));
             navigate('/dashboard/default');
         }
