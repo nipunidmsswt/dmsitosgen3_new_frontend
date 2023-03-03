@@ -17,7 +17,11 @@ const AuthGuard = ({ children }) => {
     const token = localStorage.getItem('token');
     useEffect(() => {
         // console.log(localStorage.setItem('token') );
-        if (token == null) {
+        console.log(token);
+        console.log(typeof token);
+        console.log('nipuniiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii');
+        if (token == 'null' || token == null) {
+            console.log('nipuniiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii');
             navigate('/pages/login', { replace: true });
         }
     }, [token, navigate]);

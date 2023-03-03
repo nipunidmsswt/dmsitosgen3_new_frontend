@@ -62,6 +62,7 @@ const ProfileSection = () => {
     const handleLogout = async () => {
         console.log('Logout');
         localStorage.setItem('userData', null);
+        localStorage.setItem('token', null);
         navigate('/pages/login');
     };
 
