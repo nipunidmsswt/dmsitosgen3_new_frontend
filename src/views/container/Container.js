@@ -8,21 +8,6 @@ import { BestServices } from './components/main/bestServices/BestServices';
 import { Contact } from './components/main/contact/Contact';
 import { Blog } from './components/main/blog/Blog';
 import BackgroundImg from '../../assets/20944166.jpg';
-// function Container()=> {}
-//     return (
-//         <div>
-//             <Header />
-
-//             <Hero />
-//             <BestRecipes />
-//             <BestServices />
-//             <Blog />
-//             <Contact />
-//             <Footer />
-//         <div/>
-//     );
-//     }
-// }
 
 const Container = () => {
     return (
