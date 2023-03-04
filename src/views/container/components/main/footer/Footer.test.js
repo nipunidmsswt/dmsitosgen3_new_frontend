@@ -6,7 +6,7 @@ describe('Testing Footer component', () => {
     it('should appears copyright message in user screen', () => {
         render(<Footer />);
 
-        const copyMsg = screen.getByText("© Copyright 2019 Stack. All Rights Reserved")
+        const copyMsg = screen.getByText("© Copyright 2023 Stack. All Rights Reserved")
         expect(copyMsg).toBeInTheDocument();
        
     });
