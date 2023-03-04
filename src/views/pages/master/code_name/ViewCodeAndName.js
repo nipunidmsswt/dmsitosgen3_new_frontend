@@ -751,7 +751,7 @@ function ViewCodeAndName() {
                                                             data={tableData}
                                                             options={{
                                                                 padding: 'dense',
-                                                                showTitle: false,
+                                                                showTitle: true,
                                                                 sorting: true,
                                                                 search: true,
                                                                 searchFieldAlignment: 'right',
@@ -760,7 +760,7 @@ function ViewCodeAndName() {
                                                                 filtering: true,
                                                                 paging: true,
                                                                 pageSizeOptions: [2, 5, 10, 20, 25, 50, 100],
-                                                                pageSize: 5,
+                                                                pageSize: 10,
                                                                 paginationType: 'stepped',
                                                                 showFirstLastPageButtons: false,
                                                                 exportButton: true,

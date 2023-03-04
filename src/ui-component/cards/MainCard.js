@@ -3,6 +3,7 @@ import { forwardRef } from 'react';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
+import { makeStyles } from '@material-ui/styles';
 import { Card, CardContent, CardHeader, Divider, Typography } from '@mui/material';
 
 // constant
@@ -10,6 +11,12 @@ const headerSX = {
     '& .MuiCardHeader-action': { mr: 0 }
 };
 
+const useStyles = makeStyles(() => ({
+    title: {
+        color: 'red',
+        fontSize: 300
+    }
+}));
 // ==============================|| CUSTOM MAIN CARD ||============================== //
 
 const MainCard = forwardRef(
@@ -31,7 +38,7 @@ const MainCard = forwardRef(
         ref
     ) => {
         const theme = useTheme();
-
+        const classes = useStyles();
         return (
             <Card
                 ref={ref}
@@ -47,7 +54,15 @@ const MainCard = forwardRef(
                 }}
             >
                 {/* card header and action */}
-                {!darkTitle && title && <CardHeader sx={headerSX} title={title} action={secondary} />}
+                {!darkTitle && title && (
+                    <CardHeader
+                        sx={headerSX}
+                        classes={classes.title}
+                        title={title}
+                        action={secondary}
+                        titleTypographyProps={{ variant: 'h2' }}
+                    />
+                )}
                 {/* {darkTitle && title && (
                     <CardHeader sx={headerSX} title={<Typography variant="h3">{title}</Typography>} action={secondary} />
                 )} */}
