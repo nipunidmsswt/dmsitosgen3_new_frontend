@@ -37,7 +37,7 @@ function ViewManagingComapany() {
         },
 
         {
-            title: 'Active',
+            title: 'Status',
             field: 'status',
             filterPlaceholder: 'True || False',
             align: 'center',
@@ -54,7 +54,7 @@ function ViewManagingComapany() {
                 >
                     {rowData.status === true ? (
                         <FormGroup>
-                            <FormControlLabel control={<Switch size="small" />} checked={true} />
+                            <FormControlLabel control={<Switch size="small" color="success" />} checked={true} />
                         </FormGroup>
                     ) : (
                         <FormGroup>

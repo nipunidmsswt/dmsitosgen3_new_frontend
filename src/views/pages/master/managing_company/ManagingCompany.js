@@ -380,7 +380,7 @@ function ManagingCompany({ open, handleClose, mode, code }) {
                                                                             disabled={mode == 'VIEW'}
                                                                             onChange={handleChange}
                                                                             value={values.status}
-                                                                            control={<Switch />}
+                                                                            control={<Switch color="success" />}
                                                                             label="Status"
                                                                             checked={values.status}
                                                                             // disabled={mode == 'VIEW'}

@@ -37,7 +37,7 @@ function ViewHotelFacility() {
             align: 'left'
         },
         {
-            title: 'Active',
+            title: 'Status',
             field: 'status',
             filterPlaceholder: 'True || False',
             align: 'center',

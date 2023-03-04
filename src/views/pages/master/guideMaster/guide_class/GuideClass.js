@@ -1015,7 +1015,7 @@ function GuideClass({ open, handleClose, mode, guideCode }) {
                                                                                                             values.guideClassDetails[idx]
                                                                                                                 .status
                                                                                                         }
-                                                                                                        control={<Switch />}
+                                                                                                        control={<Switch color="success" />}
                                                                                                         error={Boolean(
                                                                                                             touched.guideClassDetails &&
                                                                                                                 touched.guideClassDetails[

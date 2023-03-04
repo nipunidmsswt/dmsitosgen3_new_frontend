@@ -78,11 +78,11 @@ function ViewActivitySupplement() {
                 >
                     {rowData.status === true ? (
                         <FormGroup>
-                            <FormControlLabel control={<Switch size="small" />} checked={true} />
+                            <FormControlLabel control={<Switch size="small" color="success" />} checked={true} />
                         </FormGroup>
                     ) : (
                         <FormGroup>
-                            <FormControlLabel control={<Switch size="small" />} checked={false} />
+                            <FormControlLabel control={<Switch size="small" color="error" />} checked={false} />
                         </FormGroup>
                     )}
                 </div>

@@ -88,7 +88,7 @@ function ViewHotelMaster() {
                 >
                     {rowData.status === true ? (
                         <FormGroup>
-                            <FormControlLabel control={<Switch size="small" />} checked={true} />
+                            <FormControlLabel control={<Switch size="small" color="success" />} checked={true} />
                         </FormGroup>
                     ) : (
                         <FormGroup>
