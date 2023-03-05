@@ -253,8 +253,8 @@ const MainRoutes = {
                     element: <ViewBranchDetails />
                 },
                 {
-                    path: 'transportmain',
-                    element: <TransportMainScreen />
+                    path: 'roombuyingrate',
+                    element: <RoomBuyingRates />
                 }
             ]
         }
