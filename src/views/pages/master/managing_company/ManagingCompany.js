@@ -80,9 +80,8 @@ function ManagingCompany({ open, handleClose, mode, code }) {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        console.log('update');
         if (mode === 'VIEW_UPDATE' || mode === 'VIEW') {
-            console.log(code);
+            // alert(code);
             dispatch(getManagingCompanyDataById(code));
         }
     }, [mode]);

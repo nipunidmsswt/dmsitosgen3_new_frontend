@@ -19,6 +19,7 @@ import {
 import HotelMaster from './HotelMaster';
 import { getAllHotelMainData, getHotelLatestModifiedDetails } from 'store/actions/masterActions/HotelMasterAction';
 import RoomBuyingRates from '../RoomBuyingRates/RoomBuyingRates';
+import FacilityCounter from '../facility_count/FacilityCount';
 
 function ViewHotelMaster() {
     const [open, setOpen] = useState(false);
@@ -29,6 +30,10 @@ function ViewHotelMaster() {
     const [tableData, setTableData] = useState([]);
     const [lastModifiedTimeDate, setLastModifiedTimeDate] = useState(null);
     const [openBuyingRateView, setOpenBuyingRateView] = useState(false);
+    const [hotelCode, setHotelCode] = useState('');
+    const [hotelName, setHotelName] = useState('');
+    const [facilityCountView, setFacilityCountView] = useState(false);
+    const [hotel, setHotel] = useState(null);
     const navigate = useNavigate();
     const columns = [
         {
@@ -175,7 +180,7 @@ function ViewHotelMaster() {
                     >
                         {/* {rowData.status === true ? ( */}
                         <FormGroup>
-                            <Button variant="outlined" endIcon={<SendIcon />} onClick={loadRoomCountView}>
+                            <Button variant="outlined" endIcon={<SendIcon />} onClick={() => loadFacilityCount(rowData)}>
                                 Hotel Facility Count
                             </Button>
                             {/* <FormControlLabel control={<Switch size="small" />} checked={true} /> */}
@@ -186,8 +191,13 @@ function ViewHotelMaster() {
         }
     ];
 
-    const loadRoomCountView = () => {
-        navigate('/master/facilitycountview', { replace: true });
+    const loadFacilityCount = (rowData) => {
+        setHotelCode(rowData.hotelCode);
+        setHotelName(rowData.longName);
+        setFacilityCountView(true);
+        setHotel(rowData);
+
+        // navigate('/master/facilitycount', { replace: true });
         // setHandleToast(false);
     };
 
@@ -201,6 +211,7 @@ function ViewHotelMaster() {
     const dispatch = useDispatch();
     const error = useSelector((state) => state.activity_supplimentReducer.errorMsg);
     const hotelMainData = useSelector((state) => state.hotelMainReducer.hotelMain);
+    const facilityCountData = useSelector((state) => state.facilityCountReducer.facilityCount);
     const hotelMainList = useSelector((state) => state.hotelMainReducer.hotelMainList);
     const lastModifiedDate = useSelector((state) => state.hotelMainReducer.lastModifiedDateTime);
 
@@ -241,6 +252,14 @@ function ViewHotelMaster() {
     }, [hotelMainData]);
 
     useEffect(() => {
+        if (facilityCountData) {
+            setHandleToast(true);
+
+            // dispatch(getAllHotelMainData());
+            // dispatch(getHotelLatestModifiedDetails());
+        }
+    }, [facilityCountData]);
+    useEffect(() => {
         dispatch(getAllHotelMainData());
         dispatch(getHotelLatestModifiedDetails());
     }, []);
@@ -258,6 +277,10 @@ function ViewHotelMaster() {
 
     const handleClose = () => {
         setOpen(false);
+    };
+
+    const handleCloseHotelFacility = () => {
+        setFacilityCountView(false);
     };
 
     const handleToast = () => {
@@ -348,6 +371,19 @@ function ViewHotelMaster() {
                                         handleClose={handleClose}
                                         code={activitySupplimentId}
                                         mode={mode}
+                                    />
+                                ) : (
+                                    ''
+                                )}
+
+                                {facilityCountView ? (
+                                    <FacilityCounter
+                                        open={facilityCountView}
+                                        handleClose={handleCloseHotelFacility}
+                                        hotelCode={hotelCode}
+                                        hotelName={hotelName}
+                                        mode={mode}
+                                        hotel={hotel}
                                     />
                                 ) : (
                                     ''

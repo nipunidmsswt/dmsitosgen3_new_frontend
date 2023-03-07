@@ -577,6 +577,8 @@ import {
     getSavedBankBrachData,
     getBankDetailsByIdSaga
 } from './mastersaga/Bank&BranchSaga';
+import { GET_ALL_FACILITYCOUNTER_DATA, SAVE_FACILITYCOUNTER_DATA } from 'store/constant/master/FacilityCounterConstant';
+import { getAllFacilityCountSaga, saveFacilityCountSaga } from './mastersaga/FacilityCountSaga';
 export function* wacherSaga() {
     // tax setup
     yield takeLatest(SAVE_TAX_DATA, saveTaxSaga);
@@ -898,4 +900,13 @@ export function* wacherSaga() {
     yield takeLatest(UPDATE_BANK_DETAILS_DATA, updateBankDetailsSaga);
     yield takeLatest(CHECK_BANK_DETAILS_DUPLICATE, checkDupicateBankSaga);
     yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_BANK_DETAILS, checkLatestBankDetailsModifiedDateSaga);
+
+    //facility count
+    yield takeLatest(SAVE_FACILITYCOUNTER_DATA, saveFacilityCountSaga);
+    // yield takeLatest(GET_HOTEL_CATEGORY_DATA_BY_ID, getHotelCateogryByIdSaga);
+    yield takeLatest(GET_ALL_FACILITYCOUNTER_DATA, getAllFacilityCountSaga);
+    // yield takeLatest(UPDATE_HOTEL_CATEGORY_DATA, updateHotelCateogrySaga);
+    // yield takeLatest(CHECK_HOTEL_CATEGORY_DUPLICATE, checkDupicateHotelCateogryCodeSaga);
+    // yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_HOTEL_CATEGORY, checkLatestHotelCateogryModifiedDateSaga);
+    // yield takeLatest(GET_ALL_ACTIVE_HOTEL_CATEGORY_DATA, getAllActiveHotelCateogrySaga);
 }
