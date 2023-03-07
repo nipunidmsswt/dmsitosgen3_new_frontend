@@ -11,7 +11,11 @@ import {
     FAILED_GET_SEASON_DATA_BY_ID,
     CHECK_SEASON_DUPLICATE,
     SUCCESS_LAST_MODIFIED_DATE_SEASON,
-    FAILED_LAST_MODIFIED_DATE_SEASON
+    FAILED_LAST_MODIFIED_DATE_SEASON,
+    SUCCESS_ACTIVE_SEASON_LIST_DATA,
+    FAILED_ACTIVE_SEASON_LIST_DATA,
+    SUCCESS_ACTIVE_RATES_BY_SEASON_ID,
+    FAILED_ACTIVE_RATES_BY_SEASON_ID
 } from 'store/constant/master/SeasonConstant';
 
 //Season saga
@@ -105,5 +109,27 @@ export function* checkLatestSeasonModifiedDateSaga() {
     } catch (e) {
         console.log('Error:' + e);
         yield put({ type: FAILED_LAST_MODIFIED_DATE_SEASON, data: '' });
+    }
+}
+
+export function* getAllActiveSeasonSaga() {
+    let responseData = [];
+
+    try {
+        responseData = yield call(get, process.env.REACT_APP_ACCOMODATION_URL + '/season/');
+        yield put({ type: SUCCESS_ACTIVE_SEASON_LIST_DATA, data: responseData.data });
+    } catch (e) {
+        yield put({ type: FAILED_ACTIVE_SEASON_LIST_DATA, data: responseData.data });
+    }
+}
+
+export function* getAllActiveRatesBySeasonSaga(action) {
+    let responseData = [];
+
+    try {
+        responseData = yield call(get, `${process.env.REACT_APP_ACCOMODATION_URL}/season/${action.data.id}`);
+        yield put({ type: SUCCESS_ACTIVE_RATES_BY_SEASON_ID, data: responseData.data });
+    } catch (e) {
+        yield put({ type: FAILED_ACTIVE_RATES_BY_SEASON_ID, data: responseData.data });
     }
 }

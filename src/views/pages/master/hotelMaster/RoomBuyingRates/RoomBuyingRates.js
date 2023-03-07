@@ -24,13 +24,18 @@ import {
     TableFooter,
     TablePagination
 } from '@mui/material';
-import { getAllSeasonData, getLatestModifiedDetails } from 'store/actions/masterActions/SeasonAction';
+import { activeSeasonsData, activeRatesSeasonId } from 'store/actions/masterActions/SeasonAction';
+import {
+    getAllActiveMarketGroupData,
+    getAllActiveOperatorByOperatorGpId
+} from 'store/actions/masterActions/operatorActions/MarketGroupAction';
 import MainCard from 'ui-component/cards/MainCard';
 import { Formik, Form, FieldArray } from 'formik';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import * as yup from 'yup';
 import AddBoxIcon from '@mui/icons-material/AddBox';
+import { getAllCurrencyListData } from 'store/actions/masterActions/ExpenseTypeAction';
 
 function RoomBuyingRates() {
     const headerInitialValues = {
@@ -77,28 +82,50 @@ function RoomBuyingRates() {
     const [open, setOpen] = useState(false);
     const [code, setCode] = useState('');
     const [mode, setMode] = useState('INSERT');
+
     const [openToast, setHandleToast] = useState(false);
     const [openErrorToast, setOpenErrorToast] = useState(false);
+    const [activeOperatorGroupList, setActiveOperatorGroupList] = useState([]);
+    const [activeOperatorList, setActiveOperatorList] = useState([]);
+    const [activeSeasonList, setactiveSeasonList] = useState([]);
+    const [activeRateListBySeason, setActiveRateListBySeason] = useState([]);
+    const [activeaxGroupList, setActiveaxGroupList] = useState([]);
+    const [currencyListOptions, setCurrencyListOptions] = useState([]);
+
     const [tableData, setTableData] = useState([]);
     const [lastModifiedTimeDate, setLastModifiedTimeDate] = useState(null);
+    const [marketListOptions, setMarketListOptions] = useState([]);
     const [initialValues, setInitial] = useState(headerInitialValues);
     const pages = [5, 10, 25];
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(pages[page]);
+
     const dispatch = useDispatch();
+
     const error = useSelector((state) => state.seasonReducer.errorMsg);
-
-    const seasonListData = useSelector((state) => state.seasonReducer.seasons);
-    const seasonData = useSelector((state) => state.seasonReducer.season);
     const lastModifiedDate = useSelector((state) => state.seasonReducer.lastModifiedDateTime);
-    console.log(seasonData);
-    const [marketListOptions, setMarketListOptions] = useState([]);
-    useEffect(() => {
-        if (seasonListData?.payload?.length > 0) {
-            setTableData(seasonListData?.payload[0]);
-        }
-    }, [seasonListData]);
+    const activeOperatorGroupData = useSelector((state) => state.marketGroupReducer.activeOperatorGroupList);
+    const activeOperatordata = useSelector((state) => state.marketGroupReducer.activeOpListPerOpGroup);
+    const activeSeasonData = useSelector((state) => state.seasonReducer.activeSeasons);
+    const activeRatesBySeason = useSelector((state) => state.seasonReducer.activeRatesBySeason);
+    const activeTaxGrupData = useSelector((state) => state.taxGroupReducer.activeTaxGrups);
+    const currencyListData = useSelector((state) => state.expenseTypesReducer.currencyList);
 
+    useEffect(() => {}, [activeSeasonData]);
+
+    useEffect(() => {}, [activeRatesBySeason]);
+
+    useEffect(() => {}, [activeOperatorGroupData]);
+
+    useEffect(() => {}, [activeOperatordata]);
+
+    useEffect(() => {}, [activeTaxGrupData]);
+
+    useEffect(() => {
+        if (currencyListData != null) {
+            setCurrencyListOptions(currencyListData);
+        }
+    }, [currencyListData]);
     useEffect(() => {
         console.log(error);
         if (error != null) {
@@ -133,8 +160,11 @@ function RoomBuyingRates() {
     }, [lastModifiedDate]);
 
     useEffect(() => {
-        dispatch(getAllSeasonData());
-        dispatch(getLatestModifiedDetails());
+        // dispatch(activeSeasonsData());
+        // dispatch(activeRatesSeasonId());
+        // dispatch(getAllActiveMarketGroupData());
+        // dispatch(getAllActiveOperatorByOperatorGpId());
+        dispatch(getAllCurrencyListData());
     }, []);
 
     const handleClickOpen = (type, data) => {

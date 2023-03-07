@@ -11,7 +11,9 @@ import {
     FAILED_LAST_MODIFIED_DATE_SEASON,
     SUCCESS_LAST_MODIFIED_DATE_SEASON,
     SUCCESS_ACTIVE_SEASON_LIST_DATA,
-    FAILED_ACTIVE_SEASON_LIST_DATA
+    FAILED_ACTIVE_SEASON_LIST_DATA,
+    SUCCESS_ACTIVE_RATES_BY_SEASON_ID,
+    FAILED_ACTIVE_RATES_BY_SEASON_ID
 } from '../../constant/master/SeasonConstant';
 
 const initialState = {
@@ -21,7 +23,8 @@ const initialState = {
     errorMsg: null,
     duplicateSeason: null,
     lastModifiedDateTime: null,
-    activeSeasons: []
+    activeSeasons: [],
+    activeRatesBySeason: []
 };
 
 export const seasonReducer = (state = initialState, action) => {
@@ -74,10 +77,16 @@ export const seasonReducer = (state = initialState, action) => {
             return { ...state, lastModifiedDateTime: data };
 
         case SUCCESS_ACTIVE_SEASON_LIST_DATA:
-            return { ...state, activeSeasons: data.payload[0].dateTime };
+            return { ...state, activeSeasons: data };
 
         case FAILED_ACTIVE_SEASON_LIST_DATA:
             return { ...state, activeSeasons: data };
+
+        case SUCCESS_ACTIVE_RATES_BY_SEASON_ID:
+            return { ...state, activeRatesBySeason: data };
+
+        case FAILED_ACTIVE_RATES_BY_SEASON_ID:
+            return { ...state, activeRatesBySeason: data };
 
         default:
             return state;
