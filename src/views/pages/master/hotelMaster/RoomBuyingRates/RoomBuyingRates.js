@@ -34,17 +34,45 @@ import AddBoxIcon from '@mui/icons-material/AddBox';
 
 function RoomBuyingRates() {
     const headerInitialValues = {
-        category: '',
-        code: '',
-        description: '',
-        status: true
+        roomCategory: null,
+        basis: null,
+        singlerate: '',
+        doubleRate: '',
+        trippleRate: '',
+        family: '',
+        child: '',
+        taxApplicable: '',
+        default: false,
+        guideRate: '',
+        tourLeadrate: ''
     };
     const [loadValues, setLoadValues] = useState({
-        category: '',
-        code: '',
-        description: '',
-        status: true,
-        codeAndNameDetails: [{ category: '', code: '', description: '', status: true }]
+        hotelCode: '',
+        hotelName: '',
+        operatorGpCode: null,
+        operatorCode: null,
+        season: null,
+        ratePeriod: null,
+        fromDate: '',
+        todate: '',
+        taxGpCode: null,
+        taxAmount: '',
+        currency: '',
+        ratesDetails: [
+            {
+                roomCategory: null,
+                basis: null,
+                singlerate: '',
+                doubleRate: '',
+                trippleRate: '',
+                family: '',
+                child: '',
+                taxApplicable: '',
+                default: false,
+                guideRate: '',
+                tourLeadrate: ''
+            }
+        ]
     });
     const [open, setOpen] = useState(false);
     const [code, setCode] = useState('');
@@ -144,16 +172,41 @@ function RoomBuyingRates() {
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
     };
+
+    const handleSubmit = async (values) => {
+        console.log(values);
+        // const initialValuesNew = {
+        //     category: values.category,
+        //     code: values.category,
+        //     description: '',
+        //     status: true,
+        //     codeAndNameDetails: [
+        //         { category: values.category, code: values.code, description: values.description, status: values.status, id: '' }
+        //     ]
+        // };
+
+        // loadValues.codeAndNameDetails?.map((s) =>
+        //     s.code === values.code && s.category == values.category ? setExistOpenModal(true) : initialValuesNew.codeAndNameDetails.push(s)
+        // );
+
+        // setLoadValues(initialValuesNew);
+    };
+    const handleSubmitForm = async (data) => {
+        // if (mode === 'INSERT') {
+        //     dispatch(saveClusterAndMarketMappingData(data));
+        // }
+        // handleClose();
+    };
     return (
         <div>
-            <MainCard title="Season">
+            <MainCard title="Room Buying Rates">
                 <div className="row">
                     <Grid container direction="row">
                         <Grid item lg={12} md={12} xs={12}>
                             <>
                                 <Formik
                                     enableReinitialize={true}
-                                    initialValues={headerInitialValues || loadValues}
+                                    initialValues={headerInitialValues}
                                     onSubmit={(values, { resetForm }) => {
                                         handleSubmit(values);
                                         resetForm('');
@@ -163,6 +216,76 @@ function RoomBuyingRates() {
                                     {({ values, handleChange, setFieldValue, errors, handleBlur, touched, resetForm }) => {
                                         return (
                                             <Form>
+                                                {/* <div style={{ marginTop: '6px', margin: '10px' }}>
+                                                    <Grid gap="10px" display="flex">
+                                                        <Grid item>
+                                                            {' '}
+                                                            <Autocomplete
+                                                                value={values.marketList}
+                                                                name="category"
+                                                                disabled={mode == 'VIEW'}
+                                                                onChange={(_, value) => {
+                                                                    setFieldValue(`marketList`, value);
+                                                                }}
+                                                                InputLabelProps={{
+                                                                    shrink: true
+                                                                }}
+                                                                options={marketListOptions}
+                                                                getOptionLabel={(option) => `${option.code} - ${option.name}`}
+                                                                isOptionEqualToValue={(option, value) => option.marketId === value.marketId}
+                                                                renderInput={(params) => (
+                                                                    <TextField
+                                                                        {...params}
+                                                                        label="Markets"
+                                                                        sx={{
+                                                                            width: { xs: 120 },
+                                                                            '& .MuiInputBase-root': {
+                                                                                height: 41
+                                                                            }
+                                                                        }}
+                                                                        InputLabelProps={{
+                                                                            shrink: true
+                                                                        }}
+                                                                        error={Boolean(touched.marketList && errors.marketList)}
+                                                                        helperText={
+                                                                            touched.marketList && errors.marketList ? errors.marketList : ''
+                                                                        }
+                                                                        // placeholder="--Select a Manager Code --"
+                                                                        variant="outlined"
+                                                                        name="marketList"
+                                                                        onBlur={handleBlur}
+                                                                    />
+                                                                )}
+                                                            />
+                                                        </Grid>
+
+                                                        <Grid item>
+                                                            <TextField
+                                                                label="Type Code"
+                                                                sx={{
+                                                                    width: { xs: 120 },
+                                                                    '& .MuiInputBase-root': {
+                                                                        height: 40
+                                                                    }
+                                                                }}
+                                                                disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                type="text"
+                                                                variant="outlined"
+                                                                name="code"
+                                                                InputLabelProps={{
+                                                                    shrink: true
+                                                                }}
+                                                                value={values.code}
+                                                                onChange={handleChange}
+                                                                onBlur={handleBlur}
+                                                                error={Boolean(touched.code && errors.code)}
+                                                                helperText={touched.code && errors.code ? errors.code : ''}
+                                                            />
+                                                        </Grid>
+                                                    </Grid>
+                                                </div> */}
+
+                                                {/* <hr />
                                                 <div style={{ marginTop: '6px', margin: '10px' }}>
                                                     <Grid gap="10px" display="flex">
                                                         <Grid item>
@@ -344,7 +467,365 @@ function RoomBuyingRates() {
                                                                 }
                                                             />
                                                         </Grid>
+                                                        <Grid item>
+                                                            <TextField
+                                                                label="Description"
+                                                                sx={{
+                                                                    width: { xs: 120 },
+                                                                    '& .MuiInputBase-root': {
+                                                                        height: 40
+                                                                    }
+                                                                }}
+                                                                disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                type="text"
+                                                                variant="outlined"
+                                                                name="description"
+                                                                InputLabelProps={{
+                                                                    shrink: true
+                                                                }}
+                                                                value={values.description}
+                                                                onChange={handleChange}
+                                                                onBlur={handleBlur}
+                                                                error={Boolean(touched.description && errors.description)}
+                                                                helperText={
+                                                                    touched.description && errors.description ? errors.description : ''
+                                                                }
+                                                            />
+                                                        </Grid>
+                                                        <Grid item>
+                                                            <TextField
+                                                                label="Description"
+                                                                sx={{
+                                                                    width: { xs: 120 },
+                                                                    '& .MuiInputBase-root': {
+                                                                        height: 40
+                                                                    }
+                                                                }}
+                                                                disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                type="text"
+                                                                variant="outlined"
+                                                                name="description"
+                                                                InputLabelProps={{
+                                                                    shrink: true
+                                                                }}
+                                                                value={values.description}
+                                                                onChange={handleChange}
+                                                                onBlur={handleBlur}
+                                                                error={Boolean(touched.description && errors.description)}
+                                                                helperText={
+                                                                    touched.description && errors.description ? errors.description : ''
+                                                                }
+                                                            />
+                                                        </Grid>
+                                                        <Grid item>
+                                                            <TextField
+                                                                label="Description"
+                                                                sx={{
+                                                                    width: { xs: 120 },
+                                                                    '& .MuiInputBase-root': {
+                                                                        height: 40
+                                                                    }
+                                                                }}
+                                                                disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                type="text"
+                                                                variant="outlined"
+                                                                name="description"
+                                                                InputLabelProps={{
+                                                                    shrink: true
+                                                                }}
+                                                                value={values.description}
+                                                                onChange={handleChange}
+                                                                onBlur={handleBlur}
+                                                                error={Boolean(touched.description && errors.description)}
+                                                                helperText={
+                                                                    touched.description && errors.description ? errors.description : ''
+                                                                }
+                                                            />
+                                                        </Grid>
+                                                    </Grid>
+                                                </div> */}
+                                                {/* <hr /> */}
+                                                <div style={{ marginTop: '6px', margin: '10px' }}>
+                                                    <Grid gap="10px" display="flex">
+                                                        <Grid item>
+                                                            {' '}
+                                                            <Autocomplete
+                                                                value={values.marketList}
+                                                                name="category"
+                                                                disabled={mode == 'VIEW'}
+                                                                onChange={(_, value) => {
+                                                                    setFieldValue(`marketList`, value);
+                                                                }}
+                                                                InputLabelProps={{
+                                                                    shrink: true
+                                                                }}
+                                                                options={marketListOptions}
+                                                                getOptionLabel={(option) => `${option.code} - ${option.name}`}
+                                                                isOptionEqualToValue={(option, value) => option.marketId === value.marketId}
+                                                                renderInput={(params) => (
+                                                                    <TextField
+                                                                        {...params}
+                                                                        label="Markets"
+                                                                        sx={{
+                                                                            width: { xs: 120 },
+                                                                            '& .MuiInputBase-root': {
+                                                                                height: 41
+                                                                            }
+                                                                        }}
+                                                                        InputLabelProps={{
+                                                                            shrink: true
+                                                                        }}
+                                                                        error={Boolean(touched.marketList && errors.marketList)}
+                                                                        helperText={
+                                                                            touched.marketList && errors.marketList ? errors.marketList : ''
+                                                                        }
+                                                                        // placeholder="--Select a Manager Code --"
+                                                                        variant="outlined"
+                                                                        name="marketList"
+                                                                        onBlur={handleBlur}
+                                                                    />
+                                                                )}
+                                                            />
+                                                        </Grid>
 
+                                                        <Grid item>
+                                                            <TextField
+                                                                label="Type Code"
+                                                                sx={{
+                                                                    width: { xs: 120 },
+                                                                    '& .MuiInputBase-root': {
+                                                                        height: 40
+                                                                    }
+                                                                }}
+                                                                disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                type="text"
+                                                                variant="outlined"
+                                                                name="code"
+                                                                InputLabelProps={{
+                                                                    shrink: true
+                                                                }}
+                                                                value={values.code}
+                                                                onChange={handleChange}
+                                                                onBlur={handleBlur}
+                                                                error={Boolean(touched.code && errors.code)}
+                                                                helperText={touched.code && errors.code ? errors.code : ''}
+                                                            />
+                                                        </Grid>
+                                                        <Grid item>
+                                                            {' '}
+                                                            <Autocomplete
+                                                                value={values.marketList}
+                                                                name="category"
+                                                                disabled={mode == 'VIEW'}
+                                                                onChange={(_, value) => {
+                                                                    setFieldValue(`marketList`, value);
+                                                                }}
+                                                                InputLabelProps={{
+                                                                    shrink: true
+                                                                }}
+                                                                options={marketListOptions}
+                                                                getOptionLabel={(option) => `${option.code} - ${option.name}`}
+                                                                isOptionEqualToValue={(option, value) => option.marketId === value.marketId}
+                                                                renderInput={(params) => (
+                                                                    <TextField
+                                                                        {...params}
+                                                                        label="Markets"
+                                                                        sx={{
+                                                                            width: { xs: 120 },
+                                                                            '& .MuiInputBase-root': {
+                                                                                height: 41
+                                                                            }
+                                                                        }}
+                                                                        InputLabelProps={{
+                                                                            shrink: true
+                                                                        }}
+                                                                        error={Boolean(touched.marketList && errors.marketList)}
+                                                                        helperText={
+                                                                            touched.marketList && errors.marketList ? errors.marketList : ''
+                                                                        }
+                                                                        // placeholder="--Select a Manager Code --"
+                                                                        variant="outlined"
+                                                                        name="marketList"
+                                                                        onBlur={handleBlur}
+                                                                    />
+                                                                )}
+                                                            />
+                                                        </Grid>
+                                                        <Grid item>
+                                                            <TextField
+                                                                label="Description"
+                                                                sx={{
+                                                                    width: { xs: 120 },
+                                                                    '& .MuiInputBase-root': {
+                                                                        height: 40
+                                                                    }
+                                                                }}
+                                                                disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                type="text"
+                                                                variant="outlined"
+                                                                name="description"
+                                                                InputLabelProps={{
+                                                                    shrink: true
+                                                                }}
+                                                                value={values.description}
+                                                                onChange={handleChange}
+                                                                onBlur={handleBlur}
+                                                                error={Boolean(touched.description && errors.description)}
+                                                                helperText={
+                                                                    touched.description && errors.description ? errors.description : ''
+                                                                }
+                                                            />
+                                                        </Grid>
+                                                        <Grid item>
+                                                            <TextField
+                                                                label="Description"
+                                                                sx={{
+                                                                    width: { xs: 120 },
+                                                                    '& .MuiInputBase-root': {
+                                                                        height: 40
+                                                                    }
+                                                                }}
+                                                                disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                type="text"
+                                                                variant="outlined"
+                                                                name="description"
+                                                                InputLabelProps={{
+                                                                    shrink: true
+                                                                }}
+                                                                value={values.description}
+                                                                onChange={handleChange}
+                                                                onBlur={handleBlur}
+                                                                error={Boolean(touched.description && errors.description)}
+                                                                helperText={
+                                                                    touched.description && errors.description ? errors.description : ''
+                                                                }
+                                                            />
+                                                        </Grid>
+                                                        <Grid item>
+                                                            <TextField
+                                                                label="Description"
+                                                                sx={{
+                                                                    width: { xs: 120 },
+                                                                    '& .MuiInputBase-root': {
+                                                                        height: 40
+                                                                    }
+                                                                }}
+                                                                disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                type="text"
+                                                                variant="outlined"
+                                                                name="description"
+                                                                InputLabelProps={{
+                                                                    shrink: true
+                                                                }}
+                                                                value={values.description}
+                                                                onChange={handleChange}
+                                                                onBlur={handleBlur}
+                                                                error={Boolean(touched.description && errors.description)}
+                                                                helperText={
+                                                                    touched.description && errors.description ? errors.description : ''
+                                                                }
+                                                            />
+                                                        </Grid>
+                                                        <Grid item>
+                                                            <TextField
+                                                                label="Description"
+                                                                sx={{
+                                                                    width: { xs: 120 },
+                                                                    '& .MuiInputBase-root': {
+                                                                        height: 40
+                                                                    }
+                                                                }}
+                                                                disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                type="text"
+                                                                variant="outlined"
+                                                                name="description"
+                                                                InputLabelProps={{
+                                                                    shrink: true
+                                                                }}
+                                                                value={values.description}
+                                                                onChange={handleChange}
+                                                                onBlur={handleBlur}
+                                                                error={Boolean(touched.description && errors.description)}
+                                                                helperText={
+                                                                    touched.description && errors.description ? errors.description : ''
+                                                                }
+                                                            />
+                                                        </Grid>
+                                                        <Grid item>
+                                                            <TextField
+                                                                label="Description"
+                                                                sx={{
+                                                                    width: { xs: 120 },
+                                                                    '& .MuiInputBase-root': {
+                                                                        height: 40
+                                                                    }
+                                                                }}
+                                                                disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                type="text"
+                                                                variant="outlined"
+                                                                name="description"
+                                                                InputLabelProps={{
+                                                                    shrink: true
+                                                                }}
+                                                                value={values.description}
+                                                                onChange={handleChange}
+                                                                onBlur={handleBlur}
+                                                                error={Boolean(touched.description && errors.description)}
+                                                                helperText={
+                                                                    touched.description && errors.description ? errors.description : ''
+                                                                }
+                                                            />
+                                                        </Grid>
+                                                        <Grid item>
+                                                            <TextField
+                                                                label="Description"
+                                                                sx={{
+                                                                    width: { xs: 120 },
+                                                                    '& .MuiInputBase-root': {
+                                                                        height: 40
+                                                                    }
+                                                                }}
+                                                                disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                type="text"
+                                                                variant="outlined"
+                                                                name="description"
+                                                                InputLabelProps={{
+                                                                    shrink: true
+                                                                }}
+                                                                value={values.description}
+                                                                onChange={handleChange}
+                                                                onBlur={handleBlur}
+                                                                error={Boolean(touched.description && errors.description)}
+                                                                helperText={
+                                                                    touched.description && errors.description ? errors.description : ''
+                                                                }
+                                                            />
+                                                        </Grid>
+                                                        <Grid item>
+                                                            <TextField
+                                                                label="Description"
+                                                                sx={{
+                                                                    width: { xs: 120 },
+                                                                    '& .MuiInputBase-root': {
+                                                                        height: 40
+                                                                    }
+                                                                }}
+                                                                disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                type="text"
+                                                                variant="outlined"
+                                                                name="description"
+                                                                InputLabelProps={{
+                                                                    shrink: true
+                                                                }}
+                                                                value={values.description}
+                                                                onChange={handleChange}
+                                                                onBlur={handleBlur}
+                                                                error={Boolean(touched.description && errors.description)}
+                                                                helperText={
+                                                                    touched.description && errors.description ? errors.description : ''
+                                                                }
+                                                            />
+                                                        </Grid>
                                                         <Grid item xs={3}>
                                                             <FormGroup>
                                                                 <FormControlLabel
@@ -373,7 +854,6 @@ function RoomBuyingRates() {
                                                         </Grid>
                                                     </Grid>
                                                 </div>
-
                                                 <br />
                                             </Form>
                                         );
@@ -414,7 +894,7 @@ function RoomBuyingRates() {
                                                                 {/* {tableBodyData ? ( */}
                                                                 <TableBody>
                                                                     {(rowsPerPage > 0
-                                                                        ? values.codeAndNameDetails.slice(
+                                                                        ? values.ratesDetails.slice(
                                                                               page * rowsPerPage,
                                                                               page * rowsPerPage + rowsPerPage
                                                                           )
@@ -436,29 +916,29 @@ function RoomBuyingRates() {
                                                                                         disabled
                                                                                         //   type="number"
                                                                                         variant="outlined"
-                                                                                        name={`codeAndNameDetails.${idx}.category`}
+                                                                                        name={`ratesDetails.${idx}.category`}
                                                                                         value={
-                                                                                            values.codeAndNameDetails[idx] &&
-                                                                                            values.codeAndNameDetails[idx].category
+                                                                                            values.ratesDetails[idx] &&
+                                                                                            values.ratesDetails[idx].category
                                                                                         }
                                                                                         onChange={handleChange}
                                                                                         onBlur={handleBlur}
                                                                                         error={Boolean(
-                                                                                            touched.codeAndNameDetails &&
-                                                                                                touched.codeAndNameDetails[idx] &&
-                                                                                                touched.codeAndNameDetails[idx].category &&
-                                                                                                errors.codeAndNameDetails &&
-                                                                                                errors.codeAndNameDetails[idx] &&
-                                                                                                errors.codeAndNameDetails[idx].category
+                                                                                            touched.ratesDetails &&
+                                                                                                touched.ratesDetails[idx] &&
+                                                                                                touched.ratesDetails[idx].category &&
+                                                                                                errors.ratesDetails &&
+                                                                                                errors.ratesDetails[idx] &&
+                                                                                                errors.ratesDetails[idx].category
                                                                                         )}
                                                                                         helperText={
-                                                                                            touched.codeAndNameDetails &&
-                                                                                            touched.codeAndNameDetails[idx] &&
-                                                                                            touched.codeAndNameDetails[idx].category &&
-                                                                                            errors.codeAndNameDetails &&
-                                                                                            errors.codeAndNameDetails[idx] &&
-                                                                                            errors.codeAndNameDetails[idx].category
-                                                                                                ? errors.codeAndNameDetails[idx].category
+                                                                                            touched.ratesDetails &&
+                                                                                            touched.ratesDetails[idx] &&
+                                                                                            touched.ratesDetails[idx].category &&
+                                                                                            errors.ratesDetails &&
+                                                                                            errors.ratesDetails[idx] &&
+                                                                                            errors.ratesDetails[idx].category
+                                                                                                ? errors.ratesDetails[idx].category
                                                                                                 : ''
                                                                                         }
                                                                                     />
@@ -477,29 +957,29 @@ function RoomBuyingRates() {
                                                                                         // placeholder="code"
                                                                                         // validate={checkDuplicateCodeForCodeAndName}
 
-                                                                                        name={`codeAndNameDetails.${idx}.code`}
+                                                                                        name={`ratesDetails.${idx}.code`}
                                                                                         value={
-                                                                                            values.codeAndNameDetails[idx] &&
-                                                                                            values.codeAndNameDetails[idx].code
+                                                                                            values.ratesDetails[idx] &&
+                                                                                            values.ratesDetails[idx].code
                                                                                         }
                                                                                         onChange={handleChange}
                                                                                         onBlur={handleBlur}
                                                                                         error={Boolean(
-                                                                                            touched.codeAndNameDetails &&
-                                                                                                touched.codeAndNameDetails[idx] &&
-                                                                                                touched.codeAndNameDetails[idx].code &&
-                                                                                                errors.codeAndNameDetails &&
-                                                                                                errors.codeAndNameDetails[idx] &&
-                                                                                                errors.codeAndNameDetails[idx].code
+                                                                                            touched.ratesDetails &&
+                                                                                                touched.ratesDetails[idx] &&
+                                                                                                touched.ratesDetails[idx].code &&
+                                                                                                errors.ratesDetails &&
+                                                                                                errors.ratesDetails[idx] &&
+                                                                                                errors.ratesDetails[idx].code
                                                                                         )}
                                                                                         helperText={
-                                                                                            touched.codeAndNameDetails &&
-                                                                                            touched.codeAndNameDetails[idx] &&
-                                                                                            touched.codeAndNameDetails[idx].code &&
-                                                                                            errors.codeAndNameDetails &&
-                                                                                            errors.codeAndNameDetails[idx] &&
-                                                                                            errors.codeAndNameDetails[idx].code
-                                                                                                ? errors.codeAndNameDetails[idx].code
+                                                                                            touched.ratesDetails &&
+                                                                                            touched.ratesDetails[idx] &&
+                                                                                            touched.ratesDetails[idx].code &&
+                                                                                            errors.ratesDetails &&
+                                                                                            errors.ratesDetails[idx] &&
+                                                                                            errors.ratesDetails[idx].code
+                                                                                                ? errors.ratesDetails[idx].code
                                                                                                 : ''
                                                                                         }
                                                                                     />
@@ -516,31 +996,30 @@ function RoomBuyingRates() {
                                                                                         //   type="number"
                                                                                         variant="outlined"
                                                                                         // placeholder="name"
-                                                                                        name={`codeAndNameDetails.${idx}.description`}
+                                                                                        name={`ratesDetails.${idx}.description`}
                                                                                         value={
-                                                                                            values.codeAndNameDetails[idx] &&
-                                                                                            values.codeAndNameDetails[idx].description
+                                                                                            values.ratesDetails[idx] &&
+                                                                                            values.ratesDetails[idx].description
                                                                                         }
                                                                                         disabled
                                                                                         onChange={handleChange}
                                                                                         onBlur={handleBlur}
                                                                                         error={Boolean(
-                                                                                            touched.codeAndNameDetails &&
-                                                                                                touched.codeAndNameDetails[idx] &&
-                                                                                                touched.codeAndNameDetails[idx]
-                                                                                                    .description &&
-                                                                                                errors.codeAndNameDetails &&
-                                                                                                errors.codeAndNameDetails[idx] &&
-                                                                                                errors.codeAndNameDetails[idx].description
+                                                                                            touched.ratesDetails &&
+                                                                                                touched.ratesDetails[idx] &&
+                                                                                                touched.ratesDetails[idx].description &&
+                                                                                                errors.ratesDetails &&
+                                                                                                errors.ratesDetails[idx] &&
+                                                                                                errors.ratesDetails[idx].description
                                                                                         )}
                                                                                         helperText={
-                                                                                            touched.codeAndNameDetails &&
-                                                                                            touched.codeAndNameDetails[idx] &&
-                                                                                            touched.codeAndNameDetails[idx].description &&
-                                                                                            errors.codeAndNameDetails &&
-                                                                                            errors.codeAndNameDetails[idx] &&
-                                                                                            errors.codeAndNameDetails[idx].description
-                                                                                                ? errors.codeAndNameDetails[idx].description
+                                                                                            touched.ratesDetails &&
+                                                                                            touched.ratesDetails[idx] &&
+                                                                                            touched.ratesDetails[idx].description &&
+                                                                                            errors.ratesDetails &&
+                                                                                            errors.ratesDetails[idx] &&
+                                                                                            errors.ratesDetails[idx].description
+                                                                                                ? errors.ratesDetails[idx].description
                                                                                                 : ''
                                                                                         }
                                                                                     />
@@ -556,31 +1035,30 @@ function RoomBuyingRates() {
                                                                                         //   type="number"
                                                                                         variant="outlined"
                                                                                         // placeholder="name"
-                                                                                        name={`codeAndNameDetails.${idx}.description`}
+                                                                                        name={`ratesDetails.${idx}.description`}
                                                                                         value={
-                                                                                            values.codeAndNameDetails[idx] &&
-                                                                                            values.codeAndNameDetails[idx].description
+                                                                                            values.ratesDetails[idx] &&
+                                                                                            values.ratesDetails[idx].description
                                                                                         }
                                                                                         disabled
                                                                                         onChange={handleChange}
                                                                                         onBlur={handleBlur}
                                                                                         error={Boolean(
-                                                                                            touched.codeAndNameDetails &&
-                                                                                                touched.codeAndNameDetails[idx] &&
-                                                                                                touched.codeAndNameDetails[idx]
-                                                                                                    .description &&
-                                                                                                errors.codeAndNameDetails &&
-                                                                                                errors.codeAndNameDetails[idx] &&
-                                                                                                errors.codeAndNameDetails[idx].description
+                                                                                            touched.ratesDetails &&
+                                                                                                touched.ratesDetails[idx] &&
+                                                                                                touched.ratesDetails[idx].description &&
+                                                                                                errors.ratesDetails &&
+                                                                                                errors.ratesDetails[idx] &&
+                                                                                                errors.ratesDetails[idx].description
                                                                                         )}
                                                                                         helperText={
-                                                                                            touched.codeAndNameDetails &&
-                                                                                            touched.codeAndNameDetails[idx] &&
-                                                                                            touched.codeAndNameDetails[idx].description &&
-                                                                                            errors.codeAndNameDetails &&
-                                                                                            errors.codeAndNameDetails[idx] &&
-                                                                                            errors.codeAndNameDetails[idx].description
-                                                                                                ? errors.codeAndNameDetails[idx].description
+                                                                                            touched.ratesDetails &&
+                                                                                            touched.ratesDetails[idx] &&
+                                                                                            touched.ratesDetails[idx].description &&
+                                                                                            errors.ratesDetails &&
+                                                                                            errors.ratesDetails[idx] &&
+                                                                                            errors.ratesDetails[idx].description
+                                                                                                ? errors.ratesDetails[idx].description
                                                                                                 : ''
                                                                                         }
                                                                                     />
@@ -596,31 +1074,30 @@ function RoomBuyingRates() {
                                                                                         //   type="number"
                                                                                         variant="outlined"
                                                                                         // placeholder="name"
-                                                                                        name={`codeAndNameDetails.${idx}.description`}
+                                                                                        name={`ratesDetails.${idx}.description`}
                                                                                         value={
-                                                                                            values.codeAndNameDetails[idx] &&
-                                                                                            values.codeAndNameDetails[idx].description
+                                                                                            values.ratesDetails[idx] &&
+                                                                                            values.ratesDetails[idx].description
                                                                                         }
                                                                                         disabled
                                                                                         onChange={handleChange}
                                                                                         onBlur={handleBlur}
                                                                                         error={Boolean(
-                                                                                            touched.codeAndNameDetails &&
-                                                                                                touched.codeAndNameDetails[idx] &&
-                                                                                                touched.codeAndNameDetails[idx]
-                                                                                                    .description &&
-                                                                                                errors.codeAndNameDetails &&
-                                                                                                errors.codeAndNameDetails[idx] &&
-                                                                                                errors.codeAndNameDetails[idx].description
+                                                                                            touched.ratesDetails &&
+                                                                                                touched.ratesDetails[idx] &&
+                                                                                                touched.ratesDetails[idx].description &&
+                                                                                                errors.ratesDetails &&
+                                                                                                errors.ratesDetails[idx] &&
+                                                                                                errors.ratesDetails[idx].description
                                                                                         )}
                                                                                         helperText={
-                                                                                            touched.codeAndNameDetails &&
-                                                                                            touched.codeAndNameDetails[idx] &&
-                                                                                            touched.codeAndNameDetails[idx].description &&
-                                                                                            errors.codeAndNameDetails &&
-                                                                                            errors.codeAndNameDetails[idx] &&
-                                                                                            errors.codeAndNameDetails[idx].description
-                                                                                                ? errors.codeAndNameDetails[idx].description
+                                                                                            touched.ratesDetails &&
+                                                                                            touched.ratesDetails[idx] &&
+                                                                                            touched.ratesDetails[idx].description &&
+                                                                                            errors.ratesDetails &&
+                                                                                            errors.ratesDetails[idx] &&
+                                                                                            errors.ratesDetails[idx].description
+                                                                                                ? errors.ratesDetails[idx].description
                                                                                                 : ''
                                                                                         }
                                                                                     />
@@ -628,15 +1105,15 @@ function RoomBuyingRates() {
                                                                                 <TableCell>
                                                                                     <FormGroup>
                                                                                         <FormControlLabel
-                                                                                            name={`codeAndNameDetails.${idx}.status`}
+                                                                                            name={`ratesDetails.${idx}.status`}
                                                                                             onChange={handleChange}
                                                                                             value={
-                                                                                                values.codeAndNameDetails[idx] &&
-                                                                                                values.codeAndNameDetails[idx].status
+                                                                                                values.ratesDetails[idx] &&
+                                                                                                values.ratesDetails[idx].status
                                                                                             }
                                                                                             control={<Switch color="success" />}
                                                                                             // label="Status"
-                                                                                            checked={values.codeAndNameDetails[idx].status}
+                                                                                            checked={values.ratesDetails[idx].status}
                                                                                             disabled
                                                                                             // disabled={mode == 'VIEW'}
                                                                                         />
@@ -644,8 +1121,8 @@ function RoomBuyingRates() {
                                                                                 </TableCell>
 
                                                                                 <TableCell>
-                                                                                    {(values.codeAndNameDetails[idx] &&
-                                                                                        values.codeAndNameDetails[idx].id) === '' ? (
+                                                                                    {(values.ratesDetails[idx] &&
+                                                                                        values.ratesDetails[idx].id) === '' ? (
                                                                                         <IconButton
                                                                                             aria-label="delete"
                                                                                             onClick={() => {
@@ -672,7 +1149,7 @@ function RoomBuyingRates() {
                                                                                 5, 10, 25
                                                                                 // { label: 'All', value: -1 }
                                                                             ]}
-                                                                            count={values.codeAndNameDetails.length}
+                                                                            count={values.ratesDetails.length}
                                                                             rowsPerPage={rowsPerPage}
                                                                             page={page}
                                                                             SelectProps={{
