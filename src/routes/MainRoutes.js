@@ -37,6 +37,7 @@ import ViewBankDetail from 'views/pages/master/bank_detail/ViewBankDetail';
 import ViewBranchDetails from 'views/pages/master/bank/ViewBranchDetails';
 import TransportMainScreen from 'views/pages/master/transportMaster/transportMainScreen/TransportMainScreen';
 import AuthGuard from 'utils/route-guard/AuthGuard';
+import FacilityCounter from 'views/pages/master/hotelMaster/facility_count/FacilityCount';
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
 
@@ -56,9 +57,9 @@ const MainRoutes = {
     path: '/',
     // element: <MainLayout />,
     element: (
-        <AuthGuard>
-            <MainLayout />
-        </AuthGuard>
+        // <AuthGuard>
+        <MainLayout />
+        // </AuthGuard>
     ),
     children: [
         {
@@ -207,6 +208,10 @@ const MainRoutes = {
                 {
                     path: 'facilitycountview',
                     element: <ViewFacilityCounter />
+                },
+                {
+                    path: 'facilitycount',
+                    element: <FacilityCounter />
                 },
                 {
                     path: 'guideclassview',
