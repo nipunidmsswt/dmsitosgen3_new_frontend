@@ -263,6 +263,7 @@ function HotelMaster({ open, handleClose, mode, hotelId }) {
 
     const [managingCompanyCode, setManagingCompanyCode] = useState('');
     const viewManagingCompanyDetails = (value) => {
+        // alert(value.code);
         setManagingCompanyCode(value.code);
         setExistOpenModal(true);
         // alert('managing company');
