@@ -4,7 +4,11 @@ import {
     ADD_SUCCESS_FACILITYCOUNTER_DATA,
     FAILED_FACILITYCOUNTER_LAST_MODIFIED_DATE,
     FAILED_FACILITYCOUNTER_LIST_DATA,
-    SUCCESS_FACILITYCOUNTER_LIST_DATA
+    FAILED_GET_ALL_FACILITY_COUNTER_DATA_HOTEL_WISE,
+    SUCCESS_FACILITYCOUNTER_LIST_DATA,
+    SUCCESS_GET_ALL_FACILITY_COUNTER_DATA_HOTEL_WISE,
+    UPDATE_FAILED_FACILITYCOUNTER_DATA,
+    UPDATE_SUCCESS_FACILITYCOUNTER_DATA
 } from 'store/constant/master/FacilityCounterConstant';
 import { create, getById, update, get } from '../../../apis/Apis';
 import {
@@ -48,6 +52,20 @@ export function* getAllFacilityCountSaga() {
     }
 }
 
+export function* getAllFacilityCountHotelWiseSaga(action) {
+    console.log(action.data.hotel);
+
+    let responseData = [];
+    try {
+        responseData = yield call(getById, `${process.env.REACT_APP_ACCOMODATION_URL}/facilityCount/hotelWise/${action.data.hotel}`);
+        console.log(responseData.data.payload);
+        yield put({ type: SUCCESS_GET_ALL_FACILITY_COUNTER_DATA_HOTEL_WISE, data: responseData.data });
+    } catch (e) {
+        console.log(e);
+        yield put({ type: FAILED_GET_ALL_FACILITY_COUNTER_DATA_HOTEL_WISE, data: responseData.data });
+    }
+}
+
 export function* getFacilityCountByIdSaga(action) {
     console.log('getTaxByIdSaga tax saga');
     console.log(action);
@@ -65,16 +83,17 @@ export function* getFacilityCountByIdSaga(action) {
 
 export function* updateFacilityCountSaga(action) {
     console.log('update Tax groupSaga tax saga');
+    alert('facility saga');
     console.log(action);
-    action.data.path = `${process.env.REACT_APP_ACCOMODATION_URL}/hotelcategory/${action.data.code}`;
+    action.data.path = `${process.env.REACT_APP_ACCOMODATION_URL}/facilityCount/`;
     let responseData = [];
     try {
         responseData = yield call(update, action.data);
         console.log(responseData.data.payload);
-        yield put({ type: UPDATE_SUCCESS_HOTEL_CATEGORY_DATA, data: responseData.data });
+        yield put({ type: UPDATE_SUCCESS_FACILITYCOUNTER_DATA, data: responseData.data });
     } catch (e) {
         console.log(e);
-        yield put({ type: UPDATE_FAILED_HOTEL_CATEGORY_DATA, data: responseData.data });
+        yield put({ type: UPDATE_FAILED_FACILITYCOUNTER_DATA, data: responseData.data });
     }
 }
 

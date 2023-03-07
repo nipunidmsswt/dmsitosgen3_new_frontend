@@ -85,7 +85,7 @@ function ViewFacilityCounter() {
     }, [taxGroupData]);
 
     useEffect(() => {
-        // dispatch(getAllTaxGroupDetails());
+        dispatch(getAllFacilityCounterData());
     }, []);
 
     const handleClickOpen = (type, data) => {
