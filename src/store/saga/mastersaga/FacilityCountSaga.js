@@ -5,6 +5,7 @@ import {
     FAILED_FACILITYCOUNTER_LAST_MODIFIED_DATE,
     FAILED_FACILITYCOUNTER_LIST_DATA,
     FAILED_GET_ALL_FACILITY_COUNTER_DATA_HOTEL_WISE,
+    SUCCESS_FACILITYCOUNTER_LAST_MODIFIED_DATE,
     SUCCESS_FACILITYCOUNTER_LIST_DATA,
     SUCCESS_GET_ALL_FACILITY_COUNTER_DATA_HOTEL_WISE,
     UPDATE_FAILED_FACILITYCOUNTER_DATA,
@@ -82,9 +83,6 @@ export function* getFacilityCountByIdSaga(action) {
 }
 
 export function* updateFacilityCountSaga(action) {
-    console.log('update Tax groupSaga tax saga');
-    alert('facility saga');
-    console.log(action);
     action.data.path = `${process.env.REACT_APP_ACCOMODATION_URL}/facilityCount/`;
     let responseData = [];
     try {
@@ -115,12 +113,11 @@ export function* checkDupicateFacilityCountCodeSaga(action) {
 export function* checkLatestFacilityCountModifiedDateSaga() {
     let responseData = [];
     try {
-        responseData = yield call(get, `${process.env.REACT_APP_FINANCE_URL}/hotelcategory/lastModifiedDateTime`);
-        console.log('response data last:' + responseData);
-        yield put({ type: SUCCESS_LAST_MODIFIED_DATE_HOTEL_CATEGORY, data: responseData.data });
+        responseData = yield call(get, `${process.env.REACT_APP_ACCOMODATION_URL}/facilityCount/lastModifiedDateTime`);
+        yield put({ type: SUCCESS_FACILITYCOUNTER_LAST_MODIFIED_DATE, data: responseData.data });
     } catch (e) {
         console.log('Error:' + e);
-        yield put({ type: FAILED_LAST_MODIFIED_DATE_HOTEL_CATEGORY, data: '' });
+        yield put({ type: FAILED_FACILITYCOUNTER_LAST_MODIFIED_DATE, data: '' });
     }
 }
 

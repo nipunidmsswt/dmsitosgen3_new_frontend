@@ -1,4 +1,4 @@
-// import { Header } from './components/header/Header';
+import { Header } from './components/header/Header';
 import { Hero } from './components/main/hero/HeroSection';
 import { Footer } from './components/footer/Footer';
 // import './Container.css';
@@ -12,7 +12,7 @@ import BackgroundImg from '../../assets/20944166.jpg';
 const Container = () => {
     return (
         <div>
-            {/* <Header /> */}
+            <Header />
 
             <Hero />
             <BestRecipes />

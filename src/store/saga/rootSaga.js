@@ -580,10 +580,12 @@ import {
 import {
     GET_ALL_FACILITYCOUNTER_DATA,
     GET_ALL_FACILITY_COUNTER_DATA_HOTEL_WISE,
+    GET_FACILITYCOUNTER_LAST_MODIFIED_DATE_TIME,
     SAVE_FACILITYCOUNTER_DATA,
     UPDATE_FACILITYCOUNTER_DATA
 } from 'store/constant/master/FacilityCounterConstant';
 import {
+    checkLatestFacilityCountModifiedDateSaga,
     getAllFacilityCountHotelWiseSaga,
     getAllFacilityCountSaga,
     saveFacilityCountSaga,
@@ -918,6 +920,6 @@ export function* wacherSaga() {
     yield takeLatest(GET_ALL_FACILITY_COUNTER_DATA_HOTEL_WISE, getAllFacilityCountHotelWiseSaga);
     yield takeLatest(UPDATE_FACILITYCOUNTER_DATA, updateFacilityCountSaga);
     // yield takeLatest(CHECK_HOTEL_CATEGORY_DUPLICATE, checkDupicateHotelCateogryCodeSaga);
-    // yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_HOTEL_CATEGORY, checkLatestHotelCateogryModifiedDateSaga);
+    yield takeLatest(GET_FACILITYCOUNTER_LAST_MODIFIED_DATE_TIME, checkLatestFacilityCountModifiedDateSaga);
     // yield takeLatest(GET_ALL_ACTIVE_HOTEL_CATEGORY_DATA, getAllActiveHotelCateogrySaga);
 }

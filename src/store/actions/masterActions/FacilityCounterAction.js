@@ -41,7 +41,7 @@ export const updateFacilityCounterData = (data) => {
     };
 };
 
-export const getLatestModifiedDetails = () => {
+export const getLatestModifiedDetailsFacilityCount = () => {
     return {
         type: GET_FACILITYCOUNTER_LAST_MODIFIED_DATE_TIME
     };

@@ -4,6 +4,7 @@ import {
     FAILED_FACILITYCOUNTER_LAST_MODIFIED_DATE,
     FAILED_FACILITYCOUNTER_LIST_DATA,
     FAILED_GET_ALL_FACILITY_COUNTER_DATA_HOTEL_WISE,
+    SUCCESS_FACILITYCOUNTER_LAST_MODIFIED_DATE,
     SUCCESS_FACILITYCOUNTER_LIST_DATA,
     SUCCESS_GET_ALL_FACILITY_COUNTER_DATA_HOTEL_WISE,
     UPDATE_FAILED_FACILITYCOUNTER_DATA,
@@ -105,9 +106,9 @@ export const facilityCountReducer = (state = initialState, action) => {
         case HOTEL_CATEGORY_DUPLICATE:
             return { ...state, duplicatehotelCategory: data };
 
-        case SUCCESS_LAST_MODIFIED_DATE_HOTEL_CATEGORY:
+        case SUCCESS_FACILITYCOUNTER_LAST_MODIFIED_DATE:
             return { ...state, lastModifiedDateTime: data.payload[0].dateTime };
-        case FAILED_LAST_MODIFIED_DATE_HOTEL_CATEGORY:
+        case FAILED_FACILITYCOUNTER_LAST_MODIFIED_DATE:
             return { ...state, lastModifiedDateTime: data };
 
         case SUCCESS_ACTIVE_HOTEL_CATEGORY_LIST_DATA:

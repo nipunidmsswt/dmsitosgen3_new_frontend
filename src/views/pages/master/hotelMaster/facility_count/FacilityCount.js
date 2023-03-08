@@ -310,7 +310,6 @@ function FacilityCounter({ open, handleClose, mode, hotelCode, hotelName, hotel 
             };
             dispatch(saveFacilityCounterData(initialValues));
         } else if (modeType === 'VIEW_UPDATE') {
-            alert('hi');
             const initialValues = {
                 id: values.id,
                 hotel: hotel,
