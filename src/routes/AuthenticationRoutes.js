@@ -9,6 +9,7 @@ import Login from 'views/pages/authentication/userManagement/UserLogin';
 import ForgotPassword from 'views/pages/authentication/userManagement/ForgotPassword';
 import ResetPassword from 'views/pages/authentication/userManagement/ResetPassword';
 import Container from 'views/container/Container';
+import Landing from 'views/pages/landing';
 
 // login option 3 routing
 const AuthLogin3 = Loadable(lazy(() => import('views/pages/authentication/authentication3/Login3')));
@@ -23,6 +24,10 @@ const AuthenticationRoutes = {
         {
             path: '/landing',
             element: <Container />
+        },
+        {
+            path: '/main',
+            element: <Landing />
         },
         {
             path: '/pages/login/login3',

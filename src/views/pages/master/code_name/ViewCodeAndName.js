@@ -322,12 +322,22 @@ function ViewCodeAndName() {
                             <Grid item xs={12}>
                                 <Accordion square>
                                     <AccordionSummary
+                                        style={{ background: 'linear-gradient(to right bottom, #516a9f, #1877f2)' }}
+                                        // sx={{
+                                        //     backgroundColor: '#1877f2'
+                                        // }}
                                         classes={{ content: classes.content }}
                                         expandIcon={<ExpandMoreIcon />}
                                         aria-controls="panel1a-content"
                                         id="panel1a-header"
                                     >
-                                        <Typography>Map Cluster,Market And Operator</Typography>
+                                        <Typography
+                                            sx={{
+                                                color: 'white'
+                                            }}
+                                        >
+                                            Map Cluster,Market And Operator
+                                        </Typography>
                                     </AccordionSummary>
                                     <AccordionDetails>
                                         <Typography>
@@ -671,12 +681,19 @@ function ViewCodeAndName() {
 
                                 <Accordion square>
                                     <AccordionSummary
+                                        style={{ background: 'linear-gradient(to right bottom, #516a9f, #1877f2)' }}
                                         classes={{ content: classes.content }}
                                         expandIcon={<ExpandMoreIcon />}
                                         aria-controls="panel2a-content"
                                         id="panel2a-header"
                                     >
-                                        <Typography>Cluster, Market And Operator List</Typography>
+                                        <Typography
+                                            sx={{
+                                                color: 'white'
+                                            }}
+                                        >
+                                            Cluster, Market And Operator List
+                                        </Typography>
                                     </AccordionSummary>
                                     <AccordionDetails>
                                         <Grid>
