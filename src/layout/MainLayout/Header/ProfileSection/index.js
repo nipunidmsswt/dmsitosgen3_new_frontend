@@ -54,14 +54,16 @@ const ProfileSection = () => {
     const [open, setOpen] = useState(false);
     const [openUserDailog, setOpenUserDialog] = useState(false);
     const userData = JSON.parse(localStorage.getItem('userData'));
+    const loggedUserData = useSelector((state) => state.userReducer.loggedUserData);
     console.log(userData);
     /**
      * anchorRef is used on different componets and specifying one type leads to other components throwing an error
      * */
     const anchorRef = useRef(null);
     const handleLogout = async () => {
-        console.log('Logout');
         localStorage.setItem('userData', null);
+        localStorage.setItem('token', null);
+        localStorage.setItem('status', 'logOut');
         navigate('/pages/login');
     };
 

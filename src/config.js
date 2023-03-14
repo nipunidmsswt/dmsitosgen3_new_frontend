@@ -1,6 +1,6 @@
 const config = {
     basename: '/itos',
-    defaultPath: '/dashboard/default',
+    defaultPath: '/',
     fontFamily: `'Lexend', sans-serif`,
     borderRadius: 12
 };

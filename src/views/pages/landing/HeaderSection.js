@@ -76,8 +76,9 @@ const HeaderSection = () => {
                 container
                 justifyContent="space-between"
                 alignItems="center"
-                sx={{ mt: { xs: 10, sm: 6, md: 18.75 }, mb: { xs: 2.5, md: 10 } }}
+                sx={{ mt: { xs: 12, sm: 10, md: 18.75 }, mb: { xs: 2.5, md: 10 } }}
             >
+                <br />
                 <Grid item xs={12} md={5}>
                     <Grid container spacing={6}>
                         <Grid item xs={12}>
@@ -124,22 +125,22 @@ const HeaderSection = () => {
                                         <AnimateButton>
                                             <Button
                                                 component={RouterLink}
-                                                to="/dashboard/default"
+                                                to="/pages/login"
                                                 target="_blank"
                                                 size="large"
                                                 variant="contained"
                                                 color="secondary"
                                                 startIcon={<PlayArrowIcon />}
                                             >
-                                                Live Preview
+                                                Login
                                             </Button>
                                         </AnimateButton>
                                     </Grid>
-                                    <Grid item>
+                                    {/* <Grid item>
                                         <Button component={Link} href="https://links.codedthemes.com/hsqll" target="_blank" size="large">
                                             Purchase Now
                                         </Button>
-                                    </Grid>
+                                    </Grid> */}
                                 </Grid>
                             </motion.div>
                         </Grid>

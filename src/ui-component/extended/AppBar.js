@@ -72,7 +72,7 @@ const AppBar = ({ ...others }) => {
                         <Typography component="div" sx={{ flexGrow: 1, textAlign: 'left' }}>
                             <Logo />
                         </Typography>
-                        <Stack direction="row" sx={{ display: { xs: 'none', sm: 'block' } }} spacing={{ xs: 1.5, md: 2.5 }}>
+                        {/* <Stack direction="row" sx={{ display: { xs: 'none', sm: 'block' } }} spacing={{ xs: 1.5, md: 2.5 }}>
                             <Button color="inherit" component={RouterLink} to="/dashboard" target="_blank">
                                 Dashboard
                             </Button>
@@ -91,7 +91,7 @@ const AppBar = ({ ...others }) => {
                             >
                                 Purchase Now
                             </Button>
-                        </Stack>
+                        </Stack> */}
                         <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
                             <IconButton color="inherit" onClick={drawerToggler(true)} size="large">
                                 <MenuIcon />
