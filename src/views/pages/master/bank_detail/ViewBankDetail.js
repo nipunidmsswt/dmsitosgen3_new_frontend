@@ -10,6 +10,7 @@ import MainCard from 'ui-component/cards/MainCard';
 import { gridSpacing } from 'store/constant';
 import { FormControlLabel, FormGroup, Switch } from '@mui/material';
 import { getAllBankDetailsData, getAllBranchData, getLatestModifiedDetails } from 'store/actions/masterActions/BankAction';
+import { styled } from '@mui/material/styles';
 
 function ViewBankDetail() {
     const [open, setOpen] = useState(false);

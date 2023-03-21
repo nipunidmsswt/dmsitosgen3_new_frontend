@@ -1,6 +1,5 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import PropTypes from 'prop-types';
 import { useLocation } from 'react-router-dom';
 import {
     Grid,
@@ -31,7 +30,6 @@ import MainCard from 'ui-component/cards/MainCard';
 import { Formik, Form, FieldArray, Field } from 'formik';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
-import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import * as yup from 'yup';
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import { getAllCurrencyListData } from 'store/actions/masterActions/ExpenseTypeAction';
@@ -40,44 +38,20 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { getActiveRoomcategory } from 'store/actions/masterActions/RoomCategoryAction';
 import { getActiveHotelBasisList } from 'store/actions/masterActions/operatorActions/HotelBasisAction';
-import {
-    saveRoomBuyingRateData,
-    getRoomBuyingRateDataById,
-    updateRoomBuyingRateData,
-    clearRoomBuyingRate
-} from 'store/actions/masterActions/RoomBuyongRateAction';
-import ArticleIcon from '@mui/icons-material/Article';
-import ShowTaxDetails from './ShowTaxDetails';
-import { withStyles } from '@material-ui/core/styles';
-import SuccessMsg from 'messages/SuccessMsg';
-import ErrorMsg from 'messages/ErrorMsg';
-import ExitAlert from 'messages/ExitAlert';
+import { saveRoomBuyingRateData } from 'store/actions/masterActions/RoomBuyongRateAction';
 
-const styles = (theme) => ({
-    root: {
-        width: '100%',
-        marginTop: theme.spacing.unit * 3,
-        overflowX: 'auto'
-    },
-    table: {
-        minWidth: 200
-    }
-});
-
-function RoomBuyingRates(props) {
-    const { classes } = props;
-    const formikRef = useRef();
+function RoomBuyingRates() {
     const newobj = {
-        roomBuyingRateId: '',
         hotelCode: null,
         hotelName: null,
         operatorGpCode: null,
-        operatorCode: [],
+        operatorCode: null,
         season: null,
         ratePeriod: null,
         fromDate: '',
         toDate: '',
         taxGpCode: null,
+        taxAmount: '',
         currency: null,
         roomCategory: null,
         basis: null,
@@ -88,13 +62,10 @@ function RoomBuyingRates(props) {
         child: '',
         taxApplicable: true,
         default: false,
-        guideBasis: null,
+        basis: null,
         guideRate: '',
         tourLeadRate: '',
-        taxApplicableGuide: true,
-        rateStatus: true,
-        guideStatus: true,
-        status: true,
+        taxApplicable: true,
         ratesDetails: [
             {
                 roomCategory: null,
@@ -105,26 +76,17 @@ function RoomBuyingRates(props) {
                 family: '',
                 child: '',
                 taxApplicable: true,
-                rateStatus: true,
-                singleRateAmountWithTax: '',
-                doubleRateAmountWithTax: '',
-                tripleRateAmountWithTax: '',
-                familyRateAmountWithTax: '',
-                childRateAmountWithTax: ''
+                default: false
             }
         ],
         tourGuideDetails: [
             {
-                guideBasis: null,
+                basis: null,
                 guideRate: '',
                 tourLeadRate: '',
-                taxApplicableGuide: true,
-                guideStatus: true,
-                guideRateAmountWithTax: '',
-                tourLeadRateAmountWithTaxtourLeadValue: ''
+                taxApplicable: true
             }
-        ],
-        ignoreValidation: false
+        ]
     };
 
     const [open, setOpen] = useState(false);
@@ -141,13 +103,11 @@ function RoomBuyingRates(props) {
     const [currencyListOptions, setCurrencyListOptions] = useState([]);
     const [activeRoomCategories, setActiveRoomCategories] = useState([]);
     const [activeotelBasis, setActiveHotelBasis] = useState([]);
-    const [openTaxDetails, setOpenTaxDetails] = useState(false);
-    const [openTaxDetails2, setOpenTaxDetails2] = useState(false);
-    const [storeTaxdata, setStoreTaxData] = useState([]);
-    const [taxDetails, setTaxDetails] = useState([]);
+
+    const [tableData, setTableData] = useState([]);
     const [lastModifiedTimeDate, setLastModifiedTimeDate] = useState(null);
+    const [marketListOptions, setMarketListOptions] = useState([]);
     const [hotelData, setHotelData] = useState([]);
-    const [openModal, setOpenModal] = useState(false);
 
     const pages = [5, 10, 25];
     const [page, setPage] = useState(0);
@@ -165,221 +125,54 @@ function RoomBuyingRates(props) {
     const currencyListData = useSelector((state) => state.expenseTypesReducer.currencyList);
     const activeHotelChildrenFacilityListData = useSelector((state) => state.roomCategoryReducer.activeHotelChildrenFacilityList);
     const activeHotelBasisListData = useSelector((state) => state.hotelBasisReducer.activeHotelBasisList);
-    const roomBuyingRateToUpdate = useSelector((state) => state.roomBuyingRateReducer.roomBuyingRateToUpdate);
-    const roomBuyingRate = useSelector((state) => state.roomBuyingRateReducer.roomBuyingRate);
+
     let location = useLocation();
 
     useEffect(() => {
-        console.log('roomBuyingRate roomBuyingRate roomBuyingRate');
-        if (roomBuyingRate) {
-            console.log('roomBuyingRate roomBuyingRate roomBuyingRate');
-            console.log(roomBuyingRate);
-            setnewobj({
-                hotelCode: location.state.data.rowdata,
-                hotelName: location.state.data.rowdata,
-                operatorGpCode: null,
-                operatorCode: [],
-                season: null,
-                ratePeriod: null,
-                fromDate: '',
-                toDate: '',
-                taxGpCode: null,
-                currency: null,
-                roomCategory: null,
-                basis: null,
-                guideBasis: null,
-                singleRate: '',
-                doubleRate: '',
-                trippleRate: '',
-                family: '',
-                child: '',
-                taxApplicable: true,
-                taxApplicableGuide: true,
-                default: false,
-                rateStatus: true,
-                guideStatus: true,
-                guideRate: '',
-                status: true,
-                ratesDetails: [
-                    {
-                        roomCategory: null,
-                        basis: null,
-                        singleRate: '',
-                        doubleRate: '',
-                        trippleRate: '',
-                        family: '',
-                        child: '',
-                        taxApplicable: true,
-                        rateStatus: true,
-                        singleRateAmountWithTax: '',
-                        doubleRateAmountWithTax: '',
-                        tripleRateAmountWithTax: '',
-                        familyRateAmountWithTax: '',
-                        childRateAmountWithTax: ''
-                    }
-                ],
-                tourGuideDetails: [
-                    {
-                        guideBasis: null,
-                        guideRate: '',
-                        tourLeadRate: '',
-                        taxApplicableGuide: true,
-                        guideStatus: true,
-                        guideRateAmountWithTax: '',
-                        tourLeadRateAmountWithTaxtourLeadValue: ''
-                    }
-                ],
-                ignoreValidation: false,
-                status: true
-            });
-            setHandleToast(true);
-            setOpenModal(true);
-            dispatch(clearRoomBuyingRate());
-        }
-    }, [roomBuyingRate]);
-
-    useEffect(() => {
-        console.log(location.state);
-
-        if (location.state.mode === 'INSERT') {
-            console.log(location.state.data.rowdata);
-            setMode(location.state.mode);
-            setnewobj({
-                hotelCode: location.state.data.rowdata,
-                hotelName: location.state.data.rowdata,
-                operatorGpCode: null,
-                operatorCode: [],
-                season: null,
-                ratePeriod: null,
-                fromDate: '',
-                toDate: '',
-                taxGpCode: null,
-                currency: null,
-                roomCategory: null,
-                basis: null,
-                guideBasis: null,
-                singleRate: '',
-                doubleRate: '',
-                trippleRate: '',
-                family: '',
-                child: '',
-                taxApplicable: true,
-                taxApplicableGuide: true,
-                default: false,
-                rateStatus: true,
-                guideStatus: true,
-                guideRate: '',
-                status: true,
-                ratesDetails: [
-                    {
-                        roomCategory: null,
-                        basis: null,
-                        singleRate: '',
-                        doubleRate: '',
-                        trippleRate: '',
-                        family: '',
-                        child: '',
-                        taxApplicable: true,
-                        rateStatus: true,
-                        singleRateAmountWithTax: '',
-                        doubleRateAmountWithTax: '',
-                        tripleRateAmountWithTax: '',
-                        familyRateAmountWithTax: '',
-                        childRateAmountWithTax: ''
-                    }
-                ],
-                tourGuideDetails: [
-                    {
-                        guideBasis: null,
-                        guideRate: '',
-                        tourLeadRate: '',
-                        taxApplicableGuide: true,
-                        guideStatus: true,
-                        guideRateAmountWithTax: '',
-                        tourLeadRateAmountWithTaxtourLeadValue: ''
-                    }
-                ],
-                ignoreValidation: false,
-                status: true
-            });
-        } else if (location.state.mode === 'VIEW_UPDATE') {
-            setMode(location.state.mode);
-            dispatch(getRoomBuyingRateDataById(location.state.data.roomBuyingRateId));
-        }
+        setnewobj({
+            hotelCode: location.state.data.rowdata,
+            hotelName: location.state.data.rowdata,
+            operatorGpCode: null,
+            operatorCode: null,
+            season: null,
+            ratePeriod: null,
+            fromDate: '',
+            toDate: '',
+            taxGpCode: null,
+            taxAmount: '',
+            currency: null,
+            roomCategory: null,
+            basis: null,
+            singleRate: '',
+            doubleRate: '',
+            trippleRate: '',
+            family: '',
+            child: '',
+            taxApplicable: true,
+            default: false,
+            ratesDetails: [
+                {
+                    roomCategory: null,
+                    basis: null,
+                    singleRate: '',
+                    doubleRate: '',
+                    trippleRate: '',
+                    family: '',
+                    child: '',
+                    taxApplicable: true,
+                    default: false
+                }
+            ],
+            tourGuideDetails: [
+                {
+                    basis: null,
+                    guideRate: '',
+                    tourLeadRate: '',
+                    taxApplicable: true
+                }
+            ]
+        });
     }, [location]);
-
-    useEffect(() => {
-        console.log('roomBuyingRateToUpdate roomBuyingRateToUpdate roomBuyingRateToUpdate');
-        console.log(roomBuyingRateToUpdate);
-
-        if (roomBuyingRateToUpdate !== null && mode !== 'INSERT') {
-            setnewobj({
-                hotelCode: location.state.data.hotelCode,
-                hotelName: location.state.data.hotelCode,
-                roomBuyingRateId: roomBuyingRateToUpdate.roomBuyingRateId,
-                operatorGpCode: roomBuyingRateToUpdate.operatorGpCode,
-                operatorCode: roomBuyingRateToUpdate.operatorCode,
-                season: roomBuyingRateToUpdate.season,
-                ratePeriod: roomBuyingRateToUpdate.ratePeriod,
-                fromDate: roomBuyingRateToUpdate.fromDate,
-                toDate: roomBuyingRateToUpdate.toDate,
-                taxGpCode: roomBuyingRateToUpdate.taxGpCode,
-                currency: roomBuyingRateToUpdate.currency,
-                roomCategory: null,
-                basis: null,
-                guideBasis: null,
-                singleRate: '',
-                doubleRate: '',
-                trippleRate: '',
-                family: '',
-                child: '',
-                taxApplicable: true,
-                taxApplicableGuide: true,
-                rateStatus: true,
-                guideStatus: true,
-                guideRate: '',
-                status: roomBuyingRateToUpdate.status,
-                ratesDetails: roomBuyingRateToUpdate.ratesDetails,
-                //     {
-                //         guestDetailsId: roomBuyingRateToUpdate.guestDetailsId,
-                //         roomCategory: roomBuyingRateToUpdate.roomCategory,
-                //         basis: roomBuyingRateToUpdate.basis,
-                //         singleRate: roomBuyingRateToUpdate.singleRate,
-                //         doubleRate: roomBuyingRateToUpdate.doubleRate,
-                //         trippleRate: roomBuyingRateToUpdate.trippleRate,
-                //         family: roomBuyingRateToUpdate.family,
-                //         child: roomBuyingRateToUpdate.child,
-                //         taxApplicable: roomBuyingRateToUpdate.taxApplicable,
-                //         rateStatus: roomBuyingRateToUpdate.rateStatus,
-                //         singleRateAmountWithTax: roomBuyingRateToUpdate.singleRateAmountWithTax,
-                //         doubleRateAmountWithTax: roomBuyingRateToUpdate.doubleRateAmountWithTax,
-                //         tripleRateAmountWithTax: roomBuyingRateToUpdate.tripleRateAmountWithTax,
-                //         familyRateAmountWithTax: roomBuyingRateToUpdate.familyRateAmountWithTax,
-                //         childRateAmountWithTax: roomBuyingRateToUpdate.childRateAmountWithTax
-                //     }
-                // ],
-                tourGuideDetails: roomBuyingRateToUpdate.tourGuideDetails,
-                //  [
-                //     {
-                //         guideDetailsId: roomBuyingRateToUpdate.guideDetailsId,
-                //         guideBasis: roomBuyingRateToUpdate.guideBasis,
-                //         guideRate: roomBuyingRateToUpdate.guideRate,
-                //         tourLeadRate: roomBuyingRateToUpdate.tourLeadRate,
-                //         taxApplicableGuide: roomBuyingRateToUpdate.taxApplicableGuide,
-                //         guideStatus: roomBuyingRateToUpdate.guideStatus,
-                //         guideRateAmountWithTax: roomBuyingRateToUpdate.guideRateAmountWithTax,
-                //         tourLeadRateAmountWithTaxtourLeadValue: roomBuyingRateToUpdate.tourLeadRateAmountWithTaxtourLeadValue
-                //     }
-                // ],
-                ignoreValidation: false,
-                status: true
-            });
-        }
-    }, [roomBuyingRateToUpdate]);
-
-    const handleModalClose = (status) => {
-        setOpenModal(false);
-    };
 
     useEffect(() => {
         if (activeSeasonData.length != 0) {
@@ -388,6 +181,7 @@ function RoomBuyingRates(props) {
     }, [activeSeasonData]);
 
     useEffect(() => {
+        console.log(activeRatesBySeason);
         if (activeRatesBySeason.length != 0) {
             setActiveRateListBySeason(activeRatesBySeason);
         }
@@ -400,24 +194,27 @@ function RoomBuyingRates(props) {
     }, [activeOperatorGroupData]);
 
     useEffect(() => {
-        if (activeOperatordata.length != 0) {
-            setActiveOperatorList(activeOperatordata);
-        }
-    }, [activeOperatordata]);
-
-    useEffect(() => {
         if (activeHotelChildrenFacilityListData.length != 0) {
             setActiveRoomCategories(activeHotelChildrenFacilityListData);
         }
     }, [activeHotelChildrenFacilityListData]);
 
     useEffect(() => {
+        console.log(activeHotelBasisListData);
+
         if (activeHotelBasisListData != null) {
             setActiveHotelBasis(activeHotelBasisListData);
         }
     }, [activeHotelBasisListData]);
 
-    useEffect(() => {}, [activeOperatordata]);
+    useEffect(() => {
+        console.log(activeOperatordata);
+        console.log(' activeHotelChildrenFacilityListData activeHotelChildrenFacilityListData');
+        if (activeOperatordata.length != 0) {
+            console.log(' activeHotelChildrenFacilityListData activeHotelChildrenFacilityListData');
+            setActiveOperatorList(activeOperatordata);
+        }
+    }, [activeOperatordata]);
 
     useEffect(() => {
         if (activeTaxGrupData.length != 0) {
@@ -460,28 +257,9 @@ function RoomBuyingRates(props) {
         dispatch(getActiveHotelBasisList());
         // dispatch(activeRatesSeasonId());
         dispatch(getAllActiveOperatorGroupData());
+        // dispatch(getAllActiveOperatorByOperatorGpId());
         dispatch(getAllCurrencyListData());
     }, []);
-
-    const validationSchema = yup.object().shape({
-        season: yup.object().typeError('Required field'),
-        child: yup.string().when('ignoreValidation', {
-            is: true,
-            then: yup.string().required('Required field')
-        })
-        // ratesDetails: yup.array().of(
-        //     yup.object().shape({
-        //         roomCategory: yup.object().typeError('Required field'),
-        //         basis: yup.object().typeError('Required field')
-        //         // onOriginal: yup.string().required('Required field')
-        //     })
-        // ),
-        // tourGuideDetails: yup.array().of(
-        //     yup.object().shape({
-        //         basis: yup.object().typeError('Required field')
-        //     })
-        // )
-    });
 
     const handleClickOpen = (type, data) => {
         console.log(type);
@@ -500,12 +278,9 @@ function RoomBuyingRates(props) {
     };
 
     const handleClose = () => {
-        setOpenTaxDetails(false);
+        setOpen(false);
     };
 
-    const handleClose2 = () => {
-        setOpenTaxDetails2(false);
-    };
     const handleToast = () => {
         setHandleToast(false);
     };
@@ -532,195 +307,22 @@ function RoomBuyingRates(props) {
         dispatch(getAllActiveOperatorByOperatorGpId(value.marketGroupOperatorGroupId));
     };
 
-    const handleSubmit = async (values, formValues) => {
-        console.log(values);
-        // console.log(formValues);
-        let single = values.singleRate;
-        let double = values.doubleRate;
-        let tripple = values.trippleRate;
-        let family = values.family;
-        let child = values.child;
-        if (storeTaxdata != null) {
-            console.log(storeTaxdata);
-            let jsonArray = storeTaxdata;
-            jsonArray.sort(function (a, b) {
-                return a.taxOrder - b.taxOrder;
-            });
-            console.log(jsonArray);
-            if (values.taxApplicable) {
-                jsonArray.map((data) => {
-                    let singleValue = +single * (data.tax.percentage / 100);
-                    single = +single + +singleValue;
+    const validationSchema = yup.object().shape({
+        season: yup.object().typeError('Required field'),
 
-                    let doubleValue = +double * (data.tax.percentage / 100);
-                    double = +double + +doubleValue;
-
-                    let trippleValue = +tripple * (data.tax.percentage / 100);
-                    tripple = +tripple + +trippleValue;
-
-                    let familyValue = +family * (data.tax.percentage / 100);
-                    family = +family + +familyValue;
-
-                    let childVaue = +child * (data.tax.percentage / 100);
-                    child = +child + +childVaue;
-                });
-            }
-
-            console.log(single);
-            console.log(double);
-            console.log(tripple);
-            console.log(family);
-            console.log(child);
-        }
-
-        const initialValuesNew = {
-            roomBuyingRateId: values.roomBuyingRateId,
-            hotelCode: values.hotelCode,
-            hotelName: values.hotelName,
-            operatorGpCode: values.operatorGpCode,
-            operatorCode: values.operatorCode,
-            season: values.season,
-            ratePeriod: values.ratePeriod,
-            fromDate: values.fromDate,
-            toDate: values.toDate,
-            taxGpCode: values.taxGpCode,
-            currency: values.currency,
-            roomCategory: null,
-            basis: null,
-            singleRate: '',
-            doubleRate: '',
-            trippleRate: '',
-            family: '',
-            child: '',
-            taxApplicable: true,
-            default: values.default,
-            guideBasis: null,
-            guideRate: '',
-            tourLeadRate: '',
-            taxApplicableGuide: true,
-            rateStatus: values.rateStatus,
-            guideStatus: values.guideStatus,
-            status: values.status,
-            ratesDetails: [
-                {
-                    roomCategory: values.roomCategory,
-                    basis: values.basis,
-                    singleRate: values.singleRate,
-                    doubleRate: values.doubleRate,
-                    trippleRate: values.trippleRate,
-                    family: values.family,
-                    child: values.child,
-                    taxApplicable: values.taxApplicable,
-                    rateStatus: values.rateStatus,
-                    singleRateAmountWithTax: single,
-                    doubleRateAmountWithTax: double,
-                    tripleRateAmountWithTax: tripple,
-                    familyRateAmountWithTax: family,
-                    childRateAmountWithTax: child
-                }
-            ],
-            tourGuideDetails: formValues.tourGuideDetails
-        };
-        console.log(mmObject.ratesDetails);
-        mmObject.ratesDetails?.map((s) => {
-            if (s.roomCategory !== null) {
-                initialValuesNew.ratesDetails.push(s);
-            }
-        });
-        console.log(initialValuesNew);
-        setnewobj(initialValuesNew);
-    };
-    const handleSubmit2 = async (values, formValues) => {
-        console.log(values);
-        let guide = values.guideRate;
-        let tourLead = values.tourLeadRate;
-
-        if (storeTaxdata != null) {
-            console.log(storeTaxdata);
-            let jsonArray = storeTaxdata;
-            jsonArray.sort(function (a, b) {
-                return a.taxOrder - b.taxOrder;
-            });
-            console.log(jsonArray);
-            if (values.taxApplicableGuide) {
-                jsonArray.map((data) => {
-                    let guideValue = +guide * (data.tax.percentage / 100);
-                    guide = +guide + +guideValue;
-
-                    let tourLeadValue = +tourLead * (data.tax.percentage / 100);
-                    tourLead = +tourLead + +tourLeadValue;
-                });
-            }
-        }
-        const initialValuesNew = {
-            roomBuyingRateId: values.roomBuyingRateId,
-            hotelCode: values.hotelCode,
-            hotelName: values.hotelName,
-            operatorGpCode: values.operatorGpCode,
-            operatorCode: values.operatorCode,
-            season: values.season,
-            ratePeriod: values.ratePeriod,
-            fromDate: values.fromDate,
-            toDate: values.toDate,
-            taxGpCode: values.taxGpCode,
-            currency: values.currency,
-            roomCategory: values.roomCategory,
-            basis: null,
-            singleRate: '',
-            doubleRate: '',
-            trippleRate: '',
-            family: '',
-            child: '',
-            taxApplicable: true,
-            default: values.default,
-            guideBasis: null,
-            guideRate: '',
-            tourLeadRate: '',
-            taxApplicableGuide: true,
-            ratesDetails: formValues.ratesDetails,
-            rateStatus: values.rateStatus,
-            guideStatus: values.guideStatus,
-            status: values.status,
-            tourGuideDetails: [
-                {
-                    guideBasis: values.guideBasis,
-                    guideRate: values.guideRate,
-                    tourLeadRate: values.tourLeadRate,
-                    taxApplicableGuide: values.taxApplicableGuide,
-                    guideStatus: values.guideStatus,
-                    guideRateAmountWithTax: guide,
-                    tourLeadRateAmountWithTaxtourLeadValue: tourLead
-                }
-            ]
-        };
-        mmObject.tourGuideDetails?.map((s) => {
-            if (s.guideBasis !== null) {
-                initialValuesNew.tourGuideDetails.push(s);
-            }
-        });
-
-        setnewobj(initialValuesNew);
-    };
-
-    const handleFinalSubmit = async (values) => {
-        console.log(values);
-        delete values.hotelCode.createdDate;
-        delete values.hotelCode.updatedDate;
-        if (mode === 'INSERT') {
-            dispatch(saveRoomBuyingRateData(values));
-        } else {
-            dispatch(updateRoomBuyingRateData(values));
-        }
-    };
-
-    function validateEmail(value) {
-        console.log(value);
-        let error;
-        if (!value) {
-            error = 'Required';
-        }
-        return error;
-    }
+        ratesDetails: yup.array().of(
+            yup.object().shape({
+                roomCategory: yup.object().typeError('Required field'),
+                basis: yup.object().typeError('Required field')
+                // onOriginal: yup.string().required('Required field')
+            })
+        ),
+        tourGuideDetails: yup.array().of(
+            yup.object().shape({
+                basis: yup.object().typeError('Required field')
+            })
+        )
+    });
 
     return (
         <div>
@@ -730,12 +332,11 @@ function RoomBuyingRates(props) {
                         <Grid item>
                             <Formik
                                 enableReinitialize={true}
-                                initialValues={mmObject || newobj}
-                                innerRef={formikRef}
+                                initialValues={mmObject}
                                 // onSubmit={(values) => {
-                                //     handleFinalSubmit(values);
+                                //     handleSubmit(values);
                                 // }}
-                                // validationSchema={validationSchema}
+                                validationSchema={validationSchema}
                             >
                                 {({
                                     values,
@@ -748,10 +349,7 @@ function RoomBuyingRates(props) {
                                     validateField,
                                     validateForm,
                                     isValid,
-                                    dirty,
-                                    setFieldTouched,
-                                    setTouched,
-                                    setErrors
+                                    dirty
                                 }) => {
                                     return (
                                         <Form>
@@ -761,7 +359,7 @@ function RoomBuyingRates(props) {
                                                         <Autocomplete
                                                             value={values.hotelCode}
                                                             name="hotelCode"
-                                                            disabled
+                                                            disabled={mode == 'VIEW'}
                                                             onChange={(_, value) => {
                                                                 setFieldValue(`hotelCode`, value);
                                                             }}
@@ -776,7 +374,7 @@ function RoomBuyingRates(props) {
                                                                     {...params}
                                                                     label="Hotel Code"
                                                                     sx={{
-                                                                        width: { xs: 300 },
+                                                                        // width: { xs: 150 },
                                                                         '& .MuiInputBase-root': {
                                                                             height: 41
                                                                         }
@@ -800,7 +398,7 @@ function RoomBuyingRates(props) {
                                                         <Autocomplete
                                                             value={values.hotelName}
                                                             name="hotelName"
-                                                            disabled
+                                                            disabled={mode == 'VIEW'}
                                                             onChange={(_, value) => {
                                                                 setFieldValue(`hotelName`, value);
                                                             }}
@@ -815,7 +413,7 @@ function RoomBuyingRates(props) {
                                                                     {...params}
                                                                     label="Hotel Name"
                                                                     sx={{
-                                                                        width: { xs: 300 },
+                                                                        width: { xs: 120 },
                                                                         '& .MuiInputBase-root': {
                                                                             height: 41
                                                                         }
@@ -835,19 +433,6 @@ function RoomBuyingRates(props) {
                                                             )}
                                                         />
                                                     </Grid>
-                                                    <Grid item>
-                                                        <FormGroup>
-                                                            <FormControlLabel
-                                                                name="status"
-                                                                control={<Switch color="success" />}
-                                                                label="Status"
-                                                                disabled={mode == 'VIEW'}
-                                                                onChange={handleChange}
-                                                                checked={values.status}
-                                                                value={values.status}
-                                                            />
-                                                        </FormGroup>
-                                                    </Grid>
                                                 </Grid>
                                             </div>
                                             <hr />
@@ -855,16 +440,12 @@ function RoomBuyingRates(props) {
                                                 <Grid gap="10px" display="flex">
                                                     <Grid item>
                                                         {' '}
-                                                        <Field
-                                                            as={Autocomplete}
+                                                        <Autocomplete
                                                             value={values.operatorGpCode}
                                                             name="operatorGpCode"
-                                                            disabled={mode == 'VIEW' || mode == 'VIEW_UPDATE'}
+                                                            disabled={mode == 'VIEW'}
                                                             onChange={(_, value) => {
-                                                                if (value != null) {
-                                                                    loadOperatorCode(value);
-                                                                }
-
+                                                                loadOperatorCode(value);
                                                                 setFieldValue(`operatorGpCode`, value);
                                                             }}
                                                             InputLabelProps={{
@@ -872,22 +453,16 @@ function RoomBuyingRates(props) {
                                                             }}
                                                             options={activeOperatorGroupList}
                                                             getOptionLabel={(option) => `${option.code}`}
-                                                            isOptionEqualToValue={(option, value) =>
-                                                                option.marketGroupOperatorGroupId === value.marketGroupOperatorGroupId
-                                                            }
+                                                            isOptionEqualToValue={(option, value) => option.marketId === value.marketId}
                                                             renderInput={(params) => (
-                                                                <Field
-                                                                    as={TextField}
+                                                                <TextField
                                                                     {...params}
                                                                     label="Operator Group Code"
                                                                     sx={{
-                                                                        width: { xs: 300 },
+                                                                        width: { xs: 120 },
                                                                         '& .MuiInputBase-root': {
                                                                             height: 41
                                                                         }
-                                                                    }}
-                                                                    validate={(value) => {
-                                                                        validateEmail(value);
                                                                     }}
                                                                     InputLabelProps={{
                                                                         shrink: true
@@ -911,7 +486,6 @@ function RoomBuyingRates(props) {
                                                         <Autocomplete
                                                             value={values.operatorCode}
                                                             name="operatorCode"
-                                                            fullWidth
                                                             disabled={mode == 'VIEW'}
                                                             onChange={(_, value) => {
                                                                 setFieldValue(`operatorCode`, value);
@@ -919,16 +493,15 @@ function RoomBuyingRates(props) {
                                                             InputLabelProps={{
                                                                 shrink: true
                                                             }}
-                                                            multiple
                                                             options={activeOperatorList}
-                                                            getOptionLabel={(option) => `${option.code} - ${option.name}`}
+                                                            getOptionLabel={(option) => `${option.code}`}
                                                             isOptionEqualToValue={(option, value) => option.marketId === value.marketId}
                                                             renderInput={(params) => (
                                                                 <TextField
                                                                     {...params}
                                                                     label="Operator Code"
                                                                     sx={{
-                                                                        width: { xs: 600 },
+                                                                        width: { xs: 120 },
                                                                         '& .MuiInputBase-root': {
                                                                             height: 41
                                                                         }
@@ -951,11 +524,10 @@ function RoomBuyingRates(props) {
                                                         />
                                                     </Grid>
                                                     <Grid item>
-                                                        <Field
-                                                            as={Autocomplete}
+                                                        <Autocomplete
                                                             value={values.season}
                                                             name="season"
-                                                            disabled={mode == 'VIEW' || mode == 'VIEW_UPDATE'}
+                                                            disabled={mode == 'VIEW'}
                                                             onChange={(_, value) => {
                                                                 loadRatesBySeason(value);
                                                                 setFieldValue(`season`, value);
@@ -963,17 +535,15 @@ function RoomBuyingRates(props) {
                                                             InputLabelProps={{
                                                                 shrink: true
                                                             }}
-                                                            validate={validateEmail}
                                                             options={activeSeasonList}
                                                             getOptionLabel={(option) => `${option.mainSeason}`}
                                                             isOptionEqualToValue={(option, value) => option.seasonId === value.seasonId}
                                                             renderInput={(params) => (
-                                                                <Field
-                                                                    as={TextField}
+                                                                <TextField
                                                                     {...params}
                                                                     label="Season"
                                                                     sx={{
-                                                                        width: { xs: 300 },
+                                                                        width: { xs: 120 },
                                                                         '& .MuiInputBase-root': {
                                                                             height: 41
                                                                         }
@@ -981,7 +551,6 @@ function RoomBuyingRates(props) {
                                                                     InputLabelProps={{
                                                                         shrink: true
                                                                     }}
-                                                                    validate={validateEmail}
                                                                     error={Boolean(touched.season && errors.season)}
                                                                     helperText={touched.season && errors.season ? errors.season : ''}
                                                                     // placeholder="--Select a Manager Code --"
@@ -992,17 +561,12 @@ function RoomBuyingRates(props) {
                                                             )}
                                                         />
                                                     </Grid>
-                                                </Grid>
-                                            </div>
-                                            <div style={{ marginTop: '6px', margin: '10px' }}>
-                                                <Grid gap="10px" display="flex">
                                                     <Grid item>
                                                         {' '}
-                                                        <Field
-                                                            as={Autocomplete}
+                                                        <Autocomplete
                                                             value={values.ratePeriod}
                                                             name="ratePeriod"
-                                                            disabled={mode == 'VIEW' || mode == 'VIEW_UPDATE'}
+                                                            disabled={mode == 'VIEW'}
                                                             onChange={(_, value) => {
                                                                 console.log(value);
                                                                 setFieldValue(`ratePeriod`, value);
@@ -1018,12 +582,11 @@ function RoomBuyingRates(props) {
                                                                 option.seasonDetailsId === value.seasonDetailsId
                                                             }
                                                             renderInput={(params) => (
-                                                                <Field
-                                                                    as={TextField}
+                                                                <TextField
                                                                     {...params}
                                                                     label="Rate Period"
                                                                     sx={{
-                                                                        width: { xs: 300 },
+                                                                        width: { xs: 120 },
                                                                         '& .MuiInputBase-root': {
                                                                             height: 41
                                                                         }
@@ -1031,7 +594,6 @@ function RoomBuyingRates(props) {
                                                                     InputLabelProps={{
                                                                         shrink: true
                                                                     }}
-                                                                    validate={validateEmail}
                                                                     error={Boolean(touched.ratePeriod && errors.ratePeriod)}
                                                                     helperText={
                                                                         touched.ratePeriod && errors.ratePeriod ? errors.ratePeriod : ''
@@ -1122,13 +684,8 @@ function RoomBuyingRates(props) {
                                                             <Autocomplete
                                                                 value={values.taxGpCode}
                                                                 name="taxGpCode"
-                                                                disabled={mode == 'VIEW' || mode == 'VIEW_UPDATE'}
+                                                                disabled={mode == 'VIEW'}
                                                                 onChange={(_, value) => {
-                                                                    console.log(value);
-                                                                    if (value != null) {
-                                                                        setStoreTaxData(value.taxGroupDetails);
-                                                                    }
-
                                                                     setFieldValue(`taxGpCode`, value);
                                                                 }}
                                                                 InputLabelProps={{
@@ -1144,7 +701,7 @@ function RoomBuyingRates(props) {
                                                                         {...params}
                                                                         label="Tax Group Code"
                                                                         sx={{
-                                                                            width: { xs: 300 },
+                                                                            width: { xs: 120 },
                                                                             '& .MuiInputBase-root': {
                                                                                 height: 41
                                                                             }
@@ -1174,7 +731,7 @@ function RoomBuyingRates(props) {
                                                                 console.log(value);
                                                                 setFieldValue(`currency`, value);
                                                             }}
-                                                            disabled={mode == 'VIEW' || mode == 'VIEW_UPDATE'}
+                                                            disabled={mode == 'VIEW_UPDATE'}
                                                             options={currencyListOptions}
                                                             getOptionLabel={(option) =>
                                                                 `${option.currencyCode} - ${option.currencyDescription}`
@@ -1187,7 +744,7 @@ function RoomBuyingRates(props) {
                                                                     {...params}
                                                                     // label="tax"
                                                                     sx={{
-                                                                        width: { xs: 300 },
+                                                                        width: { sm: 200 },
                                                                         '& .MuiInputBase-root': {
                                                                             height: 40
                                                                         }
@@ -1210,258 +767,42 @@ function RoomBuyingRates(props) {
                                             <hr />
 
                                             <br />
-                                            <div style={{ marginTop: '6px', margin: '10px' }}>
-                                                <Grid gap="10px" display="flex">
-                                                    <Grid item xs={3}>
-                                                        <Field
-                                                            as={Autocomplete}
-                                                            value={values.roomCategory}
-                                                            name="roomCategory"
-                                                            disabled={mode == 'VIEW'}
-                                                            onChange={(_, value) => {
-                                                                setFieldValue(`roomCategory`, value);
-                                                            }}
-                                                            InputLabelProps={{
-                                                                shrink: true
-                                                            }}
-                                                            options={activeRoomCategories}
-                                                            getOptionLabel={(option) => `${option.code}`}
-                                                            isOptionEqualToValue={(option, value) => option.id === value.id}
-                                                            renderInput={(params) => (
-                                                                <Field
-                                                                    as={TextField}
-                                                                    {...params}
-                                                                    label="Room Category"
-                                                                    sx={{
-                                                                        width: { xs: 120 },
-                                                                        '& .MuiInputBase-root': {
-                                                                            height: 41
-                                                                        }
-                                                                    }}
-                                                                    InputLabelProps={{
-                                                                        shrink: true
-                                                                    }}
-                                                                    error={Boolean(touched.roomCategory && errors.roomCategory)}
-                                                                    helperText={
-                                                                        touched.roomCategory && errors.roomCategory
-                                                                            ? errors.roomCategory
-                                                                            : ''
-                                                                    }
-                                                                    // placeholder="--Select a Manager Code --"
-                                                                    variant="outlined"
-                                                                    name="roomCategory"
-                                                                    onBlur={handleBlur}
-                                                                />
-                                                            )}
-                                                        />
-                                                    </Grid>
 
-                                                    <Grid item xs={3}>
-                                                        <Field
-                                                            as={Autocomplete}
-                                                            value={values.basis}
-                                                            name="basis"
-                                                            disabled={mode == 'VIEW'}
-                                                            onChange={(_, value) => {
-                                                                setFieldValue(`basis`, value);
-                                                            }}
-                                                            InputLabelProps={{
-                                                                shrink: true
-                                                            }}
-                                                            options={activeotelBasis}
-                                                            getOptionLabel={(option) => `${option.code}`}
-                                                            isOptionEqualToValue={(option, value) => option.id === value.id}
-                                                            renderInput={(params) => (
-                                                                <Field
-                                                                    as={TextField}
-                                                                    {...params}
-                                                                    label="Basis"
-                                                                    sx={{
-                                                                        width: { xs: 120 },
-                                                                        '& .MuiInputBase-root': {
-                                                                            height: 41
-                                                                        }
-                                                                    }}
-                                                                    InputLabelProps={{
-                                                                        shrink: true
-                                                                    }}
-                                                                    error={Boolean(touched.basis && errors.basis)}
-                                                                    helperText={touched.basis && errors.basis ? errors.basis : ''}
-                                                                    variant="outlined"
-                                                                    name="basis"
-                                                                    onBlur={handleBlur}
-                                                                />
-                                                            )}
-                                                        />
-                                                    </Grid>
-                                                    <Grid item xs={3}>
-                                                        <Field
-                                                            as={TextField}
-                                                            label="Single Rate"
-                                                            sx={{
-                                                                width: { xs: 120 },
-                                                                '& .MuiInputBase-root': {
-                                                                    height: 40
-                                                                }
-                                                            }}
-                                                            disabled={mode == 'VIEW'}
-                                                            type="text"
-                                                            variant="outlined"
-                                                            name="singleRate"
-                                                            InputLabelProps={{
-                                                                shrink: true
-                                                            }}
-                                                            value={values.singleRate}
-                                                            onChange={handleChange}
-                                                            onBlur={handleBlur}
-                                                            error={Boolean(touched.singleRate && errors.singleRate)}
-                                                            helperText={touched.singleRate && errors.singleRate ? errors.singleRate : ''}
-                                                        />
-                                                    </Grid>
-                                                    <Grid item xs={3}>
-                                                        <Field
-                                                            as={TextField}
-                                                            label="Double Rate"
-                                                            sx={{
-                                                                width: { xs: 120 },
-                                                                '& .MuiInputBase-root': {
-                                                                    height: 40
-                                                                }
-                                                            }}
-                                                            disabled={mode == 'VIEW'}
-                                                            type="text"
-                                                            variant="outlined"
-                                                            name="doubleRate"
-                                                            InputLabelProps={{
-                                                                shrink: true
-                                                            }}
-                                                            value={values.doubleRate}
-                                                            onChange={handleChange}
-                                                            onBlur={handleBlur}
-                                                            error={Boolean(touched.doubleRate && errors.doubleRate)}
-                                                            helperText={touched.doubleRate && errors.doubleRate ? errors.doubleRate : ''}
-                                                        />
-                                                    </Grid>
-                                                    <Grid item xs={3}>
-                                                        <Field
-                                                            as={TextField}
-                                                            label="Tripple Rate"
-                                                            sx={{
-                                                                width: { xs: 120 },
-                                                                '& .MuiInputBase-root': {
-                                                                    height: 40
-                                                                }
-                                                            }}
-                                                            disabled={mode == 'VIEW'}
-                                                            type="text"
-                                                            variant="outlined"
-                                                            name="trippleRate"
-                                                            InputLabelProps={{
-                                                                shrink: true
-                                                            }}
-                                                            value={values.trippleRate}
-                                                            onChange={handleChange}
-                                                            onBlur={handleBlur}
-                                                            error={Boolean(touched.trippleRate && errors.trippleRate)}
-                                                            helperText={touched.trippleRate && errors.trippleRate ? errors.trippleRate : ''}
-                                                        />
-                                                    </Grid>
-                                                    <Grid item xs={3}>
-                                                        <Field
-                                                            as={TextField}
-                                                            label="family"
-                                                            sx={{
-                                                                width: { xs: 120 },
-                                                                '& .MuiInputBase-root': {
-                                                                    height: 40
-                                                                }
-                                                            }}
-                                                            disabled={mode == 'VIEW'}
-                                                            type="text"
-                                                            variant="outlined"
-                                                            name="family"
-                                                            InputLabelProps={{
-                                                                shrink: true
-                                                            }}
-                                                            value={values.family}
-                                                            onChange={handleChange}
-                                                            onBlur={handleBlur}
-                                                            error={Boolean(touched.family && errors.family)}
-                                                            helperText={touched.family && errors.family ? errors.family : ''}
-                                                        />
-                                                    </Grid>
-                                                    <Grid item xs={3}>
-                                                        <Field
-                                                            as={TextField}
-                                                            label="Child"
-                                                            sx={{
-                                                                width: { xs: 120 },
-                                                                '& .MuiInputBase-root': {
-                                                                    height: 40
-                                                                }
-                                                            }}
-                                                            disabled={mode == 'VIEW'}
-                                                            type="text"
-                                                            variant="outlined"
-                                                            name="child"
-                                                            InputLabelProps={{
-                                                                shrink: true
-                                                            }}
-                                                            validate={validateEmail}
-                                                            value={values.child}
-                                                            onChange={handleChange}
-                                                            onBlur={handleBlur}
-                                                            error={Boolean(touched.child && errors.child)}
-                                                            helperText={touched.child && errors.child ? errors.child : ''}
-                                                        />
-                                                    </Grid>
-
-                                                    <Grid item xs={3}>
-                                                        <FormGroup>
-                                                            <Field
-                                                                as={FormControlLabel}
-                                                                name="taxApplicable"
-                                                                onChange={handleChange}
-                                                                value={values.taxApplicable}
-                                                                control={<Switch color="success" />}
-                                                                label="Tax Applicable"
-                                                                checked={values.taxApplicable}
-                                                                // disabled={mode == 'VIEW'}
-                                                            />
-                                                        </FormGroup>
-                                                    </Grid>
-                                                    <Grid item>
-                                                        <IconButton
-                                                            aria-label="delete"
-                                                            type="button"
-                                                            onClick={() => {
-                                                                setTouched({ child: true }).then(() => {
-                                                                    console.log(formikRef);
-                                                                    console.log(formikRef.current.errors);
-                                                                    if (formikRef.current.errors.child == undefined) {
-                                                                        handleSubmit(values, formikRef.current.values);
-                                                                    }
-                                                                });
-                                                            }}
-                                                        >
-                                                            {mode === 'INSERT' ? <AddBoxIcon /> : null}
-                                                        </IconButton>
-                                                    </Grid>
-                                                </Grid>
-                                            </div>
                                             <br />
                                             <FieldArray name="ratesDetails">
                                                 {({ insert, remove, push }) => (
-                                                    <Paper className={classes.root}>
+                                                    <Paper>
+                                                        {mode != 'VIEW' ? (
+                                                            <Box display="flex" flexDirection="row-reverse">
+                                                                <IconButton
+                                                                    aria-label="delete"
+                                                                    disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                    onClick={() => {
+                                                                        // setFieldValue(
+                                                                        //   `taxGroupDetails.${ref.current.values.taxGroupDetails.length}.taxOrder`,
+                                                                        //   ref.current.values.taxGroupDetails.length+1
+                                                                        // );
+                                                                        push({
+                                                                            roomCategory: null,
+                                                                            basis: null,
+                                                                            singleRate: '',
+                                                                            doubleRate: '',
+                                                                            trippleRate: '',
+                                                                            family: '',
+                                                                            child: '',
+                                                                            taxApplicable: true,
+                                                                            default: false
+                                                                        });
+                                                                    }}
+                                                                >
+                                                                    <AddBoxIcon />
+                                                                </IconButton>
+                                                            </Box>
+                                                        ) : (
+                                                            ''
+                                                        )}
                                                         <TableContainer>
-                                                            <Table
-                                                                stickyHeader
-                                                                className={classes.table}
-                                                                // size="small"
-                                                                // sx={{
-                                                                //     height: 200
-                                                                // }}
-                                                            >
+                                                            <Table stickyHeader size="small">
                                                                 <TableHead alignItems="center">
                                                                     <TableRow>
                                                                         {/* <TableCell>Sequence</TableCell> */}
@@ -1472,8 +813,6 @@ function RoomBuyingRates(props) {
                                                                         <TableCell>Tripple</TableCell>
                                                                         <TableCell>Family</TableCell>
                                                                         <TableCell>Child</TableCell>
-                                                                        <TableCell>Tax Applicable</TableCell>
-                                                                        <TableCell>Status</TableCell>
                                                                         <TableCell>Actions</TableCell>
                                                                     </TableRow>
                                                                 </TableHead>
@@ -1817,23 +1156,6 @@ function RoomBuyingRates(props) {
                                                                                             control={<Switch color="success" />}
                                                                                             // label="Status"
                                                                                             checked={values.ratesDetails[idx].taxApplicable}
-
-                                                                                            // disabled={mode == 'VIEW'}
-                                                                                        />
-                                                                                    </FormGroup>
-                                                                                </TableCell>
-                                                                                <TableCell>
-                                                                                    <FormGroup>
-                                                                                        <FormControlLabel
-                                                                                            name={`ratesDetails.${idx}.rateStatus`}
-                                                                                            onChange={handleChange}
-                                                                                            value={
-                                                                                                values.ratesDetails[idx] &&
-                                                                                                values.ratesDetails[idx].rateStatus
-                                                                                            }
-                                                                                            control={<Switch color="success" />}
-                                                                                            // label="Status"
-                                                                                            checked={values.ratesDetails[idx].rateStatus}
                                                                                             disabled
                                                                                             // disabled={mode == 'VIEW'}
                                                                                         />
@@ -1841,31 +1163,17 @@ function RoomBuyingRates(props) {
                                                                                 </TableCell>
 
                                                                                 <TableCell>
-                                                                                    <IconButton
-                                                                                        disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
-                                                                                        disa
-                                                                                        aria-label="delete"
-                                                                                        onClick={() => {
-                                                                                            remove(idx);
-                                                                                        }}
-                                                                                    >
-                                                                                        <HighlightOffIcon />
-                                                                                    </IconButton>
-                                                                                    <IconButton
-                                                                                        disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
-                                                                                        disa
-                                                                                        aria-label="delete"
-                                                                                        onClick={() => {
-                                                                                            console.log('here');
-                                                                                            console.log(values);
-                                                                                            setTaxDetails(values);
-                                                                                            setOpenTaxDetails(true);
-
-                                                                                            // remove(idx);
-                                                                                        }}
-                                                                                    >
-                                                                                        <ArticleIcon />
-                                                                                    </IconButton>
+                                                                                    {(values.ratesDetails[idx] &&
+                                                                                        values.ratesDetails[idx].id) === '' ? (
+                                                                                        <IconButton
+                                                                                            aria-label="delete"
+                                                                                            onClick={() => {
+                                                                                                remove(idx);
+                                                                                            }}
+                                                                                        >
+                                                                                            <HighlightOffIcon />
+                                                                                        </IconButton>
+                                                                                    ) : null}
                                                                                 </TableCell>
                                                                             </TableRow>
                                                                         );
@@ -1905,135 +1213,33 @@ function RoomBuyingRates(props) {
                                                 )}
                                             </FieldArray>
                                             <br />
-                                            <div style={{ marginTop: '6px', margin: '10px' }}>
-                                                <Grid gap="10px" display="flex">
-                                                    <Grid item>
-                                                        <Field
-                                                            as={Autocomplete}
-                                                            value={values.guideBasis}
-                                                            name="guideBasis"
-                                                            disabled={mode == 'VIEW'}
-                                                            onChange={(_, value) => {
-                                                                setFieldValue(`guideBasis`, value);
-                                                            }}
-                                                            InputLabelProps={{
-                                                                shrink: true
-                                                            }}
-                                                            options={activeotelBasis}
-                                                            getOptionLabel={(option) => `${option.code}`}
-                                                            isOptionEqualToValue={(option, value) => option.id === value.id}
-                                                            renderInput={(params) => (
-                                                                <Field
-                                                                    as={TextField}
-                                                                    {...params}
-                                                                    label="Guide Basis"
-                                                                    sx={{
-                                                                        width: { xs: 250 },
-                                                                        '& .MuiInputBase-root': {
-                                                                            height: 41
-                                                                        }
-                                                                    }}
-                                                                    InputLabelProps={{
-                                                                        shrink: true
-                                                                    }}
-                                                                    error={Boolean(touched.guideBasis && errors.guideBasis)}
-                                                                    helperText={touched.guideBasis && errors.basis ? errors.guideBasis : ''}
-                                                                    variant="outlined"
-                                                                    name="guideBasis"
-                                                                    onBlur={handleBlur}
-                                                                />
-                                                            )}
-                                                        />
-                                                    </Grid>
-                                                    <Grid item>
-                                                        <Field
-                                                            as={TextField}
-                                                            label="Guide Rate"
-                                                            sx={{
-                                                                width: { xs: 250 },
-                                                                '& .MuiInputBase-root': {
-                                                                    height: 40
-                                                                }
-                                                            }}
-                                                            type="text"
-                                                            variant="outlined"
-                                                            name="guideRate"
-                                                            InputLabelProps={{
-                                                                shrink: true
-                                                            }}
-                                                            validate={validateEmail}
-                                                            value={values.guideRate}
-                                                            onChange={handleChange}
-                                                            onBlur={handleBlur}
-                                                            error={Boolean(touched.guideRate && errors.guideRate)}
-                                                            helperText={touched.guideRate && errors.guideRate ? errors.guideRate : ''}
-                                                        />
-                                                    </Grid>
-                                                    <Grid item>
-                                                        <Field
-                                                            as={TextField}
-                                                            label="Tour Lead Rate"
-                                                            sx={{
-                                                                width: { xs: 250 },
-                                                                '& .MuiInputBase-root': {
-                                                                    height: 40
-                                                                }
-                                                            }}
-                                                            disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
-                                                            type="text"
-                                                            variant="outlined"
-                                                            name="tourLeadRate"
-                                                            InputLabelProps={{
-                                                                shrink: true
-                                                            }}
-                                                            value={values.tourLeadRate}
-                                                            onChange={handleChange}
-                                                            onBlur={handleBlur}
-                                                            error={Boolean(touched.tourLeadRate && errors.tourLeadRate)}
-                                                            helperText={
-                                                                touched.tourLeadRate && errors.tourLeadRate ? errors.tourLeadRate : ''
-                                                            }
-                                                        />
-                                                    </Grid>
-
-                                                    <Grid item>
-                                                        <FormGroup>
-                                                            <Field
-                                                                as={FormControlLabel}
-                                                                name="taxApplicableGuide"
-                                                                onChange={handleChange}
-                                                                value={values.taxApplicableGuide}
-                                                                control={<Switch color="success" />}
-                                                                label="Tax Applicable"
-                                                                checked={values.taxApplicableGuide}
-                                                                // disabled={mode == 'VIEW'}
-                                                            />
-                                                        </FormGroup>
-                                                    </Grid>
-                                                    <Grid item>
-                                                        <IconButton
-                                                            aria-label="delete"
-                                                            type="button"
-                                                            onClick={() => {
-                                                                setTouched({ guideRate: true }).then(() => {
-                                                                    console.log(formikRef.current.isValid);
-                                                                    console.log(formikRef.current.errors);
-
-                                                                    if (formikRef.current.errors.guideRate == undefined) {
-                                                                        handleSubmit2(values, formikRef.current.values);
-                                                                    }
-                                                                });
-                                                            }}
-                                                        >
-                                                            {mode === 'INSERT' ? <AddBoxIcon /> : null}
-                                                        </IconButton>
-                                                    </Grid>
-                                                </Grid>
-                                            </div>
-                                            <br />
                                             <FieldArray name="tourGuideDetails">
                                                 {({ insert, remove, push }) => (
                                                     <Paper>
+                                                        {mode != 'VIEW' ? (
+                                                            <Box display="flex" flexDirection="row-reverse">
+                                                                <IconButton
+                                                                    aria-label="delete"
+                                                                    disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                    onClick={() => {
+                                                                        // setFieldValue(
+                                                                        //   `taxGroupDetails.${ref.current.values.taxGroupDetails.length}.taxOrder`,
+                                                                        //   ref.current.values.taxGroupDetails.length+1
+                                                                        // );
+                                                                        push({
+                                                                            basis: null,
+                                                                            guideRate: '',
+                                                                            tourLeadRate: '',
+                                                                            taxApplicable: true
+                                                                        });
+                                                                    }}
+                                                                >
+                                                                    <AddBoxIcon />
+                                                                </IconButton>
+                                                            </Box>
+                                                        ) : (
+                                                            ''
+                                                        )}
                                                         <TableContainer>
                                                             <Table stickyHeader size="small">
                                                                 <TableHead alignItems="center">
@@ -2043,8 +1249,7 @@ function RoomBuyingRates(props) {
                                                                         <TableCell>Basis </TableCell>
                                                                         <TableCell>Guide</TableCell>
                                                                         <TableCell>Tour Lead</TableCell>
-                                                                        <TableCell>Tax Applicable</TableCell>
-                                                                        <TableCell>Status</TableCell>
+
                                                                         <TableCell>Actions</TableCell>
                                                                     </TableRow>
                                                                 </TableHead>
@@ -2067,14 +1272,14 @@ function RoomBuyingRates(props) {
                                                                                         disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
                                                                                         value={
                                                                                             values.tourGuideDetails[idx]
-                                                                                                ? values.tourGuideDetails[idx].guideBasis
+                                                                                                ? values.tourGuideDetails[idx].basis
                                                                                                 : null
                                                                                         }
-                                                                                        name={`tourGuideDetails.${idx}.guideBasis`}
+                                                                                        name={`tourGuideDetails.${idx}.basis`}
                                                                                         onChange={(_, value) => {
                                                                                             console.log(value);
                                                                                             setFieldValue(
-                                                                                                `tourGuideDetails.${idx}.guideBasis`,
+                                                                                                `tourGuideDetails.${idx}.basis`,
                                                                                                 value
                                                                                             );
                                                                                         }}
@@ -2095,29 +1300,26 @@ function RoomBuyingRates(props) {
                                                                                                     }
                                                                                                 }}
                                                                                                 variant="outlined"
-                                                                                                name={`tourGuideDetails.${idx}.guideBasis`}
+                                                                                                name={`tourGuideDetails.${idx}.basis`}
                                                                                                 onBlur={handleBlur}
                                                                                                 helperText={
                                                                                                     touched.tourGuideDetails &&
                                                                                                     touched.tourGuideDetails[idx] &&
-                                                                                                    touched.tourGuideDetails[idx]
-                                                                                                        .guideBasis &&
+                                                                                                    touched.tourGuideDetails[idx].basis &&
                                                                                                     errors.tourGuideDetails &&
                                                                                                     errors.tourGuideDetails[idx] &&
-                                                                                                    errors.tourGuideDetails[idx].guideBasis
-                                                                                                        ? errors.tourGuideDetails[idx]
-                                                                                                              .guideBasis
+                                                                                                    errors.tourGuideDetails[idx].basis
+                                                                                                        ? errors.tourGuideDetails[idx].basis
                                                                                                         : ''
                                                                                                 }
                                                                                                 error={Boolean(
                                                                                                     touched.tourGuideDetails &&
                                                                                                         touched.tourGuideDetails[idx] &&
                                                                                                         touched.tourGuideDetails[idx]
-                                                                                                            .guideBasis &&
+                                                                                                            .basis &&
                                                                                                         errors.tourGuideDetails &&
                                                                                                         errors.tourGuideDetails[idx] &&
-                                                                                                        errors.tourGuideDetails[idx]
-                                                                                                            .guideBasis
+                                                                                                        errors.tourGuideDetails[idx].basis
                                                                                                 )}
                                                                                             />
                                                                                         )}
@@ -2207,69 +1409,35 @@ function RoomBuyingRates(props) {
                                                                                 <TableCell>
                                                                                     <FormGroup>
                                                                                         <FormControlLabel
-                                                                                            name={`tourGuideDetails.${idx}.taxApplicableGuide`}
+                                                                                            name={`tourGuideDetails.${idx}.taxApplicable`}
                                                                                             onChange={handleChange}
                                                                                             value={
                                                                                                 values.tourGuideDetails[idx] &&
-                                                                                                values.tourGuideDetails[idx]
-                                                                                                    .taxApplicableGuide
+                                                                                                values.tourGuideDetails[idx].taxApplicable
                                                                                             }
                                                                                             control={<Switch color="success" />}
                                                                                             // label="Status"
                                                                                             checked={
-                                                                                                values.tourGuideDetails[idx]
-                                                                                                    .taxApplicableGuide
-                                                                                            }
-
-                                                                                            // disabled={mode == 'VIEW'}
-                                                                                        />
-                                                                                    </FormGroup>
-                                                                                </TableCell>
-                                                                                <TableCell>
-                                                                                    <FormGroup>
-                                                                                        <FormControlLabel
-                                                                                            name={`tourGuideDetails.${idx}.guideStatus`}
-                                                                                            onChange={handleChange}
-                                                                                            value={
-                                                                                                values.tourGuideDetails[idx] &&
-                                                                                                values.tourGuideDetails[idx].guideStatus
-                                                                                            }
-                                                                                            control={<Switch color="success" />}
-                                                                                            // label="Status"
-                                                                                            checked={
-                                                                                                values.tourGuideDetails[idx].guideStatus
+                                                                                                values.tourGuideDetails[idx].taxApplicable
                                                                                             }
                                                                                             disabled
                                                                                             // disabled={mode == 'VIEW'}
                                                                                         />
                                                                                     </FormGroup>
                                                                                 </TableCell>
-                                                                                <TableCell>
-                                                                                    <IconButton
-                                                                                        disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
-                                                                                        disa
-                                                                                        aria-label="delete"
-                                                                                        onClick={() => {
-                                                                                            remove(idx);
-                                                                                        }}
-                                                                                    >
-                                                                                        <HighlightOffIcon />
-                                                                                    </IconButton>
-                                                                                    <IconButton
-                                                                                        disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
-                                                                                        disa
-                                                                                        aria-label="delete"
-                                                                                        onClick={() => {
-                                                                                            console.log('here');
-                                                                                            console.log(values);
-                                                                                            setTaxDetails(values);
-                                                                                            setOpenTaxDetails2(true);
 
-                                                                                            // remove(idx);
-                                                                                        }}
-                                                                                    >
-                                                                                        <ArticleIcon />
-                                                                                    </IconButton>
+                                                                                <TableCell>
+                                                                                    {(values.tourGuideDetails[idx] &&
+                                                                                        values.tourGuideDetails[idx].id) === '' ? (
+                                                                                        <IconButton
+                                                                                            aria-label="delete"
+                                                                                            onClick={() => {
+                                                                                                remove(idx);
+                                                                                            }}
+                                                                                        >
+                                                                                            <HighlightOffIcon />
+                                                                                        </IconButton>
+                                                                                    ) : null}
                                                                                 </TableCell>
                                                                             </TableRow>
                                                                         );
@@ -2302,6 +1470,7 @@ function RoomBuyingRates(props) {
                                                                         />
                                                                     </TableRow>
                                                                 </TableFooter>
+                                                                {/* ) : null} */}
                                                             </Table>
                                                         </TableContainer>
                                                     </Paper>
@@ -2309,66 +1478,23 @@ function RoomBuyingRates(props) {
                                             </FieldArray>
                                             <Box display="flex" flexDirection="row-reverse" style={{ marginTop: '20px' }}>
                                                 {mode != 'VIEW' ? (
-                                                    <Button
-                                                        className="btnSave"
-                                                        variant="contained"
-                                                        // type="button"
-                                                        // onClick={() => {
-                                                        //     setTouched({
-                                                        //         hotelCode: true,
-                                                        //         hotelName: true,
-                                                        //         operatorGpCode: true,
-                                                        //         operatorCode: true,
-                                                        //         season: true,
-                                                        //         ratePeriod: true
-                                                        //     }).then(() => {});
-                                                        // }}
-                                                        type="button"
-                                                        onClick={() => {
-                                                            console.log(formikRef);
-                                                            // handleFinalSubmit(values);
-                                                            //
-
-                                                            setTouched({ operatorGpCode: true, season: true, ratePeriod: true }).then(
-                                                                () => {
-                                                                    console.log(formikRef);
-                                                                    console.log(formikRef.current.errors);
-                                                                }
-                                                            );
-                                                        }}
-                                                    >
+                                                    <Button className="btnSave" variant="contained" type="submit">
                                                         {mode === 'INSERT' ? 'SAVE' : 'UPDATE'}
                                                     </Button>
                                                 ) : (
                                                     ''
                                                 )}
                                             </Box>
-                                            {/* ) : null} */}
                                         </Form>
                                     );
                                 }}
                             </Formik>
                         </Grid>
-                        {openTaxDetails ? (
-                            <ShowTaxDetails open={openTaxDetails} handleClose={handleClose} taxDetails={taxDetails} mode={'Rate'} />
-                        ) : (
-                            ''
-                        )}
-                        {openTaxDetails2 ? (
-                            <ShowTaxDetails open={openTaxDetails2} handleClose={handleClose2} taxDetails={taxDetails} mode={'Tour'} />
-                        ) : (
-                            ''
-                        )}
-                        {openToast ? <SuccessMsg openToast={openToast} handleToast={handleToast} mode={mode} /> : null}
-                        {openModal ? <ExitAlert title="dev" open={openModal} handleClose={handleModalClose} /> : null}
                     </Grid>
                 </div>
             </MainCard>
         </div>
     );
 }
-RoomBuyingRates.propTypes = {
-    classes: PropTypes.object.isRequired
-};
 
-export default withStyles(styles)(RoomBuyingRates);
+export default RoomBuyingRates;

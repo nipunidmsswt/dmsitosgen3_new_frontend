@@ -268,8 +268,16 @@ const utilities = {
                             breadcrumbs: false
                             // icon: "bi bi-journal-code",
                             // path: "/master/codeAndName",
+                        },
+                        {
+                            id: 'room-buying-rate',
+                            title: 'Room Buying Rates',
+                            type: 'item',
+                            url: '/master/roombuyingrate',
+                            breadcrumbs: false
+                            // icon: "bi bi-journal-code",
+                            // path: "/master/codeAndName",
                         }
-
                         // {
                         //     id: 'Color',
                         //     title: 'Color',
@@ -375,13 +383,6 @@ const utilities = {
                     title: 'Bank & Branches',
                     type: 'item',
                     url: '/master/bankbranches',
-                    breadcrumbs: false
-                },
-                {
-                    id: 'bank-detail-id',
-                    title: 'Bank Details',
-                    type: 'item',
-                    url: '/master/bankDetails',
                     breadcrumbs: false
                 },
                 {

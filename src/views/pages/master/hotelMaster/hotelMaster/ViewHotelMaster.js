@@ -9,7 +9,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { getAllLocationDetails, getLatestModifiedLocationDetails } from 'store/actions/masterActions/LocationAction';
 import Grid from '@mui/material/Grid';
 import MainCard from 'ui-component/cards/MainCard';
-import { useNavigate } from 'react-router';
+import { useNavigate } from 'react-router-dom';
 import { Button, FormControlLabel, FormGroup, Switch } from '@mui/material';
 
 import {
@@ -122,7 +122,7 @@ function ViewHotelMaster() {
                     >
                         {/* {rowData.status === true ? ( */}
                         <FormGroup>
-                            <Button variant="outlined" endIcon={<SendIcon />} onClick={loadBuyingRatesView}>
+                            <Button variant="outlined" endIcon={<SendIcon />} onClick={() => loadBuyingRatesView(rowData)}>
                                 Buying Rates
                             </Button>
                             {/* <FormControlLabel control={<Switch size="small" />} checked={true} /> */}
@@ -201,11 +201,16 @@ function ViewHotelMaster() {
         // setHandleToast(false);
     };
 
-    const loadBuyingRatesView = () => {
-        setActivitySupplimentId('');
-        setMode('INSERT');
-        setOpenBuyingRateView(true);
-        // navigate('/master/facilitycountview', { replace: true });
+    const loadBuyingRatesView = (rowdata) => {
+        console.log('loadBuyingRatesView');
+        // setActivitySupplimentId('');
+        // setMode('INSERT');
+        // setOpenBuyingRateView(true);
+        navigate('/master/roombuyingrateview', {
+            state: {
+                rowdata
+            }
+        });
         // setHandleToast(false);
     };
     const dispatch = useDispatch();
