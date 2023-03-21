@@ -614,8 +614,6 @@ import {
     clearRoomBuyingRateSaga
 } from './mastersaga/RoomBuyingRateSaga';
 
-import { GET_ALL_FACILITYCOUNTER_DATA, SAVE_FACILITYCOUNTER_DATA } from 'store/constant/master/FacilityCounterConstant';
-import { getAllFacilityCountSaga, saveFacilityCountSaga } from './mastersaga/FacilityCountSaga';
 import {
     GET_ALL_FACILITYCOUNTER_DATA,
     GET_ALL_FACILITY_COUNTER_DATA_HOTEL_WISE,
