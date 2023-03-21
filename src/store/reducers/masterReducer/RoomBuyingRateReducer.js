@@ -7,7 +7,7 @@ import {
     FAILED_ROOM_BUYING_RATE_LIST_DATA,
     SUCCESS_GET_ROOM_BUYING_RATE_BY_ID,
     FAILED_GET_ROOM_BUYING_RATE_BY_ID,
-    CHECK_ROOM_BUYING_RATE_CODE_DUPLICATE,
+    ROOM_BUYING_RATE_CODE_DUPLICATE,
     SUCCESS_ROOM_BUYING_RATE_LAST_MODIFIED_DATE,
     FAILED_ROOM_BUYING_RATE_LAST_MODIFIED_DATE,
     SUCCESS_GET_ROOM_BUYING_RATE_LIST_BY_HOTEL,
@@ -67,7 +67,7 @@ export const roomBuyingRateReducer = (state = initialState, action) => {
         case FAILED_ROOM_BUYING_RATE_LIST_DATA:
             return { ...state, roomBuyingRates: data };
 
-        case CHECK_ROOM_BUYING_RATE_CODE_DUPLICATE:
+        case ROOM_BUYING_RATE_CODE_DUPLICATE:
             return { ...state, duplicateRoomBuyingRate: data };
 
         case SUCCESS_ROOM_BUYING_RATE_LAST_MODIFIED_DATE:
