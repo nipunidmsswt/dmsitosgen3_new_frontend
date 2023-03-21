@@ -107,17 +107,21 @@ export function* getAllActiveMarketDataSaga() {
 export function* getAllActiveOperatorGroupDataSaga() {
     let responseData = [];
     try {
-        responseData = yield call(get, `${process.env.REACT_APP_OPERATOR_URL}/market/active`);
+        responseData = yield call(get, `${process.env.REACT_APP_OPERATOR_URL}/marketGroup/activeOperatorGroups`);
+        console.log(responseData);
         yield put({ type: SUCCESS_GET_ALL_ACTIVE_OPERATOR_GROUP_DATA, data: responseData.data });
     } catch (e) {
         yield put({ type: FAILED_GET_ALL_ACTIVE_OPERATOR_GROUP_DATA, data: responseData.data });
     }
 }
 
-export function* getAllActiveOperatorListByOperatorGroup() {
+export function* getAllActiveOperatorListByOperatorGroup(action) {
+    console.log(action.id);
     let responseData = [];
+    console.log('bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb');
     try {
-        responseData = yield call(get, `${process.env.REACT_APP_OPERATOR_URL}/market/active`);
+        responseData = yield call(get, `${process.env.REACT_APP_OPERATOR_URL}/marketGroup/activeOperatorCode/${action.id}`);
+        console.log(responseData);
         yield put({ type: SUCCESS_GET_ALL_ACTIVE_OPERATOR_LIST_BY_OPERATOR_GROUP, data: responseData.data });
     } catch (e) {
         yield put({ type: FAILED_GET_ALL_ACTIVE_OPERATOR_LIST_BY_OPERATOR_GROUP, data: responseData.data });

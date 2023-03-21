@@ -1,40 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <title>DMS iTos Gen3</title>
-    <link rel="icon"
-        href="data:image/jpeg;base64,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" />
-    <!-- Meta Tags-->
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#2296f3" />
-    <meta name="title" content="DMS iTos Gen3 FrontEnd" />
-    <meta name="description"
-        content="Start your next React project with Berry admin template. It build with Reactjs, Material-UI, Redux, and Hook for faster web development." />
-    <meta name="keywords"
-        content="react admin template, material-ui react dashboard template, reactjs admin template, reactjs dashboard, react backend template" />
-    <meta name="author" content="CodedThemes" />
-    <!-- Open Graph / Facebook -->
-    <meta property="og:locale" content="en_US" />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://berrydashboard.io/" />
-    <meta property="og:site_name" content="berrydashboard.io" />
-    <meta property="article:publisher" content="https://www.facebook.com/codedthemes" />
-    <meta property="og:title" content="Berry - React Material Dashboard Template" />
-    <meta property="og:description"
-        content="Berry Dashboard is made for the faster web application development built using Material-UI, Reactjs, Redux & Hook API." />
-    <meta property="og:image" content="https://berrydashboard.io/og-image/og-facebook.png" />
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content="https://berrydashboard.io" />
-    <meta property="twitter:title" content="Berry - React Material Dashboard Template" />
-    <meta property="twitter:description"
-        content="Berry Dashboard is made for the faster web application development built using Material-UI, Reactjs, Redux & Hook API." />
-    <meta property="twitter:image" content="https://berrydashboard.io/og-image/og-twitter.png" />
-    <meta name="twitter:creator" content="@codedthemes" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
-    <!--
+    <head>
+        <title>DMS iTos Gen3</title>
+        <link
+            rel="icon"
+            href="data:image/jpeg;base64,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"
+        />
+        <!-- Meta Tags-->
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="theme-color" content="#2296f3" />
+        <meta name="title" content="DMS iTos Gen3 FrontEnd" />
+        <meta
+            name="description"
+            content="Start your next React project with Berry admin template. It build with Reactjs, Material-UI, Redux, and Hook for faster web development."
+        />
+        <meta
+            name="keywords"
+            content="react admin template, material-ui react dashboard template, reactjs admin template, reactjs dashboard, react backend template"
+        />
+        <meta name="author" content="CodedThemes" />
+        <!-- Open Graph / Facebook -->
+        <meta property="og:locale" content="en_US" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://berrydashboard.io/" />
+        <meta property="og:site_name" content="berrydashboard.io" />
+        <meta property="article:publisher" content="https://www.facebook.com/codedthemes" />
+        <meta property="og:title" content="Berry - React Material Dashboard Template" />
+        <meta
+            property="og:description"
+            content="Berry Dashboard is made for the faster web application development built using Material-UI, Reactjs, Redux & Hook API."
+        />
+        <meta property="og:image" content="https://berrydashboard.io/og-image/og-facebook.png" />
+        <!-- Twitter -->
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:url" content="https://berrydashboard.io" />
+        <meta property="twitter:title" content="Berry - React Material Dashboard Template" />
+        <meta
+            property="twitter:description"
+            content="Berry Dashboard is made for the faster web application development built using Material-UI, Reactjs, Redux & Hook API."
+        />
+        <meta property="twitter:image" content="https://berrydashboard.io/og-image/og-twitter.png" />
+        <meta name="twitter:creator" content="@codedthemes" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+        <!--
       Notice the use of %PUBLIC_URL% in the tags above.
       It will be replaced with the URL of the `public` folder during the build.
       Only files inside the `public` folder can be referenced from the HTML.
@@ -43,23 +52,24 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
-    <link rel="preconnect" href="https://fonts.gstatic.com" />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap"
-        rel="stylesheet" />
-    <script type="text/javascript">
-        function zoom() {
-            // document.body.style.zoom = "100%"
-            document.getElementById('x').style.MozTransform = 'scale(0.8)';
-            document.getElementById('x').style.MozTransformOrigin = '0 0';
-        }
-    </script>
-</head>
+        <link rel="preconnect" href="https://fonts.gstatic.com" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap"
+            rel="stylesheet"
+        />
+        <script type="text/javascript">
+            function zoom() {
+                document.body.style.zoom = '100%';
+                // document.getElementById('x').style.MozTransform = 'scale(0.8)';
+                // document.getElementById('x').style.MozTransformOrigin = '0 0';
+            }
+        </script>
+    </head>
 
-<body id="x" onload="zoom()">
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
-    <!--
+    <body id="x" onload="zoom()">
+        <noscript>You need to enable JavaScript to run this app.</noscript>
+        <div id="root"></div>
+        <!--
           This HTML file is a template.
           If you open it directly in the browser, you will see an empty page.
 
@@ -69,6 +79,5 @@
           To begin the development, run `npm start` or `yarn start`.
           To create a production bundle, use `npm run build` or `yarn build`.
    -->
-</body>
-
+    </body>
 </html>

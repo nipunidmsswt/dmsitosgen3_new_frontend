@@ -77,16 +77,16 @@ export const seasonReducer = (state = initialState, action) => {
             return { ...state, lastModifiedDateTime: data };
 
         case SUCCESS_ACTIVE_SEASON_LIST_DATA:
-            return { ...state, activeSeasons: data };
+            return { ...state, activeSeasons: data.payload[0] };
 
         case FAILED_ACTIVE_SEASON_LIST_DATA:
-            return { ...state, activeSeasons: data };
+            return { ...state, activeSeasons: data.payload[0] };
 
         case SUCCESS_ACTIVE_RATES_BY_SEASON_ID:
-            return { ...state, activeRatesBySeason: data };
+            return { ...state, activeRatesBySeason: data.payload[0] };
 
         case FAILED_ACTIVE_RATES_BY_SEASON_ID:
-            return { ...state, activeRatesBySeason: data };
+            return { ...state, activeRatesBySeason: data.payload[0] };
 
         default:
             return state;

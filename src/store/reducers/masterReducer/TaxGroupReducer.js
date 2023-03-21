@@ -94,10 +94,10 @@ export const taxGroupReducer = (state = initialState, action) => {
             return { ...state, lastModifiedDateTime: data };
 
         case SUCCESS_GET_ACTIVE_TAX_GROUP_LIST:
-            return { ...state, activeTaxGrups: data };
+            return { ...state, activeTaxGrups: data.payload[0] };
 
         case FAILED_GET_ACTIVE_TAX_GROUP_LIST:
-            return { ...state, activeTaxGrups: data };
+            return { ...state, activeTaxGrups: data.payload[0] };
 
         default:
             return state;

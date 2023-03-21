@@ -13,7 +13,8 @@ import {
     checkDupicateTaxGroupCodeSaga,
     checkLatestTaxModifiedDateSaga,
     checkLatestTaxGrupModifiedDateSaga,
-    getTaxByUniqueIdSaga
+    getTaxByUniqueIdSaga,
+    getAllActiveTaxGroups
 } from './mastersaga/TaxSaga';
 import {
     SAVE_TAX_DATA,
@@ -28,7 +29,8 @@ import {
     CHECK_TAX_GROUP_DUPLICATE,
     GET_LAST_MODIFIED_DATE_TIME_TAX,
     GET_LAST_MODIFIED_DATE_TIME_TAX_GROUP,
-    GET_TAX_DATA_BY_UNIQUE_ID
+    GET_TAX_DATA_BY_UNIQUE_ID,
+    GET_ACTIVE_TAX_GROUP_LIST
 } from 'store/constant/master/TaxMasterConstant';
 
 import {
@@ -261,7 +263,9 @@ import {
     GET_SEASON_DATA_BY_ID,
     GET_LAST_MODIFIED_DATE_TIME_SEASON,
     SAVE_SEASON_DATA,
-    UPDATE_SEASON_DATA
+    UPDATE_SEASON_DATA,
+    ACTIVE_SEASON_LIST_DATA,
+    ACTIVE_RATES_BY_SEASON_ID
 } from 'store/constant/master/SeasonConstant';
 
 import {
@@ -270,7 +274,9 @@ import {
     getSeasonByIdSaga,
     getAllSeasonSaga,
     updateSeasonSaga,
-    checkDupicateSeasonSaga
+    checkDupicateSeasonSaga,
+    getAllActiveRatesBySeasonSaga,
+    getAllActiveSeasonSaga
 } from './mastersaga/SeasonSaga';
 
 import {
@@ -308,7 +314,9 @@ import {
     GET_MARKET_GROUP_DETAILS_BY_CODE,
     GET_MARKET_GROUP_LAST_MODIFIED_DATE_TIME,
     SAVE_MARKET_GROUP_DATA,
-    UPDATE_MARKET_GROUP_DATA
+    UPDATE_MARKET_GROUP_DATA,
+    GET_ALL_ACTIVE_OPERATOR_GROUP_DATA,
+    GET_ALL_ACTIVE_OPERATOR_LIST_BY_OPERATOR_GROUP
 } from 'store/constant/master/MarketGroupConstant';
 
 import {
@@ -317,7 +325,9 @@ import {
     getMarketGroupDetailsByCodeSaga,
     getMarketGroupLatestModifiedDateSaga,
     saveMarketGroupDataHandler,
-    updateMarketGroupDataSaga
+    updateMarketGroupDataSaga,
+    getAllActiveOperatorListByOperatorGroup,
+    getAllActiveOperatorGroupDataSaga
 } from './mastersaga/MarketGroupSaga';
 import {
     CHECK_HOTEL_BASIS_CODE_DUPLICATE,
@@ -325,7 +335,8 @@ import {
     GET_HOTEL_BASIS_BY_ID,
     GET_HOTEL_BASIS_LAST_MODIFIED_DATE_TIME,
     SAVE_HOTEL_BASIS,
-    UPDATE_HOTEL_BASIS
+    UPDATE_HOTEL_BASIS,
+    GET_ACTIVE_HOTEL_BASIS
 } from 'store/constant/master/HotelBasisConstant';
 import {
     checkHotelBasisDupicateCodeSaga,
@@ -333,7 +344,8 @@ import {
     getHotelBasisByCodeSaga,
     getHotelBasisLatestModifiedDateSaga,
     saveHotelBasisDataHandler,
-    updateHotelBasisDataSaga
+    updateHotelBasisDataSaga,
+    getActiveHotelBasisListSaga
 } from './mastersaga/HotelBasisSaga';
 
 import {
@@ -342,7 +354,8 @@ import {
     getRoomCategoryByCodeSaga,
     getRoomCategoryLatestModifiedDateSaga,
     saveRoomCategoryDataHandler,
-    updateRoomCategoryDataSaga
+    updateRoomCategoryDataSaga,
+    getActiveRoomCategoryListSaga
 } from './mastersaga/RoomCategorySaga';
 
 import {
@@ -351,7 +364,8 @@ import {
     GET_ROOM_CATEGORY_BY_ID,
     GET_ROOM_CATEGORY_LAST_MODIFIED_DATE_TIME,
     SAVE_ROOM_CATEGORY,
-    UPDATE_ROOM_CATEGORY
+    UPDATE_ROOM_CATEGORY,
+    GET_ACTIVE_ROOM_CATEGORY
 } from 'store/constant/master/RoomCategoryConstant';
 import {
     CHECK_EXPENSE_TYPES_CODE_DUPLICATE,
@@ -577,6 +591,29 @@ import {
     getSavedBankBrachData,
     getBankDetailsByIdSaga
 } from './mastersaga/Bank&BranchSaga';
+
+import {
+    SAVE_ROOM_BUYING_RATE,
+    GET_ALL_ROOM_BUYING_RATE,
+    GET_ROOM_BUYING_RATE_BY_ID,
+    UPDATE_ROOM_BUYING_RATE,
+    CHECK_ROOM_BUYING_RATE_CODE_DUPLICATE,
+    GET_ROOM_BUYING_RATE_LAST_MODIFIED_DATE_TIME,
+    GET_ROOM_BUYING_RATE_LIST_BY_HOTEL,
+    CLEAR_ROOM_BUYING_RATE
+} from 'store/constant/master/RoomBuyingRateConstant';
+
+import {
+    saveRoomBuyingRateSaga,
+    getRoomBuyingRateByIdSaga,
+    updateRoomBuyingRateSaga,
+    getAllRoomBuyingRateSaga,
+    checkDupicateRoomBuyingRateSaga,
+    checkLatestRoomBuyingRateModifiedDateSaga,
+    getBuyingRoomRatesByHotelSaga,
+    clearRoomBuyingRateSaga
+} from './mastersaga/RoomBuyingRateSaga';
+
 import { GET_ALL_FACILITYCOUNTER_DATA, SAVE_FACILITYCOUNTER_DATA } from 'store/constant/master/FacilityCounterConstant';
 import { getAllFacilityCountSaga, saveFacilityCountSaga } from './mastersaga/FacilityCountSaga';
 export function* wacherSaga() {
@@ -596,6 +633,7 @@ export function* wacherSaga() {
     yield takeLatest(UPDATE_TAX_GROUP_DATA, updateTaxGroupSaga);
     yield takeLatest(CHECK_TAX_GROUP_DUPLICATE, checkDupicateTaxGroupCodeSaga);
     yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_TAX_GROUP, checkLatestTaxGrupModifiedDateSaga);
+    yield takeLatest(GET_ACTIVE_TAX_GROUP_LIST, getAllActiveTaxGroups);
 
     // //tour category setup
     yield takeLatest(SAVE_TOUR_CATEGORY_DATA, saveTourCategoryHandler);
@@ -708,14 +746,14 @@ export function* wacherSaga() {
     yield takeLatest(CHECK_TOURTYPE_CODE_DUPLICATE, checkDuplicateTourTypeCode);
 
     // // Market Group
-
+    yield takeLatest(GET_ALL_ACTIVE_OPERATOR_GROUP_DATA, getAllActiveOperatorGroupDataSaga);
     yield takeLatest(SAVE_MARKET_GROUP_DATA, saveMarketGroupDataHandler);
     yield takeLatest(GET_ALL_MARKET_GROUP_DATA, getAllMarketGroupDataSaga);
     yield takeLatest(GET_MARKET_GROUP_DETAILS_BY_CODE, getMarketGroupDetailsByCodeSaga);
     yield takeLatest(GET_MARKET_GROUP_LAST_MODIFIED_DATE_TIME, getMarketGroupLatestModifiedDateSaga);
     yield takeLatest(CHECK_MARKET_GROUP_CODE_DUPLICATE, checkMarketGroupDupicateCodeSaga);
     yield takeLatest(UPDATE_MARKET_GROUP_DATA, updateMarketGroupDataSaga);
-    yield takeLatest(GET_ALL_ACTIVE_MARKET_GROUP_DATA, getAllMarketGroupDataSaga);
+    yield takeLatest(GET_ALL_ACTIVE_OPERATOR_LIST_BY_OPERATOR_GROUP, getAllActiveOperatorListByOperatorGroup);
 
     //managing company
     yield takeLatest(SAVE_MANAGING_COMAPANY_DATA, saveManagingCompanySaga);
@@ -739,6 +777,8 @@ export function* wacherSaga() {
     yield takeLatest(UPDATE_SEASON_DATA, updateSeasonSaga);
     yield takeLatest(CHECK_SEASON_DUPLICATE, checkDupicateSeasonSaga);
     yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_SEASON, checkLatestSeasonModifiedDateSaga);
+    yield takeLatest(ACTIVE_RATES_BY_SEASON_ID, getAllActiveRatesBySeasonSaga);
+    yield takeLatest(ACTIVE_SEASON_LIST_DATA, getAllActiveSeasonSaga);
 
     // //hotel facility data
     yield takeLatest(SAVE_HOTEL_FACILITY_DATA, saveHotelFacilitySaga);
@@ -756,20 +796,20 @@ export function* wacherSaga() {
     yield takeLatest(SAVE_HOTEL_BASIS, saveHotelBasisDataHandler);
     yield takeLatest(GET_ALL_HOTEL_BASIS, getAllHotelBasisDataSaga);
     yield takeLatest(GET_HOTEL_BASIS_BY_ID, getHotelBasisByCodeSaga);
-
     yield takeLatest(GET_HOTEL_BASIS_LAST_MODIFIED_DATE_TIME, getHotelBasisLatestModifiedDateSaga);
     yield takeLatest(CHECK_HOTEL_BASIS_CODE_DUPLICATE, checkHotelBasisDupicateCodeSaga);
     yield takeLatest(UPDATE_HOTEL_BASIS, updateHotelBasisDataSaga);
+    yield takeLatest(GET_ACTIVE_HOTEL_BASIS, getActiveHotelBasisListSaga);
 
     // //Room Category
 
     yield takeLatest(SAVE_ROOM_CATEGORY, saveRoomCategoryDataHandler);
     yield takeLatest(GET_ALL_ROOM_CATEGORY, getAllRoomCategoryDataSaga);
     yield takeLatest(GET_ROOM_CATEGORY_BY_ID, getRoomCategoryByCodeSaga);
-
     yield takeLatest(GET_ROOM_CATEGORY_LAST_MODIFIED_DATE_TIME, getRoomCategoryLatestModifiedDateSaga);
     yield takeLatest(CHECK_ROOM_CATEGORY_CODE_DUPLICATE, checkRoomCategoryDupicateCodeSaga);
     yield takeLatest(UPDATE_ROOM_CATEGORY, updateRoomCategoryDataSaga);
+    yield takeLatest(GET_ACTIVE_ROOM_CATEGORY, getActiveRoomCategoryListSaga);
 
     //EXPENSE TYPES
     yield takeLatest(GET_ALL_CURRENCY_LIST, getAllCurrencyListData);
@@ -909,4 +949,15 @@ export function* wacherSaga() {
     // yield takeLatest(CHECK_HOTEL_CATEGORY_DUPLICATE, checkDupicateHotelCateogryCodeSaga);
     // yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_HOTEL_CATEGORY, checkLatestHotelCateogryModifiedDateSaga);
     // yield takeLatest(GET_ALL_ACTIVE_HOTEL_CATEGORY_DATA, getAllActiveHotelCateogrySaga);
+
+    //room buying rate
+    yield takeLatest(SAVE_ROOM_BUYING_RATE, saveRoomBuyingRateSaga);
+    yield takeLatest(GET_ALL_ROOM_BUYING_RATE, getAllRoomBuyingRateSaga);
+    yield takeLatest(GET_ROOM_BUYING_RATE_BY_ID, getRoomBuyingRateByIdSaga);
+    yield takeLatest(GET_ROOM_BUYING_RATE_LAST_MODIFIED_DATE_TIME, checkLatestRoomBuyingRateModifiedDateSaga);
+    yield takeLatest(CHECK_ROOM_BUYING_RATE_CODE_DUPLICATE, checkDupicateRoomBuyingRateSaga);
+    yield takeLatest(UPDATE_ROOM_BUYING_RATE, updateRoomBuyingRateSaga);
+    yield takeLatest(GET_ROOM_BUYING_RATE_LIST_BY_HOTEL, getBuyingRoomRatesByHotelSaga);
+    yield takeLatest(CLEAR_ROOM_BUYING_RATE, clearRoomBuyingRateSaga);
+    // yield takeLatest(GET_ALL_ACTIVE_GUIDE_CLASS_DATA, getAllActiveGuideClassDataSaga);
 }
