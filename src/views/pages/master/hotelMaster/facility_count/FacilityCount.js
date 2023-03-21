@@ -39,12 +39,19 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { checkDuplicateSeasonCode, getSeasonDataById, saveSeasonData, updateSeasonData } from 'store/actions/masterActions/SeasonAction';
 import { getHotelMainDataById } from 'store/actions/masterActions/HotelMasterAction';
-import { getAllFacilityCounterData, saveFacilityCounterData } from 'store/actions/masterActions/FacilityCounterAction';
+import {
+    getAllFacilityCounterData,
+    getAllFacilityCounterDataHotelWise,
+    saveFacilityCounterData,
+    updateFacilityCounterData
+} from 'store/actions/masterActions/FacilityCounterAction';
 import MaterialTable from 'material-table';
+import { updateFacilityCountSaga } from 'store/saga/mastersaga/FacilityCountSaga';
 // import CreatedUpdatedUserDetailsWithTableFormat from '../userTimeDetails/CreatedUpdatedUserDetailsWithTableFormat';
 
 function FacilityCounter({ open, handleClose, mode, hotelCode, hotelName, hotel }) {
     const initialValues = {
+        id: '',
         hotel: hotel,
         hotelCode: hotelCode,
         hotelName: hotelName,
@@ -54,7 +61,8 @@ function FacilityCounter({ open, handleClose, mode, hotelCode, hotelName, hotel 
                 facilityType: null,
                 facilityCodeName: null,
                 count: '',
-                status: true
+                status: true,
+                enableRow: false
             }
         ]
     };
@@ -76,6 +84,13 @@ function FacilityCounter({ open, handleClose, mode, hotelCode, hotelName, hotel 
         {
             title: 'Facility Type',
             field: 'facilityType',
+            filterPlaceholder: 'filter',
+            align: 'center'
+        },
+
+        {
+            title: 'Count',
+            field: 'count',
             filterPlaceholder: 'filter',
             align: 'center'
         },
@@ -119,42 +134,49 @@ function FacilityCounter({ open, handleClose, mode, hotelCode, hotelName, hotel 
     const [selectedFacilityType, setSelectedFacilityType] = useState(null);
     const [activeServiceOfferedListData, setActiveServiceOfferedListData] = useState([]);
     const facilityCountList = useSelector((state) => state.facilityCountReducer.facilityCountList);
+    // facilityCountListHotelWise
+    const facilityCountListHotelWise = useSelector((state) => state.facilityCountReducer.facilityCountListHotelWise);
     const arrayList = [];
     const [modeType, setModeType] = useState('INSERT');
+    console.log(facilityCountListHotelWise);
 
     useEffect(() => {
-        if (facilityCountList?.payload?.length > 0) {
-            facilityCountList?.payload[0].forEach((element) => {
-                const initialValues = {
-                    hotel: element.hotel,
-                    hotelCode: element.hotel.hotelCode,
-                    hotelName: element.hotel.longName,
-                    facilityType: element.status,
-                    // status: values.status,
-                    facilityType: element.facilityCountDetails.facilityType,
-                    facilityCountDetails: element.facilityCountDetails
-                    // facilityCountDetails: [
-                    //     {
-                    //         facilityType: values.facilityCountDetails.facilityType,
-                    //         facilityCodeName: values.facilityCountDetails.acilityCodeName,
-                    //         count: values.facilityCountDetails.count,
-                    //         status: values.facilityCountDetails.status
-                    //     }
-                    // ]
-                };
-                arrayList.push(initialValues);
+        if (facilityCountListHotelWise?.payload?.length > 0) {
+            facilityCountListHotelWise?.payload[0].forEach((element) => {
+                element?.facilityCountDetails.forEach((element2) => {
+                    const initialValues = {
+                        id: element?.id,
+                        hotel: element?.hotel,
+                        hotelCode: element?.hotel?.hotelCode,
+                        hotelName: element?.hotel?.longName,
+                        // facilityType: element.status,
+                        status: element?.status,
+                        facilityType: element2.facilityCodeName?.hotelFacilityType?.hotelFacilityType,
+                        count: element2?.count,
+                        facilityCountDetails: element2 // facilityCountDetails: [
+                        //     {
+                        //         facilityType: values.facilityCountDetails.facilityType,
+                        //         facilityCodeName: values.facilityCountDetails.acilityCodeName,
+                        //         count: values.facilityCountDetails.count,
+                        //         status: values.facilityCountDetails.status
+                        //     }
+                        // ]
+                    };
+                    arrayList.push(initialValues);
+                });
             });
 
             setTableData(arrayList);
+        } else {
+            setTableData(initialValues);
         }
-    }, [facilityCountList]);
+    }, [facilityCountListHotelWise]);
 
     useEffect(() => {
         const facilityCodeAndName = [];
         if (facilityTypes.length > 0) {
             if (modeType == 'INSERT') {
                 if (selectedFacilityType == 'Service Offered') {
-                    console.log(hotel?.serviceOffered);
                     facilityCodeAndName.push(hotel?.serviceOffered);
                 }
                 if (selectedFacilityType == 'Children Facilities') {
@@ -165,7 +187,7 @@ function FacilityCounter({ open, handleClose, mode, hotelCode, hotelName, hotel 
                     facilityCodeAndName.push(hotel?.reCreation);
                 }
 
-                if (selectedFacilityType == 'Facility Offered') {
+                if (selectedFacilityType == 'Facilities Offered') {
                     facilityCodeAndName.push(hotel?.facilitiesOffered);
                 }
                 setActiveServiceOfferedListData(facilityCodeAndName[0]);
@@ -241,6 +263,7 @@ function FacilityCounter({ open, handleClose, mode, hotelCode, hotelName, hotel 
             if (hotel?.facilitiesOffered?.length > 0) {
                 facilityType.push(hotel?.facilitiesOffered[0]?.hotelFacilityType);
             }
+
             if (hotel?.reCreation?.length > 0) {
                 facilityType.push(hotel?.reCreation[0]?.hotelFacilityType);
             }
@@ -255,49 +278,17 @@ function FacilityCounter({ open, handleClose, mode, hotelCode, hotelName, hotel 
         }
     }, [hotel]);
 
-    // useEffect(() => {
-    //     // if ((mode === 'VIEW_UPDATE' && hotelMainToUpdate != null) || (mode === 'VIEW' && hotelMainToUpdate != null)) {
-    //     // setMainRoomId(hotelMainToUpdate?.id);
-    //     // alert(hotelMainToUpdate?.hotelCode);
-    //     const initialValues = {
-    //         hotelCode: hotelMainToUpdate?.hotelCode,
-    //         propertyCode: hotelMainToUpdate?.propertyCode,
-    //         starClass: hotelMainToUpdate?.starClass,
-    //         managingCompany: hotelMainToUpdate?.managingCompany,
-    //         longName: hotelMainToUpdate?.longName,
-    //         address: hotelMainToUpdate?.address,
-    //         hotelCategory: hotelMainToUpdate?.hotelCategory,
-    //         location: hotelMainToUpdate?.location,
-    //         phone1: hotelMainToUpdate?.phone1,
-    //         phone2: hotelMainToUpdate?.phone2,
-    //         fax1: hotelMainToUpdate?.fax1,
-    //         fax2: hotelMainToUpdate?.fax2,
-    //         email: hotelMainToUpdate?.email,
-    //         cancellationPolicy: hotelMainToUpdate?.cancellationPolicy,
-    //         status: hotelMainToUpdate?.status,
-    //         reCreation: hotelMainToUpdate?.reCreation,
-    //         facilitiesOffered: hotelMainToUpdate?.facilitiesOffered,
-    //         childrenFacilities: hotelMainToUpdate?.childrenFacilities,
-    //         serviceOffered: hotelMainToUpdate?.serviceOffered
-    //     };
-    //     // setLoadValues(initialValues);
-    //     // }
-    // }, [hotelMainToUpdate]);
-
     const validationSchema = yup.object().shape({
-        // mainSeason: yup.string().required('Required field'),
-        // //   .checkDuplicateSeason("Duplicate Code"),
-        // seasonFromDate: yup.date().required('Required field'),
-        // // toDate: yup.date(),
-        // seasonToDate: yup.date().required('Required field').min(yup.ref('seasonFromDate'), "End date can't be before start date"),
-        // seasonDetails: yup.array().of(
-        //     yup.object().shape({
-        //         ratePeriod: yup.string().required('Required field'),
-        //         fromDate: yup.date().required('Required field'),
-        //         toDate: yup.date().required('Required field').min(yup.ref('fromDate'), "End date can't be before start date")
-        //         // .min(yup.ref('seasonToDate'), "End date can't be before season start date")
-        //     })
-        // )
+        hotelCode: yup.string().required('Required field'),
+        hotelName: yup.string().required('Required field'),
+
+        facilityCountDetails: yup.array().of(
+            yup.object().shape({
+                facilityType: yup.object().typeError('Required field'),
+                facilityCodeName: yup.object().typeError('Required field'),
+                count: yup.number().positive('Must be greater than zero').required('Required field')
+            })
+        )
     });
 
     //get data from reducers
@@ -305,70 +296,27 @@ function FacilityCounter({ open, handleClose, mode, hotelCode, hotelName, hotel 
     const dispatch = useDispatch();
 
     useEffect(() => {
-        dispatch(getAllFacilityCounterData());
+        dispatch(getAllFacilityCounterDataHotelWise(hotel.id));
         // console.log('hotel Code:' + hotelCode);
         // console.log('hotel Name:' + hotelName);
     }, []);
-
-    // useEffect(() => {
-    //     console.log('update');
-    //     if (mode === 'VIEW_UPDATE' || mode === 'VIEW') {
-    //         console.log(code);
-    //         dispatch(getSeasonDataById(code));
-    //     }
-    // }, [mode]);
-
-    // useEffect(() => {
-    //     console.log(seasonToUpdate);
-
-    //     if ((mode === 'VIEW_UPDATE' && seasonToUpdate != null) || (mode === 'VIEW' && seasonToUpdate != null)) {
-    //         setLoadValues(seasonToUpdate);
-    //     }
-    // }, [seasonToUpdate]);
-
-    // const handleSubmitForm = (data) => {
-    //     console.log(data);
-    //     console.log(data.seasonFromDate);
-    //     console.log(data.seasonDetails[data.seasonDetails.length - 1].toDate);
-    //     const x = new Date(data.seasonToDate).toISOString().split('T')[0];
-    //     const y = new Date(data.seasonDetails[data.seasonDetails.length - 1].toDate).toISOString().split('T')[0];
-    //     console.log(x);
-    //     console.log(y);
-    //     if (x < y || x > y) {
-    //         console.log('yuiy');
-    //         setOpenDialogBox(true);
-    //     } else {
-    //         if (mode === 'INSERT') {
-    //             dispatch(saveSeasonData(data));
-    //         } else if (mode === 'VIEW_UPDATE') {
-    //             console.log('yes click');
-    //             dispatch(updateSeasonData(data));
-    //         }
-    //         handleClose();
-    //     }
-    // };
 
     const handleSubmitForm = (values) => {
         if (modeType === 'INSERT') {
             const initialValues = {
                 hotel: hotel,
-                // hotelCode: hotelCode,
-                // hotelName: hotelName,
                 status: values.status,
                 facilityCountDetails: values.facilityCountDetails
-                // facilityCountDetails: [
-                //     {
-                //         facilityType: values.facilityCountDetails.facilityType,
-                //         facilityCodeName: values.facilityCountDetails.acilityCodeName,
-                //         count: values.facilityCountDetails.count,
-                //         status: values.facilityCountDetails.status
-                //     }
-                // ]
             };
-            console.log(initialValues);
             dispatch(saveFacilityCounterData(initialValues));
-        } else if (mode === 'VIEW_UPDATE') {
-            // dispatch(updateOwnerData(values));
+        } else if (modeType === 'VIEW_UPDATE') {
+            const initialValues = {
+                id: values.id,
+                hotel: hotel,
+                status: values.status,
+                facilityCountDetails: values.facilityCountDetails
+            };
+            dispatch(updateFacilityCounterData(initialValues));
         }
         handleClose();
         // setDuplicateError(false);
@@ -376,69 +324,27 @@ function FacilityCounter({ open, handleClose, mode, hotelCode, hotelName, hotel 
     };
 
     const handleCancel = () => {
+        setModeType('INSERT');
         setLoadValues(initialValues);
     };
 
     const handleClickOpen = (type, data) => {
         setModeType(type);
-        if (data?.facilityCountDetails?.length > 0) {
-            let facilityCountDetailsArray = {};
-            if (type === 'VIEW_UPDATE') {
-                console.log(data);
-                const array = [];
-                data?.facilityCountDetails.forEach((element) => {
-                    facilityCountDetailsArray = {
-                        facilityType: element.facilityType,
-                        facilityCodeName: element.facilityCodeName,
-                        count: element?.count,
-                        status: true
-                        // status: data?.facilityCountDetails[0]?.status
-                    };
-                    array.push(facilityCountDetailsArray);
-                });
-                console.log(facilityCountDetailsArray);
-
-                console.log(array);
-                const initialValues = {
-                    hotel: data?.hotel,
-                    hotelCode: data?.hotelCode,
-                    hotelName: data?.hotelName,
-                    status: data?.status,
-                    facilityCountDetails: array
-                    // facilityCountDetails: data?.facilityCountDetails
-
-                    // facilityCountDetails: [
-                    //     {
-                    //         facilityType: null,
-                    //         facilityCodeName: null,
-                    //         count: data?.facilityCountDetails[0]?.count
-                    //         // status: data?.facilityCountDetails[0]?.status
-                    //     }
-                    // ]
-                };
-                setLoadValues(initialValues);
-            }
+        console.log(data);
+        if (type === 'VIEW_UPDATE') {
+            const initialValues = {
+                id: data?.id,
+                hotel: data?.hotel,
+                hotelCode: data?.hotelCode,
+                hotelName: data?.hotelName,
+                status: data?.status,
+                facilityCountDetails: [data?.facilityCountDetails],
+                enableRow: true
+            };
+            setLoadValues(initialValues);
         }
-
-        //  else if (type === 'INSERT') {
-        //     setTaxGroupCode('');
-        //     setMode(type);
-        // } else {
-        //     setMode(type);
-        //     setTaxGroupCode(data.taxGroupCode);
-        // }
-        // setOpen(true);
     };
 
-    // const handleChange = (e) => {
-    //     const target = e.target;
-    //     // const value = target.type === 'checkbox' ? target.checked : target.value;
-    //     const name = target.name;
-    //     setLoadValues({
-    //         ...loadValues,
-    //         [name]: target.value
-    //     });
-    // };
     return (
         <div>
             <Dialog maxWidth="220px" open={open} keepMounted onClose={handleClose} aria-describedby="alert-dialog-slide-description">
@@ -496,12 +402,12 @@ function FacilityCounter({ open, handleClose, mode, hotelCode, hotelName, hotel 
                                                                             value={values.hotelCode}
                                                                             onChange={handleChange}
                                                                             onBlur={handleBlur}
-                                                                            // error={Boolean(touched.hotelCode && errors.hotelCode)}
-                                                                            // helperText={
-                                                                            //     touched.hotelCode && errors.hotelCode
-                                                                            //         ? errors.hotelCode
-                                                                            //         : ''
-                                                                            // }
+                                                                            error={Boolean(touched.hotelCode && errors.hotelCode)}
+                                                                            helperText={
+                                                                                touched.hotelCode && errors.hotelCode
+                                                                                    ? errors.hotelCode
+                                                                                    : ''
+                                                                            }
                                                                         />
                                                                     </Grid>
 
@@ -524,12 +430,12 @@ function FacilityCounter({ open, handleClose, mode, hotelCode, hotelName, hotel 
                                                                             value={values.hotelName}
                                                                             onChange={handleChange}
                                                                             onBlur={handleBlur}
-                                                                            // error={Boolean(touched.hotelName && errors.hotelName)}
-                                                                            // helperText={
-                                                                            //     touched.hotelName && errors.hotelName
-                                                                            //         ? errors.hotelName
-                                                                            //         : ''
-                                                                            // }
+                                                                            error={Boolean(touched.hotelName && errors.hotelName)}
+                                                                            helperText={
+                                                                                touched.hotelName && errors.hotelName
+                                                                                    ? errors.hotelName
+                                                                                    : ''
+                                                                            }
                                                                         />
                                                                     </Grid>
                                                                     <Grid
@@ -541,14 +447,6 @@ function FacilityCounter({ open, handleClose, mode, hotelCode, hotelName, hotel 
                                                                             //   marginBottom: "10px",
                                                                         }}
                                                                     >
-                                                                        {/* <Typography
-                                                                            variant=""
-                                                                            component="p"
-                                                                            style={{ marginRight: '10px' }}
-                                                                        >
-                                                                            Active
-                                                                        </Typography> */}
-
                                                                         <FormGroup>
                                                                             <FormControlLabel
                                                                                 name="status"
@@ -584,7 +482,11 @@ function FacilityCounter({ open, handleClose, mode, hotelCode, hotelName, hotel 
                                                                                             facilityCodeName: null,
                                                                                             count: '',
                                                                                             // onOriginal: '',
-                                                                                            status: true
+                                                                                            status: true,
+                                                                                            enableRow:
+                                                                                                mode === 'VIEW_UPDATE' || mode === 'INSERT'
+                                                                                                    ? false
+                                                                                                    : true
                                                                                         });
                                                                                     }}
                                                                                 >
@@ -615,8 +517,8 @@ function FacilityCounter({ open, handleClose, mode, hotelCode, hotelName, hotel 
                                                                                                 <TableCell>
                                                                                                     <Autocomplete
                                                                                                         disabled={
-                                                                                                            mode == 'VIEW_UPDATE' ||
-                                                                                                            mode == 'VIEW'
+                                                                                                            modeType == 'VIEW_UPDATE' ||
+                                                                                                            modeType == 'VIEW'
                                                                                                         }
                                                                                                         value={
                                                                                                             values.facilityCountDetails[idx]
@@ -637,6 +539,11 @@ function FacilityCounter({ open, handleClose, mode, hotelCode, hotelName, hotel 
                                                                                                                 value.hotelFacilityType
                                                                                                             );
                                                                                                         }}
+                                                                                                        // disabled={
+                                                                                                        //     values.facilityCountDetails[idx]
+                                                                                                        //         .enableRow ||
+                                                                                                        //     modeType == 'VIEW'
+                                                                                                        // }
                                                                                                         // onChange={handleChange}
                                                                                                         options={facilityTypes}
                                                                                                         getOptionLabel={(option) =>
@@ -665,51 +572,51 @@ function FacilityCounter({ open, handleClose, mode, hotelCode, hotelName, hotel 
                                                                                                                 variant="outlined"
                                                                                                                 name={`facilityCountDetails.${idx}.facilityType`}
                                                                                                                 onBlur={handleBlur}
-                                                                                                                // helperText={
-                                                                                                                //     touched.facilityCountDetails &&
-                                                                                                                //     touched
-                                                                                                                //         .facilityCountDetails[
-                                                                                                                //         idx
-                                                                                                                //     ] &&
-                                                                                                                //     touched
-                                                                                                                //         .facilityCountDetails[
-                                                                                                                //         idx
-                                                                                                                //     ].facilityType &&
-                                                                                                                //     errors.facilityCountDetails &&
-                                                                                                                //     errors
-                                                                                                                //         .facilityCountDetails[
-                                                                                                                //         idx
-                                                                                                                //     ] &&
-                                                                                                                //     errors
-                                                                                                                //         .facilityCountDetails[
-                                                                                                                //         idx
-                                                                                                                //     ].facilityType
-                                                                                                                //         ? errors
-                                                                                                                //               .facilityCountDetails[
-                                                                                                                //               idx
-                                                                                                                //           ].facilityType
-                                                                                                                //         : ''
-                                                                                                                // }
-                                                                                                                // error={Boolean(
-                                                                                                                //     touched.facilityCountDetails &&
-                                                                                                                //         touched
-                                                                                                                //             .facilityCountDetails[
-                                                                                                                //             idx
-                                                                                                                //         ] &&
-                                                                                                                //         touched
-                                                                                                                //             .facilityCountDetails[
-                                                                                                                //             idx
-                                                                                                                //         ].facilityType &&
-                                                                                                                //         errors.facilityCountDetails &&
-                                                                                                                //         errors
-                                                                                                                //             .facilityCountDetails[
-                                                                                                                //             idx
-                                                                                                                //         ] &&
-                                                                                                                //         errors
-                                                                                                                //             .facilityCountDetails[
-                                                                                                                //             idx
-                                                                                                                //         ].facilityType
-                                                                                                                // )}
+                                                                                                                helperText={
+                                                                                                                    touched.facilityCountDetails &&
+                                                                                                                    touched
+                                                                                                                        .facilityCountDetails[
+                                                                                                                        idx
+                                                                                                                    ] &&
+                                                                                                                    touched
+                                                                                                                        .facilityCountDetails[
+                                                                                                                        idx
+                                                                                                                    ].facilityType &&
+                                                                                                                    errors.facilityCountDetails &&
+                                                                                                                    errors
+                                                                                                                        .facilityCountDetails[
+                                                                                                                        idx
+                                                                                                                    ] &&
+                                                                                                                    errors
+                                                                                                                        .facilityCountDetails[
+                                                                                                                        idx
+                                                                                                                    ].facilityType
+                                                                                                                        ? errors
+                                                                                                                              .facilityCountDetails[
+                                                                                                                              idx
+                                                                                                                          ].facilityType
+                                                                                                                        : ''
+                                                                                                                }
+                                                                                                                error={Boolean(
+                                                                                                                    touched.facilityCountDetails &&
+                                                                                                                        touched
+                                                                                                                            .facilityCountDetails[
+                                                                                                                            idx
+                                                                                                                        ] &&
+                                                                                                                        touched
+                                                                                                                            .facilityCountDetails[
+                                                                                                                            idx
+                                                                                                                        ].facilityType &&
+                                                                                                                        errors.facilityCountDetails &&
+                                                                                                                        errors
+                                                                                                                            .facilityCountDetails[
+                                                                                                                            idx
+                                                                                                                        ] &&
+                                                                                                                        errors
+                                                                                                                            .facilityCountDetails[
+                                                                                                                            idx
+                                                                                                                        ].facilityType
+                                                                                                                )}
                                                                                                             />
                                                                                                         )}
                                                                                                     />
@@ -719,8 +626,8 @@ function FacilityCounter({ open, handleClose, mode, hotelCode, hotelName, hotel 
                                                                                                     {' '}
                                                                                                     <Autocomplete
                                                                                                         disabled={
-                                                                                                            mode == 'VIEW_UPDATE' ||
-                                                                                                            mode == 'VIEW'
+                                                                                                            modeType == 'VIEW_UPDATE' ||
+                                                                                                            modeType == 'VIEW'
                                                                                                         }
                                                                                                         value={
                                                                                                             values.facilityCountDetails[idx]
@@ -771,52 +678,52 @@ function FacilityCounter({ open, handleClose, mode, hotelCode, hotelName, hotel 
                                                                                                                 variant="outlined"
                                                                                                                 name={`facilityCountDetails.${idx}.facilityCodeName`}
                                                                                                                 onBlur={handleBlur}
-                                                                                                                // helperText={
-                                                                                                                //     touched.facilityCountDetails &&
-                                                                                                                //     touched
-                                                                                                                //         .facilityCountDetails[
-                                                                                                                //         idx
-                                                                                                                //     ] &&
-                                                                                                                //     touched
-                                                                                                                //         .facilityCountDetails[
-                                                                                                                //         idx
-                                                                                                                //     ].facilityCodeName &&
-                                                                                                                //     errors.facilityCountDetails &&
-                                                                                                                //     errors
-                                                                                                                //         .facilityCountDetails[
-                                                                                                                //         idx
-                                                                                                                //     ] &&
-                                                                                                                //     errors
-                                                                                                                //         .facilityCountDetails[
-                                                                                                                //         idx
-                                                                                                                //     ].facilityCodeName
-                                                                                                                //         ? errors
-                                                                                                                //               .facilityCountDetails[
-                                                                                                                //               idx
-                                                                                                                //           ].facilityCodeName
-                                                                                                                //         : ''
-                                                                                                                // }
-                                                                                                                //     error={Boolean(
-                                                                                                                //         touched.facilityCountDetails &&
-                                                                                                                //             touched
-                                                                                                                //                 .facilityCountDetails[
-                                                                                                                //                 idx
-                                                                                                                //             ] &&
-                                                                                                                //             touched
-                                                                                                                //                 .facilityCountDetails[
-                                                                                                                //                 idx
-                                                                                                                //             ]
-                                                                                                                //                 .facilityCodeName &&
-                                                                                                                //             errors.facilityCountDetails &&
-                                                                                                                //             errors
-                                                                                                                //                 .facilityCountDetails[
-                                                                                                                //                 idx
-                                                                                                                //             ] &&
-                                                                                                                //             errors
-                                                                                                                //                 .facilityCountDetails[
-                                                                                                                //                 idx
-                                                                                                                //             ].facilityCodeName
-                                                                                                                //     )}
+                                                                                                                helperText={
+                                                                                                                    touched.facilityCountDetails &&
+                                                                                                                    touched
+                                                                                                                        .facilityCountDetails[
+                                                                                                                        idx
+                                                                                                                    ] &&
+                                                                                                                    touched
+                                                                                                                        .facilityCountDetails[
+                                                                                                                        idx
+                                                                                                                    ].facilityCodeName &&
+                                                                                                                    errors.facilityCountDetails &&
+                                                                                                                    errors
+                                                                                                                        .facilityCountDetails[
+                                                                                                                        idx
+                                                                                                                    ] &&
+                                                                                                                    errors
+                                                                                                                        .facilityCountDetails[
+                                                                                                                        idx
+                                                                                                                    ].facilityCodeName
+                                                                                                                        ? errors
+                                                                                                                              .facilityCountDetails[
+                                                                                                                              idx
+                                                                                                                          ].facilityCodeName
+                                                                                                                        : ''
+                                                                                                                }
+                                                                                                                error={Boolean(
+                                                                                                                    touched.facilityCountDetails &&
+                                                                                                                        touched
+                                                                                                                            .facilityCountDetails[
+                                                                                                                            idx
+                                                                                                                        ] &&
+                                                                                                                        touched
+                                                                                                                            .facilityCountDetails[
+                                                                                                                            idx
+                                                                                                                        ]
+                                                                                                                            .facilityCodeName &&
+                                                                                                                        errors.facilityCountDetails &&
+                                                                                                                        errors
+                                                                                                                            .facilityCountDetails[
+                                                                                                                            idx
+                                                                                                                        ] &&
+                                                                                                                        errors
+                                                                                                                            .facilityCountDetails[
+                                                                                                                            idx
+                                                                                                                        ].facilityCodeName
+                                                                                                                )}
                                                                                                             />
                                                                                                         )}
                                                                                                     />
@@ -837,50 +744,50 @@ function FacilityCounter({ open, handleClose, mode, hotelCode, hotelName, hotel 
                                                                                                             shrink: true
                                                                                                         }}
                                                                                                         disabled={
-                                                                                                            mode == 'VIEW_UPDATE' ||
-                                                                                                            mode == 'VIEW'
+                                                                                                            modeType == 'VIEW_UPDATE' ||
+                                                                                                            modeType == 'VIEW'
                                                                                                         }
                                                                                                         onChange={handleChange}
                                                                                                         onBlur={handleBlur}
                                                                                                         name={`facilityCountDetails.${idx}.count`}
-                                                                                                        // helperText={
-                                                                                                        //     touched.facilityCountDetails &&
-                                                                                                        //     touched.facilityCountDetails[
-                                                                                                        //         idx
-                                                                                                        //     ] &&
-                                                                                                        //     touched.facilityCountDetails[
-                                                                                                        //         idx
-                                                                                                        //     ].count &&
-                                                                                                        //     errors.facilityCountDetails &&
-                                                                                                        //     errors.facilityCountDetails[
-                                                                                                        //         idx
-                                                                                                        //     ] &&
-                                                                                                        //     errors.facilityCountDetails[idx]
-                                                                                                        //         .count
-                                                                                                        //         ? errors
-                                                                                                        //               .facilityCountDetails[
-                                                                                                        //               idx
-                                                                                                        //           ].count
-                                                                                                        //         : ''
-                                                                                                        // }
-                                                                                                        // error={Boolean(
-                                                                                                        //     touched.facilityCountDetails &&
-                                                                                                        //         touched
-                                                                                                        //             .facilityCountDetails[
-                                                                                                        //             idx
-                                                                                                        //         ] &&
-                                                                                                        //         touched
-                                                                                                        //             .facilityCountDetails[
-                                                                                                        //             idx
-                                                                                                        //         ].count &&
-                                                                                                        //         errors.facilityCountDetails &&
-                                                                                                        //         errors.facilityCountDetails[
-                                                                                                        //             idx
-                                                                                                        //         ] &&
-                                                                                                        //         errors.facilityCountDetails[
-                                                                                                        //             idx
-                                                                                                        //         ].count
-                                                                                                        // )}
+                                                                                                        helperText={
+                                                                                                            touched.facilityCountDetails &&
+                                                                                                            touched.facilityCountDetails[
+                                                                                                                idx
+                                                                                                            ] &&
+                                                                                                            touched.facilityCountDetails[
+                                                                                                                idx
+                                                                                                            ].count &&
+                                                                                                            errors.facilityCountDetails &&
+                                                                                                            errors.facilityCountDetails[
+                                                                                                                idx
+                                                                                                            ] &&
+                                                                                                            errors.facilityCountDetails[idx]
+                                                                                                                .count
+                                                                                                                ? errors
+                                                                                                                      .facilityCountDetails[
+                                                                                                                      idx
+                                                                                                                  ].count
+                                                                                                                : ''
+                                                                                                        }
+                                                                                                        error={Boolean(
+                                                                                                            touched.facilityCountDetails &&
+                                                                                                                touched
+                                                                                                                    .facilityCountDetails[
+                                                                                                                    idx
+                                                                                                                ] &&
+                                                                                                                touched
+                                                                                                                    .facilityCountDetails[
+                                                                                                                    idx
+                                                                                                                ].count &&
+                                                                                                                errors.facilityCountDetails &&
+                                                                                                                errors.facilityCountDetails[
+                                                                                                                    idx
+                                                                                                                ] &&
+                                                                                                                errors.facilityCountDetails[
+                                                                                                                    idx
+                                                                                                                ].count
+                                                                                                        )}
                                                                                                         value={
                                                                                                             values.facilityCountDetails[idx]
                                                                                                                 ? values
@@ -920,16 +827,20 @@ function FacilityCounter({ open, handleClose, mode, hotelCode, hotelName, hotel 
                                                                                                         />
                                                                                                     </FormGroup>
                                                                                                 </TableCell>
-                                                                                                <TableCell>
-                                                                                                    <IconButton
-                                                                                                        aria-label="delete"
-                                                                                                        onClick={() => {
-                                                                                                            remove(idx);
-                                                                                                        }}
-                                                                                                    >
-                                                                                                        <HighlightOffIcon />
-                                                                                                    </IconButton>
-                                                                                                </TableCell>
+                                                                                                {modeType == 'INSERT' ? (
+                                                                                                    <TableCell>
+                                                                                                        <IconButton
+                                                                                                            aria-label="delete"
+                                                                                                            onClick={() => {
+                                                                                                                remove(idx);
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            <HighlightOffIcon />
+                                                                                                        </IconButton>
+                                                                                                    </TableCell>
+                                                                                                ) : (
+                                                                                                    ''
+                                                                                                )}
                                                                                             </TableRow>
                                                                                         );
                                                                                     })}
@@ -939,37 +850,7 @@ function FacilityCounter({ open, handleClose, mode, hotelCode, hotelName, hotel 
                                                                     </Paper>
                                                                 )}
                                                             </FieldArray>
-                                                            {openDialogBox ? (
-                                                                <Dialog
-                                                                    open={open}
-                                                                    onClose={handleClose}
-                                                                    aria-labelledby="alert-dialog-title"
-                                                                    aria-describedby="alert-dialog-description"
-                                                                >
-                                                                    <DialogTitle id="alert-dialog-title" style={{ color: 'red' }}>
-                                                                        {'Error Msg'}
-                                                                    </DialogTitle>
-                                                                    <DialogContent>
-                                                                        <DialogContentText id="alert-dialog-description">
-                                                                            to date is lower than sub level to date
-                                                                        </DialogContentText>
-                                                                    </DialogContent>
-                                                                    <DialogActions>
-                                                                        {/* <Button onClick={handleClose}>Disagree</Button> */}
-                                                                        <Button
-                                                                            className="btnSave"
-                                                                            type="button"
-                                                                            onClick={() => {
-                                                                                setOpenDialogBox(false);
-                                                                            }}
-                                                                        >
-                                                                            OK
-                                                                        </Button>
-                                                                    </DialogActions>
-                                                                </Dialog>
-                                                            ) : (
-                                                                ''
-                                                            )}
+
                                                             <Box display="flex" flexDirection="row-reverse" style={{ marginTop: '20px' }}>
                                                                 {mode != 'VIEW' ? (
                                                                     <Button
@@ -1020,22 +901,22 @@ function FacilityCounter({ open, handleClose, mode, hotelCode, hotelName, hotel 
                                                         columns={columns}
                                                         data={tableData}
                                                         actions={[
-                                                            {
-                                                                icon: tableIcons.Add,
-                                                                tooltip: 'Add New',
-                                                                isFreeAction: true,
-                                                                onClick: () => handleClickOpen('INSERT', null)
-                                                            },
+                                                            // {
+                                                            //     icon: tableIcons.Add,
+                                                            //     tooltip: 'Add New',
+                                                            //     isFreeAction: true,
+                                                            //     onClick: () => handleClickOpen('INSERT', null)
+                                                            // },
                                                             (rowData) => ({
                                                                 icon: tableIcons.Edit,
                                                                 tooltip: 'Edit',
                                                                 onClick: () => handleClickOpen('VIEW_UPDATE', rowData)
-                                                            }),
-                                                            (rowData) => ({
-                                                                icon: tableIcons.VisibilityIcon,
-                                                                tooltip: 'Edit',
-                                                                onClick: () => handleClickOpen('VIEW', rowData)
                                                             })
+                                                            // (rowData) => ({
+                                                            //     icon: tableIcons.VisibilityIcon,
+                                                            //     tooltip: 'Edit',
+                                                            //     onClick: () => handleClickOpen('VIEW', rowData)
+                                                            // })
                                                         ]}
                                                         options={{
                                                             padding: 'dense',

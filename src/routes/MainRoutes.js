@@ -39,6 +39,7 @@ import TransportMainScreen from 'views/pages/master/transportMaster/transportMai
 import AuthGuard from 'utils/route-guard/AuthGuard';
 import FacilityCounter from 'views/pages/master/hotelMaster/facility_count/FacilityCount';
 import ViewRoomBuyingRate from 'views/pages/master/hotelMaster/RoomBuyingRates/ViewRoomBuyingRate';
+import Landing from 'views/pages/landing';
 // dashboard routing
 const DashboardDefault = Loadable(lazy(() => import('views/dashboard/Default')));
 

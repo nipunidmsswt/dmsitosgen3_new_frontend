@@ -22,6 +22,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import SuccessMsg from 'messages/SuccessMsg';
 import ErrorMsg from 'messages/ErrorMsg';
+import './slider/Slider.scss';
+import { sliderData } from './slider/slider-data';
 
 function Copyright(props) {
     return (
@@ -98,6 +100,38 @@ export default function Login() {
 
     const MINUTE_MS = 10000;
 
+    const [currentSlide, setCurrentSlide] = useState(0);
+    const slideLength = sliderData.length;
+
+    const autoScroll = true;
+    let slideInterval;
+    let intervalTime = 5000;
+
+    const nextSlide = () => {
+        setCurrentSlide(currentSlide === slideLength - 1 ? 0 : currentSlide + 1);
+        console.log('next');
+    };
+
+    const prevSlide = () => {
+        setCurrentSlide(currentSlide === 0 ? slideLength - 1 : currentSlide - 1);
+        console.log('prev');
+    };
+
+    function auto() {
+        slideInterval = setInterval(nextSlide, intervalTime);
+    }
+
+    useEffect(() => {
+        setCurrentSlide(0);
+    }, []);
+
+    useEffect(() => {
+        if (autoScroll) {
+            auto();
+        }
+        return () => clearInterval(slideInterval);
+    }, [currentSlide]);
+
     // useEffect(() => {
     //     const urlsss = ["https://images.unsplash.com/photo-1674428431800-399f847e5322?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=387&q=80"],
 
@@ -113,19 +147,38 @@ export default function Login() {
         <ThemeProvider theme={theme}>
             <Grid container sx={{ height: '100vh' }}>
                 <CssBaseline />
+                <Grid item sm={4} md={7} xs={false}>
+                    {' '}
+                    {sliderData.map((slide, index) => {
+                        return (
+                            <div className={index === currentSlide ? 'slide current' : 'slide'} key={index}>
+                                {index === currentSlide && (
+                                    <div>
+                                        <img
+                                            height="auto"
+                                            src={slide.image}
+                                            alt="slide"
+                                            // sx={{ backgroundSize: 'cover', backgroundPosition: 'center', height: '150vh' }}
+                                        />
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    })}
+                </Grid>
                 <Grid
-                    item
-                    xs={false}
-                    sm={4}
-                    md={7}
-                    sx={{
-                        backgroundImage:
-                            'url(https://images.unsplash.com/photo-1530521954074-e64f6810b32d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=870&q=80)',
-                        backgroundRepeat: 'no-repeat',
-                        backgroundColor: (t) => (t.palette.mode === 'light' ? t.palette.grey[50] : t.palette.grey[900]),
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'center'
-                    }}
+                // item
+                // xs={false}
+                // sm={4}
+                // md={7}
+                // sx={{
+                //     backgroundImage:
+                //         'url(https://images.unsplash.com/photo-1530521954074-e64f6810b32d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=870&q=80)',
+                //     backgroundRepeat: 'no-repeat',
+                //     backgroundColor: (t) => (t.palette.mode === 'light' ? t.palette.grey[50] : t.palette.grey[900]),
+                //     backgroundSize: 'cover',
+                //     backgroundPosition: 'center'
+                // }}
                 />
                 <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
                     <Formik
