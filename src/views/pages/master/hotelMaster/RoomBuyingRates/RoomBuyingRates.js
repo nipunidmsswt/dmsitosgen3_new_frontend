@@ -44,7 +44,8 @@ import {
     saveRoomBuyingRateData,
     getRoomBuyingRateDataById,
     updateRoomBuyingRateData,
-    clearRoomBuyingRate
+    clearRoomBuyingRate,
+    checkDuplicateRoomBuyingRateCode
 } from 'store/actions/masterActions/RoomBuyongRateAction';
 import ArticleIcon from '@mui/icons-material/Article';
 import ShowTaxDetails from './ShowTaxDetails';
@@ -340,37 +341,9 @@ function RoomBuyingRates(props) {
                 guideRate: '',
                 status: roomBuyingRateToUpdate.status,
                 ratesDetails: roomBuyingRateToUpdate.ratesDetails,
-                //     {
-                //         guestDetailsId: roomBuyingRateToUpdate.guestDetailsId,
-                //         roomCategory: roomBuyingRateToUpdate.roomCategory,
-                //         basis: roomBuyingRateToUpdate.basis,
-                //         singleRate: roomBuyingRateToUpdate.singleRate,
-                //         doubleRate: roomBuyingRateToUpdate.doubleRate,
-                //         trippleRate: roomBuyingRateToUpdate.trippleRate,
-                //         family: roomBuyingRateToUpdate.family,
-                //         child: roomBuyingRateToUpdate.child,
-                //         taxApplicable: roomBuyingRateToUpdate.taxApplicable,
-                //         rateStatus: roomBuyingRateToUpdate.rateStatus,
-                //         singleRateAmountWithTax: roomBuyingRateToUpdate.singleRateAmountWithTax,
-                //         doubleRateAmountWithTax: roomBuyingRateToUpdate.doubleRateAmountWithTax,
-                //         tripleRateAmountWithTax: roomBuyingRateToUpdate.tripleRateAmountWithTax,
-                //         familyRateAmountWithTax: roomBuyingRateToUpdate.familyRateAmountWithTax,
-                //         childRateAmountWithTax: roomBuyingRateToUpdate.childRateAmountWithTax
-                //     }
-                // ],
+
                 tourGuideDetails: roomBuyingRateToUpdate.tourGuideDetails,
-                //  [
-                //     {
-                //         guideDetailsId: roomBuyingRateToUpdate.guideDetailsId,
-                //         guideBasis: roomBuyingRateToUpdate.guideBasis,
-                //         guideRate: roomBuyingRateToUpdate.guideRate,
-                //         tourLeadRate: roomBuyingRateToUpdate.tourLeadRate,
-                //         taxApplicableGuide: roomBuyingRateToUpdate.taxApplicableGuide,
-                //         guideStatus: roomBuyingRateToUpdate.guideStatus,
-                //         guideRateAmountWithTax: roomBuyingRateToUpdate.guideRateAmountWithTax,
-                //         tourLeadRateAmountWithTaxtourLeadValue: roomBuyingRateToUpdate.tourLeadRateAmountWithTaxtourLeadValue
-                //     }
-                // ],
+
                 ignoreValidation: false,
                 status: true
             });
@@ -721,6 +694,19 @@ function RoomBuyingRates(props) {
         }
         return error;
     }
+    const validate = (values) => {
+        console.log(values);
+        delete values.hotelCode.createdDate;
+        delete values.hotelCode.updatedDate;
+        let data = {
+            hotelCode: values.hotelCode,
+            operatorGpCode: values.operatorGpCode,
+            operatorCode: values.operatorCode,
+            season: values.season,
+            ratePeriod: values.ratePeriod
+        };
+        dispatch(checkDuplicateRoomBuyingRateCode(data));
+    };
 
     return (
         <div>
@@ -732,6 +718,7 @@ function RoomBuyingRates(props) {
                                 enableReinitialize={true}
                                 initialValues={mmObject || newobj}
                                 innerRef={formikRef}
+                                validate={validate}
                                 // onSubmit={(values) => {
                                 //     handleFinalSubmit(values);
                                 // }}
@@ -2329,12 +2316,12 @@ function RoomBuyingRates(props) {
                                                             // handleFinalSubmit(values);
                                                             //
 
-                                                            setTouched({ operatorGpCode: true, season: true, ratePeriod: true }).then(
-                                                                () => {
-                                                                    console.log(formikRef);
-                                                                    console.log(formikRef.current.errors);
-                                                                }
-                                                            );
+                                                            // setTouched({ operatorGpCode: true, season: true, ratePeriod: true }).then(
+                                                            //     () => {
+                                                            //         console.log(formikRef);
+                                                            //         console.log(formikRef.current.errors);
+                                                            //     }
+                                                            // );
                                                         }}
                                                     >
                                                         {mode === 'INSERT' ? 'SAVE' : 'UPDATE'}

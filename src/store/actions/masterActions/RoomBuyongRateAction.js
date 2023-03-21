@@ -42,10 +42,10 @@ export const updateRoomBuyingRateData = (data) => {
     };
 };
 
-export const checkDuplicateRoomBuyingRateCode = (RoomBuyingRateCode) => {
+export const checkDuplicateRoomBuyingRateCode = (data) => {
     return {
         type: CHECK_ROOM_BUYING_RATE_CODE_DUPLICATE,
-        data: { RoomBuyingRateCode }
+        data: { data }
     };
 };
 

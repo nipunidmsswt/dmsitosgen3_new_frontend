@@ -9,7 +9,7 @@ import {
     FAILED_ROOM_BUYING_RATE_LIST_DATA,
     SUCCESS_GET_ROOM_BUYING_RATE_BY_ID,
     FAILED_GET_ROOM_BUYING_RATE_BY_ID,
-    CHECK_ROOM_BUYING_RATE_CODE_DUPLICATE,
+    ROOM_BUYING_RATE_CODE_DUPLICATE,
     SUCCESS_ROOM_BUYING_RATE_LAST_MODIFIED_DATE,
     FAILED_ROOM_BUYING_RATE_LAST_MODIFIED_DATE,
     SUCCESS_GET_ROOM_BUYING_RATE_LIST_BY_HOTEL,
@@ -81,15 +81,15 @@ export function* getAllRoomBuyingRateSaga() {
 
 export function* checkDupicateRoomBuyingRateSaga(action) {
     console.log(action);
-
+    action.data.data.path = `${process.env.REACT_APP_ACCOMODATION_URL}/checkRoomBuyingRate`;
     let responseData = [];
     try {
-        responseData = yield call(getById, `${process.env.REACT_APP_ACCOMODATION_URL}/sessionCheck/${action.data.taxCode}`);
+        responseData = yield call(create, action.data.data);
         console.log(responseData);
-        yield put({ type: CHECK_ROOM_BUYING_RATE_CODE_DUPLICATE, data: responseData.data });
+        yield put({ type: ROOM_BUYING_RATE_CODE_DUPLICATE, data: responseData.data });
     } catch (e) {
         console.log(responseData);
-        yield put({ type: CHECK_ROOM_BUYING_RATE_CODE_DUPLICATE, data: responseData });
+        yield put({ type: ROOM_BUYING_RATE_CODE_DUPLICATE, data: responseData });
     }
 }
 
