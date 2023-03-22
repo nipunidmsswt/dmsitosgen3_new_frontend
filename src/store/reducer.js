@@ -35,7 +35,7 @@ import { bankReducer } from './reducers/masterReducer/BankReducer';
 import { branchReducer } from './reducers/masterReducer/BranchReducer';
 import { hotelMainReducer } from './reducers/masterReducer/HotelMainReducer';
 import { bankDetailReducer } from './reducers/masterReducer/BankDetailsReducer';
-import { MainTransportCategoryReducer } from './reducers/masterReducer/transportReducer/MainTransportDetailsReducer';
+import { mainTransportCategoryReducer } from './reducers/masterReducer/transportReducer/MainTransportDetailsReducer';
 import { facilityCountReducer } from './reducers/masterReducer/FacilityCountReducer';
 
 // ==============================|| COMBINE REDUCER ||============================== //
@@ -78,7 +78,7 @@ const reducer = combineReducers({
     branchReducer,
     hotelMainReducer,
     bankDetailReducer,
-    MainTransportCategoryReducer,
+    mainTransportCategoryReducer,
     facilityCountReducer
 });
 

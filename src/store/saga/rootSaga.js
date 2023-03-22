@@ -406,7 +406,8 @@ import {
     FORGOT_PASSWORD_CREDENTIALS,
     RESET_PASSWORD_CREDENTIALS,
     GET_PROFILE_DATA_BY_ID,
-    UPDATE_MY_PROFILE
+    UPDATE_MY_PROFILE,
+    CLEAR_USER
 } from 'store/constant/authentication/UserConstant';
 import {
     checkDupicateUserSaga,
@@ -421,7 +422,8 @@ import {
     forgotPasswordSaga,
     resetPasswordSaga,
     getProfileDataByIdSaga,
-    updateMyProfileData
+    updateMyProfileData,
+    clearUserDataSaga
 } from './authenticationSaga/UserSaga';
 
 import {
@@ -591,6 +593,24 @@ import {
     saveFacilityCountSaga,
     updateFacilityCountSaga
 } from './mastersaga/FacilityCountSaga';
+import {
+    CHECK_MAIN_TRANSPORT_DETAILS_DUPLICATE,
+    GET_ALL_MAIN_TRANSPORT_DETAILS_DATA,
+    GET_LAST_MODIFIED_DATE_TIME_MAIN_TRANSPORT_DETAILS,
+    GET_MAIN_TRANSPORT_DETAILS_BY_ID,
+    GET_TRANSPORT_MAIN_CATEGORY_DATA_BY_TYPE,
+    SAVE_MAIN_TRANSPORT_DETAILS_DATA,
+    UPDATE_MAIN_TRANSPORT_DETAILS_DATA
+} from 'store/constant/master/TransportMasterConstant/MainTransportCategoryConstant';
+import {
+    checkDupicateMainTransportCategoriesSaga,
+    checkLatestMainTransportCategoriesModifiedDateSaga,
+    getAllMainTransportCategoriesSaga,
+    getMainTransportCategoriesByIdSaga,
+    getTransportMainCategoryDataByTypeSaga,
+    saveMainTransportCategoriesSaga,
+    updateMainTransportCategoriesSaga
+} from './mastersaga/transportSaga/MainTransportCategorySaga';
 export function* wacherSaga() {
     // tax setup
     yield takeLatest(SAVE_TAX_DATA, saveTaxSaga);
@@ -817,6 +837,7 @@ export function* wacherSaga() {
     yield takeLatest(GET_ACTIVE_USERS, getAllActiveUsers);
     yield takeLatest(GET_ALL_USER_ROLES, getAllRolesSaga);
     yield takeLatest(GET_PROFILE_DATA_BY_ID, getProfileDataByIdSaga);
+    yield takeLatest(CLEAR_USER, clearUserDataSaga);
 
     //company profile
     yield takeLatest(SAVE_COMPANY_PROFILE, saveCompanyProfileSaga);
@@ -922,4 +943,14 @@ export function* wacherSaga() {
     // yield takeLatest(CHECK_HOTEL_CATEGORY_DUPLICATE, checkDupicateHotelCateogryCodeSaga);
     yield takeLatest(GET_FACILITYCOUNTER_LAST_MODIFIED_DATE_TIME, checkLatestFacilityCountModifiedDateSaga);
     // yield takeLatest(GET_ALL_ACTIVE_HOTEL_CATEGORY_DATA, getAllActiveHotelCateogrySaga);
+
+    //transport category
+
+    yield takeLatest(SAVE_MAIN_TRANSPORT_DETAILS_DATA, saveMainTransportCategoriesSaga);
+    yield takeLatest(GET_MAIN_TRANSPORT_DETAILS_BY_ID, getMainTransportCategoriesByIdSaga);
+    yield takeLatest(GET_ALL_MAIN_TRANSPORT_DETAILS_DATA, getAllMainTransportCategoriesSaga);
+    yield takeLatest(UPDATE_MAIN_TRANSPORT_DETAILS_DATA, updateMainTransportCategoriesSaga);
+    yield takeLatest(CHECK_MAIN_TRANSPORT_DETAILS_DUPLICATE, checkDupicateMainTransportCategoriesSaga);
+    yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_MAIN_TRANSPORT_DETAILS, checkLatestMainTransportCategoriesModifiedDateSaga);
+    yield takeLatest(GET_TRANSPORT_MAIN_CATEGORY_DATA_BY_TYPE, getTransportMainCategoryDataByTypeSaga);
 }

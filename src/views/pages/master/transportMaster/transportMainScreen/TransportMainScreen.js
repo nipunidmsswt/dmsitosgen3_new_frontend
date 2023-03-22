@@ -103,6 +103,7 @@ function TransportMainScreen() {
 
     const dataToTableView = useSelector((state) => state.codeAndNameReducer.dataToTableView);
     const agentData = useSelector((state) => state.agentReducer.agent);
+    const mainTransportDetail = useSelector((state) => state.mainTransportCategoryReducer.mainTransportDetail);
 
     const handleClickOpenAgentForm = (code, marketCode) => {
         console.log('market Code:' + marketCode);
@@ -176,14 +177,14 @@ function TransportMainScreen() {
     }, [operatorMappingWithMarket]);
 
     useEffect(() => {
-        if (codeAndNameData != null) {
+        if (mainTransportDetail != null) {
             setHandleToast(true);
 
             // dispatch(getAllCodeAndNameDetails());
             // dispatch(getLatestModifiedDetails());
         } else {
         }
-    }, [codeAndNameData]);
+    }, [mainTransportDetail]);
 
     useEffect(() => {
         if (agentData != null) {
@@ -211,11 +212,11 @@ function TransportMainScreen() {
         }
     }, [marketOperatorMappingData]);
 
-    useEffect(() => {
-        if (clusterListData != null) {
-            setClusterListOptions(clusterListData);
-        }
-    }, [clusterListData]);
+    // useEffect(() => {
+    //     if (clusterListData != null) {
+    //         setClusterListOptions(clusterListData);
+    //     }
+    // }, [clusterListData]);
 
     useEffect(() => {
         if (error != null) {
@@ -228,9 +229,9 @@ function TransportMainScreen() {
     }, [marketListData]);
 
     useEffect(() => {
-        dispatch(getAllClusterData());
-        dispatch(getAllActiveMarketData());
-        dispatch(getAllActiveOperatorData());
+        // dispatch(getAllClusterData());
+        // dispatch(getAllActiveMarketData());
+        // dispatch(getAllActiveOperatorData());
         // dispatch(getAllMarketAndOperatorForCluster());
     }, []);
 
@@ -280,9 +281,9 @@ function TransportMainScreen() {
     const handleClose = () => {
         setOpen(false);
         setAgentOpen(false);
-        dispatch(getAllClusterData());
-        dispatch(getAllActiveMarketData());
-        dispatch(getAllActiveOperatorData());
+        // dispatch(getAllClusterData());
+        // dispatch(getAllActiveMarketData());
+        // dispatch(getAllActiveOperatorData());
     };
 
     const loadExisitngMarketCodesForCluster = (value) => {
@@ -322,12 +323,19 @@ function TransportMainScreen() {
                             <Grid item xs={12}>
                                 <Accordion square>
                                     <AccordionSummary
+                                        style={{ background: 'linear-gradient(to right bottom, #516a9f, #1877f2)' }}
                                         classes={{ content: classes.content }}
                                         expandIcon={<ExpandMoreIcon />}
                                         aria-controls="panel1a-content"
                                         id="panel1a-header"
                                     >
-                                        <Typography>Distances Details</Typography>
+                                        <Typography
+                                            sx={{
+                                                color: 'white'
+                                            }}
+                                        >
+                                            Distances Details
+                                        </Typography>
                                     </AccordionSummary>
                                     <AccordionDetails>
                                         <DistancesDetails mode={mode}></DistancesDetails>
@@ -336,53 +344,88 @@ function TransportMainScreen() {
 
                                 <Accordion square>
                                     <AccordionSummary
+                                        style={{ background: 'linear-gradient(to right bottom, #516a9f, #1877f2)' }}
                                         classes={{ content: classes.content }}
                                         expandIcon={<ExpandMoreIcon />}
                                         aria-controls="panel2a-content"
                                         id="panel2a-header"
                                     >
-                                        <Typography>Pax vise Rates (Per Day)</Typography>
+                                        <Typography
+                                            sx={{
+                                                color: 'white'
+                                            }}
+                                        >
+                                            Pax vise Rates (Per Day)
+                                        </Typography>
                                     </AccordionSummary>
                                 </Accordion>
                                 <Accordion square>
                                     <AccordionSummary
+                                        style={{ background: 'linear-gradient(to right bottom, #516a9f, #1877f2)' }}
                                         classes={{ content: classes.content }}
                                         expandIcon={<ExpandMoreIcon />}
                                         aria-controls="panel2a-content"
                                         id="panel2a-header"
                                     >
-                                        <Typography>Baggage Transport Rates</Typography>
+                                        <Typography
+                                            sx={{
+                                                color: 'white'
+                                            }}
+                                        >
+                                            Baggage Transport Rates
+                                        </Typography>
                                     </AccordionSummary>
                                 </Accordion>
                                 <Accordion square>
                                     <AccordionSummary
+                                        style={{ background: 'linear-gradient(to right bottom, #516a9f, #1877f2)' }}
                                         classes={{ content: classes.content }}
                                         expandIcon={<ExpandMoreIcon />}
                                         aria-controls="panel2a-content"
                                         id="panel2a-header"
                                     >
-                                        <Typography>Per km Rates</Typography>
+                                        <Typography
+                                            sx={{
+                                                color: 'white'
+                                            }}
+                                        >
+                                            Per km Rates
+                                        </Typography>
                                     </AccordionSummary>
                                 </Accordion>
 
                                 <Accordion square>
                                     <AccordionSummary
+                                        style={{ background: 'linear-gradient(to right bottom, #516a9f, #1877f2)' }}
                                         classes={{ content: classes.content }}
                                         expandIcon={<ExpandMoreIcon />}
                                         aria-controls="panel2a-content"
                                         id="panel2a-header"
                                     >
-                                        <Typography>Per hour Rates</Typography>
+                                        <Typography
+                                            sx={{
+                                                color: 'white'
+                                            }}
+                                        >
+                                            Per hour Rates
+                                        </Typography>
                                     </AccordionSummary>
                                 </Accordion>
                                 <Accordion square>
                                     <AccordionSummary
+                                        style={{ background: 'linear-gradient(to right bottom, #516a9f, #1877f2)' }}
                                         classes={{ content: classes.content }}
                                         expandIcon={<ExpandMoreIcon />}
                                         aria-controls="panel2a-content"
                                         id="panel2a-header"
                                     >
-                                        <Typography>Reant a car</Typography>
+                                        <Typography
+                                            sx={{
+                                                color: 'white'
+                                            }}
+                                        >
+                                            Reant a car
+                                        </Typography>
                                     </AccordionSummary>
                                 </Accordion>
                                 {openAgent ? (

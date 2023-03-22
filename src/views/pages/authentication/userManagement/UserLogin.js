@@ -386,7 +386,8 @@ const Login = () => {
     }, [error]);
 
     useEffect(() => {
-        if (loggedUserData !== null && localStorage.getItem('status') !== 'logOut') {
+        // if (loggedUserData !== null && localStorage.getItem('status') !== 'logOut') {
+        if (loggedUserData !== null) {
             localStorage.setItem('userData', JSON.stringify(loggedUserData.user));
             localStorage.setItem('token', JSON.stringify(loggedUserData.token));
             localStorage.setItem('status', 'logIn');
