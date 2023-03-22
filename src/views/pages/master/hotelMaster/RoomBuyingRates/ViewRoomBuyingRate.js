@@ -6,7 +6,7 @@ import tableIcons from 'utils/MaterialTableIcons';
 import { gridSpacing } from 'store/constant';
 import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { getRoomBuyingRatesByHotel } from 'store/actions/masterActions/RoomBuyongRateAction';
+import { getRoomBuyingRatesByHotel, getLatestModifiedDetails } from 'store/actions/masterActions/RoomBuyongRateAction';
 import SuccessMsg from 'messages/SuccessMsg';
 import ErrorMsg from 'messages/ErrorMsg';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -96,7 +96,7 @@ const ViewRoomBuyingRate = () => {
 
     const branchData = useSelector((state) => state.branchReducer.branch);
     const roomBuyingRateByHotelList = useSelector((state) => state.roomBuyingRateReducer.roomBuyingRateByHotel);
-    // const lastModifiedDate = useSelector((state) => state.RoomBuyingRateReducer.lastModifiedDateTime);
+    const lastModifiedDate = useSelector((state) => state.roomBuyingRateReducer.lastModifiedDateTime);
 
     const navigate = useNavigate();
     let location = useLocation();
@@ -131,24 +131,24 @@ const ViewRoomBuyingRate = () => {
     }, [error]);
 
     useEffect(() => {
-        // dispatch(getLatestModifiedBranchDetails());
+        dispatch(getLatestModifiedDetails());
     }, []);
 
-    // useEffect(() => {
-    //     console.log(lastModifiedDate);
-    //     setLastModifiedTimeDate(
-    //         lastModifiedDate === null
-    //             ? ''
-    //             : new Date(lastModifiedDate).toLocaleString('en-GB', {
-    //                   year: 'numeric',
-    //                   month: 'long',
-    //                   day: '2-digit',
-    //                   hour: 'numeric',
-    //                   minute: 'numeric',
-    //                   hour12: true
-    //               })
-    //     );
-    // }, [lastModifiedDate]);
+    useEffect(() => {
+        console.log(lastModifiedDate);
+        setLastModifiedTimeDate(
+            lastModifiedDate === null
+                ? ''
+                : new Date(lastModifiedDate).toLocaleString('en-GB', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: '2-digit',
+                      hour: 'numeric',
+                      minute: 'numeric',
+                      hour12: true
+                  })
+        );
+    }, [lastModifiedDate]);
 
     const handleClickOpen = (type, data) => {
         if (type === 'VIEW_UPDATE') {

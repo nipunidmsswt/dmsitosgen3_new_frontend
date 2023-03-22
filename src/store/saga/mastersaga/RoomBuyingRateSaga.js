@@ -96,7 +96,7 @@ export function* checkDupicateRoomBuyingRateSaga(action) {
 export function* checkLatestRoomBuyingRateModifiedDateSaga() {
     let responseData = [];
     try {
-        responseData = yield call(get, `${process.env.REACT_APP_ACCOMODATION_URL}/RoomBuyingRate/lastModifiedTime`);
+        responseData = yield call(get, `${process.env.REACT_APP_ACCOMODATION_URL}/roomBuyingRates/lastModified`);
         console.log('response data last:' + responseData);
         yield put({
             type: SUCCESS_ROOM_BUYING_RATE_LAST_MODIFIED_DATE,

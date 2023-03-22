@@ -52,12 +52,12 @@ export const roomBuyingRateReducer = (state = initialState, action) => {
             };
 
         case UPDATE_SUCCESS_ROOM_BUYING_RATE:
-            return { ...state, roomBuyingRates: data.payload[0] };
+            return { ...state, roomBuyingRate: data.payload[0] };
 
         case UPDATE_FAILED_ROOM_BUYING_RATE:
             return {
                 ...state,
-                roomBuyingRates: null,
+                roomBuyingRate: null,
                 errorMsg: data ? data.errorMessages : 'netwok error'
             };
 

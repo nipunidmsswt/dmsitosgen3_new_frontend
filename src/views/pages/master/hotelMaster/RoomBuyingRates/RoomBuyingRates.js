@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
-import { useLocation } from 'react-router-dom';
 import {
     Grid,
     FormGroup,
@@ -53,7 +52,8 @@ import { withStyles } from '@material-ui/core/styles';
 import SuccessMsg from 'messages/SuccessMsg';
 import ErrorMsg from 'messages/ErrorMsg';
 import ExitAlert from 'messages/ExitAlert';
-
+import AlertItemExist from 'messages/AlertItemExist';
+import { useNavigate, useLocation } from 'react-router-dom';
 const styles = (theme) => ({
     root: {
         width: '100%',
@@ -149,6 +149,7 @@ function RoomBuyingRates(props) {
     const [lastModifiedTimeDate, setLastModifiedTimeDate] = useState(null);
     const [hotelData, setHotelData] = useState([]);
     const [openModal, setOpenModal] = useState(false);
+    const [existOpenModal, setExistOpenModal] = useState(false);
 
     const pages = [5, 10, 25];
     const [page, setPage] = useState(0);
@@ -169,10 +170,10 @@ function RoomBuyingRates(props) {
     const roomBuyingRateToUpdate = useSelector((state) => state.roomBuyingRateReducer.roomBuyingRateToUpdate);
     const roomBuyingRate = useSelector((state) => state.roomBuyingRateReducer.roomBuyingRate);
     let location = useLocation();
-
+    const navigate = useNavigate();
     useEffect(() => {
         console.log('roomBuyingRate roomBuyingRate roomBuyingRate');
-        if (roomBuyingRate) {
+        if (roomBuyingRate && mode === 'INSERT') {
             console.log('roomBuyingRate roomBuyingRate roomBuyingRate');
             console.log(roomBuyingRate);
             setnewobj({
@@ -236,6 +237,9 @@ function RoomBuyingRates(props) {
             setHandleToast(true);
             setOpenModal(true);
             dispatch(clearRoomBuyingRate());
+        } else if (roomBuyingRate && mode === 'VIEW_UPDATE') {
+            console.log('heyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy');
+            setHandleToast(true);
         }
     }, [roomBuyingRate]);
 
@@ -312,7 +316,7 @@ function RoomBuyingRates(props) {
     useEffect(() => {
         console.log('roomBuyingRateToUpdate roomBuyingRateToUpdate roomBuyingRateToUpdate');
         console.log(roomBuyingRateToUpdate);
-
+        console.log(mode);
         if (roomBuyingRateToUpdate !== null && mode !== 'INSERT') {
             setnewobj({
                 hotelCode: location.state.data.hotelCode,
@@ -321,7 +325,7 @@ function RoomBuyingRates(props) {
                 operatorGpCode: roomBuyingRateToUpdate.operatorGpCode,
                 operatorCode: roomBuyingRateToUpdate.operatorCode,
                 season: roomBuyingRateToUpdate.season,
-                ratePeriod: roomBuyingRateToUpdate.ratePeriod,
+                ratePeriod: roomBuyingRateToUpdate.seasonDetails,
                 fromDate: roomBuyingRateToUpdate.fromDate,
                 toDate: roomBuyingRateToUpdate.toDate,
                 taxGpCode: roomBuyingRateToUpdate.taxGpCode,
@@ -344,9 +348,9 @@ function RoomBuyingRates(props) {
 
                 tourGuideDetails: roomBuyingRateToUpdate.tourGuideDetails,
 
-                ignoreValidation: false,
-                status: true
+                ignoreValidation: false
             });
+        } else {
         }
     }, [roomBuyingRateToUpdate]);
 
@@ -595,11 +599,22 @@ function RoomBuyingRates(props) {
             tourGuideDetails: formValues.tourGuideDetails
         };
         console.log(mmObject.ratesDetails);
+
+        // mmObject.ratesDetails?.map((s) => {
+        //     console.log(s);
+        //     if (s.roomCategory !== null) {
+        //         initialValuesNew.ratesDetails.push(s);
+        //     }
+        // });
         mmObject.ratesDetails?.map((s) => {
+            console.log(s);
             if (s.roomCategory !== null) {
-                initialValuesNew.ratesDetails.push(s);
+                s.roomCategory.id === values.roomCategory.id && s.basis.id === values.basis.id
+                    ? setExistOpenModal(true)
+                    : initialValuesNew.ratesDetails.push(s);
             }
         });
+
         console.log(initialValuesNew);
         setnewobj(initialValuesNew);
     };
@@ -666,12 +681,16 @@ function RoomBuyingRates(props) {
                 }
             ]
         };
+        // mmObject.tourGuideDetails?.map((s) => {
+        //     if (s.guideBasis !== null) {
+        //         initialValuesNew.tourGuideDetails.push(s);
+        //     }
+        // });
         mmObject.tourGuideDetails?.map((s) => {
             if (s.guideBasis !== null) {
-                initialValuesNew.tourGuideDetails.push(s);
+                s.guideBasis.id === values.guideBasis.id ? setExistOpenModal(true) : initialValuesNew.tourGuideDetails.push(s);
             }
         });
-
         setnewobj(initialValuesNew);
     };
 
@@ -686,7 +705,7 @@ function RoomBuyingRates(props) {
         }
     };
 
-    function validateEmail(value) {
+    function requiredValidation(value) {
         console.log(value);
         let error;
         if (!value) {
@@ -705,9 +724,12 @@ function RoomBuyingRates(props) {
             season: values.season,
             ratePeriod: values.ratePeriod
         };
-        dispatch(checkDuplicateRoomBuyingRateCode(data));
+        // dispatch(checkDuplicateRoomBuyingRateCode(data));
     };
 
+    const handleExistModalClose = () => {
+        setExistOpenModal(false);
+    };
     return (
         <div>
             <MainCard title="Room Buying Rates">
@@ -835,6 +857,19 @@ function RoomBuyingRates(props) {
                                                             />
                                                         </FormGroup>
                                                     </Grid>
+                                                    <Grid item style={{ marginLeft: '500px' }}>
+                                                        {' '}
+                                                        <Button
+                                                            className="btnSave"
+                                                            variant="contained"
+                                                            type="button"
+                                                            onClick={() => {
+                                                                navigate('/master/hotelview');
+                                                            }}
+                                                        >
+                                                            {'Hotel Master'}
+                                                        </Button>
+                                                    </Grid>
                                                 </Grid>
                                             </div>
                                             <hr />
@@ -873,9 +908,7 @@ function RoomBuyingRates(props) {
                                                                             height: 41
                                                                         }
                                                                     }}
-                                                                    validate={(value) => {
-                                                                        validateEmail(value);
-                                                                    }}
+                                                                    validate={requiredValidation}
                                                                     InputLabelProps={{
                                                                         shrink: true
                                                                     }}
@@ -886,6 +919,7 @@ function RoomBuyingRates(props) {
                                                                             : ''
                                                                     }
                                                                     // placeholder="--Select a Manager Code --"
+
                                                                     variant="outlined"
                                                                     name="operatorGpCode"
                                                                     onBlur={handleBlur}
@@ -950,7 +984,7 @@ function RoomBuyingRates(props) {
                                                             InputLabelProps={{
                                                                 shrink: true
                                                             }}
-                                                            validate={validateEmail}
+                                                            validate={requiredValidation}
                                                             options={activeSeasonList}
                                                             getOptionLabel={(option) => `${option.mainSeason}`}
                                                             isOptionEqualToValue={(option, value) => option.seasonId === value.seasonId}
@@ -968,7 +1002,7 @@ function RoomBuyingRates(props) {
                                                                     InputLabelProps={{
                                                                         shrink: true
                                                                     }}
-                                                                    validate={validateEmail}
+                                                                    validate={requiredValidation}
                                                                     error={Boolean(touched.season && errors.season)}
                                                                     helperText={touched.season && errors.season ? errors.season : ''}
                                                                     // placeholder="--Select a Manager Code --"
@@ -993,8 +1027,11 @@ function RoomBuyingRates(props) {
                                                             onChange={(_, value) => {
                                                                 console.log(value);
                                                                 setFieldValue(`ratePeriod`, value);
-                                                                setFieldValue(`fromDate`, value.fromDate);
-                                                                setFieldValue(`toDate`, value.toDate);
+
+                                                                if (value !== null) {
+                                                                    setFieldValue(`fromDate`, value.fromDate);
+                                                                    setFieldValue(`toDate`, value.toDate);
+                                                                }
                                                             }}
                                                             InputLabelProps={{
                                                                 shrink: true
@@ -1018,7 +1055,7 @@ function RoomBuyingRates(props) {
                                                                     InputLabelProps={{
                                                                         shrink: true
                                                                     }}
-                                                                    validate={validateEmail}
+                                                                    validate={requiredValidation}
                                                                     error={Boolean(touched.ratePeriod && errors.ratePeriod)}
                                                                     helperText={
                                                                         touched.ratePeriod && errors.ratePeriod ? errors.ratePeriod : ''
@@ -1076,7 +1113,6 @@ function RoomBuyingRates(props) {
                                                             <DatePicker
                                                                 disabled={mode != 'INSERT'}
                                                                 onChange={(value) => {
-                                                                    let idx = 0;
                                                                     setFieldValue(`toDate`, value);
                                                                 }}
                                                                 inputFormat="DD/MM/YYYY"
@@ -1154,7 +1190,8 @@ function RoomBuyingRates(props) {
                                                     </Grid>
 
                                                     <Grid item>
-                                                        <Autocomplete
+                                                        <Field
+                                                            as={Autocomplete}
                                                             value={values.currency}
                                                             name="currency"
                                                             onChange={(_, value) => {
@@ -1170,7 +1207,8 @@ function RoomBuyingRates(props) {
                                                                 option.currencyListId === value.currencyListId
                                                             }
                                                             renderInput={(params) => (
-                                                                <TextField
+                                                                <Field
+                                                                    as={TextField}
                                                                     {...params}
                                                                     // label="tax"
                                                                     sx={{
@@ -1184,6 +1222,7 @@ function RoomBuyingRates(props) {
                                                                     }}
                                                                     label="Currency"
                                                                     variant="outlined"
+                                                                    validate={requiredValidation}
                                                                     name="currency"
                                                                     onBlur={handleBlur}
                                                                     error={Boolean(touched.currency && errors.currency)}
@@ -1228,6 +1267,7 @@ function RoomBuyingRates(props) {
                                                                     InputLabelProps={{
                                                                         shrink: true
                                                                     }}
+                                                                    validate={requiredValidation}
                                                                     error={Boolean(touched.roomCategory && errors.roomCategory)}
                                                                     helperText={
                                                                         touched.roomCategory && errors.roomCategory
@@ -1272,6 +1312,7 @@ function RoomBuyingRates(props) {
                                                                     InputLabelProps={{
                                                                         shrink: true
                                                                     }}
+                                                                    validate={requiredValidation}
                                                                     error={Boolean(touched.basis && errors.basis)}
                                                                     helperText={touched.basis && errors.basis ? errors.basis : ''}
                                                                     variant="outlined"
@@ -1394,7 +1435,6 @@ function RoomBuyingRates(props) {
                                                             InputLabelProps={{
                                                                 shrink: true
                                                             }}
-                                                            validate={validateEmail}
                                                             value={values.child}
                                                             onChange={handleChange}
                                                             onBlur={handleBlur}
@@ -1422,10 +1462,13 @@ function RoomBuyingRates(props) {
                                                             aria-label="delete"
                                                             type="button"
                                                             onClick={() => {
-                                                                setTouched({ child: true }).then(() => {
+                                                                setTouched({ roomCategory: true, basis: true }).then(() => {
                                                                     console.log(formikRef);
                                                                     console.log(formikRef.current.errors);
-                                                                    if (formikRef.current.errors.child == undefined) {
+                                                                    if (
+                                                                        formikRef.current.errors.roomCategory == undefined &&
+                                                                        formikRef.current.errors.basis == undefined
+                                                                    ) {
                                                                         handleSubmit(values, formikRef.current.values);
                                                                     }
                                                                 });
@@ -1804,7 +1847,7 @@ function RoomBuyingRates(props) {
                                                                                             control={<Switch color="success" />}
                                                                                             // label="Status"
                                                                                             checked={values.ratesDetails[idx].taxApplicable}
-
+                                                                                            disabled
                                                                                             // disabled={mode == 'VIEW'}
                                                                                         />
                                                                                     </FormGroup>
@@ -1821,7 +1864,7 @@ function RoomBuyingRates(props) {
                                                                                             control={<Switch color="success" />}
                                                                                             // label="Status"
                                                                                             checked={values.ratesDetails[idx].rateStatus}
-                                                                                            disabled
+
                                                                                             // disabled={mode == 'VIEW'}
                                                                                         />
                                                                                     </FormGroup>
@@ -1839,7 +1882,7 @@ function RoomBuyingRates(props) {
                                                                                         <HighlightOffIcon />
                                                                                     </IconButton>
                                                                                     <IconButton
-                                                                                        disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                                        disabled={mode == 'VIEW'}
                                                                                         disa
                                                                                         aria-label="delete"
                                                                                         onClick={() => {
@@ -1923,6 +1966,7 @@ function RoomBuyingRates(props) {
                                                                     InputLabelProps={{
                                                                         shrink: true
                                                                     }}
+                                                                    validate={requiredValidation}
                                                                     error={Boolean(touched.guideBasis && errors.guideBasis)}
                                                                     helperText={touched.guideBasis && errors.basis ? errors.guideBasis : ''}
                                                                     variant="outlined"
@@ -1948,7 +1992,6 @@ function RoomBuyingRates(props) {
                                                             InputLabelProps={{
                                                                 shrink: true
                                                             }}
-                                                            validate={validateEmail}
                                                             value={values.guideRate}
                                                             onChange={handleChange}
                                                             onBlur={handleBlur}
@@ -2002,11 +2045,11 @@ function RoomBuyingRates(props) {
                                                             aria-label="delete"
                                                             type="button"
                                                             onClick={() => {
-                                                                setTouched({ guideRate: true }).then(() => {
+                                                                setTouched({ guideBasis: true }).then(() => {
                                                                     console.log(formikRef.current.isValid);
                                                                     console.log(formikRef.current.errors);
 
-                                                                    if (formikRef.current.errors.guideRate == undefined) {
+                                                                    if (formikRef.current.errors.guideBasis == undefined) {
                                                                         handleSubmit2(values, formikRef.current.values);
                                                                     }
                                                                 });
@@ -2207,7 +2250,7 @@ function RoomBuyingRates(props) {
                                                                                                 values.tourGuideDetails[idx]
                                                                                                     .taxApplicableGuide
                                                                                             }
-
+                                                                                            disabled
                                                                                             // disabled={mode == 'VIEW'}
                                                                                         />
                                                                                     </FormGroup>
@@ -2226,7 +2269,7 @@ function RoomBuyingRates(props) {
                                                                                             checked={
                                                                                                 values.tourGuideDetails[idx].guideStatus
                                                                                             }
-                                                                                            disabled
+
                                                                                             // disabled={mode == 'VIEW'}
                                                                                         />
                                                                                     </FormGroup>
@@ -2243,7 +2286,7 @@ function RoomBuyingRates(props) {
                                                                                         <HighlightOffIcon />
                                                                                     </IconButton>
                                                                                     <IconButton
-                                                                                        disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                                        disabled={mode == 'VIEW'}
                                                                                         disa
                                                                                         aria-label="delete"
                                                                                         onClick={() => {
@@ -2316,12 +2359,23 @@ function RoomBuyingRates(props) {
                                                             // handleFinalSubmit(values);
                                                             //
 
-                                                            // setTouched({ operatorGpCode: true, season: true, ratePeriod: true }).then(
-                                                            //     () => {
-                                                            //         console.log(formikRef);
-                                                            //         console.log(formikRef.current.errors);
-                                                            //     }
-                                                            // );
+                                                            setTouched({
+                                                                operatorGpCode: true,
+                                                                season: true,
+                                                                ratePeriod: true,
+                                                                currency: true
+                                                            }).then(() => {
+                                                                console.log(formikRef);
+                                                                console.log(formikRef.current.errors);
+                                                                if (
+                                                                    formikRef.current.errors.operatorGpCode == undefined &&
+                                                                    formikRef.current.errors.season == undefined &&
+                                                                    (formikRef.current.errors.ratePeriod == undefined) &
+                                                                        (formikRef.current.errors.currency == undefined)
+                                                                ) {
+                                                                    handleFinalSubmit(values);
+                                                                }
+                                                            });
                                                         }}
                                                     >
                                                         {mode === 'INSERT' ? 'SAVE' : 'UPDATE'}
@@ -2348,6 +2402,7 @@ function RoomBuyingRates(props) {
                         )}
                         {openToast ? <SuccessMsg openToast={openToast} handleToast={handleToast} mode={mode} /> : null}
                         {openModal ? <ExitAlert title="dev" open={openModal} handleClose={handleModalClose} /> : null}
+                        {existOpenModal ? <AlertItemExist title="dev" open={existOpenModal} handleClose={handleExistModalClose} /> : null}
                     </Grid>
                 </div>
             </MainCard>

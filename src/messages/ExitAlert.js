@@ -19,7 +19,9 @@ export default function ExitAlert({ title, open, handleClose }) {
         >
             {open && (
                 <>
-                    <DialogTitle id="item-delete-title">Do you want to continue ?</DialogTitle>
+                    <DialogTitle id="item-delete-title" style={{ fontSize: '15px', fontWeight: 'bold' }}>
+                        Do you want to continue ?
+                    </DialogTitle>
 
                     <Box position="absolute" top={0} right={0}>
                         <IconButton>
