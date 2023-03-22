@@ -23,7 +23,8 @@ import {
     SUCCESS_GET_PROFILE_DATA_BY_ID,
     FAILED_GET_PROFILE_DATA_BY_ID,
     SUCCESS_UPDATE_MY_PROFILE,
-    FAILED_UPDATE_MY_PROFILE
+    FAILED_UPDATE_MY_PROFILE,
+    SUCCESS_CLEAR_USER
 } from 'store/constant/authentication/UserConstant';
 
 const initialState = {
@@ -176,6 +177,8 @@ export const userReducer = (state = initialState, action) => {
                 myProfileUpdate: null,
                 errorMsg: data ? data.errorMessages : 'netwok error'
             };
+        case SUCCESS_CLEAR_USER:
+            return { ...state, loggedUserData: null };
         default:
             return state;
     }

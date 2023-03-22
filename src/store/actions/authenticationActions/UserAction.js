@@ -11,7 +11,8 @@ import {
     RESET_PASSWORD_CREDENTIALS,
     GET_ALL_USER_ROLES,
     GET_PROFILE_DATA_BY_ID,
-    UPDATE_MY_PROFILE
+    UPDATE_MY_PROFILE,
+    CLEAR_USER
 } from 'store/constant/authentication/UserConstant';
 
 //user creation
@@ -113,5 +114,11 @@ export const updateMyProfile = (data) => {
     return {
         type: UPDATE_MY_PROFILE,
         data
+    };
+};
+
+export const clearUserDetails = () => {
+    return {
+        type: CLEAR_USER
     };
 };

@@ -9,19 +9,22 @@ import {
     UPDATE_SUCCESS_MAIN_TRANSPORT_DETAILS_DATA,
     MAIN_TRANSPORT_DETAILS_DUPLICATE,
     FAILED_LAST_MODIFIED_DATE_MAIN_TRANSPORT_DETAILS,
-    SUCCESS_LAST_MODIFIED_DATE_MAIN_TRANSPORT_DETAILS
-} from '../../../constant/master/TransportMasterConstant/MainTransportCategory';
+    SUCCESS_LAST_MODIFIED_DATE_MAIN_TRANSPORT_DETAILS,
+    SUCCESS_GET_TRANSPORT_MAIN_CATEGORY_DATA_BY_TYPE,
+    FAILED_GET_TRANSPORT_MAIN_CATEGORY_DATA_BY_TYPE
+} from '../../../constant/master/TransportMasterConstant/MainTransportCategoryConstant';
 
 const initialState = {
     mainTransportDetail: null,
     mainTransportDetails: [],
     mainTransportDetailToUpdate: null,
+    detailsType: [],
     errorMsg: null,
     duplicateMainTransportDetail: null,
     lastModifiedDateTime: null
 };
 
-export const MainTransportCategoryReducer = (state = initialState, action) => {
+export const mainTransportCategoryReducer = (state = initialState, action) => {
     const { data } = action;
     console.log(data);
     switch (action.type) {
@@ -69,6 +72,17 @@ export const MainTransportCategoryReducer = (state = initialState, action) => {
 
         case FAILED_LAST_MODIFIED_DATE_MAIN_TRANSPORT_DETAILS:
             return { ...state, lastModifiedDateTime: data };
+
+        case SUCCESS_GET_TRANSPORT_MAIN_CATEGORY_DATA_BY_TYPE:
+            console.warn('SUCCESS_GET_CODE_NAME_DATA_BY_CODE', data.payload[0]);
+            return { ...state, detailsType: data.payload[0] };
+
+        case FAILED_GET_TRANSPORT_MAIN_CATEGORY_DATA_BY_TYPE:
+            return {
+                ...state,
+                detailsType: null,
+                errorMsg: data ? data.errorMessages : 'netwok error'
+            };
 
         default:
             return state;

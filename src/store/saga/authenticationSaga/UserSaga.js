@@ -25,7 +25,8 @@ import {
     SUCCESS_GET_PROFILE_DATA_BY_ID,
     FAILED_GET_PROFILE_DATA_BY_ID,
     FAILED_UPDATE_MY_PROFILE,
-    SUCCESS_UPDATE_MY_PROFILE
+    SUCCESS_UPDATE_MY_PROFILE,
+    SUCCESS_CLEAR_USER
 } from 'store/constant/authentication/UserConstant';
 import { create, getById, updateWithUpload, get, createWithUpload, update } from '../../../apis/Apis';
 
@@ -305,4 +306,23 @@ export function* updateMyProfileData(action) {
             data: e.response.data.errorMessages
         });
     }
+}
+
+export function* clearUserDataSaga() {
+    // action.data.path = `${process.env.REACT_APP_USER_MANAGEMENT_URL}/user`;
+    // let responseData = [];
+    // try {
+    //     responseData = yield call(update, action.data);
+
+    yield put({
+        type: SUCCESS_CLEAR_USER,
+        data: null
+    });
+    // } catch (e) {
+    //     console.log(e);
+    //     yield put({
+    //         type: FAILED_UPDATE_MY_PROFILE,
+    //         data: e.response.data.errorMessages
+    //     });
+    // }
 }

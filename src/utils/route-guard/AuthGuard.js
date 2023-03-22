@@ -17,7 +17,7 @@ const AuthGuard = ({ children }) => {
     const token = localStorage.getItem('token');
     useEffect(() => {
         if (token == null || token == 'null') {
-            navigate('/landing', { replace: true });
+            navigate('/', { replace: true });
         }
     }, [token, navigate]);
 

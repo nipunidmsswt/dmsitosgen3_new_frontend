@@ -11,12 +11,15 @@ import {
     UPDATE_SUCCESS_MAIN_TRANSPORT_DETAILS_DATA,
     MAIN_TRANSPORT_DETAILS_DUPLICATE,
     FAILED_LAST_MODIFIED_DATE_MAIN_TRANSPORT_DETAILS,
-    SUCCESS_LAST_MODIFIED_DATE_MAIN_TRANSPORT_DETAILS
-} from '../../../constant/master/TransportMasterConstant/MainTransportCategory';
+    SUCCESS_LAST_MODIFIED_DATE_MAIN_TRANSPORT_DETAILS,
+    SUCCESS_GET_TRANSPORT_MAIN_CATEGORY_DATA_BY_TYPE,
+    FAILED_GET_TRANSPORT_MAIN_CATEGORY_DATA_BY_TYPE
+} from '../../../constant/master/TransportMasterConstant/MainTransportCategoryConstant';
 
 //Main Transport categories saga
 export function* saveMainTransportCategoriesSaga(action) {
-    action.data.path = `${process.env.REACT_APP_TRANSPORT_URL}/MainTransport/`;
+    console.log(action.data);
+    action.data.path = `${process.env.REACT_APP_TRANSPORT_URL}/allMainCategories`;
     let responseData = [];
     try {
         responseData = yield call(create, action.data);
@@ -89,6 +92,18 @@ export function* checkDupicateMainTransportCategoriesSaga(action) {
     } catch (e) {
         console.log(responseData);
         yield put({ type: MAIN_TRANSPORT_DETAILS_DUPLICATE, data: responseData });
+    }
+}
+
+export function* getTransportMainCategoryDataByTypeSaga(action) {
+    let responseData = [];
+    try {
+        responseData = yield call(getById, `${process.env.REACT_APP_TRANSPORT_URL}/allMainCategories/${action.data.type}`);
+        console.log(responseData);
+        yield put({ type: SUCCESS_GET_TRANSPORT_MAIN_CATEGORY_DATA_BY_TYPE, data: responseData.data });
+    } catch (e) {
+        console.log(responseData);
+        yield put({ type: FAILED_GET_TRANSPORT_MAIN_CATEGORY_DATA_BY_TYPE, data: responseData });
     }
 }
 

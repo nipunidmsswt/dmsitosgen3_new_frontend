@@ -35,6 +35,10 @@ import { getCodeAndNameDataByType } from 'store/actions/masterActions/CodeAndNam
 import CreatedUpdatedUserDetailsWithTableFormat from '../../userTimeDetails/CreatedUpdatedUserDetailsWithTableFormat';
 import AlertItemDelete from 'messages/AlertItemDelete';
 import AlertItemExist from 'messages/AlertItemExist';
+import {
+    getTransportMainCategoryDataByType,
+    saveMainTransportDetailsData
+} from 'store/actions/masterActions/transportActions/MainTransportCategoriesActions';
 
 const Transition = forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -64,11 +68,11 @@ function MainTransportCategories({ open, handleClose, mode, ccode }) {
     const [openModal, setOpenModal] = useState(false);
     const [existOpenModal, setExistOpenModal] = useState(false);
     const [loadValues, setLoadValues] = useState({
-        category: '',
-        code: '',
-        description: '',
-        status: true,
-        codeAndNameDetails: [{ category: '', code: '', description: '', status: true }]
+        // category: '',
+        // code: '',
+        // description: '',
+        // status: true,
+        mainCategoryDetails: [{ categoryType: '', typeCode: '', description: '', status: true, enableRow: false }]
     });
     yup.addMethod(yup.array, 'uniqueCode', function (message) {
         return this.test('uniqueCode', message, function (list) {
@@ -83,17 +87,17 @@ function MainTransportCategories({ open, handleClose, mode, ccode }) {
 
             const idx = list.findIndex((l, i) => mapper(l) !== set[i]);
             return this.createError({
-                path: `codeAndNameDetails[${idx}].code`,
+                path: `mainCategoryDetails[${idx}].code`,
                 message: message
             });
         });
     });
 
     const validationSchema = yup.object().shape({
-        codeAndNameDetails: yup.array().of(
+        mainCategoryDetails: yup.array().of(
             yup.object().shape({
-                category: yup.string().required('Required field'),
-                code: yup.string().required('Required field'),
+                categoryType: yup.string().required('Required field'),
+                typeCode: yup.string().required('Required field'),
                 description: yup.string().required('Required field')
             })
         )
@@ -108,16 +112,15 @@ function MainTransportCategories({ open, handleClose, mode, ccode }) {
     });
 
     //get data from reducers
-    const detailsType = useSelector((state) => state.codeAndNameReducer.detailsType);
+    const detailsType = useSelector((state) => state.mainTransportCategoryReducer.detailsType);
     const dispatch = useDispatch();
 
     const [categoryType, setCategoryType] = useState(null);
 
     const handleModalClose = (status) => {
         setOpenModal(false);
-
         if (status) {
-            dispatch(getCodeAndNameDataByType(categoryType));
+            dispatch(getTransportMainCategoryDataByType(categoryType));
         }
     };
     const handleExistModalClose = (status) => {
@@ -126,37 +129,73 @@ function MainTransportCategories({ open, handleClose, mode, ccode }) {
         }
     };
 
-    useEffect(() => {
-        if (categoryType !== null) {
-            loadValues.codeAndNameDetails?.map((s) =>
-                s.category === ''
-                    ? dispatch(getCodeAndNameDataByType(categoryType))
-                    : detailsType.codeAndNameDetails.length != loadValues.codeAndNameDetails.length
-                    ? setOpenModal(true)
-                    : dispatch(getCodeAndNameDataByType(categoryType))
-            );
-        }
-    }, [categoryType]);
+    // useEffect(() => {
+    //     if (categoryType !== null) {
+    //         if (loadValues?.mainCategoryDetails.length != 0) {
+    //             loadValues.mainCategoryDetails?.map((s) =>
+    //                 s.categoryType === ''
+    //                     ? dispatch(getTransportMainCategoryDataByType(categoryType))
+    //                     : detailsType.mainCategoryDetails.length != loadValues.mainCategoryDetails.length
+    //                     ? setOpenModal(true)
+    //                     : dispatch(getTransportMainCategoryDataByType(categoryType))
+    //             );
+    //         } else {
+    //             dispatch(getTransportMainCategoryDataByType(categoryType));
+    //         }
+    //     }
+    // }, [categoryType]);
 
     useEffect(() => {
         if (categoryType !== null) {
             if (detailsType !== null && detailsType.length != 0) {
-                setLoadValues(detailsType);
+                console.log(detailsType);
+
+                const values = {
+                    mainCategoryDetails: detailsType
+                };
+                setLoadValues(values);
+            } else {
+                const values = {
+                    mainCategoryDetails: [{ categoryType: '', typeCode: '', description: '', status: true, enableRow: false }]
+                };
+                setLoadValues(values);
             }
         }
     }, [detailsType]);
 
+    useEffect(() => {
+        if (categoryType !== null && loadValues.mainCategoryDetails != null) {
+            loadValues?.mainCategoryDetails?.map((s) =>
+                s.categoryType === ''
+                    ? dispatch(getTransportMainCategoryDataByType(categoryType))
+                    : detailsType?.length != loadValues?.mainCategoryDetails?.length && s.categoryType != categoryType
+                    ? setOpenModal(true)
+                    : dispatch(getTransportMainCategoryDataByType(categoryType))
+            );
+        }
+    }, [categoryType]);
+
+    // useEffect(() => {
+    //     if (categoryType !== null) {
+    //         if (detailsType !== null && detailsType.length != 0) {
+    //             setLoadValues(detailsType);
+    //         }
+    //     }
+    // }, [detailsType]);
+
     const handleSubmitForm = async (data) => {
         console.log(data);
-        // if (mode === 'INSERT') {
-        //     dispatch(saveCodeAndNameData(data));
-        // } else if (mode === 'VIEW_UPDATE') {
-        //     dispatch(updateCodeAndNameData(data));
-        // }
-        // handleClose();
+        if (mode === 'INSERT') {
+            const mainCategoryArray = data.mainCategoryDetails;
+            console.log(mainCategoryArray);
+            dispatch(saveMainTransportDetailsData(mainCategoryArray));
+        } else if (mode === 'VIEW_UPDATE') {
+            // dispatch(updateCodeAndNameData(data));
+        }
+        handleClose();
     };
 
-    const loadCodeAndNameDetails = (event) => {
+    const loadCategory = (event) => {
         const selectedType = event.currentTarget.dataset.value;
         if (loadValues.length != 0) {
         }
@@ -166,20 +205,33 @@ function MainTransportCategories({ open, handleClose, mode, ccode }) {
     const handleSubmit = async (values) => {
         console.log(values);
         const initialValuesNew = {
-            category: values.category,
-            code: values.category,
-            description: '',
-            status: true,
-            codeAndNameDetails: [
-                { category: values.category, code: values.code, description: values.description, status: values.status, id: '' }
+            // category: values.category,
+            // code: values.category,
+            // description: '',
+            // status: true,
+            mainCategoryDetails: [
+                {
+                    categoryType: values.category,
+                    typeCode: values.code,
+                    description: values.description,
+                    status: values.status,
+                    categoryId: ''
+                }
             ]
         };
+        if (loadValues.mainCategoryDetails.length != 0) {
+            loadValues.mainCategoryDetails?.map((s) =>
+                s.typeCode == '' && s.categoryType == ''
+                    ? initialValuesNew
+                    : s.typeCode === values.code && s.categoryType == values.category
+                    ? setExistOpenModal(true)
+                    : initialValuesNew.mainCategoryDetails.push(s)
+            );
 
-        loadValues.codeAndNameDetails?.map((s) =>
-            s.code === values.code && s.category == values.category ? setExistOpenModal(true) : initialValuesNew.codeAndNameDetails.push(s)
-        );
-
-        setLoadValues(initialValuesNew);
+            setLoadValues(initialValuesNew);
+        } else {
+            setLoadValues(initialValuesNew);
+        }
     };
 
     return (
@@ -215,7 +267,7 @@ function MainTransportCategories({ open, handleClose, mode, ccode }) {
                                         <>
                                             <Formik
                                                 enableReinitialize={true}
-                                                initialValues={headerInitialValues || loadValues}
+                                                initialValues={headerInitialValues}
                                                 onSubmit={(values, { resetForm }) => {
                                                     handleSubmit(values);
                                                     resetForm('');
@@ -259,8 +311,8 @@ function MainTransportCategories({ open, handleClose, mode, ccode }) {
                                                                                 key="1"
                                                                                 dense={true}
                                                                                 value={'Transport Type'}
-                                                                                onClick={loadCodeAndNameDetails}
-                                                                                // onClick={() => loadCodeAndNameDetails(this.value)}
+                                                                                onClick={loadCategory}
+                                                                                // onClick={() => loadmainCategoryDetails(this.value)}
                                                                             >
                                                                                 Transport Type
                                                                             </MenuItem>
@@ -269,7 +321,7 @@ function MainTransportCategories({ open, handleClose, mode, ccode }) {
                                                                                 dense={true}
                                                                                 selected={true}
                                                                                 value={'Vehicle Category'}
-                                                                                onClick={loadCodeAndNameDetails}
+                                                                                onClick={loadCategory}
                                                                             >
                                                                                 Vehicle Category
                                                                             </MenuItem>
@@ -278,7 +330,7 @@ function MainTransportCategories({ open, handleClose, mode, ccode }) {
                                                                                 key="3"
                                                                                 dense={true}
                                                                                 value={'Vehicle Type'}
-                                                                                onClick={loadCodeAndNameDetails}
+                                                                                onClick={loadCategory}
                                                                             >
                                                                                 Vehicle Type
                                                                             </MenuItem>
@@ -375,17 +427,18 @@ function MainTransportCategories({ open, handleClose, mode, ccode }) {
 
                                         <Formik
                                             enableReinitialize={true}
-                                            initialValues={loadValues || initialValues}
+                                            initialValues={loadValues}
+                                            // initialValues={loadValues}
                                             onSubmit={(values, resetForm) => {
                                                 handleSubmitForm(values);
-                                                resetForm('');
+                                                // resetForm('');
                                             }}
                                             validationSchema={validationSchema}
                                         >
                                             {({ values, handleChange, setFieldValue, errors, handleBlur, touched, resetForm }) => {
                                                 return (
                                                     <Form>
-                                                        <FieldArray name="codeAndNameDetails">
+                                                        <FieldArray name="mainCategoryDetails">
                                                             {({ insert, remove, push }) => (
                                                                 <Paper>
                                                                     <TableContainer>
@@ -403,13 +456,13 @@ function MainTransportCategories({ open, handleClose, mode, ccode }) {
                                                                             {/* {tableBodyData ? ( */}
                                                                             <TableBody>
                                                                                 {(rowsPerPage > 0
-                                                                                    ? values.codeAndNameDetails.slice(
+                                                                                    ? values.mainCategoryDetails.slice(
                                                                                           page * rowsPerPage,
                                                                                           page * rowsPerPage + rowsPerPage
                                                                                       )
-                                                                                    : values.codeAndNameDetails
+                                                                                    : values.mainCategoryDetails
                                                                                 ).map((record, idx) => {
-                                                                                    // {values.codeAndNameDetails.map((record, idx) => {
+                                                                                    // {values.mainCategoryDetails.map((record, idx) => {
                                                                                     return (
                                                                                         <TableRow key={idx} hover>
                                                                                             {/* <TableCell>{idx + 1}</TableCell> */}
@@ -423,41 +476,41 @@ function MainTransportCategories({ open, handleClose, mode, ccode }) {
                                                                                                         }
                                                                                                     }}
                                                                                                     disabled
-                                                                                                    //   type="number"
                                                                                                     variant="outlined"
-                                                                                                    name={`codeAndNameDetails.${idx}.category`}
+                                                                                                    name={`mainCategoryDetails.${idx}.categoryType`}
                                                                                                     value={
-                                                                                                        values.codeAndNameDetails[idx] &&
-                                                                                                        values.codeAndNameDetails[idx]
-                                                                                                            .category
+                                                                                                        values.mainCategoryDetails[idx] &&
+                                                                                                        values.mainCategoryDetails[idx]
+                                                                                                            .categoryType
                                                                                                     }
                                                                                                     onChange={handleChange}
                                                                                                     onBlur={handleBlur}
                                                                                                     error={Boolean(
-                                                                                                        touched.codeAndNameDetails &&
-                                                                                                            touched.codeAndNameDetails[
+                                                                                                        touched.mainCategoryDetails &&
+                                                                                                            touched.mainCategoryDetails[
                                                                                                                 idx
                                                                                                             ] &&
-                                                                                                            touched.codeAndNameDetails[idx]
-                                                                                                                .category &&
-                                                                                                            errors.codeAndNameDetails &&
-                                                                                                            errors.codeAndNameDetails[
+                                                                                                            touched.mainCategoryDetails[idx]
+                                                                                                                .categoryType &&
+                                                                                                            errors.mainCategoryDetails &&
+                                                                                                            errors.mainCategoryDetails[
                                                                                                                 idx
                                                                                                             ] &&
-                                                                                                            errors.codeAndNameDetails[idx]
-                                                                                                                .category
+                                                                                                            errors.mainCategoryDetails[idx]
+                                                                                                                .categoryType
                                                                                                     )}
                                                                                                     helperText={
-                                                                                                        touched.codeAndNameDetails &&
-                                                                                                        touched.codeAndNameDetails[idx] &&
-                                                                                                        touched.codeAndNameDetails[idx]
-                                                                                                            .category &&
-                                                                                                        errors.codeAndNameDetails &&
-                                                                                                        errors.codeAndNameDetails[idx] &&
-                                                                                                        errors.codeAndNameDetails[idx]
-                                                                                                            .category
-                                                                                                            ? errors.codeAndNameDetails[idx]
-                                                                                                                  .category
+                                                                                                        touched.mainCategoryDetails &&
+                                                                                                        touched.mainCategoryDetails[idx] &&
+                                                                                                        touched.mainCategoryDetails[idx]
+                                                                                                            .categoryType &&
+                                                                                                        errors.mainCategoryDetails &&
+                                                                                                        errors.mainCategoryDetails[idx] &&
+                                                                                                        errors.mainCategoryDetails[idx]
+                                                                                                            .categoryType
+                                                                                                            ? errors.mainCategoryDetails[
+                                                                                                                  idx
+                                                                                                              ].categoryType
                                                                                                             : ''
                                                                                                     }
                                                                                                 />
@@ -476,37 +529,40 @@ function MainTransportCategories({ open, handleClose, mode, ccode }) {
                                                                                                     // placeholder="code"
                                                                                                     // validate={checkDuplicateCodeForCodeAndName}
 
-                                                                                                    name={`codeAndNameDetails.${idx}.code`}
+                                                                                                    name={`mainCategoryDetails.${idx}.typeCode`}
                                                                                                     value={
-                                                                                                        values.codeAndNameDetails[idx] &&
-                                                                                                        values.codeAndNameDetails[idx].code
+                                                                                                        values.mainCategoryDetails[idx] &&
+                                                                                                        values.mainCategoryDetails[idx]
+                                                                                                            .typeCode
                                                                                                     }
                                                                                                     onChange={handleChange}
                                                                                                     onBlur={handleBlur}
                                                                                                     error={Boolean(
-                                                                                                        touched.codeAndNameDetails &&
-                                                                                                            touched.codeAndNameDetails[
+                                                                                                        touched.mainCategoryDetails &&
+                                                                                                            touched.mainCategoryDetails[
                                                                                                                 idx
                                                                                                             ] &&
-                                                                                                            touched.codeAndNameDetails[idx]
-                                                                                                                .code &&
-                                                                                                            errors.codeAndNameDetails &&
-                                                                                                            errors.codeAndNameDetails[
+                                                                                                            touched.mainCategoryDetails[idx]
+                                                                                                                .typeCode &&
+                                                                                                            errors.mainCategoryDetails &&
+                                                                                                            errors.mainCategoryDetails[
                                                                                                                 idx
                                                                                                             ] &&
-                                                                                                            errors.codeAndNameDetails[idx]
-                                                                                                                .code
+                                                                                                            errors.mainCategoryDetails[idx]
+                                                                                                                .typeCode
                                                                                                     )}
                                                                                                     helperText={
-                                                                                                        touched.codeAndNameDetails &&
-                                                                                                        touched.codeAndNameDetails[idx] &&
-                                                                                                        touched.codeAndNameDetails[idx]
-                                                                                                            .code &&
-                                                                                                        errors.codeAndNameDetails &&
-                                                                                                        errors.codeAndNameDetails[idx] &&
-                                                                                                        errors.codeAndNameDetails[idx].code
-                                                                                                            ? errors.codeAndNameDetails[idx]
-                                                                                                                  .code
+                                                                                                        touched.mainCategoryDetails &&
+                                                                                                        touched.mainCategoryDetails[idx] &&
+                                                                                                        touched.mainCategoryDetails[idx]
+                                                                                                            .typeCode &&
+                                                                                                        errors.mainCategoryDetails &&
+                                                                                                        errors.mainCategoryDetails[idx] &&
+                                                                                                        errors.mainCategoryDetails[idx]
+                                                                                                            .typeCode
+                                                                                                            ? errors.mainCategoryDetails[
+                                                                                                                  idx
+                                                                                                              ].typeCode
                                                                                                             : ''
                                                                                                     }
                                                                                                 />
@@ -523,40 +579,41 @@ function MainTransportCategories({ open, handleClose, mode, ccode }) {
                                                                                                     //   type="number"
                                                                                                     variant="outlined"
                                                                                                     // placeholder="name"
-                                                                                                    name={`codeAndNameDetails.${idx}.description`}
+                                                                                                    name={`mainCategoryDetails.${idx}.description`}
                                                                                                     value={
-                                                                                                        values.codeAndNameDetails[idx] &&
-                                                                                                        values.codeAndNameDetails[idx]
+                                                                                                        values.mainCategoryDetails[idx] &&
+                                                                                                        values.mainCategoryDetails[idx]
                                                                                                             .description
                                                                                                     }
                                                                                                     disabled
                                                                                                     onChange={handleChange}
                                                                                                     onBlur={handleBlur}
                                                                                                     error={Boolean(
-                                                                                                        touched.codeAndNameDetails &&
-                                                                                                            touched.codeAndNameDetails[
+                                                                                                        touched.mainCategoryDetails &&
+                                                                                                            touched.mainCategoryDetails[
                                                                                                                 idx
                                                                                                             ] &&
-                                                                                                            touched.codeAndNameDetails[idx]
+                                                                                                            touched.mainCategoryDetails[idx]
                                                                                                                 .description &&
-                                                                                                            errors.codeAndNameDetails &&
-                                                                                                            errors.codeAndNameDetails[
+                                                                                                            errors.mainCategoryDetails &&
+                                                                                                            errors.mainCategoryDetails[
                                                                                                                 idx
                                                                                                             ] &&
-                                                                                                            errors.codeAndNameDetails[idx]
+                                                                                                            errors.mainCategoryDetails[idx]
                                                                                                                 .description
                                                                                                     )}
                                                                                                     helperText={
-                                                                                                        touched.codeAndNameDetails &&
-                                                                                                        touched.codeAndNameDetails[idx] &&
-                                                                                                        touched.codeAndNameDetails[idx]
+                                                                                                        touched.mainCategoryDetails &&
+                                                                                                        touched.mainCategoryDetails[idx] &&
+                                                                                                        touched.mainCategoryDetails[idx]
                                                                                                             .description &&
-                                                                                                        errors.codeAndNameDetails &&
-                                                                                                        errors.codeAndNameDetails[idx] &&
-                                                                                                        errors.codeAndNameDetails[idx]
+                                                                                                        errors.mainCategoryDetails &&
+                                                                                                        errors.mainCategoryDetails[idx] &&
+                                                                                                        errors.mainCategoryDetails[idx]
                                                                                                             .description
-                                                                                                            ? errors.codeAndNameDetails[idx]
-                                                                                                                  .description
+                                                                                                            ? errors.mainCategoryDetails[
+                                                                                                                  idx
+                                                                                                              ].description
                                                                                                             : ''
                                                                                                     }
                                                                                                 />
@@ -564,31 +621,30 @@ function MainTransportCategories({ open, handleClose, mode, ccode }) {
                                                                                             <TableCell>
                                                                                                 <FormGroup>
                                                                                                     <FormControlLabel
-                                                                                                        name={`codeAndNameDetails.${idx}.status`}
+                                                                                                        name={`mainCategoryDetails.${idx}.status`}
                                                                                                         onChange={handleChange}
                                                                                                         value={
-                                                                                                            values.codeAndNameDetails[
+                                                                                                            values.mainCategoryDetails[
                                                                                                                 idx
                                                                                                             ] &&
-                                                                                                            values.codeAndNameDetails[idx]
+                                                                                                            values.mainCategoryDetails[idx]
                                                                                                                 .status
                                                                                                         }
                                                                                                         control={<Switch color="success" />}
                                                                                                         // label="Status"
                                                                                                         checked={
-                                                                                                            values.codeAndNameDetails[idx]
+                                                                                                            values.mainCategoryDetails[idx]
                                                                                                                 .status
                                                                                                         }
-                                                                                                        disabled
-                                                                                                        // disabled={mode == 'VIEW'}
+                                                                                                        disabled={mode == 'VIEW'}
                                                                                                     />
                                                                                                 </FormGroup>
                                                                                             </TableCell>
 
                                                                                             <TableCell>
-                                                                                                {(values.codeAndNameDetails[idx] &&
-                                                                                                    values.codeAndNameDetails[idx].id) ===
-                                                                                                '' ? (
+                                                                                                {(values.mainCategoryDetails[idx] &&
+                                                                                                    values.mainCategoryDetails[idx]
+                                                                                                        .categoryId) === '' ? (
                                                                                                     <IconButton
                                                                                                         aria-label="delete"
                                                                                                         onClick={() => {
@@ -615,7 +671,7 @@ function MainTransportCategories({ open, handleClose, mode, ccode }) {
                                                                                             5, 10, 25
                                                                                             // { label: 'All', value: -1 }
                                                                                         ]}
-                                                                                        count={values.codeAndNameDetails.length}
+                                                                                        count={values.mainCategoryDetails.length}
                                                                                         rowsPerPage={rowsPerPage}
                                                                                         page={page}
                                                                                         SelectProps={{
