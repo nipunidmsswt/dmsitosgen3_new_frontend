@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 
 // material-ui
-import { Button, Dialog, DialogActions, DialogTitle, Box, IconButton } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
+import { Button, Dialog, DialogActions, DialogTitle, Box, IconButton, Typography, DialogContent } from '@mui/material';
+
 export default function AlertItemExist({ title, open, handleClose }) {
     return (
         <Dialog
@@ -16,20 +16,17 @@ export default function AlertItemExist({ title, open, handleClose }) {
         >
             {open && (
                 <>
-                    <DialogTitle id="item-delete-title" style={{ fontSize: '15px', color: 'red', fontWeight: 'bold' }}>
-                        Already Exist !!
+                    <DialogTitle>
+                        {' '}
+                        <Typography variant="h4">Action</Typography>
                     </DialogTitle>
-                    <Box position="absolute" top={0} right={0}>
-                        <IconButton onClick={() => handleClose(true)}>
-                            <CloseIcon />
-                        </IconButton>
-                    </Box>
-                    <DialogActions sx={{ mr: 2 }}>
-                        {/* <Button onClick={() => handleClose(false)} color="error">
-                            OK
-                        </Button> */}
-                        <Button variant="contained" size="small" onClick={() => handleClose(true)}>
-                            OK
+                    <DialogContent>
+                        <Typography variant="h6"> {title}</Typography>
+                        {/* <Typography variant="subtitle2">You can't undo this operation</Typography> */}
+                    </DialogContent>
+                    <DialogActions>
+                        <Button variant="contained" className="btnSave" onClick={() => handleClose(true)}>
+                            Yes
                         </Button>
                     </DialogActions>
                 </>

@@ -74,6 +74,7 @@ function RoomBuyingRates(props) {
         hotelName: null,
         operatorGpCode: null,
         operatorCode: [],
+        newOperatorCode: [],
         season: null,
         ratePeriod: null,
         fromDate: '',
@@ -150,6 +151,7 @@ function RoomBuyingRates(props) {
     const [hotelData, setHotelData] = useState([]);
     const [openModal, setOpenModal] = useState(false);
     const [existOpenModal, setExistOpenModal] = useState(false);
+    const [existOpenModal1, setExistOpenModal1] = useState(false);
 
     const pages = [5, 10, 25];
     const [page, setPage] = useState(0);
@@ -169,6 +171,8 @@ function RoomBuyingRates(props) {
     const activeHotelBasisListData = useSelector((state) => state.hotelBasisReducer.activeHotelBasisList);
     const roomBuyingRateToUpdate = useSelector((state) => state.roomBuyingRateReducer.roomBuyingRateToUpdate);
     const roomBuyingRate = useSelector((state) => state.roomBuyingRateReducer.roomBuyingRate);
+    const duplicateRoomBuyingRate = useSelector((state) => state.roomBuyingRateReducer.duplicateRoomBuyingRate);
+
     let location = useLocation();
     const navigate = useNavigate();
     useEffect(() => {
@@ -181,6 +185,7 @@ function RoomBuyingRates(props) {
                 hotelName: location.state.data.rowdata,
                 operatorGpCode: null,
                 operatorCode: [],
+                newOperatorCode: [],
                 season: null,
                 ratePeriod: null,
                 fromDate: '',
@@ -240,6 +245,7 @@ function RoomBuyingRates(props) {
         } else if (roomBuyingRate && mode === 'VIEW_UPDATE') {
             console.log('heyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy');
             setHandleToast(true);
+            dispatch(clearRoomBuyingRate());
         }
     }, [roomBuyingRate]);
 
@@ -254,6 +260,7 @@ function RoomBuyingRates(props) {
                 hotelName: location.state.data.rowdata,
                 operatorGpCode: null,
                 operatorCode: [],
+                newOperatorCode: [],
                 season: null,
                 ratePeriod: null,
                 fromDate: '',
@@ -304,7 +311,6 @@ function RoomBuyingRates(props) {
                         tourLeadRateAmountWithTaxtourLeadValue: ''
                     }
                 ],
-                ignoreValidation: false,
                 status: true
             });
         } else if (location.state.mode === 'VIEW_UPDATE') {
@@ -318,9 +324,11 @@ function RoomBuyingRates(props) {
         console.log(roomBuyingRateToUpdate);
         console.log(mode);
         if (roomBuyingRateToUpdate !== null && mode !== 'INSERT') {
+            dispatch(getAllActiveOperatorByOperatorGpId(roomBuyingRateToUpdate.operatorGpCode.marketGroupOperatorGroupId));
             setnewobj({
                 hotelCode: location.state.data.hotelCode,
                 hotelName: location.state.data.hotelCode,
+                newOperatorCode: [],
                 roomBuyingRateId: roomBuyingRateToUpdate.roomBuyingRateId,
                 operatorGpCode: roomBuyingRateToUpdate.operatorGpCode,
                 operatorCode: roomBuyingRateToUpdate.operatorCode,
@@ -345,10 +353,7 @@ function RoomBuyingRates(props) {
                 guideRate: '',
                 status: roomBuyingRateToUpdate.status,
                 ratesDetails: roomBuyingRateToUpdate.ratesDetails,
-
-                tourGuideDetails: roomBuyingRateToUpdate.tourGuideDetails,
-
-                ignoreValidation: false
+                tourGuideDetails: roomBuyingRateToUpdate.tourGuideDetails
             });
         } else {
         }
@@ -440,42 +445,6 @@ function RoomBuyingRates(props) {
         dispatch(getAllCurrencyListData());
     }, []);
 
-    const validationSchema = yup.object().shape({
-        season: yup.object().typeError('Required field'),
-        child: yup.string().when('ignoreValidation', {
-            is: true,
-            then: yup.string().required('Required field')
-        })
-        // ratesDetails: yup.array().of(
-        //     yup.object().shape({
-        //         roomCategory: yup.object().typeError('Required field'),
-        //         basis: yup.object().typeError('Required field')
-        //         // onOriginal: yup.string().required('Required field')
-        //     })
-        // ),
-        // tourGuideDetails: yup.array().of(
-        //     yup.object().shape({
-        //         basis: yup.object().typeError('Required field')
-        //     })
-        // )
-    });
-
-    const handleClickOpen = (type, data) => {
-        console.log(type);
-        console.log(data);
-        if (type === 'VIEW_UPDATE') {
-            setMode(type);
-            setCode(data.mainSeason);
-        } else if (type === 'INSERT') {
-            setCode('');
-            setMode(type);
-        } else {
-            setMode(type);
-            setCode(data.mainSeason);
-        }
-        setOpen(true);
-    };
-
     const handleClose = () => {
         setOpenTaxDetails(false);
     };
@@ -542,12 +511,6 @@ function RoomBuyingRates(props) {
                     child = +child + +childVaue;
                 });
             }
-
-            console.log(single);
-            console.log(double);
-            console.log(tripple);
-            console.log(family);
-            console.log(child);
         }
 
         const initialValuesNew = {
@@ -556,6 +519,7 @@ function RoomBuyingRates(props) {
             hotelName: values.hotelName,
             operatorGpCode: values.operatorGpCode,
             operatorCode: values.operatorCode,
+            newOperatorCode: values.newOperatorCode,
             season: values.season,
             ratePeriod: values.ratePeriod,
             fromDate: values.fromDate,
@@ -599,13 +563,6 @@ function RoomBuyingRates(props) {
             tourGuideDetails: formValues.tourGuideDetails
         };
         console.log(mmObject.ratesDetails);
-
-        // mmObject.ratesDetails?.map((s) => {
-        //     console.log(s);
-        //     if (s.roomCategory !== null) {
-        //         initialValuesNew.ratesDetails.push(s);
-        //     }
-        // });
         mmObject.ratesDetails?.map((s) => {
             console.log(s);
             if (s.roomCategory !== null) {
@@ -646,6 +603,7 @@ function RoomBuyingRates(props) {
             hotelName: values.hotelName,
             operatorGpCode: values.operatorGpCode,
             operatorCode: values.operatorCode,
+            newOperatorCode: values.newOperatorCode,
             season: values.season,
             ratePeriod: values.ratePeriod,
             fromDate: values.fromDate,
@@ -681,14 +639,10 @@ function RoomBuyingRates(props) {
                 }
             ]
         };
-        // mmObject.tourGuideDetails?.map((s) => {
-        //     if (s.guideBasis !== null) {
-        //         initialValuesNew.tourGuideDetails.push(s);
-        //     }
-        // });
+
         mmObject.tourGuideDetails?.map((s) => {
             if (s.guideBasis !== null) {
-                s.guideBasis.id === values.guideBasis.id ? setExistOpenModal(true) : initialValuesNew.tourGuideDetails.push(s);
+                s.guideBasis.id === values.guideBasis.id ? setExistOpenModal1(true) : initialValuesNew.tourGuideDetails.push(s);
             }
         });
         setnewobj(initialValuesNew);
@@ -698,6 +652,22 @@ function RoomBuyingRates(props) {
         console.log(values);
         delete values.hotelCode.createdDate;
         delete values.hotelCode.updatedDate;
+
+        // let data = {
+        //     hotelCode: values.hotelCode,
+        //     operatorGpCode: values.operatorGpCode,
+        //     operatorCode: values.operatorCode,
+        //     season: values.season,
+        //     ratePeriod: values.ratePeriod
+        // };
+        // if (values.hotelCode && values.operatorGpCode && values.operatorCode && values.season && values.ratePeriod) {
+        //     dispatch(checkDuplicateRoomBuyingRateCode(data));
+        // }
+
+        for (let i in values.newOperatorCode) {
+            values.operatorCode.push(values.newOperatorCode[i]);
+        }
+
         if (mode === 'INSERT') {
             dispatch(saveRoomBuyingRateData(values));
         } else {
@@ -713,22 +683,25 @@ function RoomBuyingRates(props) {
         }
         return error;
     }
+
+    useEffect(() => {
+        console.log(duplicateRoomBuyingRate);
+        // if(duplicateRoomBuyingRate){
+        //     if(duplicateRoomBuyingRate.errormessages.length < 0){
+
+        //     }
+        // }
+    }, [duplicateRoomBuyingRate]);
+
     const validate = (values) => {
         console.log(values);
-        delete values.hotelCode.createdDate;
-        delete values.hotelCode.updatedDate;
-        let data = {
-            hotelCode: values.hotelCode,
-            operatorGpCode: values.operatorGpCode,
-            operatorCode: values.operatorCode,
-            season: values.season,
-            ratePeriod: values.ratePeriod
-        };
-        // dispatch(checkDuplicateRoomBuyingRateCode(data));
     };
 
     const handleExistModalClose = () => {
         setExistOpenModal(false);
+    };
+    const handleExistModalClose1 = () => {
+        setExistOpenModal1(false);
     };
     return (
         <div>
@@ -930,10 +903,12 @@ function RoomBuyingRates(props) {
 
                                                     <Grid item>
                                                         <Autocomplete
+                                                            disableClearable
+                                                            disablePortal
                                                             value={values.operatorCode}
                                                             name="operatorCode"
                                                             fullWidth
-                                                            disabled={mode == 'VIEW'}
+                                                            disabled={mode !== 'INSERT'}
                                                             onChange={(_, value) => {
                                                                 setFieldValue(`operatorCode`, value);
                                                             }}
@@ -943,34 +918,136 @@ function RoomBuyingRates(props) {
                                                             multiple
                                                             options={activeOperatorList}
                                                             getOptionLabel={(option) => `${option.code} - ${option.name}`}
-                                                            isOptionEqualToValue={(option, value) => option.marketId === value.marketId}
-                                                            renderInput={(params) => (
-                                                                <TextField
-                                                                    {...params}
-                                                                    label="Operator Code"
-                                                                    sx={{
-                                                                        width: { xs: 600 },
-                                                                        '& .MuiInputBase-root': {
-                                                                            height: 41
+                                                            isOptionEqualToValue={(option, value) => option.operatorId === value.operatorId}
+                                                            getOptionDisabled={(option) => {
+                                                                if (values.operatorCode.some((day) => day.code === option.code)) {
+                                                                    return true;
+                                                                }
+
+                                                                return false;
+                                                            }}
+                                                            renderInput={(params) => {
+                                                                return (
+                                                                    <TextField
+                                                                        {...params}
+                                                                        label={
+                                                                            mode !== 'INSERT' ? 'Selected Operator Code' : 'Operator Code'
                                                                         }
-                                                                    }}
-                                                                    InputLabelProps={{
-                                                                        shrink: true
-                                                                    }}
-                                                                    error={Boolean(touched.operatorCode && errors.operatorCode)}
-                                                                    helperText={
-                                                                        touched.operatorCode && errors.operatorCode
-                                                                            ? errors.operatorCode
-                                                                            : ''
-                                                                    }
-                                                                    // placeholder="--Select a Manager Code --"
-                                                                    variant="outlined"
-                                                                    name="operatorCode"
-                                                                    onBlur={handleBlur}
-                                                                />
-                                                            )}
+                                                                        sx={{
+                                                                            width: { xs: 600 },
+                                                                            '& .MuiInputBase-root': {
+                                                                                height: 41
+                                                                            }
+                                                                        }}
+                                                                        InputLabelProps={{
+                                                                            shrink: true
+                                                                        }}
+                                                                        error={Boolean(touched.operatorCode && errors.operatorCode)}
+                                                                        helperText={
+                                                                            touched.operatorCode && errors.operatorCode
+                                                                                ? errors.operatorCode
+                                                                                : ''
+                                                                        }
+                                                                        // placeholder="--Select a Manager Code --"
+                                                                        variant="outlined"
+                                                                        name="operatorCode"
+                                                                        onBlur={handleBlur}
+                                                                    />
+                                                                );
+                                                            }}
                                                         />
                                                     </Grid>
+                                                    {mode === 'VIEW_UPDATE' ? (
+                                                        <Grid item>
+                                                            <Autocomplete
+                                                                disableClearable
+                                                                disablePortal
+                                                                // value={values.newOperatorCode}
+                                                                name="newOperatorCode"
+                                                                fullWidth
+                                                                disabled={mode == 'VIEW'}
+                                                                onChange={(_, value) => {
+                                                                    setFieldValue(`newOperatorCode`, value);
+                                                                }}
+                                                                InputLabelProps={{
+                                                                    shrink: true
+                                                                }}
+                                                                multiple
+                                                                options={activeOperatorList}
+                                                                getOptionLabel={(option) => `${option.code} - ${option.name}`}
+                                                                isOptionEqualToValue={(option, value) =>
+                                                                    option.operatorId === value.operatorId
+                                                                }
+                                                                getOptionDisabled={(option) => {
+                                                                    if (values.operatorCode.some((day) => day.code === option.code)) {
+                                                                        return true;
+                                                                    }
+
+                                                                    return false;
+                                                                }}
+                                                                renderInput={(params) => {
+                                                                    return (
+                                                                        <TextField
+                                                                            {...params}
+                                                                            label="Add New Operator Code"
+                                                                            sx={{
+                                                                                width: { xs: 600 },
+                                                                                '& .MuiInputBase-root': {
+                                                                                    height: 41
+                                                                                }
+                                                                            }}
+                                                                            InputLabelProps={{
+                                                                                shrink: true
+                                                                            }}
+                                                                            error={Boolean(
+                                                                                touched.newOperatorCode && errors.newOperatorCode
+                                                                            )}
+                                                                            helperText={
+                                                                                touched.newOperatorCode && errors.newOperatorCode
+                                                                                    ? errors.newOperatorCode
+                                                                                    : ''
+                                                                            }
+                                                                            // placeholder="--Select a Manager Code --"
+                                                                            variant="outlined"
+                                                                            name="newOperatorCode"
+                                                                            onBlur={handleBlur}
+                                                                        />
+                                                                    );
+                                                                }}
+                                                            />
+                                                        </Grid>
+                                                    ) : (
+                                                        ''
+                                                    )}
+
+                                                    {/* <Grid item>
+                                                        <Field
+                                                            as={TextField}
+                                                            label="Child"
+                                                            sx={{
+                                                                width: { xs: 120 },
+                                                                '& .MuiInputBase-root': {
+                                                                    height: 40
+                                                                }
+                                                            }}
+                                                            disabled={mode == 'VIEW'}
+                                                            type="text"
+                                                            variant="outlined"
+                                                            name="child"
+                                                            InputLabelProps={{
+                                                                shrink: true
+                                                            }}
+                                                            value={values.child}
+                                                            onChange={handleChange}
+                                                            onBlur={handleBlur}
+                                                            error={Boolean(touched.child && errors.child)}
+                                                            helperText={touched.child && errors.child ? errors.child : ''}
+                                                        />
+                                                    </Grid> */}
+                                                </Grid>
+                                            </div>
+                                            <div style={{ marginTop: '6px', margin: '10px' }}>
+                                                <Grid gap="10px" display="flex">
                                                     <Grid item>
                                                         <Field
                                                             as={Autocomplete}
@@ -1013,10 +1090,6 @@ function RoomBuyingRates(props) {
                                                             )}
                                                         />
                                                     </Grid>
-                                                </Grid>
-                                            </div>
-                                            <div style={{ marginTop: '6px', margin: '10px' }}>
-                                                <Grid gap="10px" display="flex">
                                                     <Grid item>
                                                         {' '}
                                                         <Field
@@ -2402,7 +2475,16 @@ function RoomBuyingRates(props) {
                         )}
                         {openToast ? <SuccessMsg openToast={openToast} handleToast={handleToast} mode={mode} /> : null}
                         {openModal ? <ExitAlert title="dev" open={openModal} handleClose={handleModalClose} /> : null}
-                        {existOpenModal ? <AlertItemExist title="dev" open={existOpenModal} handleClose={handleExistModalClose} /> : null}
+                        {existOpenModal ? (
+                            <AlertItemExist
+                                title="Room Category and Basis should be unique"
+                                open={existOpenModal}
+                                handleClose={handleExistModalClose}
+                            />
+                        ) : null}
+                        {existOpenModal1 ? (
+                            <AlertItemExist title="Basis should be unique" open={existOpenModal1} handleClose={handleExistModalClose1} />
+                        ) : null}
                     </Grid>
                 </div>
             </MainCard>
