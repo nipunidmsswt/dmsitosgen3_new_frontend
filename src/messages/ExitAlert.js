@@ -1,35 +1,45 @@
 import PropTypes from 'prop-types';
 
 // material-ui
-import { Button, Dialog, DialogActions, DialogTitle, Box, IconButton } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogTitle, DialogContent, Box, IconButton, Typography } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import CloseIcon from '@mui/icons-material/Close';
-export default function AlertItemExist({ title, open, handleClose }) {
+
+export default function ExitAlert({ title, open, handleClose }) {
+    const navigate = useNavigate();
     return (
         <Dialog
             open={true}
             onClose={() => handleClose(false)}
             keepMounted
-            maxWidth="xs"
+            maxWidth="sm"
             fullWidth
             aria-labelledby="item-delete-title"
             aria-describedby="item-delete-description"
         >
             {open && (
                 <>
-                    <DialogTitle id="item-delete-title" style={{ fontSize: '15px', color: 'red', fontWeight: 'bold' }}>
-                        Already Exist !!
+                    <DialogTitle id="item-delete-title" style={{ fontSize: '15px', fontWeight: 'bold' }}>
+                        Do you want to continue ?
                     </DialogTitle>
+
                     <Box position="absolute" top={0} right={0}>
-                        <IconButton onClick={() => handleClose(true)}>
+                        <IconButton>
                             <CloseIcon />
                         </IconButton>
                     </Box>
                     <DialogActions sx={{ mr: 2 }}>
-                        {/* <Button onClick={() => handleClose(false)} color="error">
-                            OK
-                        </Button> */}
                         <Button variant="contained" size="small" onClick={() => handleClose(true)}>
-                            OK
+                            Yes
+                        </Button>
+                        <Button
+                            onClick={() => {
+                                handleClose(false);
+                                navigate('/master/hotelview');
+                            }}
+                            color="error"
+                        >
+                            NO
                         </Button>
                     </DialogActions>
                 </>
@@ -38,7 +48,7 @@ export default function AlertItemExist({ title, open, handleClose }) {
     );
 }
 
-AlertItemExist.propTypes = {
+ExitAlert.propTypes = {
     open: PropTypes.bool,
     handleClose: PropTypes.func,
     title: PropTypes.string
