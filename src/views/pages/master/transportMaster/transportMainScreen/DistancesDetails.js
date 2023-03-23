@@ -742,7 +742,11 @@ function DistancesDetails({ mode }) {
 
                                         <Grid item>
                                             {existOpenModal ? (
-                                                <AlertItemExist title="dev" open={existOpenModal} handleClose={handleExistModalClose} />
+                                                <AlertItemExist
+                                                    title="Already Exist"
+                                                    open={existOpenModal}
+                                                    handleClose={handleExistModalClose}
+                                                />
                                             ) : null}
                                         </Grid>
                                     </Box>

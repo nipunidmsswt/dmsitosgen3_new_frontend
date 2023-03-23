@@ -17,33 +17,29 @@ export default function ExitAlert({ title, open, handleClose }) {
             aria-labelledby="item-delete-title"
             aria-describedby="item-delete-description"
         >
-            {open && (
-                <>
-                    <DialogTitle id="item-delete-title" style={{ fontSize: '15px', fontWeight: 'bold' }}>
-                        Do you want to continue ?
-                    </DialogTitle>
-
-                    <Box position="absolute" top={0} right={0}>
-                        <IconButton>
-                            <CloseIcon />
-                        </IconButton>
-                    </Box>
-                    <DialogActions sx={{ mr: 2 }}>
-                        <Button variant="contained" size="small" onClick={() => handleClose(true)}>
-                            Yes
-                        </Button>
-                        <Button
-                            onClick={() => {
-                                handleClose(false);
-                                navigate('/master/hotelview');
-                            }}
-                            color="error"
-                        >
-                            NO
-                        </Button>
-                    </DialogActions>
-                </>
-            )}
+            <DialogTitle>
+                {' '}
+                <Typography variant="h4">Action</Typography>
+            </DialogTitle>
+            <DialogContent>
+                <Typography variant="h6">Are you sure you want to Continue this?</Typography>
+                {/* <Typography variant="subtitle2">You can't undo this operation</Typography> */}
+            </DialogContent>
+            <DialogActions>
+                <Button
+                    variant="contained"
+                    onClick={() => {
+                        handleClose(false);
+                        navigate('/master/hotelview');
+                    }}
+                    color="error"
+                >
+                    No
+                </Button>
+                <Button variant="contained" className="btnSave" onClick={() => handleClose(true)}>
+                    Yes
+                </Button>
+            </DialogActions>
         </Dialog>
     );
 }
