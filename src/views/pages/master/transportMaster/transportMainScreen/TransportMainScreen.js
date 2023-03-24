@@ -131,9 +131,6 @@ function TransportMainScreen() {
     useEffect(() => {
         if (distance != null) {
             setHandleToast(true);
-
-            // dispatch(getAllCodeAndNameDetails());
-            // dispatch(getLatestModifiedDetails());
         } else {
         }
     }, [distance]);
