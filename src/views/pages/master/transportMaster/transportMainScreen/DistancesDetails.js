@@ -38,23 +38,31 @@ import AlertItemDelete from 'messages/AlertItemDelete';
 import AlertItemExist from 'messages/AlertItemExist';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import { getCodeAndNameDataByType } from 'store/actions/masterActions/CodeAndNameAction';
-
+import { getActiveLocations } from 'store/actions/masterActions/LocationAction';
+import { getAllActiveDistanceDataByTransportType, saveDistanceData } from 'store/actions/masterActions/DistanceAction';
+import Swal from 'sweetalert2/dist/sweetalert2.js';
+import 'sweetalert2/src/sweetalert2.scss';
 const useStyles = makeStyles({
     content: {
         justifyContent: 'center'
     }
 });
 
-function DistancesDetails({ mode }) {
+function DistancesDetails({ mode, selectedType }) {
     const headerInitialValues = {
-        category: '',
-        code: '',
-        description: '',
+        fromLocation: null,
+        fromDescription: '',
+        toLocation: null,
+        toDescription: '',
+        distance: '',
+        hours: '',
         status: true
     };
     const pages = [5, 10, 25];
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(pages[page]);
+    const activeLocations = useSelector((state) => state.locationReducer.activeLocations);
+    const distanceByTransportType = useSelector((state) => state.distanceReducer.distanceByTransportType);
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
@@ -69,12 +77,15 @@ function DistancesDetails({ mode }) {
     const [openModal, setOpenModal] = useState(false);
     const [existOpenModal, setExistOpenModal] = useState(false);
     const [marketListOptions, setMarketListOptions] = useState([]);
+    const [activeLocationList, setActiveLocationList] = useState([]);
     const [loadValues, setLoadValues] = useState({
-        category: '',
-        code: '',
-        description: '',
-        status: true,
-        codeAndNameDetails: [{ category: '', code: '', description: '', status: true }]
+        // category: '',
+        // code: '',
+        // description: '',
+        // status: true,
+        distanceDetails: [
+            { fromLocation: '', fromDescription: '', toLocation: '', toDescription: '', distance: '', hours: '', status: true }
+        ]
     });
     yup.addMethod(yup.array, 'uniqueCode', function (message) {
         return this.test('uniqueCode', message, function (list) {
@@ -89,18 +100,19 @@ function DistancesDetails({ mode }) {
 
             const idx = list.findIndex((l, i) => mapper(l) !== set[i]);
             return this.createError({
-                path: `codeAndNameDetails[${idx}].code`,
+                path: `distanceDetails[${idx}].code`,
                 message: message
             });
         });
     });
 
     const validationSchema = yup.object().shape({
-        codeAndNameDetails: yup.array().of(
+        distanceDetails: yup.array().of(
             yup.object().shape({
-                category: yup.string().required('Required field'),
-                code: yup.string().required('Required field'),
-                description: yup.string().required('Required field')
+                fromLocation: yup.object().typeError('Required field'),
+                fromDescription: yup.string().required('Required field'),
+                toLocation: yup.object().typeError('Required field'),
+                toDescription: yup.string().required('Required field')
             })
         )
         // .uniqueCodeAndNameCode("Must be unique"),
@@ -108,9 +120,12 @@ function DistancesDetails({ mode }) {
     });
 
     const validationSchema1 = yup.object().shape({
-        category: yup.string().required('Required field'),
-        code: yup.string().required('Required field'),
-        description: yup.string().required('Required field')
+        fromLocation: yup.object().typeError('Required field'),
+        // fromDescription: yup.string().required('Required field'),
+        toLocation: yup.object().typeError('Required field')
+        // toDescription: yup.string().required('Required field')
+        // distance: yup.string().required('Required field'),
+        // hours:yup.string().required('Required field'),
     });
 
     //get data from reducers
@@ -133,59 +148,191 @@ function DistancesDetails({ mode }) {
     };
 
     useEffect(() => {
+        const distanceArryay = [];
+        console.log('shddddddddddddddddddddddddddddddddddddddddddd');
+        if (distanceByTransportType != null && selectedType != '') {
+            console.log(distanceByTransportType);
+
+            // distanceByTransportType.forEach((values) => {
+            //     const distanceDetails = [
+            //         {
+            //             // mainCategories: selectedType,
+            //             fromLocation: values.fromLocation,
+            //             fromDescription: values.fromLocation.shortDescription,
+            //             toLocation: values.toLocation,
+            //             toDescription: values.toLocation.shortDescription,
+            //             distance: values.distance,
+            //             hours: values.hours,
+            //             status: values.status
+            //             // mainCategories: selectedType,
+            //             // fromLocation: element.fromLocation,
+            //             // fromDescription: element.toLocation,
+            //             // toDescription: element.toLocation.shortDescription,
+            //             // distance: element.distance,
+            //             // hours: element.hours,
+            //             // status: element.status
+            //         }
+            //     ];
+            //     // };
+
+            // });
+
+            const initialValuesNew = {
+                distanceDetails: distanceByTransportType
+            };
+            console.log(initialValuesNew);
+            setLoadValues(initialValuesNew);
+
+            // const values = {
+            //     distanceDetails: distanceByTransportType
+            // };
+            // setLoadValues(values);
+        }
+    }, [distanceByTransportType]);
+
+    useEffect(() => {
         if (categoryType !== null) {
-            loadValues.codeAndNameDetails?.map((s) =>
+            loadValues.distanceDetails?.map((s) =>
                 s.category === ''
                     ? dispatch(getCodeAndNameDataByType(categoryType))
-                    : detailsType.codeAndNameDetails.length != loadValues.codeAndNameDetails.length
+                    : detailsType.distanceDetails.length != loadValues.distanceDetails.length
                     ? setOpenModal(true)
                     : dispatch(getCodeAndNameDataByType(categoryType))
             );
         }
     }, [categoryType]);
 
+    // useEffect(() => {
+    //     if (categoryType !== null) {
+    //         if (detailsType !== null && detailsType.length != 0) {
+    //             setLoadValues(detailsType);
+    //         }
+    //     }
+    // }, [detailsType]);
+
     useEffect(() => {
-        if (categoryType !== null) {
-            if (detailsType !== null && detailsType.length != 0) {
-                setLoadValues(detailsType);
-            }
+        console.log(selectedType.categoryId);
+        if (selectedType != '') {
+            dispatch(getAllActiveDistanceDataByTransportType(selectedType.categoryId));
         }
-    }, [detailsType]);
+    }, [selectedType]);
+
+    // useEffect(() => {
+    //     alert('mode:' + mode);
+    // }, [mode]);
+
+    useEffect(() => {
+        setActiveLocationList(activeLocations);
+    }, [activeLocations]);
+
+    useEffect(() => {
+        dispatch(getActiveLocations());
+    }, []);
 
     const handleSubmitForm = async (data) => {
         console.log(data);
-        // if (mode === 'INSERT') {
-        //     dispatch(saveCodeAndNameData(data));
-        // } else if (mode === 'VIEW_UPDATE') {
-        //     dispatch(updateCodeAndNameData(data));
-        // }
-        // handleClose();
+        if (mode === 'INSERT') {
+            console.log(selectedType);
+            if (selectedType == '') {
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    // showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, approve it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const confirmRequest = () => {
+                            return axios
+                                .post('http://localhost:8090/api/auth/v1/fuel-request-by-fuel-station/approveRequest/' + `${data.id}`, {})
+                                .then((response) => {
+                                    Swal.fire('Approved!', 'Your file has been approved.', 'success'); // if (response.data.accessToken) {
+                                    //     localStorage.setItem('user', JSON.stringify(response.data));
+                                    // }
+                                    dispatch(getAllFuelRequestDataSendByFillingStation());
+                                    return response.data;
+                                });
+                        };
+                        confirmRequest();
+                    }
+                });
+            }
+
+            // const distanceDetailsArray = data.distanceDetails;
+
+            // console.log(distanceDetailsArray);
+            // dispatch(saveDistanceData(distanceDetailsArray));
+
+            // const initialValuesNew = {
+            //     distanceDetails: [
+            //         {
+            //             mainCategories: '',
+            //             fromLocation: {
+            //                 code: ''
+            //             },
+            //             fromDescription: '',
+            //             toLocation: {
+            //                 code: ''
+            //             },
+            //             toDescription: '',
+            //             distance: '',
+            //             hours: '',
+            //             status: true
+            //         }
+            //     ]
+            // };
+            // setLoadValues(initialValuesNew);
+        } else if (mode === 'VIEW_UPDATE') {
+            dispatch(updateCodeAndNameData(data));
+        }
     };
 
-    const loadCodeAndNameDetails = (event) => {
-        const selectedType = event.currentTarget.dataset.value;
-        if (loadValues.length != 0) {
-        }
-        setCategoryType(selectedType);
-    };
+    // const handleSubmit = async (values) => {
+    //     console.log(values);
+    //     const initialValuesNew = {
+    //         category: values.category,
+    //         code: values.category,
+    //         description: '',
+    //         status: true,
+    //         distanceDetails: [
+    //             { category: values.category, code: values.code, description: values.description, status: values.status, id: '' }
+    //         ]
+    //     };
+
+    //     loadValues.distanceDetails?.map((s) =>
+    //         s.code === values.code && s.category == values.category ? setExistOpenModal(true) : initialValuesNew.distanceDetails.push(s)
+    //     );
+
+    //     setLoadValues(initialValuesNew);
+    // };
 
     const handleSubmit = async (values) => {
-        console.log(values);
         const initialValuesNew = {
-            category: values.category,
-            code: values.category,
-            description: '',
-            status: true,
-            codeAndNameDetails: [
-                { category: values.category, code: values.code, description: values.description, status: values.status, id: '' }
+            distanceDetails: [
+                {
+                    mainCategories: selectedType,
+                    fromLocation: values.fromLocation,
+                    fromDescription: values.fromLocation.shortDescription,
+                    toLocation: values.toLocation,
+                    toDescription: values.toLocation.shortDescription,
+                    distance: values.distance,
+                    hours: values.hours,
+                    status: values.status
+                }
             ]
         };
 
-        loadValues.codeAndNameDetails?.map((s) =>
-            s.code === values.code && s.category == values.category ? setExistOpenModal(true) : initialValuesNew.codeAndNameDetails.push(s)
-        );
+        if (loadValues.distanceDetails.length != 0) {
+            loadValues.distanceDetails?.map((s) =>
+                s.fromDescription == '' && s.toDescription == '' ? initialValuesNew : initialValuesNew.distanceDetails.push(s)
+            );
 
-        setLoadValues(initialValuesNew);
+            setLoadValues(initialValuesNew);
+        } else {
+            setLoadValues(initialValuesNew);
+        }
     };
 
     return (
@@ -200,7 +347,7 @@ function DistancesDetails({ mode }) {
                                 handleSubmit(values);
                                 resetForm('');
                             }}
-                            // validationSchema={validationSchema1}
+                            validationSchema={validationSchema1}
                         >
                             {({ values, handleChange, setFieldValue, errors, handleBlur, touched, resetForm }) => {
                                 return (
@@ -210,24 +357,24 @@ function DistancesDetails({ mode }) {
                                                 <Grid item>
                                                     {' '}
                                                     <Autocomplete
-                                                        value={values.marketList}
-                                                        name="category"
+                                                        value={values.fromLocation}
+                                                        name="fromLocation"
                                                         disabled={mode == 'VIEW'}
                                                         onChange={(_, value) => {
-                                                            setFieldValue(`marketList`, value);
+                                                            setFieldValue(`fromLocation`, value);
                                                         }}
                                                         InputLabelProps={{
                                                             shrink: true
                                                         }}
-                                                        options={marketListOptions}
-                                                        getOptionLabel={(option) => `${option.code} - ${option.name}`}
-                                                        isOptionEqualToValue={(option, value) => option.marketId === value.marketId}
+                                                        options={activeLocationList}
+                                                        getOptionLabel={(option) => `${option.code} - ${option.shortDescription}`}
+                                                        // isOptionEqualToValue={(option, value) => option.marketId === value.marketId}
                                                         renderInput={(params) => (
                                                             <TextField
                                                                 {...params}
-                                                                label="Markets"
+                                                                label="From Location"
                                                                 sx={{
-                                                                    width: { xs: 120 },
+                                                                    width: { xs: 175 },
                                                                     '& .MuiInputBase-root': {
                                                                         height: 41
                                                                     }
@@ -235,13 +382,12 @@ function DistancesDetails({ mode }) {
                                                                 InputLabelProps={{
                                                                     shrink: true
                                                                 }}
-                                                                error={Boolean(touched.marketList && errors.marketList)}
+                                                                error={Boolean(touched.fromLocation && errors.fromLocation)}
                                                                 helperText={
-                                                                    touched.marketList && errors.marketList ? errors.marketList : ''
+                                                                    touched.fromLocation && errors.fromLocation ? errors.fromLocation : ''
                                                                 }
-                                                                // placeholder="--Select a Manager Code --"
                                                                 variant="outlined"
-                                                                name="marketList"
+                                                                name="fromLocation"
                                                                 onBlur={handleBlur}
                                                             />
                                                         )}
@@ -250,48 +396,54 @@ function DistancesDetails({ mode }) {
 
                                                 <Grid item>
                                                     <TextField
-                                                        label="Type Code"
+                                                        label="Description"
                                                         sx={{
-                                                            width: { xs: 120 },
+                                                            width: { xs: 150 },
                                                             '& .MuiInputBase-root': {
                                                                 height: 40
                                                             }
                                                         }}
-                                                        disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                        disabled
                                                         type="text"
                                                         variant="outlined"
-                                                        name="code"
+                                                        name="fromDescription"
                                                         InputLabelProps={{
                                                             shrink: true
                                                         }}
-                                                        value={values.code}
+                                                        value={
+                                                            values.fromLocation && values.fromLocation
+                                                                ? values.fromLocation.shortDescription
+                                                                : ''
+                                                        }
                                                         onChange={handleChange}
                                                         onBlur={handleBlur}
-                                                        error={Boolean(touched.code && errors.code)}
-                                                        helperText={touched.code && errors.code ? errors.code : ''}
+                                                        // error={Boolean(touched.fromDescription && errors.fromDescription)}
+                                                        // helperText={
+                                                        //     touched.fromDescription && errors.fromDescription ? errors.fromDescription : ''
+                                                        // }
                                                     />
                                                 </Grid>
                                                 <Grid item>
                                                     {' '}
                                                     <Autocomplete
-                                                        value={values.marketList}
-                                                        name="category"
+                                                        value={values.toLocation}
+                                                        name="toLocation"
                                                         disabled={mode == 'VIEW'}
                                                         onChange={(_, value) => {
-                                                            setFieldValue(`marketList`, value);
+                                                            setFieldValue(`toLocation`, value);
                                                         }}
                                                         InputLabelProps={{
                                                             shrink: true
                                                         }}
-                                                        options={marketListOptions}
-                                                        getOptionLabel={(option) => `${option.code} - ${option.name}`}
-                                                        isOptionEqualToValue={(option, value) => option.marketId === value.marketId}
+                                                        options={activeLocationList}
+                                                        getOptionLabel={(option) => `${option.code} - ${option.shortDescription}`}
+                                                        // isOptionEqualToValue={(option, value) => option.marketId === value.marketId}
                                                         renderInput={(params) => (
                                                             <TextField
                                                                 {...params}
-                                                                label="Markets"
+                                                                label="To Location"
                                                                 sx={{
-                                                                    width: { xs: 120 },
+                                                                    width: { xs: 175 },
                                                                     '& .MuiInputBase-root': {
                                                                         height: 41
                                                                     }
@@ -299,13 +451,13 @@ function DistancesDetails({ mode }) {
                                                                 InputLabelProps={{
                                                                     shrink: true
                                                                 }}
-                                                                error={Boolean(touched.marketList && errors.marketList)}
+                                                                error={Boolean(touched.toLocation && errors.toLocation)}
                                                                 helperText={
-                                                                    touched.marketList && errors.marketList ? errors.marketList : ''
+                                                                    touched.toLocation && errors.toLocation ? errors.toLocation : ''
                                                                 }
                                                                 // placeholder="--Select a Manager Code --"
                                                                 variant="outlined"
-                                                                name="marketList"
+                                                                name="toLocation"
                                                                 onBlur={handleBlur}
                                                             />
                                                         )}
@@ -315,30 +467,34 @@ function DistancesDetails({ mode }) {
                                                     <TextField
                                                         label="Description"
                                                         sx={{
-                                                            width: { xs: 120 },
+                                                            width: { xs: 150 },
                                                             '& .MuiInputBase-root': {
                                                                 height: 40
                                                             }
                                                         }}
-                                                        disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                        disabled
                                                         type="text"
                                                         variant="outlined"
-                                                        name="description"
+                                                        name="toDescription"
                                                         InputLabelProps={{
                                                             shrink: true
                                                         }}
-                                                        value={values.description}
+                                                        value={
+                                                            values.toLocation && values.toLocation ? values.toLocation.shortDescription : ''
+                                                        }
                                                         onChange={handleChange}
                                                         onBlur={handleBlur}
-                                                        error={Boolean(touched.description && errors.description)}
-                                                        helperText={touched.description && errors.description ? errors.description : ''}
+                                                        // error={Boolean(touched.toDescription && errors.toDescription)}
+                                                        // helperText={
+                                                        //     touched.toDescription && errors.toDescription ? errors.toDescription : ''
+                                                        // }
                                                     />
                                                 </Grid>
                                                 <Grid item>
                                                     <TextField
-                                                        label="Description"
+                                                        label="Distance (km)"
                                                         sx={{
-                                                            width: { xs: 120 },
+                                                            width: { xs: 150 },
                                                             '& .MuiInputBase-root': {
                                                                 height: 40
                                                             }
@@ -346,22 +502,22 @@ function DistancesDetails({ mode }) {
                                                         disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
                                                         type="text"
                                                         variant="outlined"
-                                                        name="description"
+                                                        name="distance"
                                                         InputLabelProps={{
                                                             shrink: true
                                                         }}
-                                                        value={values.description}
+                                                        value={values.distance}
                                                         onChange={handleChange}
                                                         onBlur={handleBlur}
-                                                        error={Boolean(touched.description && errors.description)}
-                                                        helperText={touched.description && errors.description ? errors.description : ''}
+                                                        // error={Boolean(touched.description && errors.description)}
+                                                        // helperText={touched.description && errors.description ? errors.description : ''}
                                                     />
                                                 </Grid>
                                                 <Grid item>
                                                     <TextField
-                                                        label="Description"
+                                                        label="Hours"
                                                         sx={{
-                                                            width: { xs: 120 },
+                                                            width: { xs: 150 },
                                                             '& .MuiInputBase-root': {
                                                                 height: 40
                                                             }
@@ -369,15 +525,15 @@ function DistancesDetails({ mode }) {
                                                         disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
                                                         type="text"
                                                         variant="outlined"
-                                                        name="description"
+                                                        name="hours"
                                                         InputLabelProps={{
                                                             shrink: true
                                                         }}
-                                                        value={values.description}
+                                                        value={values.hours}
                                                         onChange={handleChange}
                                                         onBlur={handleBlur}
-                                                        error={Boolean(touched.description && errors.description)}
-                                                        helperText={touched.description && errors.description ? errors.description : ''}
+                                                        // error={Boolean(touched.description && errors.description)}
+                                                        // helperText={touched.description && errors.description ? errors.description : ''}
                                                     />
                                                 </Grid>
 
@@ -420,7 +576,7 @@ function DistancesDetails({ mode }) {
                     <Formik
                         enableReinitialize={true}
                         initialValues={loadValues || initialValues}
-                        onSubmit={(values, resetForm) => {
+                        onSubmit={(values, { resetForm }) => {
                             handleSubmitForm(values);
                             resetForm('');
                         }}
@@ -429,36 +585,56 @@ function DistancesDetails({ mode }) {
                         {({ values, handleChange, setFieldValue, errors, handleBlur, touched, resetForm }) => {
                             return (
                                 <Form>
-                                    <FieldArray name="codeAndNameDetails">
+                                    <FieldArray name="distanceDetails">
                                         {({ insert, remove, push }) => (
                                             <Paper>
                                                 <TableContainer>
                                                     <Table stickyHeader size="small">
                                                         <TableHead alignItems="center">
                                                             <TableRow>
-                                                                {/* <TableCell>Sequence</TableCell> */}
-                                                                <TableCell>Category</TableCell>
-                                                                <TableCell>Code </TableCell>
+                                                                {/* <TableCell>Transport Type</TableCell> */}
+                                                                <TableCell>From Location</TableCell>
+                                                                <TableCell>Description </TableCell>
+                                                                <TableCell>To Location</TableCell>
                                                                 <TableCell>Description</TableCell>
+                                                                <TableCell>Distance</TableCell>
+                                                                <TableCell>Duration (h)</TableCell>
                                                                 <TableCell>Status</TableCell>
-                                                                <TableCell>Actions</TableCell>
-                                                                <TableCell>Status</TableCell>
-                                                                <TableCell>Actions</TableCell>
                                                                 <TableCell>Actions</TableCell>
                                                             </TableRow>
                                                         </TableHead>
-                                                        {/* {tableBodyData ? ( */}
+
                                                         <TableBody>
                                                             {(rowsPerPage > 0
-                                                                ? values.codeAndNameDetails.slice(
+                                                                ? values.distanceDetails.slice(
                                                                       page * rowsPerPage,
                                                                       page * rowsPerPage + rowsPerPage
                                                                   )
-                                                                : values.codeAndNameDetails
+                                                                : values.distanceDetails
                                                             ).map((record, idx) => {
-                                                                // {values.codeAndNameDetails.map((record, idx) => {
+                                                                // {values.distanceDetails.map((record, idx) => {
                                                                 return (
                                                                     <TableRow key={idx} hover>
+                                                                        {/* <TableCell>
+                                                                            <TextField
+                                                                                sx={{
+                                                                                    width: { xs: 120 },
+                                                                                    '& .MuiInputBase-root': {
+                                                                                        height: 40
+                                                                                    }
+                                                                                }}
+                                                                                disabled
+                                                                                variant="outlined"
+                                                                                name={`distanceDetails.${idx}.mainCategories`}
+                                                                                value={
+                                                                                    values.distanceDetails[idx] &&
+                                                                                    values.distanceDetails[idx].mainCategories
+                                                                                }
+                                                                                onChange={handleChange}
+                                                                                onBlur={handleBlur}
+                                                                               
+                                                                            />
+                                                                        </TableCell> */}
                                                                         {/* <TableCell>{idx + 1}</TableCell> */}
 
                                                                         <TableCell>
@@ -470,31 +646,30 @@ function DistancesDetails({ mode }) {
                                                                                     }
                                                                                 }}
                                                                                 disabled
-                                                                                //   type="number"
                                                                                 variant="outlined"
-                                                                                name={`codeAndNameDetails.${idx}.category`}
+                                                                                name={`distanceDetails.${idx}.fromLocation`}
                                                                                 value={
-                                                                                    values.codeAndNameDetails[idx] &&
-                                                                                    values.codeAndNameDetails[idx].category
+                                                                                    values.distanceDetails[idx] &&
+                                                                                    values.distanceDetails[idx].fromLocation.code
                                                                                 }
                                                                                 onChange={handleChange}
                                                                                 onBlur={handleBlur}
                                                                                 error={Boolean(
-                                                                                    touched.codeAndNameDetails &&
-                                                                                        touched.codeAndNameDetails[idx] &&
-                                                                                        touched.codeAndNameDetails[idx].category &&
-                                                                                        errors.codeAndNameDetails &&
-                                                                                        errors.codeAndNameDetails[idx] &&
-                                                                                        errors.codeAndNameDetails[idx].category
+                                                                                    touched.distanceDetails &&
+                                                                                        touched.distanceDetails[idx] &&
+                                                                                        touched.distanceDetails[idx].fromLocation &&
+                                                                                        errors.distanceDetails &&
+                                                                                        errors.distanceDetails[idx] &&
+                                                                                        errors.distanceDetails[idx].fromLocation
                                                                                 )}
                                                                                 helperText={
-                                                                                    touched.codeAndNameDetails &&
-                                                                                    touched.codeAndNameDetails[idx] &&
-                                                                                    touched.codeAndNameDetails[idx].category &&
-                                                                                    errors.codeAndNameDetails &&
-                                                                                    errors.codeAndNameDetails[idx] &&
-                                                                                    errors.codeAndNameDetails[idx].category
-                                                                                        ? errors.codeAndNameDetails[idx].category
+                                                                                    touched.distanceDetails &&
+                                                                                    touched.distanceDetails[idx] &&
+                                                                                    touched.distanceDetails[idx].fromLocation &&
+                                                                                    errors.distanceDetails &&
+                                                                                    errors.distanceDetails[idx] &&
+                                                                                    errors.distanceDetails[idx].fromLocation
+                                                                                        ? errors.distanceDetails[idx].fromLocation
                                                                                         : ''
                                                                                 }
                                                                             />
@@ -508,34 +683,34 @@ function DistancesDetails({ mode }) {
                                                                                     }
                                                                                 }}
                                                                                 disabled
-                                                                                //   type="number"
                                                                                 variant="outlined"
                                                                                 // placeholder="code"
                                                                                 // validate={checkDuplicateCodeForCodeAndName}
 
-                                                                                name={`codeAndNameDetails.${idx}.code`}
+                                                                                name={`distanceDetails.${idx}.fromDescription`}
                                                                                 value={
-                                                                                    values.codeAndNameDetails[idx] &&
-                                                                                    values.codeAndNameDetails[idx].code
+                                                                                    values.distanceDetails[idx] &&
+                                                                                    values.distanceDetails[idx].fromLocation
+                                                                                        .shortDescription
                                                                                 }
                                                                                 onChange={handleChange}
                                                                                 onBlur={handleBlur}
                                                                                 error={Boolean(
-                                                                                    touched.codeAndNameDetails &&
-                                                                                        touched.codeAndNameDetails[idx] &&
-                                                                                        touched.codeAndNameDetails[idx].code &&
-                                                                                        errors.codeAndNameDetails &&
-                                                                                        errors.codeAndNameDetails[idx] &&
-                                                                                        errors.codeAndNameDetails[idx].code
+                                                                                    touched.distanceDetails &&
+                                                                                        touched.distanceDetails[idx] &&
+                                                                                        touched.distanceDetails[idx].fromDescription &&
+                                                                                        errors.distanceDetails &&
+                                                                                        errors.distanceDetails[idx] &&
+                                                                                        errors.distanceDetails[idx].fromDescription
                                                                                 )}
                                                                                 helperText={
-                                                                                    touched.codeAndNameDetails &&
-                                                                                    touched.codeAndNameDetails[idx] &&
-                                                                                    touched.codeAndNameDetails[idx].code &&
-                                                                                    errors.codeAndNameDetails &&
-                                                                                    errors.codeAndNameDetails[idx] &&
-                                                                                    errors.codeAndNameDetails[idx].code
-                                                                                        ? errors.codeAndNameDetails[idx].code
+                                                                                    touched.distanceDetails &&
+                                                                                    touched.distanceDetails[idx] &&
+                                                                                    touched.distanceDetails[idx].fromDescription &&
+                                                                                    errors.distanceDetails &&
+                                                                                    errors.distanceDetails[idx] &&
+                                                                                    errors.distanceDetails[idx].fromDescription
+                                                                                        ? errors.distanceDetails[idx].fromDescription
                                                                                         : ''
                                                                                 }
                                                                             />
@@ -552,30 +727,30 @@ function DistancesDetails({ mode }) {
                                                                                 //   type="number"
                                                                                 variant="outlined"
                                                                                 // placeholder="name"
-                                                                                name={`codeAndNameDetails.${idx}.description`}
+                                                                                name={`distanceDetails.${idx}.toLocation`}
                                                                                 value={
-                                                                                    values.codeAndNameDetails[idx] &&
-                                                                                    values.codeAndNameDetails[idx].description
+                                                                                    values.distanceDetails[idx] &&
+                                                                                    values.distanceDetails[idx].toLocation.code
                                                                                 }
                                                                                 disabled
                                                                                 onChange={handleChange}
                                                                                 onBlur={handleBlur}
                                                                                 error={Boolean(
-                                                                                    touched.codeAndNameDetails &&
-                                                                                        touched.codeAndNameDetails[idx] &&
-                                                                                        touched.codeAndNameDetails[idx].description &&
-                                                                                        errors.codeAndNameDetails &&
-                                                                                        errors.codeAndNameDetails[idx] &&
-                                                                                        errors.codeAndNameDetails[idx].description
+                                                                                    touched.distanceDetails &&
+                                                                                        touched.distanceDetails[idx] &&
+                                                                                        touched.distanceDetails[idx].toLocation &&
+                                                                                        errors.distanceDetails &&
+                                                                                        errors.distanceDetails[idx] &&
+                                                                                        errors.distanceDetails[idx].toLocation
                                                                                 )}
                                                                                 helperText={
-                                                                                    touched.codeAndNameDetails &&
-                                                                                    touched.codeAndNameDetails[idx] &&
-                                                                                    touched.codeAndNameDetails[idx].description &&
-                                                                                    errors.codeAndNameDetails &&
-                                                                                    errors.codeAndNameDetails[idx] &&
-                                                                                    errors.codeAndNameDetails[idx].description
-                                                                                        ? errors.codeAndNameDetails[idx].description
+                                                                                    touched.distanceDetails &&
+                                                                                    touched.distanceDetails[idx] &&
+                                                                                    touched.distanceDetails[idx].toLocation &&
+                                                                                    errors.distanceDetails &&
+                                                                                    errors.distanceDetails[idx] &&
+                                                                                    errors.distanceDetails[idx].toLocation
+                                                                                        ? errors.distanceDetails[idx].toLocation
                                                                                         : ''
                                                                                 }
                                                                             />
@@ -591,30 +766,30 @@ function DistancesDetails({ mode }) {
                                                                                 //   type="number"
                                                                                 variant="outlined"
                                                                                 // placeholder="name"
-                                                                                name={`codeAndNameDetails.${idx}.description`}
+                                                                                name={`distanceDetails.${idx}.toDescription`}
                                                                                 value={
-                                                                                    values.codeAndNameDetails[idx] &&
-                                                                                    values.codeAndNameDetails[idx].description
+                                                                                    values.distanceDetails[idx] &&
+                                                                                    values.distanceDetails[idx].toLocation.shortDescription
                                                                                 }
                                                                                 disabled
                                                                                 onChange={handleChange}
                                                                                 onBlur={handleBlur}
                                                                                 error={Boolean(
-                                                                                    touched.codeAndNameDetails &&
-                                                                                        touched.codeAndNameDetails[idx] &&
-                                                                                        touched.codeAndNameDetails[idx].description &&
-                                                                                        errors.codeAndNameDetails &&
-                                                                                        errors.codeAndNameDetails[idx] &&
-                                                                                        errors.codeAndNameDetails[idx].description
+                                                                                    touched.distanceDetails &&
+                                                                                        touched.distanceDetails[idx] &&
+                                                                                        touched.distanceDetails[idx].toDescription &&
+                                                                                        errors.distanceDetails &&
+                                                                                        errors.distanceDetails[idx] &&
+                                                                                        errors.distanceDetails[idx].toDescription
                                                                                 )}
                                                                                 helperText={
-                                                                                    touched.codeAndNameDetails &&
-                                                                                    touched.codeAndNameDetails[idx] &&
-                                                                                    touched.codeAndNameDetails[idx].description &&
-                                                                                    errors.codeAndNameDetails &&
-                                                                                    errors.codeAndNameDetails[idx] &&
-                                                                                    errors.codeAndNameDetails[idx].description
-                                                                                        ? errors.codeAndNameDetails[idx].description
+                                                                                    touched.distanceDetails &&
+                                                                                    touched.distanceDetails[idx] &&
+                                                                                    touched.distanceDetails[idx].toDescription &&
+                                                                                    errors.distanceDetails &&
+                                                                                    errors.distanceDetails[idx] &&
+                                                                                    errors.distanceDetails[idx].toDescription
+                                                                                        ? errors.distanceDetails[idx].toDescription
                                                                                         : ''
                                                                                 }
                                                                             />
@@ -630,64 +805,84 @@ function DistancesDetails({ mode }) {
                                                                                 //   type="number"
                                                                                 variant="outlined"
                                                                                 // placeholder="name"
-                                                                                name={`codeAndNameDetails.${idx}.description`}
+                                                                                name={`distanceDetails.${idx}.distance`}
                                                                                 value={
-                                                                                    values.codeAndNameDetails[idx] &&
-                                                                                    values.codeAndNameDetails[idx].description
+                                                                                    values.distanceDetails[idx] &&
+                                                                                    values.distanceDetails[idx].distance
                                                                                 }
-                                                                                disabled
                                                                                 onChange={handleChange}
                                                                                 onBlur={handleBlur}
-                                                                                error={Boolean(
-                                                                                    touched.codeAndNameDetails &&
-                                                                                        touched.codeAndNameDetails[idx] &&
-                                                                                        touched.codeAndNameDetails[idx].description &&
-                                                                                        errors.codeAndNameDetails &&
-                                                                                        errors.codeAndNameDetails[idx] &&
-                                                                                        errors.codeAndNameDetails[idx].description
-                                                                                )}
-                                                                                helperText={
-                                                                                    touched.codeAndNameDetails &&
-                                                                                    touched.codeAndNameDetails[idx] &&
-                                                                                    touched.codeAndNameDetails[idx].description &&
-                                                                                    errors.codeAndNameDetails &&
-                                                                                    errors.codeAndNameDetails[idx] &&
-                                                                                    errors.codeAndNameDetails[idx].description
-                                                                                        ? errors.codeAndNameDetails[idx].description
-                                                                                        : ''
+                                                                            />
+                                                                        </TableCell>
+
+                                                                        <TableCell>
+                                                                            <TextField
+                                                                                sx={{
+                                                                                    width: { xs: 120 },
+                                                                                    '& .MuiInputBase-root': {
+                                                                                        height: 40
+                                                                                    }
+                                                                                }}
+                                                                                //   type="number"
+                                                                                variant="outlined"
+                                                                                // placeholder="name"
+                                                                                name={`distanceDetails.${idx}.hours`}
+                                                                                value={
+                                                                                    values.distanceDetails[idx] &&
+                                                                                    values.distanceDetails[idx].hours
                                                                                 }
+                                                                                onChange={handleChange}
+                                                                                onBlur={handleBlur}
+                                                                                // error={Boolean(
+                                                                                //     touched.distanceDetails &&
+                                                                                //         touched.distanceDetails[idx] &&
+                                                                                //         touched.distanceDetails[idx].hours &&
+                                                                                //         errors.distanceDetails &&
+                                                                                //         errors.distanceDetails[idx] &&
+                                                                                //         errors.distanceDetails[idx].hours
+                                                                                // )}
+                                                                                // helperText={
+                                                                                //     touched.distanceDetails &&
+                                                                                //     touched.distanceDetails[idx] &&
+                                                                                //     touched.distanceDetails[idx].hours &&
+                                                                                //     errors.distanceDetails &&
+                                                                                //     errors.distanceDetails[idx] &&
+                                                                                //     errors.distanceDetails[idx].hours
+                                                                                //         ? errors.distanceDetails[idx].hours
+                                                                                //         : ''
+                                                                                // }
                                                                             />
                                                                         </TableCell>
                                                                         <TableCell>
                                                                             <FormGroup>
                                                                                 <FormControlLabel
-                                                                                    name={`codeAndNameDetails.${idx}.status`}
+                                                                                    name={`distanceDetails.${idx}.status`}
                                                                                     onChange={handleChange}
                                                                                     value={
-                                                                                        values.codeAndNameDetails[idx] &&
-                                                                                        values.codeAndNameDetails[idx].status
+                                                                                        values.distanceDetails[idx] &&
+                                                                                        values.distanceDetails[idx].status
                                                                                     }
                                                                                     control={<Switch color="success" />}
                                                                                     // label="Status"
-                                                                                    checked={values.codeAndNameDetails[idx].status}
-                                                                                    disabled
+                                                                                    checked={values.distanceDetails[idx].status}
+
                                                                                     // disabled={mode == 'VIEW'}
                                                                                 />
                                                                             </FormGroup>
                                                                         </TableCell>
 
                                                                         <TableCell>
-                                                                            {(values.codeAndNameDetails[idx] &&
-                                                                                values.codeAndNameDetails[idx].id) === '' ? (
-                                                                                <IconButton
-                                                                                    aria-label="delete"
-                                                                                    onClick={() => {
-                                                                                        remove(idx);
-                                                                                    }}
-                                                                                >
-                                                                                    <HighlightOffIcon />
-                                                                                </IconButton>
-                                                                            ) : null}
+                                                                            {/* {(values.distanceDetails[idx] &&
+                                                                                values.distanceDetails[idx].id) === '' ? ( */}
+                                                                            <IconButton
+                                                                                aria-label="delete"
+                                                                                onClick={() => {
+                                                                                    remove(idx);
+                                                                                }}
+                                                                            >
+                                                                                <HighlightOffIcon />
+                                                                            </IconButton>
+                                                                            {/* ) : null} */}
                                                                         </TableCell>
                                                                     </TableRow>
                                                                 );
@@ -705,7 +900,7 @@ function DistancesDetails({ mode }) {
                                                                         5, 10, 25
                                                                         // { label: 'All', value: -1 }
                                                                     ]}
-                                                                    count={values.codeAndNameDetails.length}
+                                                                    count={values.distanceDetails.length}
                                                                     rowsPerPage={rowsPerPage}
                                                                     page={page}
                                                                     SelectProps={{

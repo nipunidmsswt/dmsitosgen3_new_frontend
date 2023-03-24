@@ -632,6 +632,7 @@ import {
 } from './mastersaga/FacilityCountSaga';
 import {
     CHECK_MAIN_TRANSPORT_DETAILS_DUPLICATE,
+    GET_ACTIVE_TRANSPORT_MAIN_CATEGORY_DATA_BY_TYPE,
     GET_ALL_MAIN_TRANSPORT_DETAILS_DATA,
     GET_LAST_MODIFIED_DATE_TIME_MAIN_TRANSPORT_DETAILS,
     GET_MAIN_TRANSPORT_DETAILS_BY_ID,
@@ -642,12 +643,27 @@ import {
 import {
     checkDupicateMainTransportCategoriesSaga,
     checkLatestMainTransportCategoriesModifiedDateSaga,
+    getActiveTransportMainCategoryDataByTypeSaga,
     getAllMainTransportCategoriesSaga,
     getMainTransportCategoriesByIdSaga,
     getTransportMainCategoryDataByTypeSaga,
     saveMainTransportCategoriesSaga,
     updateMainTransportCategoriesSaga
 } from './mastersaga/transportSaga/MainTransportCategorySaga';
+import {
+    GET_ALL_ACTIVE_DISTANCE_DATA_TBY_TRANSPORT_TYPE,
+    GET_ALL_DISTANCE_DATA,
+    GET_DISTANCE_DATA_BY_ID,
+    SAVE_DISTANCE_DATA,
+    UPDATE_DISTANCE_DATA
+} from 'store/constant/master/TransportMasterConstant/DistanceConstant';
+import {
+    getAllActiveDistanceDataByTransportTypeSaga,
+    getDistanceByIdSaga,
+    saveDistanceDataHandler,
+    saveDistanceSaga,
+    updateDistanceSaga
+} from './mastersaga/transportSaga/DistanceSaga';
 export function* wacherSaga() {
     // tax setup
     yield takeLatest(SAVE_TAX_DATA, saveTaxSaga);
@@ -993,6 +1009,7 @@ export function* wacherSaga() {
     yield takeLatest(CHECK_MAIN_TRANSPORT_DETAILS_DUPLICATE, checkDupicateMainTransportCategoriesSaga);
     yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_MAIN_TRANSPORT_DETAILS, checkLatestMainTransportCategoriesModifiedDateSaga);
     yield takeLatest(GET_TRANSPORT_MAIN_CATEGORY_DATA_BY_TYPE, getTransportMainCategoryDataByTypeSaga);
+    yield takeLatest(GET_ACTIVE_TRANSPORT_MAIN_CATEGORY_DATA_BY_TYPE, getActiveTransportMainCategoryDataByTypeSaga);
     //room buying rate
     yield takeLatest(SAVE_ROOM_BUYING_RATE, saveRoomBuyingRateSaga);
     yield takeLatest(GET_ALL_ROOM_BUYING_RATE, getAllRoomBuyingRateSaga);
@@ -1003,4 +1020,13 @@ export function* wacherSaga() {
     yield takeLatest(GET_ROOM_BUYING_RATE_LIST_BY_HOTEL, getBuyingRoomRatesByHotelSaga);
     yield takeLatest(CLEAR_ROOM_BUYING_RATE, clearRoomBuyingRateSaga);
     // yield takeLatest(GET_ALL_ACTIVE_GUIDE_CLASS_DATA, getAllActiveGuideClassDataSaga);
+
+    //distance
+
+    yield takeLatest(SAVE_DISTANCE_DATA, saveDistanceSaga);
+    yield takeLatest(GET_ALL_DISTANCE_DATA, getAllRoomBuyingRateSaga);
+    yield takeLatest(GET_DISTANCE_DATA_BY_ID, getDistanceByIdSaga);
+    yield takeLatest(GET_ALL_ACTIVE_DISTANCE_DATA_TBY_TRANSPORT_TYPE, getAllActiveDistanceDataByTransportTypeSaga);
+    // yield takeLatest(CHECK_ROOM_BUYING_RATE_CODE_DUPLICATE, checkDupicateRoomBuyingRateSaga);
+    yield takeLatest(UPDATE_DISTANCE_DATA, updateDistanceSaga);
 }

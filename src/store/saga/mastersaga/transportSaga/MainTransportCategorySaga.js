@@ -13,7 +13,9 @@ import {
     FAILED_LAST_MODIFIED_DATE_MAIN_TRANSPORT_DETAILS,
     SUCCESS_LAST_MODIFIED_DATE_MAIN_TRANSPORT_DETAILS,
     SUCCESS_GET_TRANSPORT_MAIN_CATEGORY_DATA_BY_TYPE,
-    FAILED_GET_TRANSPORT_MAIN_CATEGORY_DATA_BY_TYPE
+    FAILED_GET_TRANSPORT_MAIN_CATEGORY_DATA_BY_TYPE,
+    SUCCESS_GET_ACTIVE_TRANSPORT_MAIN_CATEGORY_DATA_BY_TYPE,
+    FAILED_GET_ACTIVE_TRANSPORT_MAIN_CATEGORY_DATA_BY_TYPE
 } from '../../../constant/master/TransportMasterConstant/MainTransportCategoryConstant';
 
 //Main Transport categories saga
@@ -119,5 +121,17 @@ export function* checkLatestMainTransportCategoriesModifiedDateSaga() {
     } catch (e) {
         console.log('Error:' + e);
         yield put({ type: FAILED_LAST_MODIFIED_DATE_MAIN_TRANSPORT_DETAILS, data: '' });
+    }
+}
+
+export function* getActiveTransportMainCategoryDataByTypeSaga(action) {
+    let responseData = [];
+    try {
+        responseData = yield call(getById, `${process.env.REACT_APP_TRANSPORT_URL}/activeMainCategories/${action.data.type}`);
+        console.log(responseData);
+        yield put({ type: SUCCESS_GET_ACTIVE_TRANSPORT_MAIN_CATEGORY_DATA_BY_TYPE, data: responseData.data });
+    } catch (e) {
+        console.log(responseData);
+        yield put({ type: FAILED_GET_ACTIVE_TRANSPORT_MAIN_CATEGORY_DATA_BY_TYPE, data: responseData });
     }
 }

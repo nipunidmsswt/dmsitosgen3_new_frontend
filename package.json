@@ -50,6 +50,7 @@
         "redux-saga": "^1.2.1",
         "slick-carousel": "^1.8.1",
         "srilankan-provinces-districts": "^1.0.8",
+        "sweetalert2": "^11.7.3",
         "yup": "^0.32.11"
     },
     "scripts": {

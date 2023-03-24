@@ -27,6 +27,7 @@ import { getAllActiveMarketData } from 'store/actions/masterActions/operatorActi
 import { makeStyles } from '@material-ui/core/styles';
 import MainTransportCategories from './MainTransportCategories';
 import DistancesDetails from './DistancesDetails';
+import { getAllActiveTransportMainCategoryDataByType } from 'store/actions/masterActions/transportActions/MainTransportCategoriesActions';
 
 const useStyles = makeStyles({
     content: {
@@ -37,73 +38,30 @@ const useStyles = makeStyles({
 function TransportMainScreen() {
     const classes = useStyles();
 
-    const initialMarketOperator = {
-        market: null,
-        operatorList: []
+    const headerInitialValues = {
+        transportType: null,
+        description: ''
     };
-
-    const initialValuesClusterMarketMapping = {
-        cluster: null,
-        marketList: []
-    };
-
-    const validationSchema = yup.object().shape({
-        cluster: yup.object().typeError('Required field'),
-        marketList: yup
-            .array()
-            .of(
-                yup.object().shape({
-                    value: yup.string(),
-                    code: yup.string(),
-                    name: yup.string()
-                })
-            )
-            .min(1, 'Required Field')
-    });
-
-    const validationSchemaMarketOperator = yup.object().shape({
-        market: yup.object().typeError('Required field'),
-        operatorList: yup
-            .array()
-            .of(
-                yup.object().shape({
-                    value: yup.string(),
-                    code: yup.string(),
-                    name: yup.string()
-                })
-            )
-            .min(1, 'Required Field')
-    });
 
     const [open, setOpen] = useState(false);
     const [openAgent, setAgentOpen] = useState(false);
     const [ccode, setCode] = useState('');
     const [operatorCode, setOperatorCode] = useState('');
     const [marketCode, setMarketCode] = useState('');
+    const [selectedTransportType, setSelectedTransportType] = useState('');
     const [mode, setMode] = useState('INSERT');
+    const [activeTransportTypeCategoryDetails, setActiveTransportTypeCategoryDetails] = useState('');
     const [openToast, setHandleToast] = useState(false);
     const [openErrorToast, setOpenErrorToast] = useState(false);
-    const [tableData, setTableData] = useState([]);
-    const [clusterListOptions, setClusterListOptions] = useState([]);
-    const [marketListOptions, setMarketListOptions] = useState([]);
-    const [operatorListOptions, setOperatorListOptions] = useState([]);
 
     const dispatch = useDispatch();
     const error = useSelector((state) => state.codeAndNameReducer.errorMsg);
-
-    const codeAndNameData = useSelector((state) => state.codeAndNameReducer.codeAndName);
-    const clusterMarketMappingData = useSelector((state) => state.codeAndNameReducer.clusterMarketMappingData);
-    const clusterListData = useSelector((state) => state.codeAndNameReducer.cluterTypesDetails);
-    const marketListData = useSelector((state) => state.marketReducer.marketActiveList);
     const lastModifiedDate = useSelector((state) => state.codeAndNameReducer.lastModifiedDateTime);
-    const operatorListData = useSelector((state) => state.codeAndNameReducer.operatorTypesDetails);
-    const marketMappingWithCluster = useSelector((state) => state.codeAndNameReducer.marketMappingWithCluster);
-    const operatorMappingWithMarket = useSelector((state) => state.codeAndNameReducer.operatorMappingWithMarket);
-    const marketOperatorMappingData = useSelector((state) => state.codeAndNameReducer.marketOperatorMappingData);
-
     const dataToTableView = useSelector((state) => state.codeAndNameReducer.dataToTableView);
     const agentData = useSelector((state) => state.agentReducer.agent);
     const mainTransportDetail = useSelector((state) => state.mainTransportCategoryReducer.mainTransportDetail);
+    const distance = useSelector((state) => state.distanceReducer.distance);
+    const activeCategoryDetails = useSelector((state) => state.mainTransportCategoryReducer.activeCategoryDetails);
 
     const handleClickOpenAgentForm = (code, marketCode) => {
         console.log('market Code:' + marketCode);
@@ -161,22 +119,6 @@ function TransportMainScreen() {
     ];
 
     useEffect(() => {
-        setTableData(dataToTableView);
-    }, [dataToTableView]);
-
-    useEffect(() => {
-        // if (marketMappingWithCluster?.payload?.length > 0) {
-
-        setMarketListOptions(marketMappingWithCluster);
-    }, [marketMappingWithCluster]);
-
-    useEffect(() => {
-        if (operatorMappingWithMarket?.length > 0) {
-            setOperatorListOptions(operatorMappingWithMarket);
-        }
-    }, [operatorMappingWithMarket]);
-
-    useEffect(() => {
         if (mainTransportDetail != null) {
             setHandleToast(true);
 
@@ -187,36 +129,20 @@ function TransportMainScreen() {
     }, [mainTransportDetail]);
 
     useEffect(() => {
-        if (agentData != null) {
-            setHandleToast(true);
-        } else {
-        }
-    }, [agentData]);
-
-    useEffect(() => {
-        if (clusterMarketMappingData != null) {
-            setHandleToast(true);
-
-            // dispatch(getAllCodeAndNameDetails());
-            // dispatch(getLatestModifiedDetails());
-        }
-    }, [clusterMarketMappingData]);
-
-    useEffect(() => {
-        if (marketOperatorMappingData != null) {
+        if (distance != null) {
             setHandleToast(true);
 
             // dispatch(getAllCodeAndNameDetails());
             // dispatch(getLatestModifiedDetails());
         } else {
         }
-    }, [marketOperatorMappingData]);
+    }, [distance]);
 
-    // useEffect(() => {
-    //     if (clusterListData != null) {
-    //         setClusterListOptions(clusterListData);
-    //     }
-    // }, [clusterListData]);
+    useEffect(() => {}, [selectedTransportType]);
+
+    useEffect(() => {
+        dispatch(getAllActiveTransportMainCategoryDataByType('Transport Type'));
+    }, []);
 
     useEffect(() => {
         if (error != null) {
@@ -225,21 +151,15 @@ function TransportMainScreen() {
     }, [error]);
 
     useEffect(() => {
-        setMarketListOptions(marketListData);
-    }, [marketListData]);
-
-    useEffect(() => {
+        if (activeCategoryDetails != null) {
+            console.log(activeCategoryDetails);
+            setActiveTransportTypeCategoryDetails(activeCategoryDetails);
+        }
         // dispatch(getAllClusterData());
         // dispatch(getAllActiveMarketData());
         // dispatch(getAllActiveOperatorData());
         // dispatch(getAllMarketAndOperatorForCluster());
-    }, []);
-
-    useEffect(() => {
-        if (operatorListData != null) {
-            setOperatorListOptions(operatorListData);
-        }
-    }, [operatorListData]);
+    }, [activeCategoryDetails]);
 
     const [lastModifiedTimeDate, setLastModifiedTimeDate] = useState(null);
     useEffect(() => {
@@ -272,26 +192,12 @@ function TransportMainScreen() {
         handleClose();
     };
 
-    const handleMarketOperatorSubmitForm = async (data) => {
-        dispatch(saveOperatorAndMarketMappingData(data));
-
-        handleClose();
-    };
-
     const handleClose = () => {
         setOpen(false);
         setAgentOpen(false);
         // dispatch(getAllClusterData());
         // dispatch(getAllActiveMarketData());
         // dispatch(getAllActiveOperatorData());
-    };
-
-    const loadExisitngMarketCodesForCluster = (value) => {
-        dispatch(getExisitngMarketCodesForCluster(value.clusterId));
-    };
-
-    const loadExisitngOperatorCodesForMarket = (value) => {
-        dispatch(getExisitngOperatorCodesForMarket(value.marketId));
     };
 
     const handleToast = () => {
@@ -312,9 +218,105 @@ function TransportMainScreen() {
                     {' '}
                     {/* Last Modified Date : {lastModifiedTimeDate} */}
                     <Button variant="contained" type="button" className="btnSave" onClick={handleClickOpen}>
-                        Main
+                        Add New Category
                     </Button>
                 </div>
+                <br />
+                <br />
+
+                <Grid container spacing={gridSpacing} className="row">
+                    <Grid item>
+                        <Formik
+                            enableReinitialize={true}
+                            initialValues={headerInitialValues || loadValues}
+                            onSubmit={(values, { resetForm }) => {
+                                // handleSubmit(values);
+                                resetForm('');
+                            }}
+                            // validationSchema={validationSchema1}
+                        >
+                            {({ values, handleChange, setFieldValue, errors, handleBlur, touched, resetForm }) => {
+                                return (
+                                    <Form>
+                                        <div style={{ marginTop: '6px', margin: '10px' }}>
+                                            <Grid container spacing={gridSpacing}>
+                                                <Grid item>
+                                                    <Autocomplete
+                                                        value={values.transportType}
+                                                        name="transportType"
+                                                        disabled={mode == 'VIEW'}
+                                                        onChange={(_, value) => {
+                                                            setFieldValue(`transportType`, value);
+                                                            setSelectedTransportType(value);
+                                                        }}
+                                                        InputLabelProps={{
+                                                            shrink: true
+                                                        }}
+                                                        options={activeTransportTypeCategoryDetails}
+                                                        getOptionLabel={(option) => `${option.typeCode} - ${option.description}`}
+                                                        // isOptionEqualToValue={(option, value) => option.marketId === value.marketId}
+                                                        renderInput={(params) => (
+                                                            <TextField
+                                                                {...params}
+                                                                label="Transport Type Code"
+                                                                sx={{
+                                                                    width: { xs: 200 },
+                                                                    '& .MuiInputBase-root': {
+                                                                        height: 41
+                                                                    }
+                                                                }}
+                                                                InputLabelProps={{
+                                                                    shrink: true
+                                                                }}
+                                                                // error={Boolean(touched.fromLocation && errors.fromLocation)}
+                                                                // helperText={
+                                                                //     touched.fromLocation && errors.fromLocation ? errors.fromLocation : ''
+                                                                // }
+                                                                variant="outlined"
+                                                                name="transportType"
+                                                                onBlur={handleBlur}
+                                                            />
+                                                        )}
+                                                    />
+                                                </Grid>
+
+                                                <Grid item>
+                                                    <TextField
+                                                        label="Description"
+                                                        sx={{
+                                                            width: { xs: 200 },
+                                                            '& .MuiInputBase-root': {
+                                                                height: 40
+                                                            }
+                                                        }}
+                                                        disabled
+                                                        type="text"
+                                                        variant="outlined"
+                                                        name="description"
+                                                        InputLabelProps={{
+                                                            shrink: true
+                                                        }}
+                                                        value={
+                                                            values.transportType && values.transportType
+                                                                ? values.transportType.description
+                                                                : ''
+                                                        }
+                                                        onChange={handleChange}
+                                                        onBlur={handleBlur}
+                                                        // error={Boolean(touched.fromDescription && errors.fromDescription)}
+                                                        // helperText={
+                                                        //     touched.fromDescription && errors.fromDescription ? errors.fromDescription : ''
+                                                        // }
+                                                    />
+                                                </Grid>
+                                            </Grid>
+                                        </div>
+                                    </Form>
+                                );
+                            }}
+                        </Formik>
+                    </Grid>
+                </Grid>
                 <br />
                 <br />
                 <Grid container spacing={gridSpacing}>
@@ -338,7 +340,9 @@ function TransportMainScreen() {
                                         </Typography>
                                     </AccordionSummary>
                                     <AccordionDetails>
-                                        <DistancesDetails mode={mode}></DistancesDetails>
+                                        <DistancesDetails mode={mode} selectedType={selectedTransportType}>
+                                            {selectedTransportType}
+                                        </DistancesDetails>
                                     </AccordionDetails>
                                 </Accordion>
 
