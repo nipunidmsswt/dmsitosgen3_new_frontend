@@ -53,6 +53,7 @@ import ExitAlert from 'messages/ExitAlert';
 import AlertItemExist from 'messages/AlertItemExist';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { makeStyles } from '@mui/styles';
+import { getAllActiveGuideClassData } from 'store/actions/masterActions/GuideClassAction';
 const useStyles = makeStyles({
     table: {
         minWidth: 650
@@ -75,33 +76,6 @@ function PaxVehicleRate(props) {
     const classes = useStyles();
     const formikRef = useRef();
     const newobj = {
-        roomBuyingRateId: '',
-        hotelCode: null,
-        hotelName: null,
-        operatorGpCode: null,
-        operatorCode: [],
-        newOperatorCode: [],
-        season: null,
-        ratePeriod: null,
-        fromDate: '',
-        toDate: '',
-        taxGpCode: null,
-        currency: null,
-        roomCategory: null,
-        basis: null,
-        singleRate: '',
-        doubleRate: '',
-        trippleRate: '',
-        family: '',
-        child: '',
-        taxApplicable: true,
-        default: false,
-        guideBasis: null,
-        guideRate: '',
-        tourLeadRate: '',
-        taxApplicableGuide: true,
-        rateStatus: true,
-        guideStatus: true,
         status: true,
         ratesDetails: [
             {
@@ -141,7 +115,7 @@ function PaxVehicleRate(props) {
     const [mmObject, setnewobj] = useState(newobj);
     const [openToast, setHandleToast] = useState(false);
     const [openErrorToast, setOpenErrorToast] = useState(false);
-    const [activeOperatorGroupList, setActiveOperatorGroupList] = useState([]);
+    const [activeGuideClassList, setactiveGuideClassList] = useState([]);
     const [activeOperatorList, setActiveOperatorList] = useState([]);
     const [activeSeasonList, setactiveSeasonList] = useState([]);
     const [activeRateListBySeason, setActiveRateListBySeason] = useState([]);
@@ -167,17 +141,13 @@ function PaxVehicleRate(props) {
 
     const error = useSelector((state) => state.seasonReducer.errorMsg);
     const lastModifiedDate = useSelector((state) => state.seasonReducer.lastModifiedDateTime);
-    const activeOperatorGroupData = useSelector((state) => state.marketGroupReducer.activeOperatorGroupList);
-    const activeOperatordata = useSelector((state) => state.marketGroupReducer.activeOpListPerOpGroup);
-    const activeSeasonData = useSelector((state) => state.seasonReducer.activeSeasons);
-    const activeRatesBySeason = useSelector((state) => state.seasonReducer.activeRatesBySeason);
-    const activeTaxGrupData = useSelector((state) => state.taxGroupReducer.activeTaxGrups);
     const currencyListData = useSelector((state) => state.expenseTypesReducer.currencyList);
     const activeHotelChildrenFacilityListData = useSelector((state) => state.roomCategoryReducer.activeHotelChildrenFacilityList);
     const activeHotelBasisListData = useSelector((state) => state.hotelBasisReducer.activeHotelBasisList);
     const roomBuyingRateToUpdate = useSelector((state) => state.roomBuyingRateReducer.roomBuyingRateToUpdate);
     const roomBuyingRate = useSelector((state) => state.roomBuyingRateReducer.roomBuyingRate);
     const duplicateRoomBuyingRate = useSelector((state) => state.roomBuyingRateReducer.duplicateRoomBuyingRate);
+    const guideClassActiveList = useSelector((state) => state.guideClassReducer.guideClassActiveList);
 
     const navigate = useNavigate();
     useEffect(() => {
@@ -299,48 +269,28 @@ function PaxVehicleRate(props) {
     };
 
     useEffect(() => {
-        if (activeSeasonData.length != 0) {
-            setactiveSeasonList(activeSeasonData);
+        if (guideClassActiveList.length != 0) {
+            setactiveSeasonList(guideClassActiveList);
         }
-    }, [activeSeasonData]);
+    }, [guideClassActiveList]);
 
-    useEffect(() => {
-        if (activeRatesBySeason.length != 0) {
-            setActiveRateListBySeason(activeRatesBySeason);
-        }
-    }, [activeRatesBySeason]);
+    // useEffect(() => {
+    //     if (activeRatesBySeason.length != 0) {
+    //         setActiveRateListBySeason(activeRatesBySeason);
+    //     }
+    // }, [activeRatesBySeason]);
 
-    useEffect(() => {
-        if (activeOperatorGroupData.length != 0) {
-            setActiveOperatorGroupList(activeOperatorGroupData);
-        }
-    }, [activeOperatorGroupData]);
+    // useEffect(() => {
+    //     if (activeOperatorGroupData.length != 0) {
+    //         setActiveOperatorGroupList(activeOperatorGroupData);
+    //     }
+    // }, [activeOperatorGroupData]);
 
-    useEffect(() => {
-        if (activeOperatordata.length != 0) {
-            setActiveOperatorList(activeOperatordata);
-        }
-    }, [activeOperatordata]);
-
-    useEffect(() => {
-        if (activeHotelChildrenFacilityListData.length != 0) {
-            setActiveRoomCategories(activeHotelChildrenFacilityListData);
-        }
-    }, [activeHotelChildrenFacilityListData]);
-
-    useEffect(() => {
-        if (activeHotelBasisListData != null) {
-            setActiveHotelBasis(activeHotelBasisListData);
-        }
-    }, [activeHotelBasisListData]);
-
-    useEffect(() => {}, [activeOperatordata]);
-
-    useEffect(() => {
-        if (activeTaxGrupData.length != 0) {
-            setActiveTaxGroupList(activeTaxGrupData);
-        }
-    }, [activeTaxGrupData]);
+    // useEffect(() => {
+    //     if (activeOperatordata.length != 0) {
+    //         setActiveOperatorList(activeOperatordata);
+    //     }
+    // }, [activeOperatordata]);
 
     useEffect(() => {
         if (currencyListData != null) {
@@ -378,6 +328,7 @@ function PaxVehicleRate(props) {
         // dispatch(activeRatesSeasonId());
         dispatch(getAllActiveOperatorGroupData());
         dispatch(getAllCurrencyListData());
+        // dispatch(getAllActiveGuideClassData())
     }, []);
 
     const handleClose = () => {
@@ -733,7 +684,7 @@ function PaxVehicleRate(props) {
                                                                 <Field
                                                                     as={TextField}
                                                                     {...params}
-                                                                    label="Basis"
+                                                                    label="Vehicle Category Code"
                                                                     sx={{
                                                                         width: { xs: 120 },
                                                                         '& .MuiInputBase-root': {
@@ -813,14 +764,14 @@ function PaxVehicleRate(props) {
                                                             InputLabelProps={{
                                                                 shrink: true
                                                             }}
-                                                            options={activeotelBasis}
+                                                            options={activeGuideClassList}
                                                             getOptionLabel={(option) => `${option.code}`}
                                                             isOptionEqualToValue={(option, value) => option.id === value.id}
                                                             renderInput={(params) => (
                                                                 <Field
                                                                     as={TextField}
                                                                     {...params}
-                                                                    label="Basis"
+                                                                    label="Guide Class"
                                                                     sx={{
                                                                         width: { xs: 120 },
                                                                         '& .MuiInputBase-root': {
@@ -881,7 +832,7 @@ function PaxVehicleRate(props) {
                                             <FieldArray name="ratesDetails">
                                                 {({ insert, remove, push }) => (
                                                     <Paper className={classes.root}>
-                                                        <TableContainer>
+                                                        <TableContainer style={{ width: 1280 }}>
                                                             <Table stickyHeader className={classes.table}>
                                                                 <TableHead alignItems="center">
                                                                     <TableRow>
