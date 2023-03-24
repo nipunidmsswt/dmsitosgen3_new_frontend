@@ -39,6 +39,7 @@ import { mainTransportCategoryReducer } from './reducers/masterReducer/transport
 import { facilityCountReducer } from './reducers/masterReducer/FacilityCountReducer';
 import { roomBuyingRateReducer } from './reducers/masterReducer/RoomBuyingRateReducer';
 import { paxVehicleRateReducer } from './reducers/masterReducer/transportReducer/PaxVehicleRateReducer';
+import { distanceReducer } from './reducers/masterReducer/transportReducer/DistanceReducer';
 
 // ==============================|| COMBINE REDUCER ||============================== //
 
@@ -83,7 +84,8 @@ const reducer = combineReducers({
     mainTransportCategoryReducer,
     facilityCountReducer,
     roomBuyingRateReducer,
-    paxVehicleRateReducer
+    paxVehicleRateReducer,
+    distanceReducer
 });
 
 export default reducer;
