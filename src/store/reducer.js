@@ -38,6 +38,8 @@ import { bankDetailReducer } from './reducers/masterReducer/BankDetailsReducer';
 import { mainTransportCategoryReducer } from './reducers/masterReducer/transportReducer/MainTransportDetailsReducer';
 import { facilityCountReducer } from './reducers/masterReducer/FacilityCountReducer';
 import { roomBuyingRateReducer } from './reducers/masterReducer/RoomBuyingRateReducer';
+import { paxVehicleRateReducer } from './reducers/masterReducer/transportReducer/PaxVehicleRateReducer';
+
 // ==============================|| COMBINE REDUCER ||============================== //
 
 const reducer = combineReducers({
@@ -80,7 +82,8 @@ const reducer = combineReducers({
     bankDetailReducer,
     mainTransportCategoryReducer,
     facilityCountReducer,
-    roomBuyingRateReducer
+    roomBuyingRateReducer,
+    paxVehicleRateReducer
 });
 
 export default reducer;

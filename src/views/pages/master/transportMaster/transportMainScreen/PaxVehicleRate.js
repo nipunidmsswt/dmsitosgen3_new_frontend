@@ -1,6 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import PropTypes from 'prop-types';
 import {
     Grid,
     FormGroup,
@@ -47,26 +46,33 @@ import {
     checkDuplicateRoomBuyingRateCode
 } from 'store/actions/masterActions/RoomBuyongRateAction';
 import ArticleIcon from '@mui/icons-material/Article';
-import ShowTaxDetails from './ShowTaxDetails';
 import { withStyles } from '@material-ui/core/styles';
 import SuccessMsg from 'messages/SuccessMsg';
 import ErrorMsg from 'messages/ErrorMsg';
 import ExitAlert from 'messages/ExitAlert';
 import AlertItemExist from 'messages/AlertItemExist';
 import { useNavigate, useLocation } from 'react-router-dom';
-const styles = (theme) => ({
-    root: {
-        width: '100%',
-        marginTop: theme.spacing.unit * 3,
-        overflowX: 'auto'
-    },
+import { makeStyles } from '@mui/styles';
+const useStyles = makeStyles({
     table: {
-        minWidth: 200
+        minWidth: 650
     }
 });
 
-function RoomBuyingRates(props) {
-    const { classes } = props;
+function createData(name, calories, fat, carbs, protein) {
+    return { name, calories, fat, carbs, protein };
+}
+
+const rows = [
+    createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
+    createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
+    createData('Eclair', 262, 16.0, 24, 6.0),
+    createData('Cupcake', 305, 3.7, 67, 4.3),
+    createData('Gingerbread', 356, 16.0, 49, 3.9)
+];
+
+function PaxVehicleRate(props) {
+    const classes = useStyles();
     const formikRef = useRef();
     const newobj = {
         roomBuyingRateId: '',
@@ -173,7 +179,6 @@ function RoomBuyingRates(props) {
     const roomBuyingRate = useSelector((state) => state.roomBuyingRateReducer.roomBuyingRate);
     const duplicateRoomBuyingRate = useSelector((state) => state.roomBuyingRateReducer.duplicateRoomBuyingRate);
 
-    let location = useLocation();
     const navigate = useNavigate();
     useEffect(() => {
         console.log('roomBuyingRate roomBuyingRate roomBuyingRate');
@@ -248,76 +253,6 @@ function RoomBuyingRates(props) {
             dispatch(clearRoomBuyingRate());
         }
     }, [roomBuyingRate]);
-
-    useEffect(() => {
-        console.log(location.state);
-
-        if (location.state.mode === 'INSERT') {
-            console.log(location.state.data.rowdata);
-            setMode(location.state.mode);
-            setnewobj({
-                hotelCode: location.state.data.rowdata,
-                hotelName: location.state.data.rowdata,
-                operatorGpCode: null,
-                operatorCode: [],
-                newOperatorCode: [],
-                season: null,
-                ratePeriod: null,
-                fromDate: '',
-                toDate: '',
-                taxGpCode: null,
-                currency: null,
-                roomCategory: null,
-                basis: null,
-                guideBasis: null,
-                singleRate: '',
-                doubleRate: '',
-                trippleRate: '',
-                family: '',
-                child: '',
-                taxApplicable: true,
-                taxApplicableGuide: true,
-                default: false,
-                rateStatus: true,
-                guideStatus: true,
-                guideRate: '',
-                status: true,
-                ratesDetails: [
-                    {
-                        roomCategory: null,
-                        basis: null,
-                        singleRate: '',
-                        doubleRate: '',
-                        trippleRate: '',
-                        family: '',
-                        child: '',
-                        taxApplicable: true,
-                        rateStatus: true,
-                        singleRateAmountWithTax: '',
-                        doubleRateAmountWithTax: '',
-                        tripleRateAmountWithTax: '',
-                        familyRateAmountWithTax: '',
-                        childRateAmountWithTax: ''
-                    }
-                ],
-                tourGuideDetails: [
-                    {
-                        guideBasis: null,
-                        guideRate: '',
-                        tourLeadRate: '',
-                        taxApplicableGuide: true,
-                        guideStatus: true,
-                        guideRateAmountWithTax: '',
-                        tourLeadRateAmountWithTaxtourLeadValue: ''
-                    }
-                ],
-                status: true
-            });
-        } else if (location.state.mode === 'VIEW_UPDATE') {
-            setMode(location.state.mode);
-            dispatch(getRoomBuyingRateDataById(location.state.data.roomBuyingRateId));
-        }
-    }, [location]);
 
     useEffect(() => {
         console.log('roomBuyingRateToUpdate roomBuyingRateToUpdate roomBuyingRateToUpdate');
@@ -705,20 +640,11 @@ function RoomBuyingRates(props) {
     };
     return (
         <div>
-            <MainCard title="Room Buying Rates">
+            <MainCard>
                 <div className="row">
                     <Grid container direction="row">
                         <Grid item>
-                            <Formik
-                                enableReinitialize={true}
-                                initialValues={mmObject || newobj}
-                                innerRef={formikRef}
-                                validate={validate}
-                                // onSubmit={(values) => {
-                                //     handleFinalSubmit(values);
-                                // }}
-                                // validationSchema={validationSchema}
-                            >
+                            <Formik enableReinitialize={true} initialValues={mmObject || newobj} innerRef={formikRef} validate={validate}>
                                 {({
                                     values,
                                     handleChange,
@@ -737,293 +663,13 @@ function RoomBuyingRates(props) {
                                 }) => {
                                     return (
                                         <Form>
+                                            <br />
                                             <div style={{ marginTop: '6px', margin: '10px' }}>
                                                 <Grid gap="10px" display="flex">
                                                     <Grid item>
-                                                        <Autocomplete
-                                                            value={values.hotelCode}
-                                                            name="hotelCode"
-                                                            disabled
-                                                            onChange={(_, value) => {
-                                                                setFieldValue(`hotelCode`, value);
-                                                            }}
-                                                            InputLabelProps={{
-                                                                shrink: true
-                                                            }}
-                                                            options={hotelData}
-                                                            getOptionLabel={(option) => `${option.hotelCode}`}
-                                                            isOptionEqualToValue={(option, value) => option.id === value.id}
-                                                            renderInput={(params) => (
-                                                                <TextField
-                                                                    {...params}
-                                                                    label="Hotel Code"
-                                                                    sx={{
-                                                                        width: { xs: 300 },
-                                                                        '& .MuiInputBase-root': {
-                                                                            height: 41
-                                                                        }
-                                                                    }}
-                                                                    InputLabelProps={{
-                                                                        shrink: true
-                                                                    }}
-                                                                    error={Boolean(touched.hotelCode && errors.hotelCode)}
-                                                                    helperText={
-                                                                        touched.hotelCode && errors.hotelCode ? errors.hotelCode : ''
-                                                                    }
-                                                                    variant="outlined"
-                                                                    name="hotelCode"
-                                                                    onBlur={handleBlur}
-                                                                />
-                                                            )}
-                                                        />
-                                                    </Grid>
-
-                                                    <Grid item>
-                                                        <Autocomplete
-                                                            value={values.hotelName}
-                                                            name="hotelName"
-                                                            disabled
-                                                            onChange={(_, value) => {
-                                                                setFieldValue(`hotelName`, value);
-                                                            }}
-                                                            InputLabelProps={{
-                                                                shrink: true
-                                                            }}
-                                                            options={hotelData}
-                                                            getOptionLabel={(option) => `${option.hotelCode}`}
-                                                            isOptionEqualToValue={(option, value) => option.id === value.id}
-                                                            renderInput={(params) => (
-                                                                <TextField
-                                                                    {...params}
-                                                                    label="Hotel Name"
-                                                                    sx={{
-                                                                        width: { xs: 300 },
-                                                                        '& .MuiInputBase-root': {
-                                                                            height: 41
-                                                                        }
-                                                                    }}
-                                                                    InputLabelProps={{
-                                                                        shrink: true
-                                                                    }}
-                                                                    error={Boolean(touched.hotelName && errors.hotelName)}
-                                                                    helperText={
-                                                                        touched.hotelName && errors.hotelName ? errors.hotelName : ''
-                                                                    }
-                                                                    // placeholder="--Select a Manager Code --"
-                                                                    variant="outlined"
-                                                                    name="hotelName"
-                                                                    onBlur={handleBlur}
-                                                                />
-                                                            )}
-                                                        />
-                                                    </Grid>
-                                                    <Grid item>
-                                                        <FormGroup>
-                                                            <FormControlLabel
-                                                                name="status"
-                                                                control={<Switch color="success" />}
-                                                                label="Status"
-                                                                disabled={mode == 'VIEW'}
-                                                                onChange={handleChange}
-                                                                checked={values.status}
-                                                                value={values.status}
-                                                            />
-                                                        </FormGroup>
-                                                    </Grid>
-                                                    <Grid item style={{ marginLeft: '500px' }}>
-                                                        {' '}
-                                                        <Button
-                                                            className="btnSave"
-                                                            variant="contained"
-                                                            type="button"
-                                                            onClick={() => {
-                                                                navigate('/master/hotelview');
-                                                            }}
-                                                        >
-                                                            {'Hotel Master'}
-                                                        </Button>
-                                                    </Grid>
-                                                </Grid>
-                                            </div>
-                                            <hr />
-                                            <div style={{ marginTop: '6px', margin: '10px' }}>
-                                                <Grid gap="10px" display="flex">
-                                                    <Grid item>
-                                                        {' '}
-                                                        <Field
-                                                            as={Autocomplete}
-                                                            value={values.operatorGpCode}
-                                                            name="operatorGpCode"
-                                                            disabled={mode == 'VIEW' || mode == 'VIEW_UPDATE'}
-                                                            onChange={(_, value) => {
-                                                                if (value != null) {
-                                                                    loadOperatorCode(value);
-                                                                }
-
-                                                                setFieldValue(`operatorGpCode`, value);
-                                                            }}
-                                                            InputLabelProps={{
-                                                                shrink: true
-                                                            }}
-                                                            options={activeOperatorGroupList}
-                                                            getOptionLabel={(option) => `${option.code}`}
-                                                            isOptionEqualToValue={(option, value) =>
-                                                                option.marketGroupOperatorGroupId === value.marketGroupOperatorGroupId
-                                                            }
-                                                            renderInput={(params) => (
-                                                                <Field
-                                                                    as={TextField}
-                                                                    {...params}
-                                                                    label="Operator Group Code"
-                                                                    sx={{
-                                                                        width: { xs: 300 },
-                                                                        '& .MuiInputBase-root': {
-                                                                            height: 41
-                                                                        }
-                                                                    }}
-                                                                    validate={requiredValidation}
-                                                                    InputLabelProps={{
-                                                                        shrink: true
-                                                                    }}
-                                                                    error={Boolean(touched.operatorGpCode && errors.operatorGpCode)}
-                                                                    helperText={
-                                                                        touched.operatorGpCode && errors.operatorGpCode
-                                                                            ? errors.operatorGpCode
-                                                                            : ''
-                                                                    }
-                                                                    // placeholder="--Select a Manager Code --"
-
-                                                                    variant="outlined"
-                                                                    name="operatorGpCode"
-                                                                    onBlur={handleBlur}
-                                                                />
-                                                            )}
-                                                        />
-                                                    </Grid>
-
-                                                    <Grid item>
-                                                        <Autocomplete
-                                                            disableClearable
-                                                            disablePortal
-                                                            value={values.operatorCode}
-                                                            name="operatorCode"
-                                                            fullWidth
-                                                            disabled={mode !== 'INSERT'}
-                                                            onChange={(_, value) => {
-                                                                setFieldValue(`operatorCode`, value);
-                                                            }}
-                                                            InputLabelProps={{
-                                                                shrink: true
-                                                            }}
-                                                            multiple
-                                                            options={activeOperatorList}
-                                                            getOptionLabel={(option) => `${option.code} - ${option.name}`}
-                                                            isOptionEqualToValue={(option, value) => option.operatorId === value.operatorId}
-                                                            getOptionDisabled={(option) => {
-                                                                if (values.operatorCode.some((day) => day.code === option.code)) {
-                                                                    return true;
-                                                                }
-
-                                                                return false;
-                                                            }}
-                                                            renderInput={(params) => {
-                                                                return (
-                                                                    <TextField
-                                                                        {...params}
-                                                                        label={
-                                                                            mode !== 'INSERT' ? 'Selected Operator Code' : 'Operator Code'
-                                                                        }
-                                                                        sx={{
-                                                                            width: { xs: 600 },
-                                                                            '& .MuiInputBase-root': {
-                                                                                height: 41
-                                                                            }
-                                                                        }}
-                                                                        InputLabelProps={{
-                                                                            shrink: true
-                                                                        }}
-                                                                        error={Boolean(touched.operatorCode && errors.operatorCode)}
-                                                                        helperText={
-                                                                            touched.operatorCode && errors.operatorCode
-                                                                                ? errors.operatorCode
-                                                                                : ''
-                                                                        }
-                                                                        // placeholder="--Select a Manager Code --"
-                                                                        variant="outlined"
-                                                                        name="operatorCode"
-                                                                        onBlur={handleBlur}
-                                                                    />
-                                                                );
-                                                            }}
-                                                        />
-                                                    </Grid>
-                                                    {mode === 'VIEW_UPDATE' ? (
-                                                        <Grid item>
-                                                            <Autocomplete
-                                                                disableClearable
-                                                                disablePortal
-                                                                // value={values.newOperatorCode}
-                                                                name="newOperatorCode"
-                                                                fullWidth
-                                                                disabled={mode == 'VIEW'}
-                                                                onChange={(_, value) => {
-                                                                    setFieldValue(`newOperatorCode`, value);
-                                                                }}
-                                                                InputLabelProps={{
-                                                                    shrink: true
-                                                                }}
-                                                                multiple
-                                                                options={activeOperatorList}
-                                                                getOptionLabel={(option) => `${option.code} - ${option.name}`}
-                                                                isOptionEqualToValue={(option, value) =>
-                                                                    option.operatorId === value.operatorId
-                                                                }
-                                                                getOptionDisabled={(option) => {
-                                                                    if (values.operatorCode.some((day) => day.code === option.code)) {
-                                                                        return true;
-                                                                    }
-
-                                                                    return false;
-                                                                }}
-                                                                renderInput={(params) => {
-                                                                    return (
-                                                                        <TextField
-                                                                            {...params}
-                                                                            label="Add New Operator Code"
-                                                                            sx={{
-                                                                                width: { xs: 600 },
-                                                                                '& .MuiInputBase-root': {
-                                                                                    height: 41
-                                                                                }
-                                                                            }}
-                                                                            InputLabelProps={{
-                                                                                shrink: true
-                                                                            }}
-                                                                            error={Boolean(
-                                                                                touched.newOperatorCode && errors.newOperatorCode
-                                                                            )}
-                                                                            helperText={
-                                                                                touched.newOperatorCode && errors.newOperatorCode
-                                                                                    ? errors.newOperatorCode
-                                                                                    : ''
-                                                                            }
-                                                                            // placeholder="--Select a Manager Code --"
-                                                                            variant="outlined"
-                                                                            name="newOperatorCode"
-                                                                            onBlur={handleBlur}
-                                                                        />
-                                                                    );
-                                                                }}
-                                                            />
-                                                        </Grid>
-                                                    ) : (
-                                                        ''
-                                                    )}
-
-                                                    {/* <Grid item>
                                                         <Field
                                                             as={TextField}
-                                                            label="Child"
+                                                            label="Min Count"
                                                             sx={{
                                                                 width: { xs: 120 },
                                                                 '& .MuiInputBase-root': {
@@ -1033,334 +679,46 @@ function RoomBuyingRates(props) {
                                                             disabled={mode == 'VIEW'}
                                                             type="text"
                                                             variant="outlined"
-                                                            name="child"
+                                                            name="singleRate"
                                                             InputLabelProps={{
                                                                 shrink: true
                                                             }}
-                                                            value={values.child}
+                                                            value={values.singleRate}
                                                             onChange={handleChange}
                                                             onBlur={handleBlur}
-                                                            error={Boolean(touched.child && errors.child)}
-                                                            helperText={touched.child && errors.child ? errors.child : ''}
-                                                        />
-                                                    </Grid> */}
-                                                </Grid>
-                                            </div>
-                                            <div style={{ marginTop: '6px', margin: '10px' }}>
-                                                <Grid gap="10px" display="flex">
-                                                    <Grid item>
-                                                        <Field
-                                                            as={Autocomplete}
-                                                            value={values.season}
-                                                            name="season"
-                                                            disabled={mode == 'VIEW' || mode == 'VIEW_UPDATE'}
-                                                            onChange={(_, value) => {
-                                                                loadRatesBySeason(value);
-                                                                setFieldValue(`season`, value);
-                                                            }}
-                                                            InputLabelProps={{
-                                                                shrink: true
-                                                            }}
-                                                            validate={requiredValidation}
-                                                            options={activeSeasonList}
-                                                            getOptionLabel={(option) => `${option.mainSeason}`}
-                                                            isOptionEqualToValue={(option, value) => option.seasonId === value.seasonId}
-                                                            renderInput={(params) => (
-                                                                <Field
-                                                                    as={TextField}
-                                                                    {...params}
-                                                                    label="Season"
-                                                                    sx={{
-                                                                        width: { xs: 300 },
-                                                                        '& .MuiInputBase-root': {
-                                                                            height: 41
-                                                                        }
-                                                                    }}
-                                                                    InputLabelProps={{
-                                                                        shrink: true
-                                                                    }}
-                                                                    validate={requiredValidation}
-                                                                    error={Boolean(touched.season && errors.season)}
-                                                                    helperText={touched.season && errors.season ? errors.season : ''}
-                                                                    // placeholder="--Select a Manager Code --"
-                                                                    variant="outlined"
-                                                                    name="season"
-                                                                    onBlur={handleBlur}
-                                                                />
-                                                            )}
+                                                            error={Boolean(touched.singleRate && errors.singleRate)}
+                                                            helperText={touched.singleRate && errors.singleRate ? errors.singleRate : ''}
                                                         />
                                                     </Grid>
                                                     <Grid item>
-                                                        {' '}
                                                         <Field
-                                                            as={Autocomplete}
-                                                            value={values.ratePeriod}
-                                                            name="ratePeriod"
-                                                            disabled={mode == 'VIEW' || mode == 'VIEW_UPDATE'}
-                                                            onChange={(_, value) => {
-                                                                console.log(value);
-                                                                setFieldValue(`ratePeriod`, value);
-
-                                                                if (value !== null) {
-                                                                    setFieldValue(`fromDate`, value.fromDate);
-                                                                    setFieldValue(`toDate`, value.toDate);
+                                                            as={TextField}
+                                                            label="Max Count"
+                                                            sx={{
+                                                                width: { xs: 120 },
+                                                                '& .MuiInputBase-root': {
+                                                                    height: 40
                                                                 }
                                                             }}
-                                                            InputLabelProps={{
-                                                                shrink: true
-                                                            }}
-                                                            options={activeRateListBySeason}
-                                                            getOptionLabel={(option) => `${option.ratePeriod}`}
-                                                            isOptionEqualToValue={(option, value) =>
-                                                                option.seasonDetailsId === value.seasonDetailsId
-                                                            }
-                                                            renderInput={(params) => (
-                                                                <Field
-                                                                    as={TextField}
-                                                                    {...params}
-                                                                    label="Rate Period"
-                                                                    sx={{
-                                                                        width: { xs: 300 },
-                                                                        '& .MuiInputBase-root': {
-                                                                            height: 41
-                                                                        }
-                                                                    }}
-                                                                    InputLabelProps={{
-                                                                        shrink: true
-                                                                    }}
-                                                                    validate={requiredValidation}
-                                                                    error={Boolean(touched.ratePeriod && errors.ratePeriod)}
-                                                                    helperText={
-                                                                        touched.ratePeriod && errors.ratePeriod ? errors.ratePeriod : ''
-                                                                    }
-                                                                    // placeholder="--Select a Manager Code --"
-                                                                    variant="outlined"
-                                                                    name="ratePeriod"
-                                                                    onBlur={handleBlur}
-                                                                />
-                                                            )}
-                                                        />
-                                                    </Grid>
-                                                    <Grid item>
-                                                        <LocalizationProvider
-                                                            dateAdapter={AdapterDayjs}
-                                                            // adapterLocale={locale}
-                                                        >
-                                                            <DatePicker
-                                                                disabled={mode != 'INSERT'}
-                                                                onChange={(value) => {
-                                                                    setFieldValue(`fromDate`, value);
-                                                                }}
-                                                                inputFormat="DD/MM/YYYY"
-                                                                value={values.fromDate}
-                                                                renderInput={(params) => (
-                                                                    <TextField
-                                                                        {...params}
-                                                                        sx={{
-                                                                            width: { xs: 150 },
-                                                                            '& .MuiInputBase-root': {
-                                                                                height: 41
-                                                                            }
-                                                                        }}
-                                                                        InputLabelProps={{
-                                                                            shrink: true
-                                                                        }}
-                                                                        label="From Date"
-                                                                        variant="outlined"
-                                                                        name="fromDate"
-                                                                        onBlur={handleBlur}
-                                                                        error={Boolean(touched.fromDate && errors.fromDate)}
-                                                                        helperText={
-                                                                            touched.fromDate && errors.fromDate ? errors.fromDate : ''
-                                                                        }
-                                                                    />
-                                                                )}
-                                                            />
-                                                        </LocalizationProvider>
-                                                    </Grid>
-                                                    <Grid item>
-                                                        <LocalizationProvider
-                                                            dateAdapter={AdapterDayjs}
-                                                            // adapterLocale={locale}
-                                                        >
-                                                            <DatePicker
-                                                                disabled={mode != 'INSERT'}
-                                                                onChange={(value) => {
-                                                                    setFieldValue(`toDate`, value);
-                                                                }}
-                                                                inputFormat="DD/MM/YYYY"
-                                                                value={values.toDate}
-                                                                renderInput={(params) => (
-                                                                    <TextField
-                                                                        {...params}
-                                                                        sx={{
-                                                                            width: { xs: 150 },
-                                                                            '& .MuiInputBase-root': {
-                                                                                height: 41
-                                                                            }
-                                                                        }}
-                                                                        InputLabelProps={{
-                                                                            shrink: true
-                                                                        }}
-                                                                        label="To Date"
-                                                                        variant="outlined"
-                                                                        name="toDate"
-                                                                        onBlur={handleBlur}
-                                                                        error={Boolean(touched.toDate && errors.toDate)}
-                                                                        helperText={touched.toDate && errors.toDate ? errors.toDate : ''}
-                                                                    />
-                                                                )}
-                                                            />
-                                                        </LocalizationProvider>
-                                                    </Grid>
-                                                    <Grid item>
-                                                        <Grid item>
-                                                            <Autocomplete
-                                                                value={values.taxGpCode}
-                                                                name="taxGpCode"
-                                                                disabled={mode == 'VIEW' || mode == 'VIEW_UPDATE'}
-                                                                onChange={(_, value) => {
-                                                                    console.log(value);
-                                                                    if (value != null) {
-                                                                        setStoreTaxData(value.taxGroupDetails);
-                                                                    }
-
-                                                                    setFieldValue(`taxGpCode`, value);
-                                                                }}
-                                                                InputLabelProps={{
-                                                                    shrink: true
-                                                                }}
-                                                                options={activeaxGroupList}
-                                                                getOptionLabel={(option) => `${option.taxGroupCode}`}
-                                                                isOptionEqualToValue={(option, value) =>
-                                                                    option.taxGroupId === value.taxGroupId
-                                                                }
-                                                                renderInput={(params) => (
-                                                                    <TextField
-                                                                        {...params}
-                                                                        label="Tax Group Code"
-                                                                        sx={{
-                                                                            width: { xs: 300 },
-                                                                            '& .MuiInputBase-root': {
-                                                                                height: 41
-                                                                            }
-                                                                        }}
-                                                                        InputLabelProps={{
-                                                                            shrink: true
-                                                                        }}
-                                                                        error={Boolean(touched.taxGpCode && errors.taxGpCode)}
-                                                                        helperText={
-                                                                            touched.taxGpCode && errors.taxGpCode ? errors.taxGpCode : ''
-                                                                        }
-                                                                        // placeholder="--Select a Manager Code --"
-                                                                        variant="outlined"
-                                                                        name="taxGpCode"
-                                                                        onBlur={handleBlur}
-                                                                    />
-                                                                )}
-                                                            />
-                                                        </Grid>
-                                                    </Grid>
-
-                                                    <Grid item>
-                                                        <Field
-                                                            as={Autocomplete}
-                                                            value={values.currency}
-                                                            name="currency"
-                                                            onChange={(_, value) => {
-                                                                console.log(value);
-                                                                setFieldValue(`currency`, value);
-                                                            }}
-                                                            disabled={mode == 'VIEW' || mode == 'VIEW_UPDATE'}
-                                                            options={currencyListOptions}
-                                                            getOptionLabel={(option) =>
-                                                                `${option.currencyCode} - ${option.currencyDescription}`
-                                                            }
-                                                            isOptionEqualToValue={(option, value) =>
-                                                                option.currencyListId === value.currencyListId
-                                                            }
-                                                            renderInput={(params) => (
-                                                                <Field
-                                                                    as={TextField}
-                                                                    {...params}
-                                                                    // label="tax"
-                                                                    sx={{
-                                                                        width: { xs: 300 },
-                                                                        '& .MuiInputBase-root': {
-                                                                            height: 40
-                                                                        }
-                                                                    }}
-                                                                    InputLabelProps={{
-                                                                        shrink: true
-                                                                    }}
-                                                                    label="Currency"
-                                                                    variant="outlined"
-                                                                    validate={requiredValidation}
-                                                                    name="currency"
-                                                                    onBlur={handleBlur}
-                                                                    error={Boolean(touched.currency && errors.currency)}
-                                                                    helperText={touched.currency && errors.currency ? errors.currency : ''}
-                                                                />
-                                                            )}
-                                                        />
-                                                    </Grid>
-                                                </Grid>
-                                            </div>
-                                            <hr />
-
-                                            <br />
-                                            <div style={{ marginTop: '6px', margin: '10px' }}>
-                                                <Grid gap="10px" display="flex">
-                                                    <Grid item>
-                                                        <Field
-                                                            as={Autocomplete}
-                                                            value={values.roomCategory}
-                                                            name="roomCategory"
                                                             disabled={mode == 'VIEW'}
-                                                            onChange={(_, value) => {
-                                                                setFieldValue(`roomCategory`, value);
-                                                            }}
+                                                            type="text"
+                                                            variant="outlined"
+                                                            name="singleRate"
                                                             InputLabelProps={{
                                                                 shrink: true
                                                             }}
-                                                            options={activeRoomCategories}
-                                                            getOptionLabel={(option) => `${option.code}`}
-                                                            isOptionEqualToValue={(option, value) => option.id === value.id}
-                                                            renderInput={(params) => (
-                                                                <Field
-                                                                    as={TextField}
-                                                                    {...params}
-                                                                    label="Room Category"
-                                                                    sx={{
-                                                                        width: { xs: 120 },
-                                                                        '& .MuiInputBase-root': {
-                                                                            height: 41
-                                                                        }
-                                                                    }}
-                                                                    InputLabelProps={{
-                                                                        shrink: true
-                                                                    }}
-                                                                    validate={requiredValidation}
-                                                                    error={Boolean(touched.roomCategory && errors.roomCategory)}
-                                                                    helperText={
-                                                                        touched.roomCategory && errors.roomCategory
-                                                                            ? errors.roomCategory
-                                                                            : ''
-                                                                    }
-                                                                    // placeholder="--Select a Manager Code --"
-                                                                    variant="outlined"
-                                                                    name="roomCategory"
-                                                                    onBlur={handleBlur}
-                                                                />
-                                                            )}
+                                                            value={values.singleRate}
+                                                            onChange={handleChange}
+                                                            onBlur={handleBlur}
+                                                            error={Boolean(touched.singleRate && errors.singleRate)}
+                                                            helperText={touched.singleRate && errors.singleRate ? errors.singleRate : ''}
                                                         />
                                                     </Grid>
-
                                                     <Grid item>
                                                         <Field
                                                             as={Autocomplete}
                                                             value={values.basis}
-                                                            name="basis"
+                                                            name="Vehicle Category Code"
                                                             disabled={mode == 'VIEW'}
                                                             onChange={(_, value) => {
                                                                 setFieldValue(`basis`, value);
@@ -1398,7 +756,7 @@ function RoomBuyingRates(props) {
                                                     <Grid item>
                                                         <Field
                                                             as={TextField}
-                                                            label="Single Rate"
+                                                            label="No of Drivers"
                                                             sx={{
                                                                 width: { xs: 120 },
                                                                 '& .MuiInputBase-root': {
@@ -1422,7 +780,7 @@ function RoomBuyingRates(props) {
                                                     <Grid item>
                                                         <Field
                                                             as={TextField}
-                                                            label="Double Rate"
+                                                            label="No of Asssistants"
                                                             sx={{
                                                                 width: { xs: 120 },
                                                                 '& .MuiInputBase-root': {
@@ -1445,74 +803,41 @@ function RoomBuyingRates(props) {
                                                     </Grid>
                                                     <Grid item>
                                                         <Field
-                                                            as={TextField}
-                                                            label="Tripple Rate"
-                                                            sx={{
-                                                                width: { xs: 120 },
-                                                                '& .MuiInputBase-root': {
-                                                                    height: 40
-                                                                }
-                                                            }}
+                                                            as={Autocomplete}
+                                                            value={values.basis}
+                                                            name="Guide Class"
                                                             disabled={mode == 'VIEW'}
-                                                            type="text"
-                                                            variant="outlined"
-                                                            name="trippleRate"
+                                                            onChange={(_, value) => {
+                                                                setFieldValue(`basis`, value);
+                                                            }}
                                                             InputLabelProps={{
                                                                 shrink: true
                                                             }}
-                                                            value={values.trippleRate}
-                                                            onChange={handleChange}
-                                                            onBlur={handleBlur}
-                                                            error={Boolean(touched.trippleRate && errors.trippleRate)}
-                                                            helperText={touched.trippleRate && errors.trippleRate ? errors.trippleRate : ''}
-                                                        />
-                                                    </Grid>
-                                                    <Grid item>
-                                                        <Field
-                                                            as={TextField}
-                                                            label="family"
-                                                            sx={{
-                                                                width: { xs: 120 },
-                                                                '& .MuiInputBase-root': {
-                                                                    height: 40
-                                                                }
-                                                            }}
-                                                            disabled={mode == 'VIEW'}
-                                                            type="text"
-                                                            variant="outlined"
-                                                            name="family"
-                                                            InputLabelProps={{
-                                                                shrink: true
-                                                            }}
-                                                            value={values.family}
-                                                            onChange={handleChange}
-                                                            onBlur={handleBlur}
-                                                            error={Boolean(touched.family && errors.family)}
-                                                            helperText={touched.family && errors.family ? errors.family : ''}
-                                                        />
-                                                    </Grid>
-                                                    <Grid item>
-                                                        <Field
-                                                            as={TextField}
-                                                            label="Child"
-                                                            sx={{
-                                                                width: { xs: 120 },
-                                                                '& .MuiInputBase-root': {
-                                                                    height: 40
-                                                                }
-                                                            }}
-                                                            disabled={mode == 'VIEW'}
-                                                            type="text"
-                                                            variant="outlined"
-                                                            name="child"
-                                                            InputLabelProps={{
-                                                                shrink: true
-                                                            }}
-                                                            value={values.child}
-                                                            onChange={handleChange}
-                                                            onBlur={handleBlur}
-                                                            error={Boolean(touched.child && errors.child)}
-                                                            helperText={touched.child && errors.child ? errors.child : ''}
+                                                            options={activeotelBasis}
+                                                            getOptionLabel={(option) => `${option.code}`}
+                                                            isOptionEqualToValue={(option, value) => option.id === value.id}
+                                                            renderInput={(params) => (
+                                                                <Field
+                                                                    as={TextField}
+                                                                    {...params}
+                                                                    label="Basis"
+                                                                    sx={{
+                                                                        width: { xs: 120 },
+                                                                        '& .MuiInputBase-root': {
+                                                                            height: 41
+                                                                        }
+                                                                    }}
+                                                                    InputLabelProps={{
+                                                                        shrink: true
+                                                                    }}
+                                                                    validate={requiredValidation}
+                                                                    error={Boolean(touched.basis && errors.basis)}
+                                                                    helperText={touched.basis && errors.basis ? errors.basis : ''}
+                                                                    variant="outlined"
+                                                                    name="basis"
+                                                                    onBlur={handleBlur}
+                                                                />
+                                                            )}
                                                         />
                                                     </Grid>
 
@@ -1547,7 +872,7 @@ function RoomBuyingRates(props) {
                                                                 });
                                                             }}
                                                         >
-                                                            <AddBoxIcon />
+                                                            {mode === 'INSERT' ? <AddBoxIcon /> : null}
                                                         </IconButton>
                                                     </Grid>
                                                 </Grid>
@@ -1557,25 +882,16 @@ function RoomBuyingRates(props) {
                                                 {({ insert, remove, push }) => (
                                                     <Paper className={classes.root}>
                                                         <TableContainer>
-                                                            <Table
-                                                                stickyHeader
-                                                                className={classes.table}
-                                                                // size="small"
-                                                                // sx={{
-                                                                //     height: 200
-                                                                // }}
-                                                            >
+                                                            <Table stickyHeader className={classes.table}>
                                                                 <TableHead alignItems="center">
                                                                     <TableRow>
-                                                                        {/* <TableCell>Sequence</TableCell> */}
-                                                                        <TableCell>Room Category</TableCell>
-                                                                        <TableCell>Basis </TableCell>
-                                                                        <TableCell>Single</TableCell>
-                                                                        <TableCell>Double</TableCell>
-                                                                        <TableCell>Tripple</TableCell>
-                                                                        <TableCell>Family</TableCell>
-                                                                        <TableCell>Child</TableCell>
-                                                                        <TableCell>Tax Applicable</TableCell>
+                                                                        <TableCell>Min Count</TableCell>
+                                                                        <TableCell>Max Count </TableCell>
+                                                                        <TableCell>Vehicle Category Code</TableCell>
+                                                                        <TableCell>Description</TableCell>
+                                                                        <TableCell>No of Drivers</TableCell>
+                                                                        <TableCell>No of Assistant</TableCell>
+                                                                        <TableCell>Guide Class</TableCell>
                                                                         <TableCell>Status</TableCell>
                                                                         <TableCell>Actions</TableCell>
                                                                     </TableRow>
@@ -1595,64 +911,81 @@ function RoomBuyingRates(props) {
                                                                                 {/* <TableCell>{idx + 1}</TableCell> */}
 
                                                                                 <TableCell>
-                                                                                    <Autocomplete
-                                                                                        disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
-                                                                                        value={
-                                                                                            values.ratesDetails[idx]
-                                                                                                ? values.ratesDetails[idx].roomCategory
-                                                                                                : null
-                                                                                        }
-                                                                                        name={`ratesDetails.${idx}.roomCategory`}
-                                                                                        onChange={(_, value) => {
-                                                                                            console.log(value);
-                                                                                            setFieldValue(
-                                                                                                `ratesDetails.${idx}.roomCategory`,
-                                                                                                value
-                                                                                            );
+                                                                                    <TextField
+                                                                                        sx={{
+                                                                                            width: { xs: 120 },
+                                                                                            '& .MuiInputBase-root': {
+                                                                                                height: 40
+                                                                                            }
                                                                                         }}
-                                                                                        options={activeRoomCategories}
-                                                                                        getOptionLabel={(option) => `${option.code}`}
-                                                                                        isOptionEqualToValue={(option, value) =>
-                                                                                            option.id === value.id
+                                                                                        //   type="number"
+                                                                                        variant="outlined"
+                                                                                        // placeholder="name"
+                                                                                        name={`ratesDetails.${idx}.singleRate`}
+                                                                                        value={
+                                                                                            values.ratesDetails[idx] &&
+                                                                                            values.ratesDetails[idx].singleRate
                                                                                         }
-                                                                                        renderInput={(params) => (
-                                                                                            <TextField
-                                                                                                {...params}
-                                                                                                // label="tax"
-
-                                                                                                sx={{
-                                                                                                    width: { sm: 200 },
-                                                                                                    '& .MuiInputBase-root': {
-                                                                                                        height: 40
-                                                                                                    }
-                                                                                                }}
-                                                                                                variant="outlined"
-                                                                                                name={`ratesDetails.${idx}.roomCategory`}
-                                                                                                onBlur={handleBlur}
-                                                                                                helperText={
-                                                                                                    touched.ratesDetails &&
-                                                                                                    touched.ratesDetails[idx] &&
-                                                                                                    touched.ratesDetails[idx]
-                                                                                                        .roomCategory &&
-                                                                                                    errors.ratesDetails &&
-                                                                                                    errors.ratesDetails[idx] &&
-                                                                                                    errors.ratesDetails[idx].roomCategory
-                                                                                                        ? errors.ratesDetails[idx]
-                                                                                                              .roomCategory
-                                                                                                        : ''
-                                                                                                }
-                                                                                                error={Boolean(
-                                                                                                    touched.ratesDetails &&
-                                                                                                        touched.ratesDetails[idx] &&
-                                                                                                        touched.ratesDetails[idx]
-                                                                                                            .roomCategory &&
-                                                                                                        errors.ratesDetails &&
-                                                                                                        errors.ratesDetails[idx] &&
-                                                                                                        errors.ratesDetails[idx]
-                                                                                                            .roomCategory
-                                                                                                )}
-                                                                                            />
+                                                                                        disabled
+                                                                                        onChange={handleChange}
+                                                                                        onBlur={handleBlur}
+                                                                                        error={Boolean(
+                                                                                            touched.ratesDetails &&
+                                                                                                touched.ratesDetails[idx] &&
+                                                                                                touched.ratesDetails[idx].singleRate &&
+                                                                                                errors.ratesDetails &&
+                                                                                                errors.ratesDetails[idx] &&
+                                                                                                errors.ratesDetails[idx].singleRate
                                                                                         )}
+                                                                                        helperText={
+                                                                                            touched.ratesDetails &&
+                                                                                            touched.ratesDetails[idx] &&
+                                                                                            touched.ratesDetails[idx].singleRate &&
+                                                                                            errors.ratesDetails &&
+                                                                                            errors.ratesDetails[idx] &&
+                                                                                            errors.ratesDetails[idx].singleRate
+                                                                                                ? errors.ratesDetails[idx].singleRate
+                                                                                                : ''
+                                                                                        }
+                                                                                    />
+                                                                                </TableCell>
+                                                                                <TableCell>
+                                                                                    <TextField
+                                                                                        sx={{
+                                                                                            width: { xs: 120 },
+                                                                                            '& .MuiInputBase-root': {
+                                                                                                height: 40
+                                                                                            }
+                                                                                        }}
+                                                                                        //   type="number"
+                                                                                        variant="outlined"
+                                                                                        // placeholder="name"
+                                                                                        name={`ratesDetails.${idx}.singleRate`}
+                                                                                        value={
+                                                                                            values.ratesDetails[idx] &&
+                                                                                            values.ratesDetails[idx].singleRate
+                                                                                        }
+                                                                                        disabled
+                                                                                        onChange={handleChange}
+                                                                                        onBlur={handleBlur}
+                                                                                        error={Boolean(
+                                                                                            touched.ratesDetails &&
+                                                                                                touched.ratesDetails[idx] &&
+                                                                                                touched.ratesDetails[idx].singleRate &&
+                                                                                                errors.ratesDetails &&
+                                                                                                errors.ratesDetails[idx] &&
+                                                                                                errors.ratesDetails[idx].singleRate
+                                                                                        )}
+                                                                                        helperText={
+                                                                                            touched.ratesDetails &&
+                                                                                            touched.ratesDetails[idx] &&
+                                                                                            touched.ratesDetails[idx].singleRate &&
+                                                                                            errors.ratesDetails &&
+                                                                                            errors.ratesDetails[idx] &&
+                                                                                            errors.ratesDetails[idx].singleRate
+                                                                                                ? errors.ratesDetails[idx].singleRate
+                                                                                                : ''
+                                                                                        }
                                                                                     />
                                                                                 </TableCell>
                                                                                 <TableCell>
@@ -1870,45 +1203,6 @@ function RoomBuyingRates(props) {
                                                                                     />
                                                                                 </TableCell>
                                                                                 <TableCell>
-                                                                                    <TextField
-                                                                                        sx={{
-                                                                                            width: { xs: 120 },
-                                                                                            '& .MuiInputBase-root': {
-                                                                                                height: 40
-                                                                                            }
-                                                                                        }}
-                                                                                        //   type="number"
-                                                                                        variant="outlined"
-                                                                                        // placeholder="name"
-                                                                                        name={`ratesDetails.${idx}.family`}
-                                                                                        value={
-                                                                                            values.ratesDetails[idx] &&
-                                                                                            values.ratesDetails[idx].child
-                                                                                        }
-                                                                                        disabled
-                                                                                        onChange={handleChange}
-                                                                                        onBlur={handleBlur}
-                                                                                        error={Boolean(
-                                                                                            touched.ratesDetails &&
-                                                                                                touched.ratesDetails[idx] &&
-                                                                                                touched.ratesDetails[idx].child &&
-                                                                                                errors.ratesDetails &&
-                                                                                                errors.ratesDetails[idx] &&
-                                                                                                errors.ratesDetails[idx].child
-                                                                                        )}
-                                                                                        helperText={
-                                                                                            touched.ratesDetails &&
-                                                                                            touched.ratesDetails[idx] &&
-                                                                                            touched.ratesDetails[idx].child &&
-                                                                                            errors.ratesDetails &&
-                                                                                            errors.ratesDetails[idx] &&
-                                                                                            errors.ratesDetails[idx].child
-                                                                                                ? errors.ratesDetails[idx].child
-                                                                                                : ''
-                                                                                        }
-                                                                                    />
-                                                                                </TableCell>
-                                                                                <TableCell>
                                                                                     <FormGroup>
                                                                                         <FormControlLabel
                                                                                             name={`ratesDetails.${idx}.taxApplicable`}
@@ -1921,23 +1215,6 @@ function RoomBuyingRates(props) {
                                                                                             // label="Status"
                                                                                             checked={values.ratesDetails[idx].taxApplicable}
                                                                                             disabled
-                                                                                            // disabled={mode == 'VIEW'}
-                                                                                        />
-                                                                                    </FormGroup>
-                                                                                </TableCell>
-                                                                                <TableCell>
-                                                                                    <FormGroup>
-                                                                                        <FormControlLabel
-                                                                                            name={`ratesDetails.${idx}.rateStatus`}
-                                                                                            onChange={handleChange}
-                                                                                            value={
-                                                                                                values.ratesDetails[idx] &&
-                                                                                                values.ratesDetails[idx].rateStatus
-                                                                                            }
-                                                                                            control={<Switch color="success" />}
-                                                                                            // label="Status"
-                                                                                            checked={values.ratesDetails[idx].rateStatus}
-
                                                                                             // disabled={mode == 'VIEW'}
                                                                                         />
                                                                                     </FormGroup>
@@ -2008,147 +1285,491 @@ function RoomBuyingRates(props) {
                                                 )}
                                             </FieldArray>
                                             <br />
-                                            <div style={{ marginTop: '6px', margin: '10px' }}>
-                                                <Grid gap="10px" display="flex">
-                                                    <Grid item>
-                                                        <Field
-                                                            as={Autocomplete}
-                                                            value={values.guideBasis}
-                                                            name="guideBasis"
-                                                            disabled={mode == 'VIEW'}
-                                                            onChange={(_, value) => {
-                                                                setFieldValue(`guideBasis`, value);
-                                                            }}
-                                                            InputLabelProps={{
-                                                                shrink: true
-                                                            }}
-                                                            options={activeotelBasis}
-                                                            getOptionLabel={(option) => `${option.code}`}
-                                                            isOptionEqualToValue={(option, value) => option.id === value.id}
-                                                            renderInput={(params) => (
+                                            <TableContainer style={{ width: 1280 }}>
+                                                <Table stickyHeader className={classes.table}>
+                                                    <TableHead alignItems="center">
+                                                        <TableRow>
+                                                            {/* <TableCell>Sequence</TableCell> */}
+
+                                                            <TableCell>
+                                                                <LocalizationProvider
+                                                                    dateAdapter={AdapterDayjs}
+                                                                    // adapterLocale={locale}
+                                                                >
+                                                                    <DatePicker
+                                                                        disabled={mode != 'INSERT'}
+                                                                        onChange={(value) => {
+                                                                            setFieldValue(`fromDate`, value);
+                                                                        }}
+                                                                        inputFormat="DD/MM/YYYY"
+                                                                        value={values.fromDate}
+                                                                        renderInput={(params) => (
+                                                                            <TextField
+                                                                                {...params}
+                                                                                sx={{
+                                                                                    width: { xs: 150 },
+                                                                                    '& .MuiInputBase-root': {
+                                                                                        height: 41
+                                                                                    }
+                                                                                }}
+                                                                                InputLabelProps={{
+                                                                                    shrink: true
+                                                                                }}
+                                                                                label="From Date"
+                                                                                variant="outlined"
+                                                                                name="fromDate"
+                                                                                onBlur={handleBlur}
+                                                                                error={Boolean(touched.fromDate && errors.fromDate)}
+                                                                                helperText={
+                                                                                    touched.fromDate && errors.fromDate
+                                                                                        ? errors.fromDate
+                                                                                        : ''
+                                                                                }
+                                                                            />
+                                                                        )}
+                                                                    />
+                                                                </LocalizationProvider>
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                <LocalizationProvider
+                                                                    dateAdapter={AdapterDayjs}
+                                                                    // adapterLocale={locale}
+                                                                >
+                                                                    <DatePicker
+                                                                        disabled={mode != 'INSERT'}
+                                                                        onChange={(value) => {
+                                                                            setFieldValue(`fromDate`, value);
+                                                                        }}
+                                                                        inputFormat="DD/MM/YYYY"
+                                                                        value={values.fromDate}
+                                                                        renderInput={(params) => (
+                                                                            <TextField
+                                                                                {...params}
+                                                                                sx={{
+                                                                                    width: { xs: 150 },
+                                                                                    '& .MuiInputBase-root': {
+                                                                                        height: 41
+                                                                                    }
+                                                                                }}
+                                                                                InputLabelProps={{
+                                                                                    shrink: true
+                                                                                }}
+                                                                                label="To Date"
+                                                                                variant="outlined"
+                                                                                name="fromDate"
+                                                                                onBlur={handleBlur}
+                                                                                error={Boolean(touched.fromDate && errors.fromDate)}
+                                                                                helperText={
+                                                                                    touched.fromDate && errors.fromDate
+                                                                                        ? errors.fromDate
+                                                                                        : ''
+                                                                                }
+                                                                            />
+                                                                        )}
+                                                                    />
+                                                                </LocalizationProvider>
+                                                            </TableCell>
+                                                            <TableCell>
                                                                 <Field
-                                                                    as={TextField}
-                                                                    {...params}
-                                                                    label="Guide Basis"
-                                                                    sx={{
-                                                                        width: { xs: 250 },
-                                                                        '& .MuiInputBase-root': {
-                                                                            height: 41
-                                                                        }
+                                                                    as={Autocomplete}
+                                                                    value={values.currency}
+                                                                    name="currency"
+                                                                    onChange={(_, value) => {
+                                                                        console.log(value);
+                                                                        setFieldValue(`currency`, value);
+                                                                    }}
+                                                                    disabled={mode == 'VIEW' || mode == 'VIEW_UPDATE'}
+                                                                    options={currencyListOptions}
+                                                                    getOptionLabel={(option) =>
+                                                                        `${option.currencyCode} - ${option.currencyDescription}`
+                                                                    }
+                                                                    isOptionEqualToValue={(option, value) =>
+                                                                        option.currencyListId === value.currencyListId
+                                                                    }
+                                                                    renderInput={(params) => (
+                                                                        <Field
+                                                                            as={TextField}
+                                                                            {...params}
+                                                                            // label="tax"
+                                                                            sx={{
+                                                                                width: { xs: 300 },
+                                                                                '& .MuiInputBase-root': {
+                                                                                    height: 40
+                                                                                }
+                                                                            }}
+                                                                            InputLabelProps={{
+                                                                                shrink: true
+                                                                            }}
+                                                                            label="Currency"
+                                                                            variant="outlined"
+                                                                            validate={requiredValidation}
+                                                                            name="currency"
+                                                                            onBlur={handleBlur}
+                                                                            error={Boolean(touched.currency && errors.currency)}
+                                                                            helperText={
+                                                                                touched.currency && errors.currency ? errors.currency : ''
+                                                                            }
+                                                                        />
+                                                                    )}
+                                                                />
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                <Field
+                                                                    as={Autocomplete}
+                                                                    value={values.currency}
+                                                                    name="currency"
+                                                                    onChange={(_, value) => {
+                                                                        console.log(value);
+                                                                        setFieldValue(`currency`, value);
+                                                                    }}
+                                                                    disabled={mode == 'VIEW' || mode == 'VIEW_UPDATE'}
+                                                                    options={currencyListOptions}
+                                                                    getOptionLabel={(option) =>
+                                                                        `${option.currencyCode} - ${option.currencyDescription}`
+                                                                    }
+                                                                    isOptionEqualToValue={(option, value) =>
+                                                                        option.currencyListId === value.currencyListId
+                                                                    }
+                                                                    renderInput={(params) => (
+                                                                        <Field
+                                                                            as={TextField}
+                                                                            {...params}
+                                                                            // label="tax"
+                                                                            sx={{
+                                                                                width: { xs: 300 },
+                                                                                '& .MuiInputBase-root': {
+                                                                                    height: 40
+                                                                                }
+                                                                            }}
+                                                                            InputLabelProps={{
+                                                                                shrink: true
+                                                                            }}
+                                                                            label="Vehicle Type"
+                                                                            variant="outlined"
+                                                                            validate={requiredValidation}
+                                                                            name="currency"
+                                                                            onBlur={handleBlur}
+                                                                            error={Boolean(touched.currency && errors.currency)}
+                                                                            helperText={
+                                                                                touched.currency && errors.currency ? errors.currency : ''
+                                                                            }
+                                                                        />
+                                                                    )}
+                                                                />
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                {' '}
+                                                                <Field
+                                                                    as={Autocomplete}
+                                                                    value={values.guideBasis}
+                                                                    name="guideBasis"
+                                                                    disabled={mode == 'VIEW'}
+                                                                    onChange={(_, value) => {
+                                                                        setFieldValue(`guideBasis`, value);
                                                                     }}
                                                                     InputLabelProps={{
                                                                         shrink: true
                                                                     }}
-                                                                    validate={requiredValidation}
-                                                                    error={Boolean(touched.guideBasis && errors.guideBasis)}
-                                                                    helperText={touched.guideBasis && errors.basis ? errors.guideBasis : ''}
-                                                                    variant="outlined"
-                                                                    name="guideBasis"
-                                                                    onBlur={handleBlur}
+                                                                    options={activeotelBasis}
+                                                                    getOptionLabel={(option) => `${option.code}`}
+                                                                    isOptionEqualToValue={(option, value) => option.id === value.id}
+                                                                    renderInput={(params) => (
+                                                                        <Field
+                                                                            as={TextField}
+                                                                            {...params}
+                                                                            label="Rate Type"
+                                                                            sx={{
+                                                                                width: { xs: 250 },
+                                                                                '& .MuiInputBase-root': {
+                                                                                    height: 41
+                                                                                }
+                                                                            }}
+                                                                            InputLabelProps={{
+                                                                                shrink: true
+                                                                            }}
+                                                                            validate={requiredValidation}
+                                                                            error={Boolean(touched.guideBasis && errors.guideBasis)}
+                                                                            helperText={
+                                                                                touched.guideBasis && errors.basis ? errors.guideBasis : ''
+                                                                            }
+                                                                            variant="outlined"
+                                                                            name="guideBasis"
+                                                                            onBlur={handleBlur}
+                                                                        />
+                                                                    )}
                                                                 />
-                                                            )}
-                                                        />
-                                                    </Grid>
-                                                    <Grid item>
-                                                        <Field
-                                                            as={TextField}
-                                                            label="Guide Rate"
-                                                            sx={{
-                                                                width: { xs: 250 },
-                                                                '& .MuiInputBase-root': {
-                                                                    height: 40
-                                                                }
-                                                            }}
-                                                            type="text"
-                                                            variant="outlined"
-                                                            name="guideRate"
-                                                            InputLabelProps={{
-                                                                shrink: true
-                                                            }}
-                                                            value={values.guideRate}
-                                                            onChange={handleChange}
-                                                            onBlur={handleBlur}
-                                                            error={Boolean(touched.guideRate && errors.guideRate)}
-                                                            helperText={touched.guideRate && errors.guideRate ? errors.guideRate : ''}
-                                                        />
-                                                    </Grid>
-                                                    <Grid item>
-                                                        <Field
-                                                            as={TextField}
-                                                            label="Tour Lead Rate"
-                                                            sx={{
-                                                                width: { xs: 250 },
-                                                                '& .MuiInputBase-root': {
-                                                                    height: 40
-                                                                }
-                                                            }}
-                                                            disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
-                                                            type="text"
-                                                            variant="outlined"
-                                                            name="tourLeadRate"
-                                                            InputLabelProps={{
-                                                                shrink: true
-                                                            }}
-                                                            value={values.tourLeadRate}
-                                                            onChange={handleChange}
-                                                            onBlur={handleBlur}
-                                                            error={Boolean(touched.tourLeadRate && errors.tourLeadRate)}
-                                                            helperText={
-                                                                touched.tourLeadRate && errors.tourLeadRate ? errors.tourLeadRate : ''
-                                                            }
-                                                        />
-                                                    </Grid>
-
-                                                    <Grid item>
-                                                        <FormGroup>
-                                                            <Field
-                                                                as={FormControlLabel}
-                                                                name="taxApplicableGuide"
-                                                                onChange={handleChange}
-                                                                value={values.taxApplicableGuide}
-                                                                control={<Switch color="success" />}
-                                                                label="Tax Applicable"
-                                                                checked={values.taxApplicableGuide}
-                                                                // disabled={mode == 'VIEW'}
-                                                            />
-                                                        </FormGroup>
-                                                    </Grid>
-                                                    <Grid item>
-                                                        <IconButton
-                                                            aria-label="delete"
-                                                            type="button"
-                                                            onClick={() => {
-                                                                setTouched({ guideBasis: true }).then(() => {
-                                                                    console.log(formikRef.current.isValid);
-                                                                    console.log(formikRef.current.errors);
-
-                                                                    if (formikRef.current.errors.guideBasis == undefined) {
-                                                                        handleSubmit2(values, formikRef.current.values);
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                {' '}
+                                                                <Field
+                                                                    as={Autocomplete}
+                                                                    value={values.guideBasis}
+                                                                    name="guideBasis"
+                                                                    disabled={mode == 'VIEW'}
+                                                                    onChange={(_, value) => {
+                                                                        setFieldValue(`guideBasis`, value);
+                                                                    }}
+                                                                    InputLabelProps={{
+                                                                        shrink: true
+                                                                    }}
+                                                                    options={activeotelBasis}
+                                                                    getOptionLabel={(option) => `${option.code}`}
+                                                                    isOptionEqualToValue={(option, value) => option.id === value.id}
+                                                                    renderInput={(params) => (
+                                                                        <Field
+                                                                            as={TextField}
+                                                                            {...params}
+                                                                            label="Tax Code"
+                                                                            sx={{
+                                                                                width: { xs: 250 },
+                                                                                '& .MuiInputBase-root': {
+                                                                                    height: 41
+                                                                                }
+                                                                            }}
+                                                                            InputLabelProps={{
+                                                                                shrink: true
+                                                                            }}
+                                                                            validate={requiredValidation}
+                                                                            error={Boolean(touched.guideBasis && errors.guideBasis)}
+                                                                            helperText={
+                                                                                touched.guideBasis && errors.basis ? errors.guideBasis : ''
+                                                                            }
+                                                                            variant="outlined"
+                                                                            name="guideBasis"
+                                                                            onBlur={handleBlur}
+                                                                        />
+                                                                    )}
+                                                                />
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                <Field
+                                                                    as={TextField}
+                                                                    label="Vehicle Rate"
+                                                                    sx={{
+                                                                        width: { xs: 250 },
+                                                                        '& .MuiInputBase-root': {
+                                                                            height: 40
+                                                                        }
+                                                                    }}
+                                                                    disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                    type="text"
+                                                                    variant="outlined"
+                                                                    name="tourLeadRate"
+                                                                    InputLabelProps={{
+                                                                        shrink: true
+                                                                    }}
+                                                                    value={values.tourLeadRate}
+                                                                    onChange={handleChange}
+                                                                    onBlur={handleBlur}
+                                                                    error={Boolean(touched.tourLeadRate && errors.tourLeadRate)}
+                                                                    helperText={
+                                                                        touched.tourLeadRate && errors.tourLeadRate
+                                                                            ? errors.tourLeadRate
+                                                                            : ''
                                                                     }
-                                                                });
-                                                            }}
-                                                        >
-                                                            {mode === 'INSERT' ? <AddBoxIcon /> : null}
-                                                        </IconButton>
-                                                    </Grid>
-                                                </Grid>
-                                            </div>
-                                            <br />
+                                                                />
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                <Field
+                                                                    as={TextField}
+                                                                    label="Vehicle Rate with tax"
+                                                                    sx={{
+                                                                        width: { xs: 250 },
+                                                                        '& .MuiInputBase-root': {
+                                                                            height: 40
+                                                                        }
+                                                                    }}
+                                                                    disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                    type="text"
+                                                                    variant="outlined"
+                                                                    name="tourLeadRate"
+                                                                    InputLabelProps={{
+                                                                        shrink: true
+                                                                    }}
+                                                                    value={values.tourLeadRate}
+                                                                    onChange={handleChange}
+                                                                    onBlur={handleBlur}
+                                                                    error={Boolean(touched.tourLeadRate && errors.tourLeadRate)}
+                                                                    helperText={
+                                                                        touched.tourLeadRate && errors.tourLeadRate
+                                                                            ? errors.tourLeadRate
+                                                                            : ''
+                                                                    }
+                                                                />
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                <Field
+                                                                    as={TextField}
+                                                                    label="Driver Rate"
+                                                                    sx={{
+                                                                        width: { xs: 250 },
+                                                                        '& .MuiInputBase-root': {
+                                                                            height: 40
+                                                                        }
+                                                                    }}
+                                                                    disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                    type="text"
+                                                                    variant="outlined"
+                                                                    name="tourLeadRate"
+                                                                    InputLabelProps={{
+                                                                        shrink: true
+                                                                    }}
+                                                                    value={values.tourLeadRate}
+                                                                    onChange={handleChange}
+                                                                    onBlur={handleBlur}
+                                                                    error={Boolean(touched.tourLeadRate && errors.tourLeadRate)}
+                                                                    helperText={
+                                                                        touched.tourLeadRate && errors.tourLeadRate
+                                                                            ? errors.tourLeadRate
+                                                                            : ''
+                                                                    }
+                                                                />
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                <Field
+                                                                    as={TextField}
+                                                                    label="Driver Rate with Tax"
+                                                                    sx={{
+                                                                        width: { xs: 250 },
+                                                                        '& .MuiInputBase-root': {
+                                                                            height: 40
+                                                                        }
+                                                                    }}
+                                                                    disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                    type="text"
+                                                                    variant="outlined"
+                                                                    name="tourLeadRate"
+                                                                    InputLabelProps={{
+                                                                        shrink: true
+                                                                    }}
+                                                                    value={values.tourLeadRate}
+                                                                    onChange={handleChange}
+                                                                    onBlur={handleBlur}
+                                                                    error={Boolean(touched.tourLeadRate && errors.tourLeadRate)}
+                                                                    helperText={
+                                                                        touched.tourLeadRate && errors.tourLeadRate
+                                                                            ? errors.tourLeadRate
+                                                                            : ''
+                                                                    }
+                                                                />
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                <Field
+                                                                    as={TextField}
+                                                                    label="Assistant Rate"
+                                                                    sx={{
+                                                                        width: { xs: 250 },
+                                                                        '& .MuiInputBase-root': {
+                                                                            height: 40
+                                                                        }
+                                                                    }}
+                                                                    disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                    type="text"
+                                                                    variant="outlined"
+                                                                    name="tourLeadRate"
+                                                                    InputLabelProps={{
+                                                                        shrink: true
+                                                                    }}
+                                                                    value={values.tourLeadRate}
+                                                                    onChange={handleChange}
+                                                                    onBlur={handleBlur}
+                                                                    error={Boolean(touched.tourLeadRate && errors.tourLeadRate)}
+                                                                    helperText={
+                                                                        touched.tourLeadRate && errors.tourLeadRate
+                                                                            ? errors.tourLeadRate
+                                                                            : ''
+                                                                    }
+                                                                />
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                <Field
+                                                                    as={TextField}
+                                                                    label="Assistant Rate with Tax"
+                                                                    sx={{
+                                                                        width: { xs: 250 },
+                                                                        '& .MuiInputBase-root': {
+                                                                            height: 40
+                                                                        }
+                                                                    }}
+                                                                    disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                    type="text"
+                                                                    variant="outlined"
+                                                                    name="tourLeadRate"
+                                                                    InputLabelProps={{
+                                                                        shrink: true
+                                                                    }}
+                                                                    value={values.tourLeadRate}
+                                                                    onChange={handleChange}
+                                                                    onBlur={handleBlur}
+                                                                    error={Boolean(touched.tourLeadRate && errors.tourLeadRate)}
+                                                                    helperText={
+                                                                        touched.tourLeadRate && errors.tourLeadRate
+                                                                            ? errors.tourLeadRate
+                                                                            : ''
+                                                                    }
+                                                                />
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                <FormGroup>
+                                                                    <Field
+                                                                        as={FormControlLabel}
+                                                                        name="taxApplicableGuide"
+                                                                        onChange={handleChange}
+                                                                        value={values.taxApplicableGuide}
+                                                                        control={<Switch color="success" />}
+                                                                        label="Tax Applicable"
+                                                                        checked={values.taxApplicableGuide}
+                                                                        // disabled={mode == 'VIEW'}
+                                                                    />
+                                                                </FormGroup>
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                <IconButton
+                                                                    aria-label="delete"
+                                                                    type="button"
+                                                                    onClick={() => {
+                                                                        setTouched({ roomCategory: true, basis: true }).then(() => {
+                                                                            console.log(formikRef);
+                                                                            console.log(formikRef.current.errors);
+                                                                            if (
+                                                                                formikRef.current.errors.roomCategory == undefined &&
+                                                                                formikRef.current.errors.basis == undefined
+                                                                            ) {
+                                                                                handleSubmit(values, formikRef.current.values);
+                                                                            }
+                                                                        });
+                                                                    }}
+                                                                >
+                                                                    <AddBoxIcon />
+                                                                </IconButton>
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    </TableHead>
+                                                </Table>
+                                            </TableContainer>
                                             <FieldArray name="tourGuideDetails">
                                                 {({ insert, remove, push }) => (
                                                     <Paper>
-                                                        <TableContainer>
-                                                            <Table stickyHeader size="small">
+                                                        <TableContainer style={{ width: 1230 }}>
+                                                            <Table stickyHeader className={classes.table}>
                                                                 <TableHead alignItems="center">
                                                                     <TableRow>
                                                                         {/* <TableCell>Sequence</TableCell> */}
 
-                                                                        <TableCell>Basis </TableCell>
-                                                                        <TableCell>Guide</TableCell>
-                                                                        <TableCell>Tour Lead</TableCell>
-                                                                        <TableCell>Tax Applicable</TableCell>
+                                                                        <TableCell>From Date </TableCell>
+                                                                        <TableCell>To Date</TableCell>
+                                                                        <TableCell>Currency</TableCell>
+                                                                        <TableCell>vehicle Type</TableCell>
+                                                                        <TableCell>Rate Type</TableCell>
+                                                                        <TableCell>Tax Code</TableCell>
+                                                                        <TableCell>Vehicle Rate</TableCell>
+                                                                        <TableCell>Vehicle Rate with Tax</TableCell>
+                                                                        <TableCell>Driver Rate</TableCell>
+                                                                        <TableCell>Driver Rate with Tax</TableCell>
+                                                                        <TableCell>Assistant Rate</TableCell>
+                                                                        <TableCell>Assistant Rate with Tax</TableCell>
                                                                         <TableCell>Status</TableCell>
-                                                                        <TableCell>Actions</TableCell>
+                                                                        <TableCell>Action</TableCell>
                                                                     </TableRow>
                                                                 </TableHead>
                                                                 {/* {tableBodyData ? ( */}
@@ -2165,6 +1786,215 @@ function RoomBuyingRates(props) {
                                                                             <TableRow key={idx} hover>
                                                                                 {/* <TableCell>{idx + 1}</TableCell> */}
 
+                                                                                <TableCell>
+                                                                                    <Autocomplete
+                                                                                        disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                                        value={
+                                                                                            values.tourGuideDetails[idx]
+                                                                                                ? values.tourGuideDetails[idx].guideBasis
+                                                                                                : null
+                                                                                        }
+                                                                                        name={`tourGuideDetails.${idx}.guideBasis`}
+                                                                                        onChange={(_, value) => {
+                                                                                            console.log(value);
+                                                                                            setFieldValue(
+                                                                                                `tourGuideDetails.${idx}.guideBasis`,
+                                                                                                value
+                                                                                            );
+                                                                                        }}
+                                                                                        options={activeotelBasis}
+                                                                                        getOptionLabel={(option) => `${option.code}`}
+                                                                                        isOptionEqualToValue={(option, value) =>
+                                                                                            option.id === value.id
+                                                                                        }
+                                                                                        renderInput={(params) => (
+                                                                                            <TextField
+                                                                                                {...params}
+                                                                                                // label="tax"
+
+                                                                                                sx={{
+                                                                                                    width: { sm: 200 },
+                                                                                                    '& .MuiInputBase-root': {
+                                                                                                        height: 40
+                                                                                                    }
+                                                                                                }}
+                                                                                                variant="outlined"
+                                                                                                name={`tourGuideDetails.${idx}.guideBasis`}
+                                                                                                onBlur={handleBlur}
+                                                                                                helperText={
+                                                                                                    touched.tourGuideDetails &&
+                                                                                                    touched.tourGuideDetails[idx] &&
+                                                                                                    touched.tourGuideDetails[idx]
+                                                                                                        .guideBasis &&
+                                                                                                    errors.tourGuideDetails &&
+                                                                                                    errors.tourGuideDetails[idx] &&
+                                                                                                    errors.tourGuideDetails[idx].guideBasis
+                                                                                                        ? errors.tourGuideDetails[idx]
+                                                                                                              .guideBasis
+                                                                                                        : ''
+                                                                                                }
+                                                                                                error={Boolean(
+                                                                                                    touched.tourGuideDetails &&
+                                                                                                        touched.tourGuideDetails[idx] &&
+                                                                                                        touched.tourGuideDetails[idx]
+                                                                                                            .guideBasis &&
+                                                                                                        errors.tourGuideDetails &&
+                                                                                                        errors.tourGuideDetails[idx] &&
+                                                                                                        errors.tourGuideDetails[idx]
+                                                                                                            .guideBasis
+                                                                                                )}
+                                                                                            />
+                                                                                        )}
+                                                                                    />
+                                                                                </TableCell>
+
+                                                                                <TableCell>
+                                                                                    <TextField
+                                                                                        sx={{
+                                                                                            width: { xs: 120 },
+                                                                                            '& .MuiInputBase-root': {
+                                                                                                height: 40
+                                                                                            }
+                                                                                        }}
+                                                                                        //   type="number"
+                                                                                        variant="outlined"
+                                                                                        // placeholder="name"
+                                                                                        name={`tourGuideDetails.${idx}.singleRate`}
+                                                                                        value={
+                                                                                            values.tourGuideDetails[idx] &&
+                                                                                            values.tourGuideDetails[idx].guideRate
+                                                                                        }
+                                                                                        disabled
+                                                                                        onChange={handleChange}
+                                                                                        onBlur={handleBlur}
+                                                                                        error={Boolean(
+                                                                                            touched.tourGuideDetails &&
+                                                                                                touched.tourGuideDetails[idx] &&
+                                                                                                touched.tourGuideDetails[idx].guideRate &&
+                                                                                                errors.tourGuideDetails &&
+                                                                                                errors.tourGuideDetails[idx] &&
+                                                                                                errors.tourGuideDetails[idx].guideRate
+                                                                                        )}
+                                                                                        helperText={
+                                                                                            touched.tourGuideDetails &&
+                                                                                            touched.tourGuideDetails[idx] &&
+                                                                                            touched.tourGuideDetails[idx].guideRate &&
+                                                                                            errors.tourGuideDetails &&
+                                                                                            errors.tourGuideDetails[idx] &&
+                                                                                            errors.tourGuideDetails[idx].guideRate
+                                                                                                ? errors.tourGuideDetails[idx].guideRate
+                                                                                                : ''
+                                                                                        }
+                                                                                    />
+                                                                                </TableCell>
+                                                                                <TableCell>
+                                                                                    <TextField
+                                                                                        sx={{
+                                                                                            width: { xs: 120 },
+                                                                                            '& .MuiInputBase-root': {
+                                                                                                height: 40
+                                                                                            }
+                                                                                        }}
+                                                                                        //   type="number"
+                                                                                        variant="outlined"
+                                                                                        // placeholder="name"
+                                                                                        name={`tourGuideDetails.${idx}.tourLeadRate`}
+                                                                                        value={
+                                                                                            values.tourGuideDetails[idx] &&
+                                                                                            values.tourGuideDetails[idx].tourLeadRate
+                                                                                        }
+                                                                                        disabled
+                                                                                        onChange={handleChange}
+                                                                                        onBlur={handleBlur}
+                                                                                        error={Boolean(
+                                                                                            touched.tourGuideDetails &&
+                                                                                                touched.tourGuideDetails[idx] &&
+                                                                                                touched.tourGuideDetails[idx]
+                                                                                                    .tourLeadRate &&
+                                                                                                errors.tourGuideDetails &&
+                                                                                                errors.tourGuideDetails[idx] &&
+                                                                                                errors.tourGuideDetails[idx].tourLeadRate
+                                                                                        )}
+                                                                                        helperText={
+                                                                                            touched.tourGuideDetails &&
+                                                                                            touched.tourGuideDetails[idx] &&
+                                                                                            touched.tourGuideDetails[idx].tourLeadRate &&
+                                                                                            errors.tourGuideDetails &&
+                                                                                            errors.tourGuideDetails[idx] &&
+                                                                                            errors.tourGuideDetails[idx].tourLeadRate
+                                                                                                ? errors.tourGuideDetails[idx].tourLeadRate
+                                                                                                : ''
+                                                                                        }
+                                                                                    />
+                                                                                </TableCell>
+
+                                                                                <TableCell>
+                                                                                    <FormGroup>
+                                                                                        <FormControlLabel
+                                                                                            name={`tourGuideDetails.${idx}.taxApplicableGuide`}
+                                                                                            onChange={handleChange}
+                                                                                            value={
+                                                                                                values.tourGuideDetails[idx] &&
+                                                                                                values.tourGuideDetails[idx]
+                                                                                                    .taxApplicableGuide
+                                                                                            }
+                                                                                            control={<Switch color="success" />}
+                                                                                            // label="Status"
+                                                                                            checked={
+                                                                                                values.tourGuideDetails[idx]
+                                                                                                    .taxApplicableGuide
+                                                                                            }
+                                                                                            disabled
+                                                                                            // disabled={mode == 'VIEW'}
+                                                                                        />
+                                                                                    </FormGroup>
+                                                                                </TableCell>
+                                                                                <TableCell>
+                                                                                    <FormGroup>
+                                                                                        <FormControlLabel
+                                                                                            name={`tourGuideDetails.${idx}.guideStatus`}
+                                                                                            onChange={handleChange}
+                                                                                            value={
+                                                                                                values.tourGuideDetails[idx] &&
+                                                                                                values.tourGuideDetails[idx].guideStatus
+                                                                                            }
+                                                                                            control={<Switch color="success" />}
+                                                                                            // label="Status"
+                                                                                            checked={
+                                                                                                values.tourGuideDetails[idx].guideStatus
+                                                                                            }
+
+                                                                                            // disabled={mode == 'VIEW'}
+                                                                                        />
+                                                                                    </FormGroup>
+                                                                                </TableCell>
+                                                                                <TableCell>
+                                                                                    <IconButton
+                                                                                        disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                                        disa
+                                                                                        aria-label="delete"
+                                                                                        onClick={() => {
+                                                                                            remove(idx);
+                                                                                        }}
+                                                                                    >
+                                                                                        <HighlightOffIcon />
+                                                                                    </IconButton>
+                                                                                    <IconButton
+                                                                                        disabled={mode == 'VIEW'}
+                                                                                        disa
+                                                                                        aria-label="delete"
+                                                                                        onClick={() => {
+                                                                                            console.log('here');
+                                                                                            console.log(values);
+                                                                                            setTaxDetails(values);
+                                                                                            setOpenTaxDetails2(true);
+
+                                                                                            // remove(idx);
+                                                                                        }}
+                                                                                    >
+                                                                                        <ArticleIcon />
+                                                                                    </IconButton>
+                                                                                </TableCell>
                                                                                 <TableCell>
                                                                                     <Autocomplete
                                                                                         disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
@@ -2463,16 +2293,7 @@ function RoomBuyingRates(props) {
                                 }}
                             </Formik>
                         </Grid>
-                        {openTaxDetails ? (
-                            <ShowTaxDetails open={openTaxDetails} handleClose={handleClose} taxDetails={taxDetails} mode={'Rate'} />
-                        ) : (
-                            ''
-                        )}
-                        {openTaxDetails2 ? (
-                            <ShowTaxDetails open={openTaxDetails2} handleClose={handleClose2} taxDetails={taxDetails} mode={'Tour'} />
-                        ) : (
-                            ''
-                        )}
+
                         {openToast ? <SuccessMsg openToast={openToast} handleToast={handleToast} mode={mode} /> : null}
                         {openModal ? <ExitAlert title="dev" open={openModal} handleClose={handleModalClose} /> : null}
                         {existOpenModal ? (
@@ -2491,8 +2312,5 @@ function RoomBuyingRates(props) {
         </div>
     );
 }
-RoomBuyingRates.propTypes = {
-    classes: PropTypes.object.isRequired
-};
 
-export default withStyles(styles)(RoomBuyingRates);
+export default PaxVehicleRate;

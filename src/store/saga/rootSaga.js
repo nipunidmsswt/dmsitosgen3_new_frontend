@@ -648,6 +648,26 @@ import {
     saveMainTransportCategoriesSaga,
     updateMainTransportCategoriesSaga
 } from './mastersaga/transportSaga/MainTransportCategorySaga';
+
+import {
+    CHECK_PAX_VEHICLE_RATE_CODE_DUPLICATE,
+    CLEAR_PAX_VEHICLE_RATE,
+    GET_ALL_PAX_VEHICLE_RATE,
+    GET_PAX_VEHICLE_RATE_BY_ID,
+    GET_PAX_VEHICLE_RATE_LAST_MODIFIED_DATE_TIME,
+    SAVE_PAX_VEHICLE_RATE,
+    UPDATE_PAX_VEHICLE_RATE
+} from 'store/constant/master/TransportMasterConstant/PaxVehicleRateConstant';
+
+import {
+    checkDupicatePaxVehicleRateSaga,
+    checkLatestPaxVehicleRateModifiedDateSaga,
+    getAllPaxVehicleRateSaga,
+    getPaxVehicleRateByIdSaga,
+    savePaxVehicleRateSaga,
+    updatePaxVehicleRateSaga
+} from './mastersaga/transportSaga/PaxVehicleRateSaga';
+
 export function* wacherSaga() {
     // tax setup
     yield takeLatest(SAVE_TAX_DATA, saveTaxSaga);
@@ -993,6 +1013,7 @@ export function* wacherSaga() {
     yield takeLatest(CHECK_MAIN_TRANSPORT_DETAILS_DUPLICATE, checkDupicateMainTransportCategoriesSaga);
     yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_MAIN_TRANSPORT_DETAILS, checkLatestMainTransportCategoriesModifiedDateSaga);
     yield takeLatest(GET_TRANSPORT_MAIN_CATEGORY_DATA_BY_TYPE, getTransportMainCategoryDataByTypeSaga);
+
     //room buying rate
     yield takeLatest(SAVE_ROOM_BUYING_RATE, saveRoomBuyingRateSaga);
     yield takeLatest(GET_ALL_ROOM_BUYING_RATE, getAllRoomBuyingRateSaga);
@@ -1002,5 +1023,13 @@ export function* wacherSaga() {
     yield takeLatest(UPDATE_ROOM_BUYING_RATE, updateRoomBuyingRateSaga);
     yield takeLatest(GET_ROOM_BUYING_RATE_LIST_BY_HOTEL, getBuyingRoomRatesByHotelSaga);
     yield takeLatest(CLEAR_ROOM_BUYING_RATE, clearRoomBuyingRateSaga);
-    // yield takeLatest(GET_ALL_ACTIVE_GUIDE_CLASS_DATA, getAllActiveGuideClassDataSaga);
+
+    //baggage transport rate
+    yield takeLatest(SAVE_PAX_VEHICLE_RATE, savePaxVehicleRateSaga);
+    yield takeLatest(GET_ALL_PAX_VEHICLE_RATE, getAllPaxVehicleRateSaga);
+    yield takeLatest(GET_PAX_VEHICLE_RATE_BY_ID, getPaxVehicleRateByIdSaga);
+    yield takeLatest(GET_PAX_VEHICLE_RATE_LAST_MODIFIED_DATE_TIME, checkLatestPaxVehicleRateModifiedDateSaga);
+    yield takeLatest(CHECK_PAX_VEHICLE_RATE_CODE_DUPLICATE, checkDupicatePaxVehicleRateSaga);
+    yield takeLatest(UPDATE_PAX_VEHICLE_RATE, updatePaxVehicleRateSaga);
+    yield takeLatest(CLEAR_PAX_VEHICLE_RATE, clearRoomBuyingRateSaga);
 }

@@ -22,9 +22,8 @@
 
 .scrollbar-container {
     .ps__rail-y {
-
-        &:hover>.ps__thumb-y,
-        &:focus>.ps__thumb-y,
+        &:hover > .ps__thumb-y,
+        &:focus > .ps__thumb-y,
         &.ps--clicking .ps__thumb-y {
             background-color: $grey500;
             width: 5px;
@@ -40,8 +39,8 @@
 }
 
 .scrollbar-container.ps,
-.scrollbar-container>.ps {
-    &.ps--active-y>.ps__rail-y {
+.scrollbar-container > .ps {
+    &.ps--active-y > .ps__rail-y {
         width: 5px;
         background-color: transparent !important;
         z-index: 999;
@@ -53,8 +52,8 @@
         }
     }
 
-    &.ps--scrolling-y>.ps__rail-y,
-    &.ps--scrolling-x>.ps__rail-x {
+    &.ps--scrolling-y > .ps__rail-y,
+    &.ps--scrolling-x > .ps__rail-x {
         opacity: 0.4;
         background-color: transparent;
     }
@@ -83,7 +82,6 @@
 }
 
 @keyframes bounce {
-
     0%,
     20%,
     53%,
@@ -114,7 +112,6 @@
 }
 
 @keyframes slideY {
-
     0%,
     50%,
     100% {
@@ -131,7 +128,6 @@
 }
 
 @keyframes slideX {
-
     0%,
     50%,
     100% {
@@ -176,8 +172,17 @@
     /* background: linear-gradient(-180deg, rgba(255,255,255,0.50) 0%, rgba(0,0,0,0.50) 100%); */
 }
 
-
 .css-1nvdc5e-MuiCardHeader-root {
     padding: 10px !important;
     margin-left: 30px !important;
+}
+body::-webkit-scrollbar {
+    width: 5px; /* width of the entire scrollbar */
+    height: 24px;
+}
+
+body::-webkit-scrollbar-thumb {
+    background-color: #055c9d; /* color of the scroll thumb */
+    border-radius: 20px; /* roundness of the scroll thumb */
+    // border: 3px solid orange; /* creates padding around scroll thumb */
 }
