@@ -78,6 +78,7 @@ function DistancesDetails({ mode, selectedType }) {
     const [existOpenModal, setExistOpenModal] = useState(false);
     const [marketListOptions, setMarketListOptions] = useState([]);
     const [activeLocationList, setActiveLocationList] = useState([]);
+    const distance = useSelector((state) => state.distanceReducer.distance);
     const [loadValues, setLoadValues] = useState({
         // category: '',
         // code: '',
@@ -110,9 +111,9 @@ function DistancesDetails({ mode, selectedType }) {
         distanceDetails: yup.array().of(
             yup.object().shape({
                 fromLocation: yup.object().typeError('Required field'),
-                fromDescription: yup.string().required('Required field'),
-                toLocation: yup.object().typeError('Required field'),
-                toDescription: yup.string().required('Required field')
+                // fromDescription: yup.string().required('Required field'),
+                toLocation: yup.object().typeError('Required field')
+                // toDescription: yup.string().required('Required field')
             })
         )
         // .uniqueCodeAndNameCode("Must be unique"),
@@ -148,43 +149,45 @@ function DistancesDetails({ mode, selectedType }) {
     };
 
     useEffect(() => {
-        const distanceArryay = [];
-        console.log('shddddddddddddddddddddddddddddddddddddddddddd');
+        if (distance != null) {
+            dispatch(getAllActiveDistanceDataByTransportType(selectedType.categoryId));
+        }
+    }, [distance]);
+
+    useEffect(() => {
         if (distanceByTransportType != null && selectedType != '') {
-            console.log(distanceByTransportType);
-
-            // distanceByTransportType.forEach((values) => {
-            //     const distanceDetails = [
-            //         {
-            //             // mainCategories: selectedType,
-            //             fromLocation: values.fromLocation,
-            //             fromDescription: values.fromLocation.shortDescription,
-            //             toLocation: values.toLocation,
-            //             toDescription: values.toLocation.shortDescription,
-            //             distance: values.distance,
-            //             hours: values.hours,
-            //             status: values.status
-            //             // mainCategories: selectedType,
-            //             // fromLocation: element.fromLocation,
-            //             // fromDescription: element.toLocation,
-            //             // toDescription: element.toLocation.shortDescription,
-            //             // distance: element.distance,
-            //             // hours: element.hours,
-            //             // status: element.status
-            //         }
-            //     ];
-            //     // };
-
-            // });
-
             const initialValuesNew = {
                 distanceDetails: distanceByTransportType
             };
-            console.log(initialValuesNew);
             setLoadValues(initialValuesNew);
 
             // const values = {
             //     distanceDetails: distanceByTransportType
+            // };
+            // setLoadValues(values);
+        } else {
+            // const values = {
+            //     distanceDetails: [
+            //         { fromLocation: '', fromDescription: '', toLocation: '', toDescription: '', distance: '', hours: '', status: true }
+            //     ]
+            // };
+            // const initialValuesNew = {
+            //     distanceDetails: [
+            //         {
+            //             mainCategories: '',
+            //             fromLocation: {
+            //                 code: ''
+            //             },
+            //             fromDescription: '',
+            //             toLocation: {
+            //                 code: ''
+            //             },
+            //             toDescription: '',
+            //             distance: '',
+            //             hours: '',
+            //             status: true
+            //         }
+            //     ]
             // };
             // setLoadValues(values);
         }
@@ -214,12 +217,9 @@ function DistancesDetails({ mode, selectedType }) {
         console.log(selectedType.categoryId);
         if (selectedType != '') {
             dispatch(getAllActiveDistanceDataByTransportType(selectedType.categoryId));
+        } else {
         }
     }, [selectedType]);
-
-    // useEffect(() => {
-    //     alert('mode:' + mode);
-    // }, [mode]);
 
     useEffect(() => {
         setActiveLocationList(activeLocations);
@@ -258,65 +258,45 @@ function DistancesDetails({ mode, selectedType }) {
                         confirmRequest();
                     }
                 });
+            } else {
+                const distanceDetailsArray = data.distanceDetails;
+
+                console.log(distanceDetailsArray);
+                dispatch(saveDistanceData(distanceDetailsArray));
+
+                // const initialValuesNew = {
+                //     distanceDetails: [
+                //         {
+                //             mainCategories: '',
+                //             fromLocation: {
+                //                 code: ''
+                //             },
+                //             fromDescription: '',
+                //             toLocation: {
+                //                 code: ''
+                //             },
+                //             toDescription: '',
+                //             distance: '',
+                //             hours: '',
+                //             status: true
+                //         }
+                //     ]
+                // };
+                // setLoadValues(initialValuesNew);
             }
-
-            // const distanceDetailsArray = data.distanceDetails;
-
-            // console.log(distanceDetailsArray);
-            // dispatch(saveDistanceData(distanceDetailsArray));
-
-            // const initialValuesNew = {
-            //     distanceDetails: [
-            //         {
-            //             mainCategories: '',
-            //             fromLocation: {
-            //                 code: ''
-            //             },
-            //             fromDescription: '',
-            //             toLocation: {
-            //                 code: ''
-            //             },
-            //             toDescription: '',
-            //             distance: '',
-            //             hours: '',
-            //             status: true
-            //         }
-            //     ]
-            // };
-            // setLoadValues(initialValuesNew);
-        } else if (mode === 'VIEW_UPDATE') {
-            dispatch(updateCodeAndNameData(data));
         }
     };
-
-    // const handleSubmit = async (values) => {
-    //     console.log(values);
-    //     const initialValuesNew = {
-    //         category: values.category,
-    //         code: values.category,
-    //         description: '',
-    //         status: true,
-    //         distanceDetails: [
-    //             { category: values.category, code: values.code, description: values.description, status: values.status, id: '' }
-    //         ]
-    //     };
-
-    //     loadValues.distanceDetails?.map((s) =>
-    //         s.code === values.code && s.category == values.category ? setExistOpenModal(true) : initialValuesNew.distanceDetails.push(s)
-    //     );
-
-    //     setLoadValues(initialValuesNew);
-    // };
 
     const handleSubmit = async (values) => {
         const initialValuesNew = {
             distanceDetails: [
                 {
+                    id: '',
                     mainCategories: selectedType,
                     fromLocation: values.fromLocation,
-                    fromDescription: values.fromLocation.shortDescription,
+                    // fromDescription: values.fromLocation.shortDescription,
                     toLocation: values.toLocation,
-                    toDescription: values.toLocation.shortDescription,
+                    // toDescription: values.toLocation.shortDescription,
                     distance: values.distance,
                     hours: values.hours,
                     status: values.status
@@ -551,15 +531,7 @@ function DistancesDetails({ mode, selectedType }) {
                                                     </FormGroup>
                                                 </Grid>
                                                 <Grid item>
-                                                    <IconButton
-                                                        aria-label="delete"
-                                                        type="submit"
-
-                                                        // onClick={() => {
-                                                        //     addDataToTable(values);
-                                                        //     // resetForm();
-                                                        // }}
-                                                    >
+                                                    <IconButton aria-label="delete" type="submit">
                                                         {mode === 'INSERT' ? <AddBoxIcon /> : null}
                                                     </IconButton>
                                                 </Grid>
@@ -592,7 +564,7 @@ function DistancesDetails({ mode, selectedType }) {
                                                     <Table stickyHeader size="small">
                                                         <TableHead alignItems="center">
                                                             <TableRow>
-                                                                {/* <TableCell>Transport Type</TableCell> */}
+                                                                <TableCell>Transport Type</TableCell>
                                                                 <TableCell>From Location</TableCell>
                                                                 <TableCell>Description </TableCell>
                                                                 <TableCell>To Location</TableCell>
@@ -615,7 +587,7 @@ function DistancesDetails({ mode, selectedType }) {
                                                                 // {values.distanceDetails.map((record, idx) => {
                                                                 return (
                                                                     <TableRow key={idx} hover>
-                                                                        {/* <TableCell>
+                                                                        <TableCell>
                                                                             <TextField
                                                                                 sx={{
                                                                                     width: { xs: 120 },
@@ -632,9 +604,8 @@ function DistancesDetails({ mode, selectedType }) {
                                                                                 }
                                                                                 onChange={handleChange}
                                                                                 onBlur={handleBlur}
-                                                                               
                                                                             />
-                                                                        </TableCell> */}
+                                                                        </TableCell>
                                                                         {/* <TableCell>{idx + 1}</TableCell> */}
 
                                                                         <TableCell>
@@ -872,17 +843,17 @@ function DistancesDetails({ mode, selectedType }) {
                                                                         </TableCell>
 
                                                                         <TableCell>
-                                                                            {/* {(values.distanceDetails[idx] &&
-                                                                                values.distanceDetails[idx].id) === '' ? ( */}
-                                                                            <IconButton
-                                                                                aria-label="delete"
-                                                                                onClick={() => {
-                                                                                    remove(idx);
-                                                                                }}
-                                                                            >
-                                                                                <HighlightOffIcon />
-                                                                            </IconButton>
-                                                                            {/* ) : null} */}
+                                                                            {(values.distanceDetails[idx] &&
+                                                                                values.distanceDetails[idx].id) === '' ? (
+                                                                                <IconButton
+                                                                                    aria-label="delete"
+                                                                                    onClick={() => {
+                                                                                        remove(idx);
+                                                                                    }}
+                                                                                >
+                                                                                    <HighlightOffIcon />
+                                                                                </IconButton>
+                                                                            ) : null}
                                                                         </TableCell>
                                                                     </TableRow>
                                                                 );
