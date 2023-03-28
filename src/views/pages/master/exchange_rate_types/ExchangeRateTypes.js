@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
     Dialog,
     Slide,
+    Switch,
     FormControlLabel,
     Box,
     DialogContent,
@@ -151,7 +152,12 @@ function ExchangeRateTypes({ open, handleClose, mode, code }) {
             yup.object().shape({
                 // tax: yup.object().typeError("Required field"),
                 fromDate: yup.date().required('Required field'),
-                rate: yup.string().required('Required field')
+                rate: yup
+                    .number()
+                    .test('maxDigitsAfterDecimal', 'number field must have 4 digits after decimal or less', (number) =>
+                        Number.isInteger(number * 10 ** 4)
+                    ),
+                toDate: yup.date().required('Required field').min(yup.ref('fromDate'), "End date can't be before start date")
             })
         )
     });
@@ -168,7 +174,7 @@ function ExchangeRateTypes({ open, handleClose, mode, code }) {
             for (let [key, value] of Object.entries(currencies.currencies)) {
                 array.push({ name: key, value: value });
             }
-
+            console.log(array);
             setCurrecyListArray(array);
         }
     }, [currencies]);
@@ -252,6 +258,9 @@ function ExchangeRateTypes({ open, handleClose, mode, code }) {
                                                                             select
                                                                             name="exchangeType"
                                                                             label="Exchnage Type"
+                                                                            InputLabelProps={{
+                                                                                shrink: true
+                                                                            }}
                                                                             onChange={handleChange}
                                                                             onBlur={handleBlur}
                                                                             value={values.exchangeType}
@@ -287,6 +296,10 @@ function ExchangeRateTypes({ open, handleClose, mode, code }) {
                                                                             id="demo-simple-select"
                                                                             name="baseCurrencyCode"
                                                                             label="Base Currency Code"
+                                                                            InputLabelProps={{
+                                                                                shrink: true
+                                                                            }}
+                                                                            defaultValue="LKR-"
                                                                             value={values.baseCurrencyCode}
                                                                             onChange={handleChange}
                                                                             menuprops={{
@@ -348,6 +361,9 @@ function ExchangeRateTypes({ open, handleClose, mode, code }) {
                                                                                 }
                                                                             }}
                                                                             select
+                                                                            InputLabelProps={{
+                                                                                shrink: true
+                                                                            }}
                                                                             id="demo-simple-select"
                                                                             name="currencyISOCode"
                                                                             value={values.currencyISOCode}
@@ -403,21 +419,19 @@ function ExchangeRateTypes({ open, handleClose, mode, code }) {
                                                                     </Grid>
                                                                 </Grid>
 
-                                                                <Typography variant="" component="p">
-                                                                    Active
-                                                                </Typography>
-                                                                <FormGroup>
-                                                                    <FormControlLabel
-                                                                        control={
-                                                                            <Checkbox
-                                                                                name="status"
-                                                                                onChange={handleChange}
-                                                                                checked={values.status}
-                                                                                value={values.status}
-                                                                            />
-                                                                        }
-                                                                    />
-                                                                </FormGroup>
+                                                                <Grid>
+                                                                    <FormGroup>
+                                                                        <FormControlLabel
+                                                                            name="status"
+                                                                            control={<Switch color="success" />}
+                                                                            label="Status"
+                                                                            disabled={mode == 'VIEW'}
+                                                                            onChange={handleChange}
+                                                                            checked={values.status}
+                                                                            value={values.status}
+                                                                        />
+                                                                    </FormGroup>
+                                                                </Grid>
                                                             </div>
 
                                                             <FieldArray name="exchangeRates">
@@ -683,27 +697,19 @@ function ExchangeRateTypes({ open, handleClose, mode, code }) {
                                                                                                 <TableCell>
                                                                                                     <FormGroup>
                                                                                                         <FormControlLabel
-                                                                                                            control={
-                                                                                                                <Checkbox
-                                                                                                                    name={`exchangeRates.${idx}.status`}
-                                                                                                                    onChange={handleChange}
-                                                                                                                    checked={
-                                                                                                                        values
-                                                                                                                            .exchangeRates[
-                                                                                                                            idx
-                                                                                                                        ].status
-                                                                                                                    }
-                                                                                                                    value={
-                                                                                                                        values
-                                                                                                                            .exchangeRates[
-                                                                                                                            idx
-                                                                                                                        ] &&
-                                                                                                                        values
-                                                                                                                            .exchangeRates[
-                                                                                                                            idx
-                                                                                                                        ].status
-                                                                                                                    }
-                                                                                                                />
+                                                                                                            name={`exchangeRates.${idx}.status`}
+                                                                                                            control={<Switch />}
+                                                                                                            label="Status"
+                                                                                                            disabled={mode == 'VIEW'}
+                                                                                                            onChange={handleChange}
+                                                                                                            checked={
+                                                                                                                values.exchangeRates[idx]
+                                                                                                                    .status
+                                                                                                            }
+                                                                                                            value={
+                                                                                                                values.exchangeRates[idx] &&
+                                                                                                                values.exchangeRates[idx]
+                                                                                                                    .status
                                                                                                             }
                                                                                                         />
                                                                                                     </FormGroup>
@@ -730,10 +736,10 @@ function ExchangeRateTypes({ open, handleClose, mode, code }) {
                                                             <Box display="flex" flexDirection="row-reverse" style={{ marginTop: '20px' }}>
                                                                 {mode != 'VIEW' ? (
                                                                     <Button
-                                                                        variant="contained"
+                                                                        variant="outlined"
                                                                         type="button"
                                                                         style={{
-                                                                            backgroundColor: '#B22222',
+                                                                            // backgroundColor: '#B22222',
                                                                             marginLeft: '10px'
                                                                         }}
                                                                         // onClick={handleCancel}
@@ -745,13 +751,7 @@ function ExchangeRateTypes({ open, handleClose, mode, code }) {
                                                                 )}
 
                                                                 {mode != 'VIEW' ? (
-                                                                    <Button
-                                                                        variant="contained"
-                                                                        type="submit"
-                                                                        style={{
-                                                                            backgroundColor: '#00AB55'
-                                                                        }}
-                                                                    >
+                                                                    <Button variant="contained" type="submit" className="btnSave">
                                                                         {mode === 'INSERT' ? 'SAVE' : 'UPDATE'}
                                                                     </Button>
                                                                 ) : (
