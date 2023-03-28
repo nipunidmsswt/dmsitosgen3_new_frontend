@@ -232,6 +232,7 @@ import {
     UPDATE_TOURTYPE_DATA
 } from 'store/constant/master/TourTypeConstant';
 import {
+    checkDupicateTourTypeCodeSaga,
     checkTourTypeLatestModifiedDateSaga,
     getAllTourTypeSaga,
     getTourTypeByIdSaga,
@@ -791,7 +792,7 @@ export function* wacherSaga() {
     yield takeLatest(GET_TOURTYPE_DATA_BY_ID, getTourTypeByIdSaga);
     yield takeLatest(UPDATE_TOURTYPE_DATA, updateTourTypeSaga);
     yield takeLatest(GET_TOURTYPE_LAST_MODIFIED_DATE_TIME, checkTourTypeLatestModifiedDateSaga);
-    yield takeLatest(CHECK_TOURTYPE_CODE_DUPLICATE, checkDuplicateTourTypeCode);
+    yield takeLatest(CHECK_TOURTYPE_CODE_DUPLICATE, checkDupicateTourTypeCodeSaga);
 
     // // Market Group
     yield takeLatest(GET_ALL_ACTIVE_OPERATOR_GROUP_DATA, getAllActiveOperatorGroupDataSaga);
