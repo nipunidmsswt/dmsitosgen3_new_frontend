@@ -715,7 +715,7 @@ function MainTransportCategories({ open, handleClose, mode, ccode }) {
                                                             <Grid item>
                                                                 {existOpenModal ? (
                                                                     <AlertItemExist
-                                                                        title="dev"
+                                                                        title="Already Exist"
                                                                         open={existOpenModal}
                                                                         handleClose={handleExistModalClose}
                                                                     />
