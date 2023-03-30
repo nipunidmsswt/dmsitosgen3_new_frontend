@@ -27,6 +27,7 @@ import { getAllActiveMarketData } from 'store/actions/masterActions/operatorActi
 import { makeStyles } from '@material-ui/core/styles';
 import MainTransportCategories from './MainTransportCategories';
 import DistancesDetails from './DistancesDetails';
+import PaxVehicleRate from './PaxVehicleRate';
 import { getAllActiveTransportMainCategoryDataByType } from 'store/actions/masterActions/transportActions/MainTransportCategoriesActions';
 
 const useStyles = makeStyles({
@@ -356,9 +357,12 @@ function TransportMainScreen() {
                                                 color: 'white'
                                             }}
                                         >
-                                            Pax vise Rates (Per Day)
+                                            Pax Vehicle Rate (Per Day)
                                         </Typography>
                                     </AccordionSummary>
+                                    <AccordionDetails>
+                                        <PaxVehicleRate mode={mode} selectedType={selectedTransportType}></PaxVehicleRate>
+                                    </AccordionDetails>
                                 </Accordion>
                                 <Accordion square>
                                     <AccordionSummary
@@ -377,58 +381,7 @@ function TransportMainScreen() {
                                         </Typography>
                                     </AccordionSummary>
                                 </Accordion>
-                                <Accordion square>
-                                    <AccordionSummary
-                                        style={{ background: 'linear-gradient(to right bottom, #516a9f, #1877f2)' }}
-                                        classes={{ content: classes.content }}
-                                        expandIcon={<ExpandMoreIcon />}
-                                        aria-controls="panel2a-content"
-                                        id="panel2a-header"
-                                    >
-                                        <Typography
-                                            sx={{
-                                                color: 'white'
-                                            }}
-                                        >
-                                            Per km Rates
-                                        </Typography>
-                                    </AccordionSummary>
-                                </Accordion>
 
-                                <Accordion square>
-                                    <AccordionSummary
-                                        style={{ background: 'linear-gradient(to right bottom, #516a9f, #1877f2)' }}
-                                        classes={{ content: classes.content }}
-                                        expandIcon={<ExpandMoreIcon />}
-                                        aria-controls="panel2a-content"
-                                        id="panel2a-header"
-                                    >
-                                        <Typography
-                                            sx={{
-                                                color: 'white'
-                                            }}
-                                        >
-                                            Per hour Rates
-                                        </Typography>
-                                    </AccordionSummary>
-                                </Accordion>
-                                <Accordion square>
-                                    <AccordionSummary
-                                        style={{ background: 'linear-gradient(to right bottom, #516a9f, #1877f2)' }}
-                                        classes={{ content: classes.content }}
-                                        expandIcon={<ExpandMoreIcon />}
-                                        aria-controls="panel2a-content"
-                                        id="panel2a-header"
-                                    >
-                                        <Typography
-                                            sx={{
-                                                color: 'white'
-                                            }}
-                                        >
-                                            Reant a car
-                                        </Typography>
-                                    </AccordionSummary>
-                                </Accordion>
                                 {openAgent ? (
                                     <Agent
                                         open={openAgent}

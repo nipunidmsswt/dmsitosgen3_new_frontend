@@ -404,7 +404,7 @@ function MainTransportCategories({ open, handleClose, mode, ccode }) {
                                                                     </Grid>
                                                                     <Grid item>
                                                                         <IconButton
-                                                                            aria-label="delete"
+                                                                            ara-label="delete"
                                                                             type="submit"
 
                                                                             // onClick={() => {
@@ -715,7 +715,7 @@ function MainTransportCategories({ open, handleClose, mode, ccode }) {
                                                             <Grid item>
                                                                 {existOpenModal ? (
                                                                     <AlertItemExist
-                                                                        title="Already Exist"
+                                                                        title="dev"
                                                                         open={existOpenModal}
                                                                         handleClose={handleExistModalClose}
                                                                     />

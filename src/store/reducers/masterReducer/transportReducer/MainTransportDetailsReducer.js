@@ -13,7 +13,11 @@ import {
     SUCCESS_GET_TRANSPORT_MAIN_CATEGORY_DATA_BY_TYPE,
     FAILED_GET_TRANSPORT_MAIN_CATEGORY_DATA_BY_TYPE,
     SUCCESS_GET_ACTIVE_TRANSPORT_MAIN_CATEGORY_DATA_BY_TYPE,
-    FAILED_GET_ACTIVE_TRANSPORT_MAIN_CATEGORY_DATA_BY_TYPE
+    FAILED_GET_ACTIVE_TRANSPORT_MAIN_CATEGORY_DATA_BY_TYPE,
+    SUCCESS_GET_ACTIVE_VEHICLE_CATEGORY_DATA_BY_TYPE,
+    SUCCESS_GET_ACTIVE_VEHICLE_TYPE_DATA_BY_TYPE,
+    FAILED_GET_GET_ACTIVE_VEHICLE_CATEGORY_DATA_BY_TYPE,
+    FAILED_GET_GET_ACTIVE_VEHICLE_TYPE_DATA_BY_TYPE
 } from '../../../constant/master/TransportMasterConstant/MainTransportCategoryConstant';
 
 const initialState = {
@@ -24,7 +28,9 @@ const initialState = {
     activeCategoryDetails: [],
     errorMsg: null,
     duplicateMainTransportDetail: null,
-    lastModifiedDateTime: null
+    lastModifiedDateTime: null,
+    vehicleCategories: [],
+    vehicleTypes: []
 };
 
 export const mainTransportCategoryReducer = (state = initialState, action) => {
@@ -95,6 +101,26 @@ export const mainTransportCategoryReducer = (state = initialState, action) => {
             return {
                 ...state,
                 activeCategoryDetails: null,
+                errorMsg: data ? data.errorMessages : 'netwok error'
+            };
+
+        case SUCCESS_GET_ACTIVE_VEHICLE_CATEGORY_DATA_BY_TYPE:
+            return { ...state, vehicleCategories: data.payload[0] };
+
+        case FAILED_GET_GET_ACTIVE_VEHICLE_CATEGORY_DATA_BY_TYPE:
+            return {
+                ...state,
+                vehicleCategories: null,
+                errorMsg: data ? data.errorMessages : 'netwok error'
+            };
+
+        case SUCCESS_GET_ACTIVE_VEHICLE_TYPE_DATA_BY_TYPE:
+            return { ...state, vehicleTypes: data.payload[0] };
+
+        case FAILED_GET_GET_ACTIVE_VEHICLE_TYPE_DATA_BY_TYPE:
+            return {
+                ...state,
+                vehicleTypes: null,
                 errorMsg: data ? data.errorMessages : 'netwok error'
             };
 

@@ -1311,7 +1311,7 @@ function RoomBuyingRates(props) {
                                             <br />
                                             <div style={{ marginTop: '6px', margin: '10px' }}>
                                                 <Grid gap="10px" display="flex">
-                                                    <Grid item xs={3}>
+                                                    <Grid item>
                                                         <Field
                                                             as={Autocomplete}
                                                             value={values.roomCategory}
@@ -1356,7 +1356,7 @@ function RoomBuyingRates(props) {
                                                         />
                                                     </Grid>
 
-                                                    <Grid item xs={3}>
+                                                    <Grid item>
                                                         <Field
                                                             as={Autocomplete}
                                                             value={values.basis}
@@ -1395,7 +1395,7 @@ function RoomBuyingRates(props) {
                                                             )}
                                                         />
                                                     </Grid>
-                                                    <Grid item xs={3}>
+                                                    <Grid item>
                                                         <Field
                                                             as={TextField}
                                                             label="Single Rate"
@@ -1419,7 +1419,7 @@ function RoomBuyingRates(props) {
                                                             helperText={touched.singleRate && errors.singleRate ? errors.singleRate : ''}
                                                         />
                                                     </Grid>
-                                                    <Grid item xs={3}>
+                                                    <Grid item>
                                                         <Field
                                                             as={TextField}
                                                             label="Double Rate"
@@ -1443,7 +1443,7 @@ function RoomBuyingRates(props) {
                                                             helperText={touched.doubleRate && errors.doubleRate ? errors.doubleRate : ''}
                                                         />
                                                     </Grid>
-                                                    <Grid item xs={3}>
+                                                    <Grid item>
                                                         <Field
                                                             as={TextField}
                                                             label="Tripple Rate"
@@ -1467,7 +1467,7 @@ function RoomBuyingRates(props) {
                                                             helperText={touched.trippleRate && errors.trippleRate ? errors.trippleRate : ''}
                                                         />
                                                     </Grid>
-                                                    <Grid item xs={3}>
+                                                    <Grid item>
                                                         <Field
                                                             as={TextField}
                                                             label="family"
@@ -1491,7 +1491,7 @@ function RoomBuyingRates(props) {
                                                             helperText={touched.family && errors.family ? errors.family : ''}
                                                         />
                                                     </Grid>
-                                                    <Grid item xs={3}>
+                                                    <Grid item>
                                                         <Field
                                                             as={TextField}
                                                             label="Child"
@@ -1516,7 +1516,7 @@ function RoomBuyingRates(props) {
                                                         />
                                                     </Grid>
 
-                                                    <Grid item xs={3}>
+                                                    <Grid item>
                                                         <FormGroup>
                                                             <Field
                                                                 as={FormControlLabel}
@@ -1547,7 +1547,7 @@ function RoomBuyingRates(props) {
                                                                 });
                                                             }}
                                                         >
-                                                            {mode === 'INSERT' ? <AddBoxIcon /> : null}
+                                                            <AddBoxIcon />
                                                         </IconButton>
                                                     </Grid>
                                                 </Grid>

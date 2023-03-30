@@ -11,7 +11,9 @@ import {
     SUCCESS_GET_EXPENSE_TYPES_BY_ID,
     SUCESS_GET_ALL_CURRENCY_LIST,
     UPDATE_FAILED_EXPENSE_TYPES,
-    UPDATE_SUCCESS_EXPENSE_TYPES
+    UPDATE_SUCCESS_EXPENSE_TYPES,
+    SUCCESS_ACTIVE_EXPENSE_TYPES_LIST_DATA,
+    FAILED_ACTIVE_EXPENSE_TYPES_LIST_DATA
 } from 'store/constant/master/ExpenseTypesConstant';
 
 const initialState = {
@@ -21,7 +23,8 @@ const initialState = {
     expenseTypeToUpdate: null,
     errorMsg: null,
     duplicateExpenseType: null,
-    lastModifiedDateTime: null
+    lastModifiedDateTime: null,
+    activeExpenseTypes: []
 };
 
 export const expenseTypesReducer = (state = initialState, action) => {
@@ -88,6 +91,12 @@ export const expenseTypesReducer = (state = initialState, action) => {
 
         case FAILED_EXPENSE_TYPES_LAST_MODIFIED_DATE:
             return { ...state, lastModifiedDateTime: data };
+
+        case SUCCESS_ACTIVE_EXPENSE_TYPES_LIST_DATA:
+            return { ...state, activeExpenseTypes: data.payload[0] };
+
+        case FAILED_ACTIVE_EXPENSE_TYPES_LIST_DATA:
+            return { ...state, activeExpenseTypes: data };
 
         default:
             return state;

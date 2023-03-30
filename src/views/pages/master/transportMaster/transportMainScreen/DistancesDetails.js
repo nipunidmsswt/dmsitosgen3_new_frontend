@@ -68,6 +68,10 @@ function DistancesDetails({ mode, selectedType }) {
         setPage(newPage);
     };
 
+    useEffect(() => {
+        console.log(mode);
+        console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa');
+    }, [mode]);
     const handleChangeRowsPerPage = (event) => {
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);

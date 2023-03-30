@@ -38,6 +38,7 @@ import { bankDetailReducer } from './reducers/masterReducer/BankDetailsReducer';
 import { mainTransportCategoryReducer } from './reducers/masterReducer/transportReducer/MainTransportDetailsReducer';
 import { facilityCountReducer } from './reducers/masterReducer/FacilityCountReducer';
 import { roomBuyingRateReducer } from './reducers/masterReducer/RoomBuyingRateReducer';
+import { paxVehicleRateReducer } from './reducers/masterReducer/transportReducer/PaxVehicleRateReducer';
 import { distanceReducer } from './reducers/masterReducer/transportReducer/DistanceReducer';
 
 // ==============================|| COMBINE REDUCER ||============================== //
@@ -83,6 +84,7 @@ const reducer = combineReducers({
     mainTransportCategoryReducer,
     facilityCountReducer,
     roomBuyingRateReducer,
+    paxVehicleRateReducer,
     distanceReducer
 });
 

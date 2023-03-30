@@ -5,7 +5,8 @@ import {
     GET_EXPENSE_TYPES_BY_ID,
     GET_EXPENSE_TYPES_LAST_MODIFIED_DATE_TIME,
     SAVE_EXPENSE_TYPES,
-    UPDATE_EXPENSE_TYPES
+    UPDATE_EXPENSE_TYPES,
+    GET_ALL_ACTIVE_EXPENSE_TYPES
 } from 'store/constant/master/ExpenseTypesConstant';
 
 export const getAllCurrencyListData = (data) => {
@@ -52,5 +53,11 @@ export const checkDuplicateExpenseRateCode = (code) => {
     return {
         type: CHECK_EXPENSE_TYPES_CODE_DUPLICATE,
         data: { code }
+    };
+};
+
+export const getAllActiveExpenseTypesData = () => {
+    return {
+        type: GET_ALL_ACTIVE_EXPENSE_TYPES
     };
 };
