@@ -391,6 +391,14 @@ const utilities = {
                     type: 'item',
                     url: '/master/bankDetails',
                     breadcrumbs: false
+                },
+
+                {
+                    id: 'programm-creation-id',
+                    title: 'Programm Creation',
+                    type: 'item',
+                    url: '/master/programmCreation',
+                    breadcrumbs: false
                 }
             ]
         }

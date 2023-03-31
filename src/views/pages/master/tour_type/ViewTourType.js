@@ -33,7 +33,6 @@ function ViewTourType() {
     const handleClickOpen = (type, data) => {
         if (type === 'VIEW_UPDATE' || type === 'VIEW') {
             setMode(type);
-            console.log('get by code' + data.code);
             setCode(data.code);
         } else {
             setCode('');
@@ -111,6 +110,34 @@ function ViewTourType() {
             headerStyle: { textAlign: 'center' },
             align: 'left'
         },
+        {
+            title: 'Tour Operator',
+            field: 'tourOperator',
+            filterPlaceholder: 'True || False',
+            align: 'center',
+            emptyValue: () => <em>null</em>,
+            render: (rowData) => (
+                <div
+                    style={{
+                        alignItems: 'center',
+                        align: 'center',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center'
+                    }}
+                >
+                    {rowData.tourOperator === true ? (
+                        <FormGroup>
+                            <FormControlLabel control={<Switch color="success" size="small" />} checked={true} />
+                        </FormGroup>
+                    ) : (
+                        <FormGroup>
+                            <FormControlLabel control={<Switch color="error" size="small" />} checked={false} />
+                        </FormGroup>
+                    )}
+                </div>
+            )
+        },
 
         {
             title: 'Status',
@@ -126,10 +153,6 @@ function ViewTourType() {
                         display: 'flex',
                         justifyContent: 'center',
                         alignItems: 'center'
-                        // background: rowData.status === true ? "#008000aa" : "#f90000aa",
-                        // borderRadius: "4px",
-                        // paddingLeft: 5,
-                        // paddingRight: 5,
                     }}
                 >
                     {rowData.status === true ? (
