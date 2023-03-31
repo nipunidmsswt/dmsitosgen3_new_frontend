@@ -27,7 +27,7 @@ import { getAllActiveMarketData } from 'store/actions/masterActions/operatorActi
 import { makeStyles } from '@material-ui/core/styles';
 import MainTransportCategories from './MainTransportCategories';
 import DistancesDetails from './DistancesDetails';
-import BaggageTransportRate from './PaxVehicleRate';
+import PaxVehicleRate from './PaxVehicleRate';
 import { getAllActiveTransportMainCategoryDataByType } from 'store/actions/masterActions/transportActions/MainTransportCategoriesActions';
 
 const useStyles = makeStyles({
@@ -364,7 +364,7 @@ function TransportMainScreen() {
                                         </Typography>
                                     </AccordionSummary>
                                     <AccordionDetails>
-                                        <BaggageTransportRate mode={mode}></BaggageTransportRate>
+                                        <PaxVehicleRate mode={mode} selectedType={selectedTransportType}></PaxVehicleRate>
                                     </AccordionDetails>
                                 </Accordion>
                                 <Accordion square>

@@ -374,7 +374,8 @@ import {
     GET_EXPENSE_TYPES_BY_ID,
     GET_EXPENSE_TYPES_LAST_MODIFIED_DATE_TIME,
     SAVE_EXPENSE_TYPES,
-    UPDATE_EXPENSE_TYPES
+    UPDATE_EXPENSE_TYPES,
+    GET_ALL_ACTIVE_EXPENSE_TYPES
 } from 'store/constant/master/ExpenseTypesConstant';
 import {
     checkExpenseTypesDupicateCodeSaga,
@@ -383,7 +384,8 @@ import {
     getExpenseTypesByCodeSaga,
     getExpenseTypesLatestModifiedDateSaga,
     saveExpenseTypesDataHandler,
-    updateExpenseTypesDataSaga
+    updateExpenseTypesDataSaga,
+    getAllActiveExpenseTypesDataSaga
 } from './mastersaga/ExpenseTypesSaga';
 
 import { getAllChargeMethods, getAllModeOfTransort } from './mastersaga/TransportRateSaga';
@@ -638,7 +640,9 @@ import {
     GET_MAIN_TRANSPORT_DETAILS_BY_ID,
     GET_TRANSPORT_MAIN_CATEGORY_DATA_BY_TYPE,
     SAVE_MAIN_TRANSPORT_DETAILS_DATA,
-    UPDATE_MAIN_TRANSPORT_DETAILS_DATA
+    UPDATE_MAIN_TRANSPORT_DETAILS_DATA,
+    GET_ACTIVE_VEHICLE_CATEGORY_DATA_BY_TYPE,
+    GET_ACTIVE_VEHICLE_TYPE_DATA_BY_TYPE
 } from 'store/constant/master/TransportMasterConstant/MainTransportCategoryConstant';
 import {
     checkDupicateMainTransportCategoriesSaga,
@@ -648,7 +652,9 @@ import {
     getMainTransportCategoriesByIdSaga,
     getTransportMainCategoryDataByTypeSaga,
     saveMainTransportCategoriesSaga,
-    updateMainTransportCategoriesSaga
+    updateMainTransportCategoriesSaga,
+    getActiveVehicleTypeDataByTypeSaga,
+    getActiveVehicleCategoryDataByTypeSaga
 } from './mastersaga/transportSaga/MainTransportCategorySaga';
 
 import {
@@ -887,6 +893,8 @@ export function* wacherSaga() {
     yield takeLatest(UPDATE_EXPENSE_TYPES, updateExpenseTypesDataSaga);
     yield takeLatest(GET_EXPENSE_TYPES_LAST_MODIFIED_DATE_TIME, getExpenseTypesLatestModifiedDateSaga);
     yield takeLatest(CHECK_EXPENSE_TYPES_CODE_DUPLICATE, checkExpenseTypesDupicateCodeSaga);
+    yield takeLatest(GET_ALL_ACTIVE_EXPENSE_TYPES, getAllActiveExpenseTypesDataSaga);
+
     //charge method
     yield takeLatest(GET_ALL_CHARGE_METHOD_DATA, getAllChargeMethods);
 
@@ -1030,6 +1038,9 @@ export function* wacherSaga() {
     yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_MAIN_TRANSPORT_DETAILS, checkLatestMainTransportCategoriesModifiedDateSaga);
     yield takeLatest(GET_TRANSPORT_MAIN_CATEGORY_DATA_BY_TYPE, getTransportMainCategoryDataByTypeSaga);
     yield takeLatest(GET_ACTIVE_TRANSPORT_MAIN_CATEGORY_DATA_BY_TYPE, getActiveTransportMainCategoryDataByTypeSaga);
+    yield takeLatest(GET_ACTIVE_VEHICLE_CATEGORY_DATA_BY_TYPE, getActiveVehicleCategoryDataByTypeSaga);
+    yield takeLatest(GET_ACTIVE_VEHICLE_TYPE_DATA_BY_TYPE, getActiveVehicleTypeDataByTypeSaga);
+
     //room buying rate
     yield takeLatest(SAVE_ROOM_BUYING_RATE, saveRoomBuyingRateSaga);
     yield takeLatest(GET_ALL_ROOM_BUYING_RATE, getAllRoomBuyingRateSaga);
@@ -1040,7 +1051,7 @@ export function* wacherSaga() {
     yield takeLatest(GET_ROOM_BUYING_RATE_LIST_BY_HOTEL, getBuyingRoomRatesByHotelSaga);
     yield takeLatest(CLEAR_ROOM_BUYING_RATE, clearRoomBuyingRateSaga);
 
-    //baggage transport rate
+    //pax vehicle rate
     yield takeLatest(SAVE_PAX_VEHICLE_RATE, savePaxVehicleRateSaga);
     yield takeLatest(GET_ALL_PAX_VEHICLE_RATE, getAllPaxVehicleRateSaga);
     yield takeLatest(GET_PAX_VEHICLE_RATE_BY_ID, getPaxVehicleRateByIdSaga);

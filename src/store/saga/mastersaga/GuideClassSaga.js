@@ -95,7 +95,7 @@ export function* checkGuideClassDupicateCodeSaga(action) {
 export function* getAllActiveGuideClassDataSaga() {
     let responseData = [];
     try {
-        responseData = yield call(get, `${process.env.REACT_APP_TOUR_URL}/guideClass/active`);
+        responseData = yield call(get, `${process.env.REACT_APP_TOUR_URL}/guideClass/activeGuideClass`);
         yield put({ type: SUCCESS_GET_ALL_ACTIVE_GUIDE_CLASS_DATA, data: responseData.data });
     } catch (e) {
         yield put({ type: FAILED_GET_ALL_ACTIVE_GUIDE_CLASS_DATA, data: responseData.data });

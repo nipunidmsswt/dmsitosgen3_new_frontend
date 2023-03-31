@@ -15,7 +15,11 @@ import {
     SUCCESS_GET_TRANSPORT_MAIN_CATEGORY_DATA_BY_TYPE,
     FAILED_GET_TRANSPORT_MAIN_CATEGORY_DATA_BY_TYPE,
     SUCCESS_GET_ACTIVE_TRANSPORT_MAIN_CATEGORY_DATA_BY_TYPE,
-    FAILED_GET_ACTIVE_TRANSPORT_MAIN_CATEGORY_DATA_BY_TYPE
+    FAILED_GET_ACTIVE_TRANSPORT_MAIN_CATEGORY_DATA_BY_TYPE,
+    SUCCESS_GET_ACTIVE_VEHICLE_CATEGORY_DATA_BY_TYPE,
+    SUCCESS_GET_ACTIVE_VEHICLE_TYPE_DATA_BY_TYPE,
+    FAILED_GET_GET_ACTIVE_VEHICLE_CATEGORY_DATA_BY_TYPE,
+    FAILED_GET_GET_ACTIVE_VEHICLE_TYPE_DATA_BY_TYPE
 } from '../../../constant/master/TransportMasterConstant/MainTransportCategoryConstant';
 
 //Main Transport categories saga
@@ -133,5 +137,29 @@ export function* getActiveTransportMainCategoryDataByTypeSaga(action) {
     } catch (e) {
         console.log(responseData);
         yield put({ type: FAILED_GET_ACTIVE_TRANSPORT_MAIN_CATEGORY_DATA_BY_TYPE, data: responseData });
+    }
+}
+
+export function* getActiveVehicleCategoryDataByTypeSaga(action) {
+    let responseData = [];
+    try {
+        responseData = yield call(getById, `${process.env.REACT_APP_TRANSPORT_URL}/activeMainCategories/${action.data.type}`);
+        console.log(responseData);
+        yield put({ type: SUCCESS_GET_ACTIVE_VEHICLE_CATEGORY_DATA_BY_TYPE, data: responseData.data });
+    } catch (e) {
+        console.log(responseData);
+        yield put({ type: FAILED_GET_GET_ACTIVE_VEHICLE_CATEGORY_DATA_BY_TYPE, data: responseData });
+    }
+}
+
+export function* getActiveVehicleTypeDataByTypeSaga(action) {
+    let responseData = [];
+    try {
+        responseData = yield call(getById, `${process.env.REACT_APP_TRANSPORT_URL}/activeMainCategories/${action.data.type}`);
+        console.log(responseData);
+        yield put({ type: SUCCESS_GET_ACTIVE_VEHICLE_TYPE_DATA_BY_TYPE, data: responseData.data });
+    } catch (e) {
+        console.log(responseData);
+        yield put({ type: FAILED_GET_GET_ACTIVE_VEHICLE_TYPE_DATA_BY_TYPE, data: responseData });
     }
 }
