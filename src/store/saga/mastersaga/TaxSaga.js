@@ -26,7 +26,9 @@ import {
     UPDATE_SUCCESS_TAX_DATA,
     UPDATE_SUCCESS_TAX_GROUP_DATA,
     SUCCESS_GET_ACTIVE_TAX_GROUP_LIST,
-    FAILED_GET_ACTIVE_TAX_GROUP_LIST
+    FAILED_GET_ACTIVE_TAX_GROUP_LIST,
+    SUCCESS_GET_TAX_GROUP_AND_TAX_LIST,
+    FAILED_GET_TAX_GROUP_AND_TAX_LIST
 } from 'store/constant/master/TaxMasterConstant';
 
 //tax saga
@@ -223,5 +225,17 @@ export function* getAllActiveTaxGroups() {
     } catch (e) {
         console.log('Error:' + e);
         yield put({ type: FAILED_GET_ACTIVE_TAX_GROUP_LIST, data: '' });
+    }
+}
+
+export function* getAllActiveTaxGroupsandTaxes() {
+    let responseData = [];
+    try {
+        responseData = yield call(get, `${process.env.REACT_APP_FINANCE_URL}/taxTaxGroupDetails`);
+        console.log('response data last:' + responseData);
+        yield put({ type: SUCCESS_GET_TAX_GROUP_AND_TAX_LIST, data: responseData.data });
+    } catch (e) {
+        console.log('Error:' + e);
+        yield put({ type: FAILED_GET_TAX_GROUP_AND_TAX_LIST, data: '' });
     }
 }

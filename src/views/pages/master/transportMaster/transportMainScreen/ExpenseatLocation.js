@@ -9,7 +9,6 @@ import {
     TextField,
     DialogTitle,
     Button,
-    MenuItem,
     Table,
     TableBody,
     TableCell,
@@ -41,6 +40,7 @@ import {
 } from 'store/actions/masterActions/transportActions/MainTransportCategoriesActions';
 import { getActiveLocations } from 'store/actions/masterActions/LocationAction';
 import { getAllActiveExpenseTypesData } from 'store/actions/masterActions/ExpenseTypeAction';
+import { ViewPaxVehicleRateDetails } from './ViewPaxVehicleRateDetails';
 
 const Transition = forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -147,6 +147,8 @@ function ExpenseatLocation({ open, handleClose, mode, childToParent, expenseLoca
     useEffect(() => {
         if (categoryType !== null) {
             if (detailsType !== null && detailsType.length != 0) {
+                console.log('vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv');
+
                 console.log(detailsType);
 
                 const values = {
