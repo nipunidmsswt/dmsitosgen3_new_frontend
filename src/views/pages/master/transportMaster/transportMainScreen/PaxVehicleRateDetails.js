@@ -151,25 +151,6 @@ function PaxVehicleRateDetails({ open, handleClose, mode, childToParent, paxVehi
         }
     }, [activeTaxGroupandTaxesListData]);
 
-    // yup.addMethod(yup.array, 'uniqueCode', function (message) {
-    //     return this.test('uniqueCode', message, function (list) {
-    //         const mapper = (x) => {
-    //             return x.code;
-    //         };
-    //         const set = [...new Set(list.map(mapper))];
-    //         const isUnique = list.length === set.length;
-    //         if (isUnique) {
-    //             return true;
-    //         }
-
-    //         const idx = list.findIndex((l, i) => mapper(l) !== set[i]);
-    //         return this.createError({
-    //             path: `mainCategoryDetails[${idx}].code`,
-    //             message: message
-    //         });
-    //     });
-    // });
-
     const validationSchema = yup.object().shape({
         mainCategoryDetails: yup.array().of(
             yup.object().shape({
@@ -203,9 +184,34 @@ function PaxVehicleRateDetails({ open, handleClose, mode, childToParent, paxVehi
     const [categoryType, setCategoryType] = useState(null);
 
     useEffect(() => {
-        const values = {
-            paxVehicleRateDetails: paxVehicleRate
-        };
+        console.log(paxVehicleRate);
+        let values;
+        if (paxVehicleRate.length === 0) {
+            values = {
+                paxVehicleRateDetails: [
+                    {
+                        fromDate: '',
+                        toDate: '',
+                        currency: null,
+                        vehicleType: null,
+                        rateType: '',
+                        taxCode: null,
+                        vehicleRate: '',
+                        vehicleRateWithTax: 0.0,
+                        driverRate: '',
+                        driverRateWithTax: 0.0,
+                        assistantRate: '',
+                        assistantWithTax: 0.0,
+                        status: true
+                    }
+                ]
+            };
+        } else {
+            values = {
+                paxVehicleRateDetails: paxVehicleRate
+            };
+        }
+
         setLoadValues(values);
     }, [paxVehicleRate]);
 
@@ -231,64 +237,6 @@ function PaxVehicleRateDetails({ open, handleClose, mode, childToParent, paxVehi
             setvehicleTypes(vehicleTypes);
         }
     }, [vehicleTypes]);
-
-    // useEffect(() => {
-    //     if (categoryType !== null) {
-    //         if (detailsType !== null && detailsType.length != 0) {
-    //             console.log('vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv');
-
-    //             console.log(detailsType);
-
-    //             const values = {
-    //                 mainCategoryDetails: detailsType
-    //             };
-    //             setLoadValues(values);
-    //         } else {
-    //             const values = {
-    //                 mainCategoryDetails: [{ categoryType: '', typeCode: '', description: '', status: true, enableRow: false }]
-    //             };
-    //             setLoadValues(values);
-    //         }
-    //     }
-    // }, [detailsType]);
-
-    // useEffect(() => {
-    //     if (categoryType !== null && loadValues.mainCategoryDetails != null) {
-    //         loadValues?.mainCategoryDetails?.map((s) =>
-    //             s.categoryType === ''
-    //                 ? dispatch(getTransportMainCategoryDataByType(categoryType))
-    //                 : detailsType?.length != loadValues?.mainCategoryDetails?.length && s.categoryType != categoryType
-    //                 ? setOpenModal(true)
-    //                 : dispatch(getTransportMainCategoryDataByType(categoryType))
-    //         );
-    //     }
-    // }, [categoryType]);
-
-    // useEffect(() => {
-    //     console.log(activeExpenseTypes);
-    //     if (activeExpenseTypes.length != 0) {
-    //         setExpenseTypes(activeExpenseTypes);
-    //     }
-    // }, [activeExpenseTypes]);
-
-    const handleSubmitForm = async (data) => {
-        console.log(data);
-        if (mode === 'INSERT') {
-            const mainCategoryArray = data.mainCategoryDetails;
-            console.log(mainCategoryArray);
-            dispatch(saveMainTransportDetailsData(mainCategoryArray));
-        } else if (mode === 'VIEW_UPDATE') {
-            // dispatch(updateCodeAndNameData(data));
-        }
-        handleClose();
-    };
-
-    const loadCategory = (event) => {
-        const selectedType = event.currentTarget.dataset.value;
-        if (loadValues.length != 0) {
-        }
-        setCategoryType(selectedType);
-    };
 
     useEffect(() => {
         setActiveLocationList(activeLocations);
@@ -470,7 +418,6 @@ function PaxVehicleRateDetails({ open, handleClose, mode, childToParent, paxVehi
                                                                             // adapterLocale={locale}
                                                                         >
                                                                             <DatePicker
-                                                                                disabled={mode != 'INSERT'}
                                                                                 onChange={(value) => {
                                                                                     setFieldValue(`fromDate`, value);
                                                                                 }}
@@ -510,7 +457,6 @@ function PaxVehicleRateDetails({ open, handleClose, mode, childToParent, paxVehi
                                                                             // adapterLocale={locale}
                                                                         >
                                                                             <DatePicker
-                                                                                disabled={mode != 'INSERT'}
                                                                                 onChange={(value) => {
                                                                                     setFieldValue(`toDate`, value);
                                                                                 }}
@@ -552,7 +498,6 @@ function PaxVehicleRateDetails({ open, handleClose, mode, childToParent, paxVehi
                                                                                 console.log(value);
                                                                                 setFieldValue(`currency`, value);
                                                                             }}
-                                                                            disabled={mode == 'VIEW' || mode == 'VIEW_UPDATE'}
                                                                             options={currencyListOptions}
                                                                             getOptionLabel={(option) => `${option.currencyCode}`}
                                                                             isOptionEqualToValue={(option, value) =>
@@ -594,7 +539,6 @@ function PaxVehicleRateDetails({ open, handleClose, mode, childToParent, paxVehi
                                                                                 console.log(value);
                                                                                 setFieldValue(`vehicleType`, value);
                                                                             }}
-                                                                            disabled={mode == 'VIEW' || mode == 'VIEW_UPDATE'}
                                                                             options={vehicleTypeList}
                                                                             getOptionLabel={(option) => `${option.typeCode}`}
                                                                             isOptionEqualToValue={(option, value) =>
@@ -638,7 +582,6 @@ function PaxVehicleRateDetails({ open, handleClose, mode, childToParent, paxVehi
                                                                                     height: 40
                                                                                 }
                                                                             }}
-                                                                            disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
                                                                             id="standard-select-currency"
                                                                             select
                                                                             label="Rate Type"
@@ -736,7 +679,6 @@ function PaxVehicleRateDetails({ open, handleClose, mode, childToParent, paxVehi
                                                                                     height: 40
                                                                                 }
                                                                             }}
-                                                                            disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
                                                                             type="text"
                                                                             variant="outlined"
                                                                             name="vehicleRate"
@@ -802,7 +744,6 @@ function PaxVehicleRateDetails({ open, handleClose, mode, childToParent, paxVehi
                                                                                     height: 40
                                                                                 }
                                                                             }}
-                                                                            disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
                                                                             type="text"
                                                                             variant="outlined"
                                                                             name="driverRate"
@@ -866,7 +807,6 @@ function PaxVehicleRateDetails({ open, handleClose, mode, childToParent, paxVehi
                                                                                     height: 40
                                                                                 }
                                                                             }}
-                                                                            disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
                                                                             type="text"
                                                                             variant="outlined"
                                                                             name="assistantRate"
@@ -1431,19 +1371,18 @@ function PaxVehicleRateDetails({ open, handleClose, mode, childToParent, paxVehi
                                                                                                 </FormGroup>
                                                                                             </TableCell>
                                                                                             <TableCell>
-                                                                                                <IconButton
-                                                                                                    disabled={
-                                                                                                        mode == 'VIEW_UPDATE' ||
-                                                                                                        mode == 'VIEW'
-                                                                                                    }
-                                                                                                    disa
-                                                                                                    aria-label="delete"
-                                                                                                    onClick={() => {
-                                                                                                        remove(idx);
-                                                                                                    }}
-                                                                                                >
-                                                                                                    <HighlightOffIcon />
-                                                                                                </IconButton>
+                                                                                                {(values.paxVehicleRateDetails[idx] &&
+                                                                                                    values.paxVehicleRateDetails[idx]
+                                                                                                        .id) === undefined ? (
+                                                                                                    <IconButton
+                                                                                                        aria-label="delete"
+                                                                                                        onClick={() => {
+                                                                                                            remove(idx);
+                                                                                                        }}
+                                                                                                    >
+                                                                                                        <HighlightOffIcon />
+                                                                                                    </IconButton>
+                                                                                                ) : null}
                                                                                             </TableCell>
                                                                                         </TableRow>
                                                                                     );

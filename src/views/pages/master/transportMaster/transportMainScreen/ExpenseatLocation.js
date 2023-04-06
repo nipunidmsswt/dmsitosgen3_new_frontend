@@ -80,24 +80,6 @@ function ExpenseatLocation({ open, handleClose, mode, childToParent, expenseLoca
     const activeLocations = useSelector((state) => state.locationReducer.activeLocations);
     const activeExpenseTypes = useSelector((state) => state.expenseTypesReducer.activeExpenseTypes);
     const dispatch = useDispatch();
-    // yup.addMethod(yup.array, 'uniqueCode', function (message) {
-    //     return this.test('uniqueCode', message, function (list) {
-    //         const mapper = (x) => {
-    //             return x.code;
-    //         };
-    //         const set = [...new Set(list.map(mapper))];
-    //         const isUnique = list.length === set.length;
-    //         if (isUnique) {
-    //             return true;
-    //         }
-
-    //         const idx = list.findIndex((l, i) => mapper(l) !== set[i]);
-    //         return this.createError({
-    //             path: `mainCategoryDetails[${idx}].code`,
-    //             message: message
-    //         });
-    //     });
-    // });
 
     const validationSchema = yup.object().shape({
         mainCategoryDetails: yup.array().of(
@@ -108,8 +90,6 @@ function ExpenseatLocation({ open, handleClose, mode, childToParent, expenseLoca
                 expenseDes: yup.string().required('Required field')
             })
         )
-        // .uniqueCodeAndNameCode("Must be unique"),
-        // .uniqueCode('Code Already Exist')
     });
     const validationSchema1 = yup.object().shape({
         location: yup.object().nullable().required('Required field'),
@@ -121,10 +101,18 @@ function ExpenseatLocation({ open, handleClose, mode, childToParent, expenseLoca
     const [categoryType, setCategoryType] = useState(null);
 
     useEffect(() => {
+        let values;
         console.log(expenseLocationDetails);
-        const values = {
-            expensesAtLocations: expenseLocationDetails
-        };
+        if (expenseLocationDetails.length === 0) {
+            values = {
+                expensesAtLocations: [{ location: null, locationDes: '', expenseTypes: null, expenseDes: '', status: true }]
+            };
+        } else {
+            values = {
+                expensesAtLocations: expenseLocationDetails
+            };
+        }
+
         setLoadValues(values);
     }, [expenseLocationDetails]);
 
@@ -182,25 +170,6 @@ function ExpenseatLocation({ open, handleClose, mode, childToParent, expenseLoca
             setExpenseTypes(activeExpenseTypes);
         }
     }, [activeExpenseTypes]);
-
-    const handleSubmitForm = async (data) => {
-        console.log(data);
-        if (mode === 'INSERT') {
-            const mainCategoryArray = data.mainCategoryDetails;
-            console.log(mainCategoryArray);
-            dispatch(saveMainTransportDetailsData(mainCategoryArray));
-        } else if (mode === 'VIEW_UPDATE') {
-            // dispatch(updateCodeAndNameData(data));
-        }
-        handleClose();
-    };
-
-    const loadCategory = (event) => {
-        const selectedType = event.currentTarget.dataset.value;
-        if (loadValues.length != 0) {
-        }
-        setCategoryType(selectedType);
-    };
 
     useEffect(() => {
         setActiveLocationList(activeLocations);
@@ -293,7 +262,7 @@ function ExpenseatLocation({ open, handleClose, mode, childToParent, expenseLoca
                                                                                     setFieldValue(`locationDes`, '');
                                                                                 }
                                                                             }}
-                                                                            disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                            disabled={mode == 'VIEW'}
                                                                             options={activeLocationList}
                                                                             getOptionLabel={(option) => `${option.code}`}
                                                                             isOptionEqualToValue={(option, value) =>
@@ -314,7 +283,7 @@ function ExpenseatLocation({ open, handleClose, mode, childToParent, expenseLoca
                                                                                             height: 40
                                                                                         }
                                                                                     }}
-                                                                                    disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                                    disabled={mode == 'VIEW'}
                                                                                     variant="outlined"
                                                                                     name="location"
                                                                                     onBlur={handleBlur}
@@ -368,7 +337,7 @@ function ExpenseatLocation({ open, handleClose, mode, childToParent, expenseLoca
                                                                                     setFieldValue(`expenseDes`, '');
                                                                                 }
                                                                             }}
-                                                                            disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                            disabled={mode == 'VIEW'}
                                                                             options={activeExpenseTypeList}
                                                                             getOptionLabel={(option) => `${option.expenseCode}`}
                                                                             isOptionEqualToValue={(option, value) =>
@@ -389,7 +358,7 @@ function ExpenseatLocation({ open, handleClose, mode, childToParent, expenseLoca
                                                                                             height: 40
                                                                                         }
                                                                                     }}
-                                                                                    disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
+                                                                                    disabled={mode == 'VIEW'}
                                                                                     variant="outlined"
                                                                                     name="expenseTypes"
                                                                                     onBlur={handleBlur}
@@ -608,38 +577,38 @@ function ExpenseatLocation({ open, handleClose, mode, childToParent, expenseLoca
                                                                                                     value={
                                                                                                         values.expensesAtLocations[idx] &&
                                                                                                         values.expensesAtLocations[idx]
-                                                                                                            .locationDes
+                                                                                                            .location?.shortDescription
                                                                                                     }
                                                                                                     onChange={handleChange}
                                                                                                     onBlur={handleBlur}
-                                                                                                    error={Boolean(
-                                                                                                        touched.expensesAtLocations &&
-                                                                                                            touched.expensesAtLocations[
-                                                                                                                idx
-                                                                                                            ] &&
-                                                                                                            touched.expensesAtLocations[idx]
-                                                                                                                .locationDes &&
-                                                                                                            errors.expensesAtLocations &&
-                                                                                                            errors.expensesAtLocations[
-                                                                                                                idx
-                                                                                                            ] &&
-                                                                                                            errors.expensesAtLocations[idx]
-                                                                                                                .locationDes
-                                                                                                    )}
-                                                                                                    helperText={
-                                                                                                        touched.expensesAtLocations &&
-                                                                                                        touched.expensesAtLocations[idx] &&
-                                                                                                        touched.expensesAtLocations[idx]
-                                                                                                            .locationDes &&
-                                                                                                        errors.expensesAtLocations &&
-                                                                                                        errors.expensesAtLocations[idx] &&
-                                                                                                        errors.expensesAtLocations[idx]
-                                                                                                            .locationDes
-                                                                                                            ? errors.expensesAtLocations[
-                                                                                                                  idx
-                                                                                                              ].locationDes
-                                                                                                            : ''
-                                                                                                    }
+                                                                                                    // error={Boolean(
+                                                                                                    //     touched.expensesAtLocations &&
+                                                                                                    //         touched.expensesAtLocations[
+                                                                                                    //             idx
+                                                                                                    //         ] &&
+                                                                                                    //         touched.expensesAtLocations[idx]
+                                                                                                    //             .locationDes &&
+                                                                                                    //         errors.expensesAtLocations &&
+                                                                                                    //         errors.expensesAtLocations[
+                                                                                                    //             idx
+                                                                                                    //         ] &&
+                                                                                                    //         errors.expensesAtLocations[idx]
+                                                                                                    //             .locationDes
+                                                                                                    // )}
+                                                                                                    // helperText={
+                                                                                                    //     touched.expensesAtLocations &&
+                                                                                                    //     touched.expensesAtLocations[idx] &&
+                                                                                                    //     touched.expensesAtLocations[idx]
+                                                                                                    //         .locationDes &&
+                                                                                                    //     errors.expensesAtLocations &&
+                                                                                                    //     errors.expensesAtLocations[idx] &&
+                                                                                                    //     errors.expensesAtLocations[idx]
+                                                                                                    //         .locationDes
+                                                                                                    //         ? errors.expensesAtLocations[
+                                                                                                    //               idx
+                                                                                                    //           ].locationDes
+                                                                                                    //         : ''
+                                                                                                    // }
                                                                                                 />
                                                                                             </TableCell>
 
@@ -746,38 +715,38 @@ function ExpenseatLocation({ open, handleClose, mode, childToParent, expenseLoca
                                                                                                     value={
                                                                                                         values.expensesAtLocations[idx] &&
                                                                                                         values.expensesAtLocations[idx]
-                                                                                                            .expenseDes
+                                                                                                            .expenseTypes?.description
                                                                                                     }
                                                                                                     onChange={handleChange}
                                                                                                     onBlur={handleBlur}
-                                                                                                    error={Boolean(
-                                                                                                        touched.expensesAtLocations &&
-                                                                                                            touched.expensesAtLocations[
-                                                                                                                idx
-                                                                                                            ] &&
-                                                                                                            touched.expensesAtLocations[idx]
-                                                                                                                .expenseDes &&
-                                                                                                            errors.expensesAtLocations &&
-                                                                                                            errors.expensesAtLocations[
-                                                                                                                idx
-                                                                                                            ] &&
-                                                                                                            errors.expensesAtLocations[idx]
-                                                                                                                .expenseDes
-                                                                                                    )}
-                                                                                                    helperText={
-                                                                                                        touched.expensesAtLocations &&
-                                                                                                        touched.expensesAtLocations[idx] &&
-                                                                                                        touched.expensesAtLocations[idx]
-                                                                                                            .expenseDes &&
-                                                                                                        errors.expensesAtLocations &&
-                                                                                                        errors.expensesAtLocations[idx] &&
-                                                                                                        errors.expensesAtLocations[idx]
-                                                                                                            .expenseDes
-                                                                                                            ? errors.expensesAtLocations[
-                                                                                                                  idx
-                                                                                                              ].expenseDes
-                                                                                                            : ''
-                                                                                                    }
+                                                                                                    // error={Boolean(
+                                                                                                    //     touched.expensesAtLocations &&
+                                                                                                    //         touched.expensesAtLocations[
+                                                                                                    //             idx
+                                                                                                    //         ] &&
+                                                                                                    //         touched.expensesAtLocations[idx]
+                                                                                                    //             .expenseDes &&
+                                                                                                    //         errors.expensesAtLocations &&
+                                                                                                    //         errors.expensesAtLocations[
+                                                                                                    //             idx
+                                                                                                    //         ] &&
+                                                                                                    //         errors.expensesAtLocations[idx]
+                                                                                                    //             .expenseDes
+                                                                                                    // )}
+                                                                                                    // helperText={
+                                                                                                    //     touched.expensesAtLocations &&
+                                                                                                    //     touched.expensesAtLocations[idx] &&
+                                                                                                    //     touched.expensesAtLocations[idx]
+                                                                                                    //         .expenseDes &&
+                                                                                                    //     errors.expensesAtLocations &&
+                                                                                                    //     errors.expensesAtLocations[idx] &&
+                                                                                                    //     errors.expensesAtLocations[idx]
+                                                                                                    //         .expenseDes
+                                                                                                    //         ? errors.expensesAtLocations[
+                                                                                                    //               idx
+                                                                                                    //           ].expenseDes
+                                                                                                    //         : ''
+                                                                                                    // }
                                                                                                 />
                                                                                             </TableCell>
                                                                                             <TableCell>
@@ -805,8 +774,8 @@ function ExpenseatLocation({ open, handleClose, mode, childToParent, expenseLoca
 
                                                                                             <TableCell>
                                                                                                 {(values.expensesAtLocations[idx] &&
-                                                                                                    values.expensesAtLocations[idx]
-                                                                                                        .categoryId) === '' ? (
+                                                                                                    values.expensesAtLocations[idx].id) ===
+                                                                                                undefined ? (
                                                                                                     <IconButton
                                                                                                         aria-label="delete"
                                                                                                         onClick={() => {

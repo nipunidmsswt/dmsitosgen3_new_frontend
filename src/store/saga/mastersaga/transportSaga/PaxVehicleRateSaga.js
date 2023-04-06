@@ -52,10 +52,10 @@ export function* updatePaxVehicleRateSaga(action) {
     console.log('updatePaxVehicleRateSaga tax saga');
     console.log(action);
 
-    action.data.path = `${process.env.REACT_APP_TRANSPORT_URL}/roomBuyingRate`;
+    action.data.path = `${process.env.REACT_APP_TRANSPORT_URL}/paxVehicleRates`;
     let responseData = [];
     try {
-        responseData = yield call(update, action.data);
+        responseData = yield call(create, action.data);
         console.log(responseData);
         yield put({ type: UPDATE_SUCCESS_PAX_VEHICLE_RATE, data: responseData.data });
     } catch (e) {
