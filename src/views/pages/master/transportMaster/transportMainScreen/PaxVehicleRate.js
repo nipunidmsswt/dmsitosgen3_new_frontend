@@ -39,7 +39,11 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { getActiveRoomcategory } from 'store/actions/masterActions/RoomCategoryAction';
 import { getActiveHotelBasisList } from 'store/actions/masterActions/operatorActions/HotelBasisAction';
-import { savePaxVehicleRateData, getPaxVehicleRateDataById } from 'store/actions/masterActions/transportActions/PaxVehicleRateActions';
+import {
+    savePaxVehicleRateData,
+    getPaxVehicleRateDataById,
+    updatePaxVehicleRateData
+} from 'store/actions/masterActions/transportActions/PaxVehicleRateActions';
 import SuccessMsg from 'messages/SuccessMsg';
 import ErrorMsg from 'messages/ErrorMsg';
 import ExitAlert from 'messages/ExitAlert';
@@ -92,7 +96,7 @@ const rows = [
     createData('Gingerbread', 356, 16.0, 49, 3.9)
 ];
 
-function PaxVehicleRate({ mode, selectedType }) {
+function PaxVehicleRate({ mode, selectedType, setMode }) {
     const classes = useStyles();
     const styles = (theme) => ({
         tableRow: {
@@ -230,7 +234,8 @@ function PaxVehicleRate({ mode, selectedType }) {
 
     useEffect(() => {
         console.log(paxVehicleRateToUpdate);
-        if (paxVehicleRateToUpdate) {
+        if (paxVehicleRateToUpdate !== null) {
+            setMode('VIEW_UPDATE');
             const data = {
                 transportType: selectedType,
                 minCount: '',
@@ -296,6 +301,8 @@ function PaxVehicleRate({ mode, selectedType }) {
 
             data.ratesDetails = paxVehicleRateToUpdate;
             setnewobj(data);
+        } else {
+            setMode('INSERT');
         }
     }, [paxVehicleRateToUpdate]);
 
@@ -554,7 +561,7 @@ function PaxVehicleRate({ mode, selectedType }) {
         if (mode === 'INSERT') {
             dispatch(savePaxVehicleRateData(values.ratesDetails));
         } else {
-            // dispatch(updateRoomBuyingRateData(values));
+            dispatch(updatePaxVehicleRateData(values.ratesDetails));
         }
     };
 
@@ -1249,7 +1256,7 @@ function PaxVehicleRate({ mode, selectedType }) {
                                                                                             control={<Switch color="success" />}
                                                                                             // label="Status"
                                                                                             checked={values.ratesDetails[idx].status}
-                                                                                            disabled
+
                                                                                             // disabled={mode == 'VIEW'}
                                                                                         />
                                                                                     </FormGroup>

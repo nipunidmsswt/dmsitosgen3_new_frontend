@@ -361,7 +361,7 @@ function TransportMainScreen() {
                                         </Typography>
                                     </AccordionSummary>
                                     <AccordionDetails>
-                                        <PaxVehicleRate mode={mode} selectedType={selectedTransportType}></PaxVehicleRate>
+                                        <PaxVehicleRate mode={mode} selectedType={selectedTransportType} setMode={setMode}></PaxVehicleRate>
                                     </AccordionDetails>
                                 </Accordion>
                                 <Accordion square>
