@@ -18,7 +18,7 @@ import {
 //PaxVehicleRate saga
 
 export function* savePaxVehicleRateSaga(action) {
-    action.data.path = `${process.env.REACT_APP_ACCOMODATION_URL}/roomBuyingRate`;
+    action.data.path = `${process.env.REACT_APP_TRANSPORT_URL}/paxVehicleRates`;
     let responseData = [];
     try {
         responseData = yield call(create, action.data);
@@ -33,7 +33,7 @@ export function* savePaxVehicleRateSaga(action) {
 export function* getPaxVehicleRateByIdSaga(action) {
     let responseData = [];
     try {
-        responseData = yield call(getById, `${process.env.REACT_APP_ACCOMODATION_URL}/roomBuyingRates/${action.data.id}`);
+        responseData = yield call(getById, `${process.env.REACT_APP_TRANSPORT_URL}/paxVehicleRates/${action.data.id}`);
         console.log(responseData);
         yield put({
             type: SUCCESS_GET_PAX_VEHICLE_RATE_BY_ID,
@@ -52,7 +52,7 @@ export function* updatePaxVehicleRateSaga(action) {
     console.log('updatePaxVehicleRateSaga tax saga');
     console.log(action);
 
-    action.data.path = `${process.env.REACT_APP_ACCOMODATION_URL}/roomBuyingRate`;
+    action.data.path = `${process.env.REACT_APP_TRANSPORT_URL}/roomBuyingRate`;
     let responseData = [];
     try {
         responseData = yield call(update, action.data);
@@ -68,7 +68,7 @@ export function* getAllPaxVehicleRateSaga() {
     let responseData = [];
 
     try {
-        responseData = yield call(get, process.env.REACT_APP_ACCOMODATION_URL + '/roomBuyingRates');
+        responseData = yield call(get, process.env.REACT_APP_TRANSPORT_URL + '/roomBuyingRates');
         console.log(responseData.data.payload);
         yield put({ type: SUCCESS_PAX_VEHICLE_RATE_LIST_DATA, data: responseData.data });
     } catch (e) {
@@ -79,7 +79,7 @@ export function* getAllPaxVehicleRateSaga() {
 
 export function* checkDupicatePaxVehicleRateSaga(action) {
     console.log(action);
-    action.data.data.path = `${process.env.REACT_APP_ACCOMODATION_URL}/checkPaxVehicleRate`;
+    action.data.data.path = `${process.env.REACT_APP_TRANSPORT_URL}/checkPaxVehicleRate`;
     let responseData = [];
     try {
         responseData = yield call(create, action.data.data);
@@ -94,7 +94,7 @@ export function* checkDupicatePaxVehicleRateSaga(action) {
 export function* checkLatestPaxVehicleRateModifiedDateSaga() {
     let responseData = [];
     try {
-        responseData = yield call(get, `${process.env.REACT_APP_ACCOMODATION_URL}/roomBuyingRates/lastModified`);
+        responseData = yield call(get, `${process.env.REACT_APP_TRANSPORT_URL}/roomBuyingRates/lastModified`);
         console.log('response data last:' + responseData);
         yield put({
             type: SUCCESS_PAX_VEHICLE_RATE_LAST_MODIFIED_DATE,
