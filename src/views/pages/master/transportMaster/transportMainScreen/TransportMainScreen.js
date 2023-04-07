@@ -63,6 +63,8 @@ function TransportMainScreen() {
     const mainTransportDetail = useSelector((state) => state.mainTransportCategoryReducer.mainTransportDetail);
     const distance = useSelector((state) => state.distanceReducer.distance);
     const activeCategoryDetails = useSelector((state) => state.mainTransportCategoryReducer.activeCategoryDetails);
+    const paxVehicleRate = useSelector((state) => state.paxVehicleRateReducer.paxVehicleRate);
+    const updatedPaxVehicleRate = useSelector((state) => state.paxVehicleRateReducer.updatedPaxVehicleRate);
 
     const handleClickOpenAgentForm = (code, marketCode) => {
         console.log('market Code:' + marketCode);
@@ -136,6 +138,19 @@ function TransportMainScreen() {
         }
     }, [distance]);
 
+    useEffect(() => {
+        if (paxVehicleRate != null) {
+            setHandleToast(true);
+        } else {
+        }
+    }, [paxVehicleRate]);
+
+    useEffect(() => {
+        if (updatedPaxVehicleRate != null) {
+            setHandleToast(true);
+        } else {
+        }
+    }, [updatedPaxVehicleRate]);
     useEffect(() => {}, [selectedTransportType]);
 
     useEffect(() => {

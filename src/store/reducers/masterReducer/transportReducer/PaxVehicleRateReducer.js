@@ -16,6 +16,7 @@ import {
 const initialState = {
     paxVehicleRate: null,
     paxVehicleRates: [],
+    updatedPaxVehicleRate: null,
     paxVehicleRateToUpdate: null,
     errorMsg: null,
     duplicatePaxVehicleRate: null,
@@ -47,12 +48,12 @@ export const paxVehicleRateReducer = (state = initialState, action) => {
             };
 
         case UPDATE_SUCCESS_PAX_VEHICLE_RATE:
-            return { ...state, paxVehicleRate: data.payload[0] };
+            return { ...state, updatedPaxVehicleRate: data.payload[0] };
 
         case UPDATE_FAILED_PAX_VEHICLE_RATE:
             return {
                 ...state,
-                paxVehicleRate: null,
+                updatedPaxVehicleRate: null,
                 errorMsg: data ? data.errorMessages : 'netwok error'
             };
 
