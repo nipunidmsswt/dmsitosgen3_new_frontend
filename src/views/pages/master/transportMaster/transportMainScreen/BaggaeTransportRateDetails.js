@@ -52,7 +52,7 @@ const Transition = forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
 
-function PaxVehicleRateDetails({ open, handleClose, mode, childToParent, paxVehicleRate, paxVehicleRateHeader }) {
+function BaggaeTransportRateDetails({ open, handleClose, mode, childToParent, paxVehicleRate, paxVehicleRateHeader }) {
     const headerInitialValues = {
         fromDate: '',
         toDate: '',
@@ -347,7 +347,7 @@ function PaxVehicleRateDetails({ open, handleClose, mode, childToParent, paxVehi
                     <Box display="flex" className="dialog-title">
                         <Box flexGrow={1}>
                             {mode === 'INSERT' ? 'Add' : ''} {mode === 'VIEW_UPDATE' ? 'Update ' : ''} {mode === 'VIEW' ? 'View ' : ''}
-                            Pax Vehicle Rate Details
+                            Baggage Transport Rate Details
                         </Box>
                         <Box>
                             <IconButton onClick={handleClose}>
@@ -531,88 +531,7 @@ function PaxVehicleRateDetails({ open, handleClose, mode, childToParent, paxVehi
                                                                             )}
                                                                         />
                                                                     </Grid>
-                                                                    <Grid item>
-                                                                        <Autocomplete
-                                                                            value={values.vehicleType}
-                                                                            name="vehicleType"
-                                                                            onChange={(_, value) => {
-                                                                                console.log(value);
-                                                                                setFieldValue(`vehicleType`, value);
-                                                                            }}
-                                                                            options={vehicleTypeList}
-                                                                            getOptionLabel={(option) => `${option.typeCode}`}
-                                                                            isOptionEqualToValue={(option, value) =>
-                                                                                option.categoryId === value.categoryId
-                                                                            }
-                                                                            renderInput={(params) => (
-                                                                                <Field
-                                                                                    as={TextField}
-                                                                                    {...params}
-                                                                                    // label="tax"
-                                                                                    sx={{
-                                                                                        width: { xs: 150 },
-                                                                                        '& .MuiInputBase-root': {
-                                                                                            height: 40
-                                                                                        }
-                                                                                    }}
-                                                                                    InputLabelProps={{
-                                                                                        shrink: true
-                                                                                    }}
-                                                                                    label="Vehicle Type"
-                                                                                    variant="outlined"
-                                                                                    name="vehicleType"
-                                                                                    onBlur={handleBlur}
-                                                                                    error={Boolean(
-                                                                                        touched.vehicleType && errors.vehicleType
-                                                                                    )}
-                                                                                    helperText={
-                                                                                        touched.vehicleType && errors.vehicleType
-                                                                                            ? errors.vehicleType
-                                                                                            : ''
-                                                                                    }
-                                                                                />
-                                                                            )}
-                                                                        />
-                                                                    </Grid>
-                                                                    <Grid item>
-                                                                        <TextField
-                                                                            sx={{
-                                                                                width: { sm: 200, md: 200 },
-                                                                                '& .MuiInputBase-root': {
-                                                                                    height: 40
-                                                                                }
-                                                                            }}
-                                                                            id="standard-select-currency"
-                                                                            select
-                                                                            label="Rate Type"
-                                                                            value={values.rateType}
-                                                                            name="rateType"
-                                                                            InputLabelProps={{
-                                                                                shrink: true
-                                                                            }}
-                                                                            onChange={handleChange}
-                                                                            SelectProps={{
-                                                                                renderValue: (value) => value
-                                                                            }}
-                                                                            onBlur={handleBlur}
-                                                                            error={Boolean(touched.rateType && errors.rateType)}
-                                                                            helperText={
-                                                                                touched.rateType && errors.rateType ? errors.rateType : ''
-                                                                            }
-                                                                        >
-                                                                            <MenuItem key="1" dense={true} value={'Per KM'}>
-                                                                                Per KM
-                                                                            </MenuItem>
-                                                                            <MenuItem
-                                                                                key="2"
-                                                                                dense={true}
-                                                                                selected={true}
-                                                                                value={'Per Hour'}
-                                                                            >
-                                                                                Per Hour
-                                                                            </MenuItem>
-                                                                        </TextField>
-                                                                    </Grid>
+
                                                                     <Grid item>
                                                                         <Autocomplete
                                                                             value={values.taxCode}
@@ -913,8 +832,7 @@ function PaxVehicleRateDetails({ open, handleClose, mode, childToParent, paxVehi
                                                                                     <TableCell>From Date </TableCell>
                                                                                     <TableCell>To Date</TableCell>
                                                                                     <TableCell>Currency</TableCell>
-                                                                                    <TableCell>vehicle Type</TableCell>
-                                                                                    <TableCell>Rate Type</TableCell>
+                                                                                    <TableCell>Max KM</TableCell>
                                                                                     <TableCell>Tax Code</TableCell>
                                                                                     <TableCell>Vehicle Rate</TableCell>
                                                                                     <TableCell>Vehicle Rate with Tax</TableCell>
@@ -1077,52 +995,6 @@ function PaxVehicleRateDetails({ open, handleClose, mode, childToParent, paxVehi
                                                                                                     )}
                                                                                                 />
                                                                                             </TableCell>
-
-                                                                                            <TableCell>
-                                                                                                <Autocomplete
-                                                                                                    disabled
-                                                                                                    value={
-                                                                                                        values.paxVehicleRateDetails[idx]
-                                                                                                            ? values.paxVehicleRateDetails[
-                                                                                                                  idx
-                                                                                                              ].vehicleType
-                                                                                                            : null
-                                                                                                    }
-                                                                                                    name={`paxVehicleRateDetails.${idx}.vehicleType`}
-                                                                                                    onChange={(_, value) => {
-                                                                                                        console.log(value);
-                                                                                                        setFieldValue(
-                                                                                                            `paxVehicleRateDetails.${idx}.vehicleType`,
-                                                                                                            value
-                                                                                                        );
-                                                                                                    }}
-                                                                                                    options={vehicleTypeList}
-                                                                                                    getOptionLabel={(option) =>
-                                                                                                        `${option.typeCode}`
-                                                                                                    }
-                                                                                                    isOptionEqualToValue={(option, value) =>
-                                                                                                        option.categoryId ===
-                                                                                                        value.categoryId
-                                                                                                    }
-                                                                                                    renderInput={(params) => (
-                                                                                                        <TextField
-                                                                                                            {...params}
-                                                                                                            // label="tax"
-
-                                                                                                            sx={{
-                                                                                                                width: { sm: 200 },
-                                                                                                                '& .MuiInputBase-root': {
-                                                                                                                    height: 40
-                                                                                                                }
-                                                                                                            }}
-                                                                                                            variant="outlined"
-                                                                                                            name={`paxVehicleRateDetails.${idx}.vehicleType`}
-                                                                                                            onBlur={handleBlur}
-                                                                                                            error={false}
-                                                                                                        />
-                                                                                                    )}
-                                                                                                />
-                                                                                            </TableCell>
                                                                                             <TableCell>
                                                                                                 <TextField
                                                                                                     sx={{
@@ -1148,6 +1020,7 @@ function PaxVehicleRateDetails({ open, handleClose, mode, childToParent, paxVehi
                                                                                                     error={false}
                                                                                                 />
                                                                                             </TableCell>
+
                                                                                             <TableCell>
                                                                                                 <Autocomplete
                                                                                                     disabled
@@ -1492,4 +1365,4 @@ function PaxVehicleRateDetails({ open, handleClose, mode, childToParent, paxVehi
     );
 }
 
-export default PaxVehicleRateDetails;
+export default BaggaeTransportRateDetails;
