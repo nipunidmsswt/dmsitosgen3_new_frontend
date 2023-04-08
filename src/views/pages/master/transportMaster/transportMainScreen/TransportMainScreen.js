@@ -29,6 +29,7 @@ import MainTransportCategories from './MainTransportCategories';
 import DistancesDetails from './DistancesDetails';
 import PaxVehicleRate from './PaxVehicleRate';
 import { getAllActiveTransportMainCategoryDataByType } from 'store/actions/masterActions/transportActions/MainTransportCategoriesActions';
+import BaggageTransportRate from './BaggageTransportRate';
 
 const useStyles = makeStyles({
     content: {
@@ -395,6 +396,9 @@ function TransportMainScreen() {
                                             Baggage Transport Rates
                                         </Typography>
                                     </AccordionSummary>
+                                    <AccordionDetails>
+                                        <BaggageTransportRate mode={mode} selectedType={selectedTransportType} setMode={setMode} />
+                                    </AccordionDetails>
                                 </Accordion>
 
                                 {openAgent ? (
