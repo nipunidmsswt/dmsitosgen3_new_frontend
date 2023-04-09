@@ -660,6 +660,28 @@ import {
     getActiveVehicleCategoryDataByTypeSaga
 } from './mastersaga/transportSaga/MainTransportCategorySaga';
 
+// import {
+//     CHECK_PAX_VEHICLE_RATE_CODE_DUPLICATE,
+//     CLEAR_PAX_VEHICLE_RATE,
+//     GET_ALL_PAX_VEHICLE_RATE,
+//     GET_PAX_VEHICLE_RATE_BY_ID,
+//     GET_PAX_VEHICLE_RATE_LAST_MODIFIED_DATE_TIME,
+//     SAVE_PAX_VEHICLE_RATE,
+//     UPDATE_PAX_VEHICLE_RATE
+// } from 'store/constant/master/TransportMasterConstant/PaxVehicleRateConstant';
+
+import {
+    SAVE_BAGGAGE_TRANSPORT_RATE
+    // CLEAR_PAX_VEHICLE_RATE,
+    // GET_ALL_PAX_VEHICLE_RATE,
+    // GET_PAX_VEHICLE_RATE_BY_ID,
+    // GET_PAX_VEHICLE_RATE_LAST_MODIFIED_DATE_TIME,
+    // SAVE_PAX_VEHICLE_RATE,
+    // UPDATE_PAX_VEHICLE_RATE
+} from 'store/constant/master/TransportMasterConstant/BaggageTransportRateConstant';
+
+import { saveBaggageTransportRateSaga } from './mastersaga/transportSaga/BaggageTransportRateSaga';
+
 import {
     CHECK_PAX_VEHICLE_RATE_CODE_DUPLICATE,
     CLEAR_PAX_VEHICLE_RATE,
@@ -1073,4 +1095,13 @@ export function* wacherSaga() {
     yield takeLatest(GET_ALL_ACTIVE_DISTANCE_DATA_TBY_TRANSPORT_TYPE, getAllActiveDistanceDataByTransportTypeSaga);
     // yield takeLatest(CHECK_ROOM_BUYING_RATE_CODE_DUPLICATE, checkDupicateRoomBuyingRateSaga);
     yield takeLatest(UPDATE_DISTANCE_DATA, updateDistanceSaga);
+
+    //baggage
+    yield takeLatest(SAVE_BAGGAGE_TRANSPORT_RATE, saveBaggageTransportRateSaga);
+    //  yield takeLatest(GET_ALL_PAX_VEHICLE_RATE, getAllPaxVehicleRateSaga);
+    //  yield takeLatest(GET_PAX_VEHICLE_RATE_BY_ID, getPaxVehicleRateByIdSaga);
+    //  yield takeLatest(GET_PAX_VEHICLE_RATE_LAST_MODIFIED_DATE_TIME, checkLatestPaxVehicleRateModifiedDateSaga);
+    //  yield takeLatest(CHECK_PAX_VEHICLE_RATE_CODE_DUPLICATE, checkDupicatePaxVehicleRateSaga);
+    //  yield takeLatest(UPDATE_PAX_VEHICLE_RATE, updatePaxVehicleRateSaga);
+    //  yield takeLatest(CLEAR_PAX_VEHICLE_RATE, clearRoomBuyingRateSaga);
 }

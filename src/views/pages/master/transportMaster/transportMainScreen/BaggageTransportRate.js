@@ -39,11 +39,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { getActiveRoomcategory } from 'store/actions/masterActions/RoomCategoryAction';
 import { getActiveHotelBasisList } from 'store/actions/masterActions/operatorActions/HotelBasisAction';
-import {
-    savePaxVehicleRateData,
-    getPaxVehicleRateDataById,
-    updatePaxVehicleRateData
-} from 'store/actions/masterActions/transportActions/PaxVehicleRateActions';
+import { saveBaggageTransportRateData } from 'store/actions/masterActions/transportActions/BaggageTransportRateAction';
 import SuccessMsg from 'messages/SuccessMsg';
 import ErrorMsg from 'messages/ErrorMsg';
 import ExitAlert from 'messages/ExitAlert';
@@ -428,7 +424,7 @@ function BaggageTransportRate({ mode, selectedType, setMode }) {
         console.log(values);
 
         if (mode === 'INSERT') {
-            dispatch(savePaxVehicleRateData(values.ratesDetails));
+            dispatch(saveBaggageTransportRateData(values.ratesDetails));
         } else {
             dispatch(updatePaxVehicleRateData(values.ratesDetails));
         }
@@ -949,13 +945,13 @@ function BaggageTransportRate({ mode, selectedType, setMode }) {
                                                                                                 console.log(idx);
                                                                                                 console.log(
                                                                                                     values.ratesDetails[idx]
-                                                                                                        .paxVehicleRateDetails
+                                                                                                        .baggageTransportRateDetails
                                                                                                 );
 
                                                                                                 setDetailTableIndex(idx);
                                                                                                 setPaxVehicleRate(
                                                                                                     mmObject.ratesDetails[idx]
-                                                                                                        .paxVehicleRateDetails
+                                                                                                        .baggageTransportRateDetails
                                                                                                 );
                                                                                                 setpaxDetailHeader(
                                                                                                     values.ratesDetails[idx]
@@ -985,13 +981,13 @@ function BaggageTransportRate({ mode, selectedType, setMode }) {
                                                                                                 console.log(idx);
                                                                                                 console.log(
                                                                                                     values.ratesDetails[idx]
-                                                                                                        .paxVehicleRateDetails
+                                                                                                        .baggageTransportRateDetails
                                                                                                 );
 
                                                                                                 setDetailTableIndex(idx);
                                                                                                 setPaxVehicleRate(
                                                                                                     mmObject.ratesDetails[idx]
-                                                                                                        .paxVehicleRateDetails
+                                                                                                        .baggageTransportRateDetails
                                                                                                 );
                                                                                                 // setOpenDetailTable(true);
                                                                                                 setOpenDetailTable(true);

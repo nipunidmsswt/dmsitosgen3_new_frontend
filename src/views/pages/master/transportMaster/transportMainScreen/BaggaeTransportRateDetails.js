@@ -57,8 +57,7 @@ function BaggaeTransportRateDetails({ open, handleClose, mode, childToParent, pa
         fromDate: '',
         toDate: '',
         currency: null,
-        vehicleType: null,
-        rateType: '',
+        maxKm: '',
         taxCode: null,
         vehicleRate: '',
         vehicleRateWithTax: 0.0,
@@ -85,13 +84,12 @@ function BaggaeTransportRateDetails({ open, handleClose, mode, childToParent, pa
     const [openModal, setOpenModal] = useState(false);
     const [existOpenModal, setExistOpenModal] = useState(false);
     const [loadValues, setLoadValues] = useState({
-        paxVehicleRateDetails: [
+        baggageTransportRateDetails: [
             {
                 fromDate: '',
                 toDate: '',
                 currency: null,
-                vehicleType: null,
-                rateType: '',
+                maxKm: '',
                 taxCode: null,
                 vehicleRate: '',
                 vehicleRateWithTax: 0.0,
@@ -109,12 +107,10 @@ function BaggaeTransportRateDetails({ open, handleClose, mode, childToParent, pa
     const [activeTaxGroupandTaxesList, setActiveTaxGroupandTaxesListData] = useState([]);
     const [taxListOptions, setTaxListOptions] = useState([]);
     const [headerValues, setHeaderValues] = useState({
-        minCount: '',
-        maxCount: '',
         vehcleCategory: '',
         noOfDrivers: '',
         noOfAssistants: '',
-        guideClass: ''
+        baggageTransportDesc: ''
     });
     //get data from reducers
     const detailsType = useSelector((state) => state.mainTransportCategoryReducer.detailsType);
@@ -136,12 +132,10 @@ function BaggaeTransportRateDetails({ open, handleClose, mode, childToParent, pa
         if (paxVehicleRateHeader != null) {
             console.log(paxVehicleRateHeader);
             setHeaderValues({
-                minCount: paxVehicleRateHeader.minCount,
-                maxCount: paxVehicleRateHeader.maxCount,
                 vehcleCategory: paxVehicleRateHeader.vehicleCategory?.typeCode,
                 noOfDrivers: paxVehicleRateHeader.noOfDrivers,
                 noOfAssistants: paxVehicleRateHeader.noOfAssistants,
-                guideClass: paxVehicleRateHeader.guideClass?.guideCode
+                baggageTransportDesc: paxVehicleRateHeader.baggageTransportDesc
             });
         }
     }, [paxVehicleRateHeader]);
@@ -154,10 +148,10 @@ function BaggaeTransportRateDetails({ open, handleClose, mode, childToParent, pa
     const validationSchema = yup.object().shape({
         mainCategoryDetails: yup.array().of(
             yup.object().shape({
-                location: yup.object().nullable().required('Required field'),
-                locationDes: yup.string().required('Required field'),
-                expenseTypes: yup.object().nullable().required('Required field'),
-                expenseDes: yup.string().required('Required field')
+                // location: yup.object().nullable().required('Required field'),
+                // locationDes: yup.string().required('Required field'),
+                // expenseTypes: yup.object().nullable().required('Required field'),
+                // expenseDes: yup.string().required('Required field')
             })
         )
         // .uniqueCodeAndNameCode("Must be unique"),
@@ -166,8 +160,7 @@ function BaggaeTransportRateDetails({ open, handleClose, mode, childToParent, pa
     const validationSchema1 = yup.object().shape({
         fromDate: yup.date().required('Required field'),
         currency: yup.object().nullable().required('Required field'),
-        vehicleType: yup.object().nullable().required('Required field'),
-        rateType: yup.string().required('Required field'),
+
         taxCode: yup.object().nullable().required('Required field'),
         vehicleRate: yup.number().required('Required field'),
         toDate: yup.date().min(yup.ref('fromDate'), "End date can't be before start date"),
@@ -181,20 +174,18 @@ function BaggaeTransportRateDetails({ open, handleClose, mode, childToParent, pa
         // expenseDes: yup.string().required('Required field')
     });
 
-    const [categoryType, setCategoryType] = useState(null);
-
     useEffect(() => {
         console.log(paxVehicleRate);
         let values;
         if (paxVehicleRate.length === 0) {
             values = {
-                paxVehicleRateDetails: [
+                baggageTransportRateDetails: [
                     {
                         fromDate: '',
                         toDate: '',
                         currency: null,
-                        vehicleType: null,
-                        rateType: '',
+
+                        maxKm: '',
                         taxCode: null,
                         vehicleRate: '',
                         vehicleRateWithTax: 0.0,
@@ -208,7 +199,7 @@ function BaggaeTransportRateDetails({ open, handleClose, mode, childToParent, pa
             };
         } else {
             values = {
-                paxVehicleRateDetails: paxVehicleRate
+                baggageTransportRateDetails: paxVehicleRate
             };
         }
 
@@ -245,13 +236,12 @@ function BaggaeTransportRateDetails({ open, handleClose, mode, childToParent, pa
     const handleSubmit = async (values) => {
         console.log(values);
         const initialValuesNew = {
-            paxVehicleRateDetails: [
+            baggageTransportRateDetails: [
                 {
                     fromDate: values.fromDate,
                     toDate: values.toDate,
                     currency: values.currency,
-                    vehicleType: values.vehicleType,
-                    rateType: values.rateType,
+                    maxKm: values.maxKm,
                     taxCode: values.taxCode,
                     vehicleRate: values.vehicleRate,
                     vehicleRateWithTax: values.vehicleRateWithTax,
@@ -263,10 +253,10 @@ function BaggaeTransportRateDetails({ open, handleClose, mode, childToParent, pa
                 }
             ]
         };
-        if (loadValues.paxVehicleRateDetails.length != 0) {
-            loadValues.paxVehicleRateDetails?.map((s) => {
+        if (loadValues.baggageTransportRateDetails.length != 0) {
+            loadValues.baggageTransportRateDetails?.map((s) => {
                 if (s.currency != null) {
-                    initialValuesNew.paxVehicleRateDetails.push(s);
+                    initialValuesNew.baggageTransportRateDetails.push(s);
                 }
             });
 
@@ -373,29 +363,17 @@ function BaggaeTransportRateDetails({ open, handleClose, mode, childToParent, pa
                                                     fontWeight: 'bold'
                                                 }}
                                             >
-                                                <Grid
-                                                    item
-                                                    xs={2}
-                                                    style={{
-                                                        fontWeight: 'bold'
-                                                    }}
-                                                >
-                                                    <Typography>Min Count : {headerValues.minCount}</Typography>
-                                                </Grid>
-                                                <Grid item xs={2}>
-                                                    <Typography>Max Count : {headerValues.maxCount}</Typography>
-                                                </Grid>
                                                 <Grid item xs={2}>
                                                     <Typography>Vehicle Category Code : {headerValues.vehcleCategory}</Typography>
+                                                </Grid>
+                                                <Grid item xs={2}>
+                                                    <Typography>Description : {headerValues.baggageTransportDesc}</Typography>
                                                 </Grid>
                                                 <Grid item xs={2}>
                                                     <Typography>No of Drivers : {headerValues.noOfDrivers}</Typography>
                                                 </Grid>
                                                 <Grid item xs={2}>
                                                     <Typography>No of Assistant : {headerValues.noOfAssistants}</Typography>
-                                                </Grid>
-                                                <Grid item xs={2}>
-                                                    <Typography>Guide Class : {headerValues.guideClass}</Typography>
                                                 </Grid>
                                             </Grid>
                                             <Formik
@@ -529,6 +507,32 @@ function BaggaeTransportRateDetails({ open, handleClose, mode, childToParent, pa
                                                                                     }
                                                                                 />
                                                                             )}
+                                                                        />
+                                                                    </Grid>
+
+                                                                    <Grid item>
+                                                                        <TextField
+                                                                            label="Max Km"
+                                                                            sx={{
+                                                                                width: { xs: 200 },
+                                                                                '& .MuiInputBase-root': {
+                                                                                    height: 40
+                                                                                }
+                                                                            }}
+                                                                            type="text"
+                                                                            variant="outlined"
+                                                                            name="maxKm"
+                                                                            InputLabelProps={{
+                                                                                shrink: true
+                                                                            }}
+                                                                            value={values.maxKm}
+                                                                            onChange={(e) => {
+                                                                                console.log(e.target.value);
+                                                                                setFieldValue('maxKm', e.target.value);
+                                                                            }}
+                                                                            onBlur={handleBlur}
+                                                                            error={Boolean(touched.maxKm && errors.maxKm)}
+                                                                            helperText={touched.maxKm && errors.maxKm ? errors.maxKm : ''}
                                                                         />
                                                                     </Grid>
 
@@ -822,7 +826,7 @@ function BaggaeTransportRateDetails({ open, handleClose, mode, childToParent, pa
                                             {({ values, handleChange, setFieldValue, errors, handleBlur, touched, resetForm }) => {
                                                 return (
                                                     <Form>
-                                                        <FieldArray name="paxVehicleRateDetails">
+                                                        <FieldArray name="baggageTransportRateDetails">
                                                             {({ insert, remove, push }) => (
                                                                 <Paper>
                                                                     <TableContainer>
@@ -847,11 +851,11 @@ function BaggaeTransportRateDetails({ open, handleClose, mode, childToParent, pa
                                                                             {/* {tableBodyData ? ( */}
                                                                             <TableBody>
                                                                                 {(rowsPerPage > 0
-                                                                                    ? values.paxVehicleRateDetails?.slice(
+                                                                                    ? values.baggageTransportRateDetails?.slice(
                                                                                           page * rowsPerPage,
                                                                                           page * rowsPerPage + rowsPerPage
                                                                                       )
-                                                                                    : values.paxVehicleRateDetails
+                                                                                    : values.baggageTransportRateDetails
                                                                                 ).map((record, idx) => {
                                                                                     // {values.mainCategoryDetails.map((record, idx) => {
                                                                                     return (
@@ -867,17 +871,18 @@ function BaggaeTransportRateDetails({ open, handleClose, mode, childToParent, pa
                                                                                                             console.log(value);
                                                                                                             console.log(ref.current);
                                                                                                             setFieldValue(
-                                                                                                                `paxVehicleRateDetails.${idx}.fromDate`,
+                                                                                                                `baggageTransportRateDetails.${idx}.fromDate`,
                                                                                                                 value
                                                                                                             );
                                                                                                         }}
                                                                                                         inputFormat="DD/MM/YYYY"
                                                                                                         value={
-                                                                                                            values.paxVehicleRateDetails[
+                                                                                                            values
+                                                                                                                .baggageTransportRateDetails[
                                                                                                                 idx
                                                                                                             ]
                                                                                                                 ? values
-                                                                                                                      .paxVehicleRateDetails[
+                                                                                                                      .baggageTransportRateDetails[
                                                                                                                       idx
                                                                                                                   ].fromDate
                                                                                                                 : null
@@ -895,7 +900,7 @@ function BaggaeTransportRateDetails({ open, handleClose, mode, childToParent, pa
                                                                                                                         }
                                                                                                                 }}
                                                                                                                 variant="outlined"
-                                                                                                                name={`paxVehicleRateDetails.${idx}.fromDate`}
+                                                                                                                name={`baggageTransportRateDetails.${idx}.fromDate`}
                                                                                                                 onBlur={handleBlur}
                                                                                                             />
                                                                                                         )}
@@ -914,17 +919,18 @@ function BaggaeTransportRateDetails({ open, handleClose, mode, childToParent, pa
                                                                                                             console.log(value);
                                                                                                             console.log(ref.current);
                                                                                                             setFieldValue(
-                                                                                                                `paxVehicleRateDetails.${idx}.toDate`,
+                                                                                                                `baggageTransportRateDetails.${idx}.toDate`,
                                                                                                                 value
                                                                                                             );
                                                                                                         }}
                                                                                                         inputFormat="DD/MM/YYYY"
                                                                                                         value={
-                                                                                                            values.paxVehicleRateDetails[
+                                                                                                            values
+                                                                                                                .baggageTransportRateDetails[
                                                                                                                 idx
                                                                                                             ]
                                                                                                                 ? values
-                                                                                                                      .paxVehicleRateDetails[
+                                                                                                                      .baggageTransportRateDetails[
                                                                                                                       idx
                                                                                                                   ].toDate
                                                                                                                 : null
@@ -942,7 +948,7 @@ function BaggaeTransportRateDetails({ open, handleClose, mode, childToParent, pa
                                                                                                                         }
                                                                                                                 }}
                                                                                                                 variant="outlined"
-                                                                                                                name={`paxVehicleRateDetails.${idx}.toDate`}
+                                                                                                                name={`baggageTransportRateDetails.${idx}.toDate`}
                                                                                                                 onBlur={handleBlur}
                                                                                                                 error={false}
                                                                                                             />
@@ -954,17 +960,20 @@ function BaggaeTransportRateDetails({ open, handleClose, mode, childToParent, pa
                                                                                                 <Autocomplete
                                                                                                     disabled
                                                                                                     value={
-                                                                                                        values.paxVehicleRateDetails[idx]
-                                                                                                            ? values.paxVehicleRateDetails[
+                                                                                                        values.baggageTransportRateDetails[
+                                                                                                            idx
+                                                                                                        ]
+                                                                                                            ? values
+                                                                                                                  .baggageTransportRateDetails[
                                                                                                                   idx
                                                                                                               ].currency
                                                                                                             : null
                                                                                                     }
-                                                                                                    name={`paxVehicleRateDetails.${idx}.currency`}
+                                                                                                    name={`baggageTransportRateDetails.${idx}.currency`}
                                                                                                     onChange={(_, value) => {
                                                                                                         console.log(value);
                                                                                                         setFieldValue(
-                                                                                                            `paxVehicleRateDetails.${idx}.currency`,
+                                                                                                            `baggageTransportRateDetails.${idx}.currency`,
                                                                                                             value
                                                                                                         );
                                                                                                     }}
@@ -988,7 +997,7 @@ function BaggaeTransportRateDetails({ open, handleClose, mode, childToParent, pa
                                                                                                                 }
                                                                                                             }}
                                                                                                             variant="outlined"
-                                                                                                            name={`paxVehicleRateDetails.${idx}.currency`}
+                                                                                                            name={`baggageTransportRateDetails.${idx}.currency`}
                                                                                                             onBlur={handleBlur}
                                                                                                             error={false}
                                                                                                         />
@@ -1007,13 +1016,16 @@ function BaggaeTransportRateDetails({ open, handleClose, mode, childToParent, pa
                                                                                                     variant="outlined"
                                                                                                     // placeholder="name"
                                                                                                     value={
-                                                                                                        values.paxVehicleRateDetails[idx]
-                                                                                                            ? values.paxVehicleRateDetails[
+                                                                                                        values.baggageTransportRateDetails[
+                                                                                                            idx
+                                                                                                        ]
+                                                                                                            ? values
+                                                                                                                  .baggageTransportRateDetails[
                                                                                                                   idx
                                                                                                               ].rateType
                                                                                                             : null
                                                                                                     }
-                                                                                                    name={`paxVehicleRateDetails.${idx}.rateType`}
+                                                                                                    name={`baggageTransportRateDetails.${idx}.rateType`}
                                                                                                     disabled
                                                                                                     onChange={handleChange}
                                                                                                     onBlur={handleBlur}
@@ -1025,17 +1037,20 @@ function BaggaeTransportRateDetails({ open, handleClose, mode, childToParent, pa
                                                                                                 <Autocomplete
                                                                                                     disabled
                                                                                                     value={
-                                                                                                        values.paxVehicleRateDetails[idx]
-                                                                                                            ? values.paxVehicleRateDetails[
+                                                                                                        values.baggageTransportRateDetails[
+                                                                                                            idx
+                                                                                                        ]
+                                                                                                            ? values
+                                                                                                                  .baggageTransportRateDetails[
                                                                                                                   idx
                                                                                                               ].taxCode
                                                                                                             : null
                                                                                                     }
-                                                                                                    name={`paxVehicleRateDetails.${idx}.taxCode`}
+                                                                                                    name={`baggageTransportRateDetails.${idx}.taxCode`}
                                                                                                     onChange={(_, value) => {
                                                                                                         console.log(value);
                                                                                                         setFieldValue(
-                                                                                                            `paxVehicleRateDetails.${idx}.taxCode`,
+                                                                                                            `baggageTransportRateDetails.${idx}.taxCode`,
                                                                                                             value
                                                                                                         );
                                                                                                     }}
@@ -1058,7 +1073,7 @@ function BaggaeTransportRateDetails({ open, handleClose, mode, childToParent, pa
                                                                                                                 }
                                                                                                             }}
                                                                                                             variant="outlined"
-                                                                                                            name={`paxVehicleRateDetails.${idx}.taxCode`}
+                                                                                                            name={`baggageTransportRateDetails.${idx}.taxCode`}
                                                                                                             onBlur={handleBlur}
                                                                                                         />
                                                                                                     )}
@@ -1075,10 +1090,13 @@ function BaggaeTransportRateDetails({ open, handleClose, mode, childToParent, pa
                                                                                                     //   type="number"
                                                                                                     variant="outlined"
                                                                                                     // placeholder="name"
-                                                                                                    name={`paxVehicleRateDetails.${idx}.vehicleRate`}
+                                                                                                    name={`baggageTransportRateDetails.${idx}.vehicleRate`}
                                                                                                     value={
-                                                                                                        values.paxVehicleRateDetails[idx]
-                                                                                                            ? values.paxVehicleRateDetails[
+                                                                                                        values.baggageTransportRateDetails[
+                                                                                                            idx
+                                                                                                        ]
+                                                                                                            ? values
+                                                                                                                  .baggageTransportRateDetails[
                                                                                                                   idx
                                                                                                               ].vehicleRate
                                                                                                             : null
@@ -1100,10 +1118,13 @@ function BaggaeTransportRateDetails({ open, handleClose, mode, childToParent, pa
                                                                                                     //   type="number"
                                                                                                     variant="outlined"
                                                                                                     // placeholder="name"
-                                                                                                    name={`paxVehicleRateDetails.${idx}.vehicleRateWithTax`}
+                                                                                                    name={`baggageTransportRateDetails.${idx}.vehicleRateWithTax`}
                                                                                                     value={
-                                                                                                        values.paxVehicleRateDetails[idx]
-                                                                                                            ? values.paxVehicleRateDetails[
+                                                                                                        values.baggageTransportRateDetails[
+                                                                                                            idx
+                                                                                                        ]
+                                                                                                            ? values
+                                                                                                                  .baggageTransportRateDetails[
                                                                                                                   idx
                                                                                                               ].vehicleRateWithTax
                                                                                                             : null
@@ -1126,10 +1147,13 @@ function BaggaeTransportRateDetails({ open, handleClose, mode, childToParent, pa
                                                                                                     //   type="number"
                                                                                                     variant="outlined"
                                                                                                     // placeholder="name"
-                                                                                                    name={`paxVehicleRateDetails.${idx}.driverRate`}
+                                                                                                    name={`baggageTransportRateDetails.${idx}.driverRate`}
                                                                                                     value={
-                                                                                                        values.paxVehicleRateDetails[idx]
-                                                                                                            ? values.paxVehicleRateDetails[
+                                                                                                        values.baggageTransportRateDetails[
+                                                                                                            idx
+                                                                                                        ]
+                                                                                                            ? values
+                                                                                                                  .baggageTransportRateDetails[
                                                                                                                   idx
                                                                                                               ].driverRate
                                                                                                             : null
@@ -1151,10 +1175,13 @@ function BaggaeTransportRateDetails({ open, handleClose, mode, childToParent, pa
                                                                                                     //   type="number"
                                                                                                     variant="outlined"
                                                                                                     // placeholder="name"
-                                                                                                    name={`paxVehicleRateDetails.${idx}.driverRateWithTax`}
+                                                                                                    name={`baggageTransportRateDetails.${idx}.driverRateWithTax`}
                                                                                                     value={
-                                                                                                        values.paxVehicleRateDetails[idx]
-                                                                                                            ? values.paxVehicleRateDetails[
+                                                                                                        values.baggageTransportRateDetails[
+                                                                                                            idx
+                                                                                                        ]
+                                                                                                            ? values
+                                                                                                                  .baggageTransportRateDetails[
                                                                                                                   idx
                                                                                                               ].driverRateWithTax
                                                                                                             : null
@@ -1177,10 +1204,13 @@ function BaggaeTransportRateDetails({ open, handleClose, mode, childToParent, pa
                                                                                                     //   type="number"
                                                                                                     variant="outlined"
                                                                                                     // placeholder="name"
-                                                                                                    name={`paxVehicleRateDetails.${idx}.assistantRate`}
+                                                                                                    name={`baggageTransportRateDetails.${idx}.assistantRate`}
                                                                                                     value={
-                                                                                                        values.paxVehicleRateDetails[idx]
-                                                                                                            ? values.paxVehicleRateDetails[
+                                                                                                        values.baggageTransportRateDetails[
+                                                                                                            idx
+                                                                                                        ]
+                                                                                                            ? values
+                                                                                                                  .baggageTransportRateDetails[
                                                                                                                   idx
                                                                                                               ].assistantRate
                                                                                                             : null
@@ -1202,10 +1232,13 @@ function BaggaeTransportRateDetails({ open, handleClose, mode, childToParent, pa
                                                                                                     //   type="number"
                                                                                                     variant="outlined"
                                                                                                     // placeholder="name"
-                                                                                                    name={`paxVehicleRateDetails.${idx}.assistantWithTax`}
+                                                                                                    name={`baggageTransportRateDetails.${idx}.assistantWithTax`}
                                                                                                     value={
-                                                                                                        values.paxVehicleRateDetails[idx]
-                                                                                                            ? values.paxVehicleRateDetails[
+                                                                                                        values.baggageTransportRateDetails[
+                                                                                                            idx
+                                                                                                        ]
+                                                                                                            ? values
+                                                                                                                  .baggageTransportRateDetails[
                                                                                                                   idx
                                                                                                               ].assistantWithTax
                                                                                                             : null
@@ -1219,14 +1252,15 @@ function BaggaeTransportRateDetails({ open, handleClose, mode, childToParent, pa
                                                                                             <TableCell>
                                                                                                 <FormGroup>
                                                                                                     <FormControlLabel
-                                                                                                        name={`paxVehicleRateDetails.${idx}.status`}
+                                                                                                        name={`baggageTransportRateDetails.${idx}.status`}
                                                                                                         onChange={handleChange}
                                                                                                         value={
-                                                                                                            values.paxVehicleRateDetails[
+                                                                                                            values
+                                                                                                                .baggageTransportRateDetails[
                                                                                                                 idx
                                                                                                             ]
                                                                                                                 ? values
-                                                                                                                      .paxVehicleRateDetails[
+                                                                                                                      .baggageTransportRateDetails[
                                                                                                                       idx
                                                                                                                   ].status
                                                                                                                 : null
@@ -1234,7 +1268,8 @@ function BaggaeTransportRateDetails({ open, handleClose, mode, childToParent, pa
                                                                                                         control={<Switch color="success" />}
                                                                                                         // label="Status"
                                                                                                         checked={
-                                                                                                            values.paxVehicleRateDetails[
+                                                                                                            values
+                                                                                                                .baggageTransportRateDetails[
                                                                                                                 idx
                                                                                                             ].status
                                                                                                         }
@@ -1244,8 +1279,8 @@ function BaggaeTransportRateDetails({ open, handleClose, mode, childToParent, pa
                                                                                                 </FormGroup>
                                                                                             </TableCell>
                                                                                             <TableCell>
-                                                                                                {(values.paxVehicleRateDetails[idx] &&
-                                                                                                    values.paxVehicleRateDetails[idx]
+                                                                                                {(values.baggageTransportRateDetails[idx] &&
+                                                                                                    values.baggageTransportRateDetails[idx]
                                                                                                         .id) === undefined ? (
                                                                                                     <IconButton
                                                                                                         aria-label="delete"
@@ -1273,7 +1308,7 @@ function BaggaeTransportRateDetails({ open, handleClose, mode, childToParent, pa
                                                                                             5, 10, 25
                                                                                             // { label: 'All', value: -1 }
                                                                                         ]}
-                                                                                        count={values.paxVehicleRateDetails.length}
+                                                                                        count={values.baggageTransportRateDetails.length}
                                                                                         rowsPerPage={rowsPerPage}
                                                                                         page={page}
                                                                                         SelectProps={{
