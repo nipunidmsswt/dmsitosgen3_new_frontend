@@ -57,7 +57,8 @@ function TransportMainScreen() {
     const [openErrorToast, setOpenErrorToast] = useState(false);
 
     const dispatch = useDispatch();
-    const error = useSelector((state) => state.codeAndNameReducer.errorMsg);
+    const error = useSelector((state) => state.bagggeTransportRateReducer.errorMsg);
+    const error2 = useSelector((state) => state.paxVehicleRateReducer.errorMsg);
     const lastModifiedDate = useSelector((state) => state.codeAndNameReducer.lastModifiedDateTime);
     const dataToTableView = useSelector((state) => state.codeAndNameReducer.dataToTableView);
     const agentData = useSelector((state) => state.agentReducer.agent);
@@ -66,6 +67,8 @@ function TransportMainScreen() {
     const activeCategoryDetails = useSelector((state) => state.mainTransportCategoryReducer.activeCategoryDetails);
     const paxVehicleRate = useSelector((state) => state.paxVehicleRateReducer.paxVehicleRate);
     const updatedPaxVehicleRate = useSelector((state) => state.paxVehicleRateReducer.updatedPaxVehicleRate);
+    const bagggeTransportRate = useSelector((state) => state.bagggeTransportRateReducer.bagggeTransportRate);
+    const updatedBagggeTransportRate = useSelector((state) => state.bagggeTransportRateReducer.updatedBagggeTransportRate);
 
     const handleClickOpenAgentForm = (code, marketCode) => {
         console.log('market Code:' + marketCode);
@@ -125,7 +128,7 @@ function TransportMainScreen() {
     useEffect(() => {
         if (mainTransportDetail != null) {
             setHandleToast(true);
-
+            dispatch(getAllActiveTransportMainCategoryDataByType('Transport Type'));
             // dispatch(getAllCodeAndNameDetails());
             // dispatch(getLatestModifiedDetails());
         } else {
@@ -135,6 +138,7 @@ function TransportMainScreen() {
     useEffect(() => {
         if (distance != null) {
             setHandleToast(true);
+            dispatch(getAllActiveTransportMainCategoryDataByType('Transport Type'));
         } else {
         }
     }, [distance]);
@@ -142,13 +146,35 @@ function TransportMainScreen() {
     useEffect(() => {
         if (paxVehicleRate != null) {
             setHandleToast(true);
+            dispatch(getAllActiveTransportMainCategoryDataByType('Transport Type'));
+            window.location.reload(false);
         } else {
         }
     }, [paxVehicleRate]);
 
     useEffect(() => {
+        if (bagggeTransportRate != null) {
+            setHandleToast(true);
+            dispatch(getAllActiveTransportMainCategoryDataByType('Transport Type'));
+            window.location.reload(false);
+        } else {
+        }
+    }, [bagggeTransportRate]);
+
+    useEffect(() => {
+        if (updatedBagggeTransportRate != null) {
+            setHandleToast(true);
+            dispatch(getAllActiveTransportMainCategoryDataByType('Transport Type'));
+            window.location.reload(false);
+        } else {
+        }
+    }, [updatedBagggeTransportRate]);
+
+    useEffect(() => {
         if (updatedPaxVehicleRate != null) {
             setHandleToast(true);
+            dispatch(getAllActiveTransportMainCategoryDataByType('Transport Type'));
+            window.location.reload(false);
         } else {
         }
     }, [updatedPaxVehicleRate]);
@@ -163,6 +189,12 @@ function TransportMainScreen() {
             setOpenErrorToast(true);
         }
     }, [error]);
+
+    useEffect(() => {
+        if (error2 != null) {
+            setOpenErrorToast(true);
+        }
+    }, [error2]);
 
     useEffect(() => {
         if (activeCategoryDetails != null) {
@@ -259,6 +291,7 @@ function TransportMainScreen() {
                                                         value={values.transportType}
                                                         name="transportType"
                                                         disabled={mode == 'VIEW'}
+                                                        disableClearable={true}
                                                         onChange={(_, value) => {
                                                             setFieldValue(`transportType`, value);
                                                             setSelectedTransportType(value);

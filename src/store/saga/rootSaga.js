@@ -671,16 +671,21 @@ import {
 // } from 'store/constant/master/TransportMasterConstant/PaxVehicleRateConstant';
 
 import {
-    SAVE_BAGGAGE_TRANSPORT_RATE
+    SAVE_BAGGAGE_TRANSPORT_RATE,
+    GET_BAGGAGE_TRANSPORT_RATE_BY_ID,
+    UPDATE_BAGGAGE_TRANSPORT_RATE
     // CLEAR_PAX_VEHICLE_RATE,
     // GET_ALL_PAX_VEHICLE_RATE,
     // GET_PAX_VEHICLE_RATE_BY_ID,
     // GET_PAX_VEHICLE_RATE_LAST_MODIFIED_DATE_TIME,
     // SAVE_PAX_VEHICLE_RATE,
-    // UPDATE_PAX_VEHICLE_RATE
 } from 'store/constant/master/TransportMasterConstant/BaggageTransportRateConstant';
 
-import { saveBaggageTransportRateSaga } from './mastersaga/transportSaga/BaggageTransportRateSaga';
+import {
+    saveBaggageTransportRateSaga,
+    getBaggageTransportRateByIdSaga,
+    updateBaggageTransportRateSaga
+} from './mastersaga/transportSaga/BaggageTransportRateSaga';
 
 import {
     CHECK_PAX_VEHICLE_RATE_CODE_DUPLICATE,
@@ -1099,9 +1104,9 @@ export function* wacherSaga() {
     //baggage
     yield takeLatest(SAVE_BAGGAGE_TRANSPORT_RATE, saveBaggageTransportRateSaga);
     //  yield takeLatest(GET_ALL_PAX_VEHICLE_RATE, getAllPaxVehicleRateSaga);
-    //  yield takeLatest(GET_PAX_VEHICLE_RATE_BY_ID, getPaxVehicleRateByIdSaga);
+    yield takeLatest(GET_BAGGAGE_TRANSPORT_RATE_BY_ID, getBaggageTransportRateByIdSaga);
     //  yield takeLatest(GET_PAX_VEHICLE_RATE_LAST_MODIFIED_DATE_TIME, checkLatestPaxVehicleRateModifiedDateSaga);
     //  yield takeLatest(CHECK_PAX_VEHICLE_RATE_CODE_DUPLICATE, checkDupicatePaxVehicleRateSaga);
-    //  yield takeLatest(UPDATE_PAX_VEHICLE_RATE, updatePaxVehicleRateSaga);
+    yield takeLatest(UPDATE_BAGGAGE_TRANSPORT_RATE, updateBaggageTransportRateSaga);
     //  yield takeLatest(CLEAR_PAX_VEHICLE_RATE, clearRoomBuyingRateSaga);
 }

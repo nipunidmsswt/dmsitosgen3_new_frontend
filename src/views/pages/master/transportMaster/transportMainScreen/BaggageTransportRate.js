@@ -39,7 +39,11 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { getActiveRoomcategory } from 'store/actions/masterActions/RoomCategoryAction';
 import { getActiveHotelBasisList } from 'store/actions/masterActions/operatorActions/HotelBasisAction';
-import { saveBaggageTransportRateData } from 'store/actions/masterActions/transportActions/BaggageTransportRateAction';
+import {
+    saveBaggageTransportRateData,
+    getBaggageTransportRateDataById,
+    updateBaggageTransportRateData
+} from 'store/actions/masterActions/transportActions/BaggageTransportRateAction';
 import SuccessMsg from 'messages/SuccessMsg';
 import ErrorMsg from 'messages/ErrorMsg';
 import ExitAlert from 'messages/ExitAlert';
@@ -202,7 +206,7 @@ function BaggageTransportRate({ mode, selectedType, setMode }) {
     useEffect(() => {
         console.log(selectedType.categoryId);
         if (selectedType != '') {
-            // dispatch(getPaxVehicleRateDataById(selectedType.categoryId));
+            dispatch(getBaggageTransportRateDataById(selectedType.categoryId));
         }
     }, [selectedType]);
 
@@ -426,7 +430,7 @@ function BaggageTransportRate({ mode, selectedType, setMode }) {
         if (mode === 'INSERT') {
             dispatch(saveBaggageTransportRateData(values.ratesDetails));
         } else {
-            dispatch(updatePaxVehicleRateData(values.ratesDetails));
+            dispatch(updateBaggageTransportRateData(values.ratesDetails));
         }
     };
 
@@ -582,6 +586,7 @@ function BaggageTransportRate({ mode, selectedType, setMode }) {
                                                                     height: 40
                                                                 }
                                                             }}
+                                                            validate={requiredValidation}
                                                             disabled={mode == 'VIEW'}
                                                             type="text"
                                                             variant="outlined"
@@ -672,7 +677,7 @@ function BaggageTransportRate({ mode, selectedType, setMode }) {
                                                             onClick={() => {
                                                                 setTouched({
                                                                     noOfDrivers: true,
-                                                                    noOfAssistants: true,
+
                                                                     vehicleCategory: true,
                                                                     baggageTransportDesc: true
                                                                 }).then(() => {
@@ -681,7 +686,6 @@ function BaggageTransportRate({ mode, selectedType, setMode }) {
                                                                     if (
                                                                         formikRef.current.errors.noOfDrivers == undefined &&
                                                                         formikRef.current.errors.vehicleCategory == undefined &&
-                                                                        formikRef.current.errors.noOfAssistants == undefined &&
                                                                         formikRef.current.errors.baggageTransportDesc == undefined
                                                                     ) {
                                                                         addRows(values, formikRef.current.values);
@@ -913,12 +917,11 @@ function BaggageTransportRate({ mode, selectedType, setMode }) {
                                                                                     <div>
                                                                                         <IconButton
                                                                                             disabled={
-                                                                                                values.ratesDetails[idx].vehicleCategory
-                                                                                                    ?.categoryId == ''
+                                                                                                values.ratesDetails[idx].vehicleCategory ==
+                                                                                                null
                                                                                                     ? true
                                                                                                     : false
                                                                                             }
-                                                                                            disa
                                                                                             aria-label="delete"
                                                                                             onClick={() => {
                                                                                                 remove(idx);
@@ -928,12 +931,11 @@ function BaggageTransportRate({ mode, selectedType, setMode }) {
                                                                                         </IconButton>
                                                                                         <IconButton
                                                                                             disabled={
-                                                                                                values.ratesDetails[idx].vehicleCategory
-                                                                                                    ?.categoryId == ''
+                                                                                                values.ratesDetails[idx].vehicleCategory ==
+                                                                                                null
                                                                                                     ? true
                                                                                                     : false
                                                                                             }
-                                                                                            disa
                                                                                             aria-label="delete"
                                                                                             color={
                                                                                                 flag && selectedID === idx
@@ -964,12 +966,11 @@ function BaggageTransportRate({ mode, selectedType, setMode }) {
                                                                                         </IconButton>
                                                                                         <IconButton
                                                                                             disabled={
-                                                                                                values.ratesDetails[idx].vehicleCategory
-                                                                                                    ?.categoryId == ''
+                                                                                                values.ratesDetails[idx].vehicleCategory ==
+                                                                                                null
                                                                                                     ? true
                                                                                                     : false
                                                                                             }
-                                                                                            disa
                                                                                             aria-label="delete"
                                                                                             color={
                                                                                                 flag && selectedID === idx
@@ -997,12 +998,11 @@ function BaggageTransportRate({ mode, selectedType, setMode }) {
                                                                                         </IconButton>
                                                                                         <IconButton
                                                                                             disabled={
-                                                                                                values.ratesDetails[idx].vehicleCategory
-                                                                                                    ?.categoryId == ''
+                                                                                                values.ratesDetails[idx].vehicleCategory ==
+                                                                                                null
                                                                                                     ? true
                                                                                                     : false
                                                                                             }
-                                                                                            disa
                                                                                             aria-label="delete"
                                                                                             onClick={() => {
                                                                                                 console.log('here');

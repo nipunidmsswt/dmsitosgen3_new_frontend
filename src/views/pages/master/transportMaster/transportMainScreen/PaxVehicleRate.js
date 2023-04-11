@@ -64,6 +64,7 @@ import ExpenseatLocation from './ExpenseatLocation';
 import PaxVehicleRateDetails from './PaxVehicleRateDetails';
 import ViewPaxVehicleRateDetails from './ViewPaxVehicleRateDetails';
 import ArticleIcon from '@mui/icons-material/Article';
+
 const useStyles = makeStyles({
     table: {
         minWidth: 650
@@ -207,8 +208,6 @@ function PaxVehicleRate({ mode, selectedType, setMode }) {
     const lastModifiedDate = useSelector((state) => state.seasonReducer.lastModifiedDateTime);
     const currencyListData = useSelector((state) => state.expenseTypesReducer.currencyList);
     const paxVehicleRateToUpdate = useSelector((state) => state.paxVehicleRateReducer.paxVehicleRateToUpdate);
-    const roomBuyingRate = useSelector((state) => state.roomBuyingRateReducer.roomBuyingRate);
-    const duplicateRoomBuyingRate = useSelector((state) => state.roomBuyingRateReducer.duplicateRoomBuyingRate);
     const guideClassActiveList = useSelector((state) => state.guideClassReducer.guideClassActiveList);
     const vehicleCategories = useSelector((state) => state.mainTransportCategoryReducer.vehicleCategories);
     const vehicleTypes = useSelector((state) => state.mainTransportCategoryReducer.vehicleTypes);
@@ -556,8 +555,20 @@ function PaxVehicleRate({ mode, selectedType, setMode }) {
     };
 
     const handleFinalSubmit = async (values) => {
-        console.log(values);
+        console.log(values.ratesDetails);
+        let result = false;
+        // for (let i in values.ratesDetails) {
+        //     console.log(values.ratesDetails[+i + 1]);
+        //     if (values.ratesDetails[+i + 1] !== undefined) {
+        //         console.log(typeof +values.ratesDetails[i].maxCount + 1);
+        //         console.log(typeof +values.ratesDetails[+i + 1].minCount);
 
+        //         if (+values.ratesDetails[i].maxCount + 1 !== +values.ratesDetails[+i + 1].minCount) {
+        //             result == true;
+        //         }
+        //     }
+        // }
+        console.log(result);
         if (mode === 'INSERT') {
             dispatch(savePaxVehicleRateData(values.ratesDetails));
         } else {
@@ -574,14 +585,29 @@ function PaxVehicleRate({ mode, selectedType, setMode }) {
         return error;
     }
 
-    useEffect(() => {
-        console.log(duplicateRoomBuyingRate);
-        // if(duplicateRoomBuyingRate){
-        //     if(duplicateRoomBuyingRate.errormessages.length < 0){
+    function validationOnMaxCount(value) {
+        let error;
+        console.log(mmObject.minCount);
+        if (!value) {
+            error = 'Required';
+        } else if (value < mmObject.minCount) {
+            error = 'Max Count should be greater than Min Count';
+        } else if (value < 0) {
+            error = 'Max Count should be greater than 0';
+        }
+        return error;
+    }
 
-        //     }
-        // }
-    }, [duplicateRoomBuyingRate]);
+    function validationOnMinCount(value) {
+        let error;
+        console.log(mmObject.minCount);
+        if (!value) {
+            error = 'Required';
+        } else if (value < 0) {
+            error = 'Min Count should be greater than 0';
+        }
+        return error;
+    }
 
     const validate = (values) => {
         console.log(values);
@@ -692,7 +718,7 @@ function PaxVehicleRate({ mode, selectedType, setMode }) {
                                                             InputLabelProps={{
                                                                 shrink: true
                                                             }}
-                                                            validate={requiredValidation}
+                                                            validate={validationOnMinCount}
                                                             value={values.minCount}
                                                             onChange={handleChange}
                                                             onBlur={handleBlur}
@@ -718,7 +744,7 @@ function PaxVehicleRate({ mode, selectedType, setMode }) {
                                                                 shrink: true
                                                             }}
                                                             value={values.maxCount}
-                                                            validate={requiredValidation}
+                                                            validate={validationOnMaxCount}
                                                             onChange={handleChange}
                                                             onBlur={handleBlur}
                                                             error={Boolean(touched.maxCount && errors.maxCount)}
@@ -843,7 +869,7 @@ function PaxVehicleRate({ mode, selectedType, setMode }) {
                                                                     {...params}
                                                                     label="Guide Class"
                                                                     sx={{
-                                                                        width: { xs: 200 },
+                                                                        width: { xs: 250 },
                                                                         '& .MuiInputBase-root': {
                                                                             height: 41
                                                                         }

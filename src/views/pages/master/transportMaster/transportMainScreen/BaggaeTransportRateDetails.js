@@ -360,20 +360,36 @@ function BaggaeTransportRateDetails({ open, handleClose, mode, childToParent, pa
                                                     border: '3px solid #6082B6',
                                                     marginTop: '2px',
                                                     marginBottom: '22px',
-                                                    fontWeight: 'bold'
+                                                    fontWeight: 'bold',
+                                                    justifyContent: 'center',
+                                                    alignItems: 'center',
+                                                    backgroundColor: '#A7C7E7',
+                                                    paddingBottom: '10px',
+                                                    paddingLeft: '10px',
+                                                    marginLeft: '10px',
+                                                    width: '1570px',
+                                                    borderRadius: '5px'
                                                 }}
                                             >
-                                                <Grid item xs={2}>
-                                                    <Typography>Vehicle Category Code : {headerValues.vehcleCategory}</Typography>
+                                                <Grid item xs={3}>
+                                                    <Typography style={{ fontSize: '16px', fontWeight: 'bold' }}>
+                                                        Vehicle Category Code : {headerValues.vehcleCategory}
+                                                    </Typography>
                                                 </Grid>
-                                                <Grid item xs={2}>
-                                                    <Typography>Description : {headerValues.baggageTransportDesc}</Typography>
+                                                <Grid item xs={3}>
+                                                    <Typography style={{ fontSize: '16px', fontWeight: 'bold' }}>
+                                                        Description : {headerValues.baggageTransportDesc}
+                                                    </Typography>
                                                 </Grid>
-                                                <Grid item xs={2}>
-                                                    <Typography>No of Drivers : {headerValues.noOfDrivers}</Typography>
+                                                <Grid item xs={3}>
+                                                    <Typography style={{ fontSize: '16px', fontWeight: 'bold' }}>
+                                                        No of Drivers : {headerValues.noOfDrivers}
+                                                    </Typography>
                                                 </Grid>
-                                                <Grid item xs={2}>
-                                                    <Typography>No of Assistant : {headerValues.noOfAssistants}</Typography>
+                                                <Grid item xs={3}>
+                                                    <Typography style={{ fontSize: '16px', fontWeight: 'bold' }}>
+                                                        No of Assistant : {headerValues.noOfAssistants}
+                                                    </Typography>
                                                 </Grid>
                                             </Grid>
                                             <Formik
@@ -1022,10 +1038,10 @@ function BaggaeTransportRateDetails({ open, handleClose, mode, childToParent, pa
                                                                                                             ? values
                                                                                                                   .baggageTransportRateDetails[
                                                                                                                   idx
-                                                                                                              ].rateType
+                                                                                                              ].maxKm
                                                                                                             : null
                                                                                                     }
-                                                                                                    name={`baggageTransportRateDetails.${idx}.rateType`}
+                                                                                                    name={`baggageTransportRateDetails.${idx}.maxKm`}
                                                                                                     disabled
                                                                                                     onChange={handleChange}
                                                                                                     onBlur={handleBlur}

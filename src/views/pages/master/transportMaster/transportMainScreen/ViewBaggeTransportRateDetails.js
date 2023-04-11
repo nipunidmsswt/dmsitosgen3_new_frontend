@@ -41,22 +41,58 @@ function ViewBaggeTransportRateDetails({ paxVehicleRate }) {
             filterPlaceholder: 'filter'
         },
         {
-            title: 'Vehicle Type',
-            field: 'vehicleType.typeCode',
+            title: 'Max KM',
+            field: 'maxKm',
             align: 'left',
             grouping: false,
             filterPlaceholder: 'filter'
         },
-        {
-            title: 'Rate Type',
-            field: 'rateType',
-            align: 'left',
-            grouping: false,
-            filterPlaceholder: 'filter'
-        },
+
         {
             title: 'TaxCode',
             field: 'taxCode.code',
+            align: 'left',
+            grouping: false,
+            filterPlaceholder: 'filter'
+        },
+        {
+            title: 'Vehicle Rate',
+            field: 'vehicleRate',
+            align: 'left',
+            grouping: false,
+            filterPlaceholder: 'filter'
+        },
+        {
+            title: 'Vehicle Rate with Tax',
+            field: 'vehicleRateWithTax',
+            align: 'left',
+            grouping: false,
+            filterPlaceholder: 'filter'
+        },
+        {
+            title: 'Driver Rate',
+            field: 'driverRate',
+            align: 'left',
+            grouping: false,
+            filterPlaceholder: 'filter'
+        },
+        {
+            title: 'Driver Rate with Tax',
+            field: 'driverRateWithTax',
+            align: 'left',
+            grouping: false,
+            filterPlaceholder: 'filter'
+        },
+        {
+            title: 'Assistant Rate',
+            field: 'assistantRate',
+            align: 'left',
+            grouping: false,
+            filterPlaceholder: 'filter'
+        },
+        {
+            title: 'Assistant Rate with Tax',
+            field: 'assistantWithTax',
             align: 'left',
             grouping: false,
             filterPlaceholder: 'filter'
