@@ -23,7 +23,7 @@ function ViewPaxVehicleRateDetails({ paxVehicleRate }) {
     const columns = [
         // {
         //     title: 'From Date',
-        //     field: 'fromDate',
+        //     field: 'fromDate.$d',
         //     filterPlaceholder: 'filter',
         //     align: 'left'
         // },
@@ -57,6 +57,48 @@ function ViewPaxVehicleRateDetails({ paxVehicleRate }) {
         {
             title: 'TaxCode',
             field: 'taxCode.code',
+            align: 'left',
+            grouping: false,
+            filterPlaceholder: 'filter'
+        },
+        {
+            title: 'Vehicle Rate',
+            field: 'vehicleRate',
+            align: 'left',
+            grouping: false,
+            filterPlaceholder: 'filter'
+        },
+        {
+            title: 'Vehicle Rate with Tax',
+            field: 'vehicleRateWithTax',
+            align: 'left',
+            grouping: false,
+            filterPlaceholder: 'filter'
+        },
+        {
+            title: 'Driver Rate',
+            field: 'driverRate',
+            align: 'left',
+            grouping: false,
+            filterPlaceholder: 'filter'
+        },
+        {
+            title: 'Driver Rate with Tax',
+            field: 'driverRateWithTax',
+            align: 'left',
+            grouping: false,
+            filterPlaceholder: 'filter'
+        },
+        {
+            title: 'Assistant Rate',
+            field: 'assistantRate',
+            align: 'left',
+            grouping: false,
+            filterPlaceholder: 'filter'
+        },
+        {
+            title: 'Asisstant R.w.Tax',
+            field: 'assistantWithTax',
             align: 'left',
             grouping: false,
             filterPlaceholder: 'filter'
@@ -184,7 +226,6 @@ function ViewPaxVehicleRateDetails({ paxVehicleRate }) {
                 exportFileName: 'TableData',
                 actionsColumnIndex: -1,
                 columnsButton: true,
-
                 headerStyle: {
                     whiteSpace: 'nowrap',
                     height: 20,

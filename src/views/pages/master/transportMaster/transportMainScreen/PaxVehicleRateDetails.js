@@ -370,7 +370,15 @@ function PaxVehicleRateDetails({ open, handleClose, mode, childToParent, paxVehi
                                                     border: '3px solid #6082B6',
                                                     marginTop: '2px',
                                                     marginBottom: '22px',
-                                                    fontWeight: 'bold'
+                                                    fontWeight: 'bold',
+                                                    justifyContent: 'center',
+                                                    alignItems: 'center',
+                                                    backgroundColor: '#A7C7E7',
+                                                    paddingBottom: '10px',
+                                                    paddingLeft: '10px',
+                                                    marginLeft: '10px',
+                                                    width: '1570px',
+                                                    borderRadius: '5px'
                                                 }}
                                             >
                                                 <Grid

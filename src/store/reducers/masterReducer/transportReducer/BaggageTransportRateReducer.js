@@ -16,7 +16,7 @@ import {
 const initialState = {
     bagggeTransportRate: null,
     bagggeTransportRates: [],
-    updatedPaxVehicleRate: null,
+    updatedBagggeTransportRate: null,
     bagggeTransportRateToUpdate: null,
     errorMsg: null,
     duplicatePaxVehicleRate: null,
@@ -38,7 +38,7 @@ export const bagggeTransportRateReducer = (state = initialState, action) => {
             };
 
         case SUCCESS_GET_BAGGAGE_TRANSPORT_RATE_BY_ID:
-            return { ...state, bagggeTransportRateToUpdate: data.payload[0] };
+            return { ...state, bagggeTransportRateToUpdate: data.payload === null ? null : data.payload[0] };
 
         case FAILED_GET_BAGGAGE_TRANSPORT_RATE_BY_ID:
             return {
@@ -48,12 +48,12 @@ export const bagggeTransportRateReducer = (state = initialState, action) => {
             };
 
         case UPDATE_SUCCESS_BAGGAGE_TRANSPORT_RATE:
-            return { ...state, updatedPaxVehicleRate: data.payload[0] };
+            return { ...state, updatedBagggeTransportRate: data.payload[0] };
 
         case UPDATE_FAILED_BAGGAGE_TRANSPORT_RATE:
             return {
                 ...state,
-                updatedPaxVehicleRate: null,
+                updatedBagggeTransportRate: null,
                 errorMsg: data ? data.errorMessages : 'netwok error'
             };
 

@@ -4,6 +4,7 @@ import React from 'react';
 import { gridSpacing } from 'store/constant';
 import MainCard from 'ui-component/cards/MainCard';
 import { makeStyles } from '@material-ui/core/styles';
+import ProgramHeader from './ProgramHeader';
 
 const useStyles = makeStyles({
     content: {
@@ -39,7 +40,9 @@ const ViewMainScreen = () => {
                                             Programm Header Creation
                                         </Typography>
                                     </AccordionSummary>
-                                    <AccordionDetails></AccordionDetails>
+                                    <AccordionDetails>
+                                        <ProgramHeader></ProgramHeader>
+                                    </AccordionDetails>
                                 </Accordion>
 
                                 <Accordion square>

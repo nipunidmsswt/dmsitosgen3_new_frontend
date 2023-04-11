@@ -38,7 +38,7 @@ export const paxVehicleRateReducer = (state = initialState, action) => {
             };
 
         case SUCCESS_GET_PAX_VEHICLE_RATE_BY_ID:
-            return { ...state, paxVehicleRateToUpdate: data.payload[0] };
+            return { ...state, paxVehicleRateToUpdate: data.payload === null ? null : data.payload[0] };
 
         case FAILED_GET_PAX_VEHICLE_RATE_BY_ID:
             return {
