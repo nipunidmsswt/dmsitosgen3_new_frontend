@@ -129,6 +129,7 @@ function TransportMainScreen() {
         if (mainTransportDetail != null) {
             setHandleToast(true);
             dispatch(getAllActiveTransportMainCategoryDataByType('Transport Type'));
+
             // dispatch(getAllCodeAndNameDetails());
             // dispatch(getLatestModifiedDetails());
         } else {
@@ -139,6 +140,7 @@ function TransportMainScreen() {
         if (distance != null) {
             setHandleToast(true);
             dispatch(getAllActiveTransportMainCategoryDataByType('Transport Type'));
+            window.location.reload(false);
         } else {
         }
     }, [distance]);

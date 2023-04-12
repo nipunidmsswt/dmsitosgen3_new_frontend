@@ -85,6 +85,17 @@ const ProgramHeader = () => {
         dispatch(getAllActiveMarketData());
     }, []);
 
+    function getDuration(endDate, startDate) {
+        console.log(endDate);
+        console.log(startDate);
+        const x = new Date(endDate).toISOString().split('T')[0];
+        const y = new Date(startDate).toISOString().split('T')[0];
+        console.log(x);
+        console.log(y);
+
+        // console.log(x.getTime());
+    }
+
     return (
         <div>
             <Formik
@@ -391,6 +402,7 @@ const ProgramHeader = () => {
                                     <DatePicker
                                         onChange={(value) => {
                                             setFieldValue(`endDate`, value);
+                                            getDuration(value, values.startDate);
                                         }}
                                         inputFormat="DD/MM/YYYY"
                                         value={values.endDate}

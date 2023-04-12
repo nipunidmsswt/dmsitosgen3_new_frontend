@@ -64,6 +64,8 @@ import ExpenseatLocation from './ExpenseatLocation';
 import BaggaeTransportRateDetails from './BaggaeTransportRateDetails';
 import ViewBaggeTransportRateDetails from './ViewBaggeTransportRateDetails';
 import ArticleIcon from '@mui/icons-material/Article';
+import ErrorAlert from 'messages/ErrorAlert';
+
 const useStyles = makeStyles({
     table: {
         minWidth: 650
@@ -184,6 +186,7 @@ function BaggageTransportRate({ mode, selectedType, setMode }) {
     const [activeTaxGroupandTaxesList, setActiveTaxGroupandTaxesListData] = useState([]);
     const [openPaxDetailDialog, setOpenPaxDetailDialog] = useState(false);
     const [paxDetailHeader, setpaxDetailHeader] = useState({});
+    const [openErrorAlert, setOpenErrorAlert] = useState(false);
 
     const dispatch = useDispatch();
 
@@ -209,6 +212,10 @@ function BaggageTransportRate({ mode, selectedType, setMode }) {
             dispatch(getBaggageTransportRateDataById(selectedType.categoryId));
         }
     }, [selectedType]);
+
+    const handleErrorAlertClose = (status) => {
+        setOpenErrorAlert(false);
+    };
 
     useEffect(() => {
         if (activeTaxGroupandTaxesListData.length != 0) {
@@ -427,11 +434,14 @@ function BaggageTransportRate({ mode, selectedType, setMode }) {
 
     const handleFinalSubmit = async (values) => {
         console.log(values);
-
-        if (mode === 'INSERT') {
-            dispatch(saveBaggageTransportRateData(values.ratesDetails));
+        if (selectedType == '') {
+            setOpenErrorAlert(true);
         } else {
-            dispatch(updateBaggageTransportRateData(values.ratesDetails));
+            if (mode === 'INSERT') {
+                dispatch(saveBaggageTransportRateData(values.ratesDetails));
+            } else {
+                dispatch(updateBaggageTransportRateData(values.ratesDetails));
+            }
         }
     };
 
@@ -1116,6 +1126,11 @@ function BaggageTransportRate({ mode, selectedType, setMode }) {
                                 paxVehicleRateHeader={paxDetailHeader}
                             />
                         ) : null}
+                        {openErrorAlert ? (
+                            <ErrorAlert open={openErrorAlert} msg={'Please select Transport Type'} handleClose={handleErrorAlertClose} />
+                        ) : (
+                            ''
+                        )}
                     </Grid>
                 </div>
             </MainCard>
