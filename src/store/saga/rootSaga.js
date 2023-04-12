@@ -41,7 +41,8 @@ import {
     getTourCategoryByIdSaga,
     updateTourCategorySaga,
     checkDupicateTourCategotyCodeSaga,
-    checkLeatestModifiedDateSaga
+    checkLeatestModifiedDateSaga,
+    getActiveTourCategoriesSaga
 } from './mastersaga/TourCategorySaga';
 
 import {
@@ -50,7 +51,8 @@ import {
     GET_TOUR_CATEGORY_DATA_BY_ID,
     SAVE_TOUR_CATEGORY_DATA,
     UPDATE_TOUR_CATEGORY_DATA,
-    GET_LAST_MODIFIED_DATE_TIME
+    GET_LAST_MODIFIED_DATE_TIME,
+    GET_ACTIVE_TOUR_CATEGORY_DATA
 } from 'store/constant/master/TourCategoryMasterConstant';
 
 import { getAllCurrenciesSaga } from '../saga/ApiServiceSaga/ApiServiceSaga';
@@ -231,7 +233,8 @@ import {
     GET_TOURTYPE_DATA_BY_ID,
     GET_TOURTYPE_LAST_MODIFIED_DATE_TIME,
     SAVE_TOURTYPE_DATA,
-    UPDATE_TOURTYPE_DATA
+    UPDATE_TOURTYPE_DATA,
+    GET_ACTIVE_TOURTYPE_DATA
 } from 'store/constant/master/TourTypeConstant';
 import {
     checkDupicateTourTypeCodeSaga,
@@ -239,7 +242,8 @@ import {
     getAllTourTypeSaga,
     getTourTypeByIdSaga,
     saveTourType,
-    updateTourTypeSaga
+    updateTourTypeSaga,
+    getActiveTourTypes
 } from './mastersaga/TourTypeSaga';
 import { checkDuplicateTourTypeCode } from 'store/actions/masterActions/TourTypeAction';
 
@@ -747,6 +751,7 @@ export function* wacherSaga() {
     yield takeLatest(UPDATE_TOUR_CATEGORY_DATA, updateTourCategorySaga);
     yield takeLatest(CHECK_TOUR_CATEGORY_CODE_DUPLICATE, checkDupicateTourCategotyCodeSaga);
     yield takeLatest(GET_LAST_MODIFIED_DATE_TIME, checkLeatestModifiedDateSaga);
+    yield takeLatest(GET_ACTIVE_TOUR_CATEGORY_DATA, getActiveTourCategoriesSaga);
 
     // //currency
     yield takeLatest(GET_ALL_CURRENCIES, getAllCurrenciesSaga);
@@ -849,6 +854,7 @@ export function* wacherSaga() {
     yield takeLatest(UPDATE_TOURTYPE_DATA, updateTourTypeSaga);
     yield takeLatest(GET_TOURTYPE_LAST_MODIFIED_DATE_TIME, checkTourTypeLatestModifiedDateSaga);
     yield takeLatest(CHECK_TOURTYPE_CODE_DUPLICATE, checkDupicateTourTypeCodeSaga);
+    yield takeLatest(GET_ACTIVE_TOURTYPE_DATA, getActiveTourTypes);
 
     // // Market Group
     yield takeLatest(GET_ALL_ACTIVE_OPERATOR_GROUP_DATA, getAllActiveOperatorGroupDataSaga);
