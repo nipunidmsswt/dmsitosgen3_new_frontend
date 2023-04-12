@@ -145,6 +145,15 @@ function TransportMainScreen() {
 
     useEffect(() => {
         if (paxVehicleRate != null) {
+            // async function makeRequest() {
+            //     setHandleToast(true);
+            //     dispatch(getAllActiveTransportMainCategoryDataByType('Transport Type'));
+            //     // await delay(10);
+            //     // console.log('after');
+            //     window.location.reload(false);
+            // }
+
+            // makeRequest();
             setHandleToast(true);
             dispatch(getAllActiveTransportMainCategoryDataByType('Transport Type'));
             window.location.reload(false);

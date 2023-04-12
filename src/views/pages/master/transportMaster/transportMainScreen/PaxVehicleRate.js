@@ -118,6 +118,7 @@ function PaxVehicleRate({ mode, selectedType, setMode }) {
         noOfDrivers: 1,
         noOfAssistants: 0,
         guideClass: null,
+        description: '',
         status: true,
         fromDate: '',
         toDate: '',
@@ -138,6 +139,7 @@ function PaxVehicleRate({ mode, selectedType, setMode }) {
                 minCount: '',
                 maxCount: '',
                 vehicleCategory: null,
+                description: '',
                 noOfDrivers: '',
                 noOfAssistants: '',
                 guideClass: null,
@@ -301,6 +303,7 @@ function PaxVehicleRate({ mode, selectedType, setMode }) {
             data.ratesDetails = paxVehicleRateToUpdate;
             setnewobj(data);
         } else {
+            setnewobj(newobj);
             setMode('INSERT');
         }
     }, [paxVehicleRateToUpdate]);
@@ -1125,13 +1128,14 @@ function PaxVehicleRate({ mode, selectedType, setMode }) {
                                                                                             }
                                                                                         }}
                                                                                         //   type="number"
-
+                                                                                        onChange={handleChange}
                                                                                         name={`ratesDetails.${idx}.description`}
                                                                                         value={
                                                                                             values.ratesDetails[idx] &&
                                                                                             values.ratesDetails[idx].vehicleCategory
                                                                                                 ?.description
                                                                                         }
+                                                                                        onBlur={handleBlur}
                                                                                         disabled
                                                                                     />
                                                                                 </TableCell>

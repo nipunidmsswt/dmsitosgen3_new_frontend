@@ -270,6 +270,7 @@ function BaggageTransportRate({ mode, selectedType, setMode }) {
             data.ratesDetails = bagggeTransportRateToUpdate;
             setnewobj(data);
         } else {
+            setnewobj(newobj);
             setMode('INSERT');
         }
     }, [bagggeTransportRateToUpdate]);
