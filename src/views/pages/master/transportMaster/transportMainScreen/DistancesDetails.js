@@ -2,7 +2,6 @@ import React from 'react';
 //main screen
 import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { gridSpacing } from 'store/constant';
 import AddBoxIcon from '@mui/icons-material/AddBox';
 import {
     Autocomplete,
@@ -24,6 +23,7 @@ import {
     TablePagination
 } from '@mui/material';
 import SuccessMsg from 'messages/SuccessMsg';
+import ErrorAlert from 'messages/ErrorAlert';
 import ErrorMsg from 'messages/ErrorMsg';
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
@@ -61,6 +61,7 @@ function DistancesDetails({ mode, selectedType }) {
     const pages = [5, 10, 25];
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(pages[page]);
+    const [openErrorAlert, setOpenErrorAlert] = useState(false);
     const activeLocations = useSelector((state) => state.locationReducer.activeLocations);
     const distanceByTransportType = useSelector((state) => state.distanceReducer.distanceByTransportType);
 
@@ -146,6 +147,11 @@ function DistancesDetails({ mode, selectedType }) {
             dispatch(getCodeAndNameDataByType(categoryType));
         }
     };
+
+    const handleErrorAlertClose = (status) => {
+        setOpenErrorAlert(false);
+    };
+
     const handleExistModalClose = (status) => {
         if (status) {
             setExistOpenModal(false);
@@ -170,11 +176,11 @@ function DistancesDetails({ mode, selectedType }) {
             // };
             // setLoadValues(values);
         } else {
-            // const values = {
-            //     distanceDetails: [
-            //         { fromLocation: '', fromDescription: '', toLocation: '', toDescription: '', distance: '', hours: '', status: true }
-            //     ]
-            // };
+            const values = {
+                distanceDetails: [
+                    { fromLocation: '', fromDescription: '', toLocation: '', toDescription: '', distance: '', hours: '', status: true }
+                ]
+            };
             // const initialValuesNew = {
             //     distanceDetails: [
             //         {
@@ -193,7 +199,7 @@ function DistancesDetails({ mode, selectedType }) {
             //         }
             //     ]
             // };
-            // setLoadValues(values);
+            setLoadValues(values);
         }
     }, [distanceByTransportType]);
 
@@ -235,33 +241,11 @@ function DistancesDetails({ mode, selectedType }) {
 
     const handleSubmitForm = async (data) => {
         console.log(data);
-        if (mode === 'INSERT') {
+        if (mode === 'INSERT' || mode === 'VIEW_UPDATE') {
             console.log(selectedType);
             if (selectedType == '') {
-                Swal.fire({
-                    title: 'Are you sure?',
-                    text: "You won't be able to revert this!",
-                    icon: 'warning',
-                    // showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes, approve it!'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        const confirmRequest = () => {
-                            return axios
-                                .post('http://localhost:8090/api/auth/v1/fuel-request-by-fuel-station/approveRequest/' + `${data.id}`, {})
-                                .then((response) => {
-                                    Swal.fire('Approved!', 'Your file has been approved.', 'success'); // if (response.data.accessToken) {
-                                    //     localStorage.setItem('user', JSON.stringify(response.data));
-                                    // }
-                                    dispatch(getAllFuelRequestDataSendByFillingStation());
-                                    return response.data;
-                                });
-                        };
-                        confirmRequest();
-                    }
-                });
+                console.log('selectedType');
+                setOpenErrorAlert(true);
             } else {
                 const distanceDetailsArray = data.distanceDetails;
 
@@ -483,7 +467,6 @@ function DistancesDetails({ mode, selectedType }) {
                                                                 height: 40
                                                             }
                                                         }}
-                                                        disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
                                                         type="text"
                                                         variant="outlined"
                                                         name="distance"
@@ -506,7 +489,6 @@ function DistancesDetails({ mode, selectedType }) {
                                                                 height: 40
                                                             }
                                                         }}
-                                                        disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
                                                         type="text"
                                                         variant="outlined"
                                                         name="hours"
@@ -536,7 +518,7 @@ function DistancesDetails({ mode, selectedType }) {
                                                 </Grid>
                                                 <Grid item>
                                                     <IconButton aria-label="delete" type="submit">
-                                                        {mode === 'INSERT' ? <AddBoxIcon /> : null}
+                                                        <AddBoxIcon />
                                                     </IconButton>
                                                 </Grid>
                                             </Grid>
@@ -568,12 +550,12 @@ function DistancesDetails({ mode, selectedType }) {
                                                     <Table stickyHeader size="small">
                                                         <TableHead alignItems="center">
                                                             <TableRow>
-                                                                <TableCell>Transport Type</TableCell>
+                                                                {/* <TableCell>Transport Type</TableCell> */}
                                                                 <TableCell>From Location</TableCell>
                                                                 <TableCell>Description </TableCell>
                                                                 <TableCell>To Location</TableCell>
                                                                 <TableCell>Description</TableCell>
-                                                                <TableCell>Distance</TableCell>
+                                                                <TableCell>Distance (Km)</TableCell>
                                                                 <TableCell>Duration (h)</TableCell>
                                                                 <TableCell>Status</TableCell>
                                                                 <TableCell>Actions</TableCell>
@@ -591,7 +573,7 @@ function DistancesDetails({ mode, selectedType }) {
                                                                 // {values.distanceDetails.map((record, idx) => {
                                                                 return (
                                                                     <TableRow key={idx} hover>
-                                                                        <TableCell>
+                                                                        {/* <TableCell>
                                                                             <TextField
                                                                                 sx={{
                                                                                     width: { xs: 120 },
@@ -609,7 +591,7 @@ function DistancesDetails({ mode, selectedType }) {
                                                                                 onChange={handleChange}
                                                                                 onBlur={handleBlur}
                                                                             />
-                                                                        </TableCell>
+                                                                        </TableCell> */}
                                                                         {/* <TableCell>{idx + 1}</TableCell> */}
 
                                                                         <TableCell>
@@ -950,6 +932,11 @@ function DistancesDetails({ mode, selectedType }) {
                             );
                         }}
                     </Formik>
+                    {openErrorAlert ? (
+                        <ErrorAlert open={openErrorAlert} msg={'Please select Transport Type'} handleClose={handleErrorAlertClose} />
+                    ) : (
+                        ''
+                    )}
                 </Grid>
             </Grid>
         </div>

@@ -64,6 +64,7 @@ import ExpenseatLocation from './ExpenseatLocation';
 import PaxVehicleRateDetails from './PaxVehicleRateDetails';
 import ViewPaxVehicleRateDetails from './ViewPaxVehicleRateDetails';
 import ArticleIcon from '@mui/icons-material/Article';
+import ErrorAlert from 'messages/ErrorAlert';
 
 const useStyles = makeStyles({
     table: {
@@ -203,6 +204,7 @@ function PaxVehicleRate({ mode, selectedType, setMode }) {
     const [activeTaxGroupandTaxesList, setActiveTaxGroupandTaxesListData] = useState([]);
     const [openPaxDetailDialog, setOpenPaxDetailDialog] = useState(false);
     const [paxDetailHeader, setpaxDetailHeader] = useState({});
+    const [openErrorAlert, setOpenErrorAlert] = useState(false);
 
     const dispatch = useDispatch();
 
@@ -219,6 +221,10 @@ function PaxVehicleRate({ mode, selectedType, setMode }) {
     const [flag, setFlag] = useState(true);
 
     const navigate = useNavigate();
+
+    const handleErrorAlertClose = (status) => {
+        setOpenErrorAlert(false);
+    };
 
     useEffect(() => {
         console.log(selectedType.categoryId);
@@ -558,24 +564,15 @@ function PaxVehicleRate({ mode, selectedType, setMode }) {
     };
 
     const handleFinalSubmit = async (values) => {
-        console.log(values.ratesDetails);
-        let result = false;
-        // for (let i in values.ratesDetails) {
-        //     console.log(values.ratesDetails[+i + 1]);
-        //     if (values.ratesDetails[+i + 1] !== undefined) {
-        //         console.log(typeof +values.ratesDetails[i].maxCount + 1);
-        //         console.log(typeof +values.ratesDetails[+i + 1].minCount);
-
-        //         if (+values.ratesDetails[i].maxCount + 1 !== +values.ratesDetails[+i + 1].minCount) {
-        //             result == true;
-        //         }
-        //     }
-        // }
-        console.log(result);
-        if (mode === 'INSERT') {
-            dispatch(savePaxVehicleRateData(values.ratesDetails));
+        if (selectedType == '') {
+            console.log('selectedType');
+            setOpenErrorAlert(true);
         } else {
-            dispatch(updatePaxVehicleRateData(values.ratesDetails));
+            if (mode === 'INSERT') {
+                dispatch(savePaxVehicleRateData(values.ratesDetails));
+            } else {
+                dispatch(updatePaxVehicleRateData(values.ratesDetails));
+            }
         }
     };
 
@@ -1512,6 +1509,11 @@ function PaxVehicleRate({ mode, selectedType, setMode }) {
                                 paxVehicleRateHeader={paxDetailHeader}
                             />
                         ) : null}
+                        {openErrorAlert ? (
+                            <ErrorAlert open={openErrorAlert} msg={'Please select Transport Type'} handleClose={handleErrorAlertClose} />
+                        ) : (
+                            ''
+                        )}
                     </Grid>
                 </div>
             </MainCard>
