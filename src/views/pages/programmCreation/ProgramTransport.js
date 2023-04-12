@@ -35,11 +35,11 @@ function ProgramTransport({ open, handleClose, mode }) {
         chargeMethod: '',
         vehicleType: '',
         vehicleCategory: '',
-        location1: '',
-        location2: '',
-        location3: '',
-        location4: '',
-        location5: '',
+        location1: null,
+        location2: null,
+        location3: null,
+        location4: null,
+        location5: null,
         kms: 0,
         hours: 0
     };
@@ -490,7 +490,7 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                 }}
                                                 onClick={(e) => resetForm()}
                                             >
-                                                CANCEL
+                                                CLEAR
                                             </Button>
                                         </Box>
                                     </Form>
