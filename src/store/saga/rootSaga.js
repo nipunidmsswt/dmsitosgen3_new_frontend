@@ -63,7 +63,8 @@ import {
     UPDATE_EXCHNAGE_RATE_TYPE_DATA,
     GET_ALL_EXCHNAGE_RATE_TYPE_DATA,
     GET_EXCHNAGE_RATE_TYPE_BY_ID,
-    GET_LAST_MODIFIED_DATE_TIME_EXCHNAGE_RATE_TYPE
+    GET_LAST_MODIFIED_DATE_TIME_EXCHNAGE_RATE_TYPE,
+    GET_EXCHNAGE_RATE_TYPE_DATA_BY_CURRENCY_ID
 } from 'store/constant/master/ExchangeRateConstant';
 
 import {
@@ -71,7 +72,8 @@ import {
     updateExchangeRateTypeSaga,
     getAllExchnageRateTypeDataSaga,
     getExchangeRateTypeByIdSaga,
-    checkLatestCurrencyModifiedDateSaga
+    checkLatestCurrencyModifiedDateSaga,
+    getExChangeRateDataByCurrencyId
 } from './mastersaga/ExchangeRateTypeSaga';
 
 import {
@@ -762,6 +764,7 @@ export function* wacherSaga() {
     yield takeLatest(GET_ALL_EXCHNAGE_RATE_TYPE_DATA, getAllExchnageRateTypeDataSaga);
     yield takeLatest(UPDATE_EXCHNAGE_RATE_TYPE_DATA, updateExchangeRateTypeSaga);
     yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_EXCHNAGE_RATE_TYPE, checkLatestCurrencyModifiedDateSaga);
+    yield takeLatest(GET_EXCHNAGE_RATE_TYPE_DATA_BY_CURRENCY_ID, getExChangeRateDataByCurrencyId);
 
     // //product  setup
 

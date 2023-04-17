@@ -13,7 +13,7 @@ import {
     FormGroup,
     Checkbox,
     Button,
-    Typography,
+    Autocomplete,
     MenuItem,
     Table,
     TableBody,
@@ -39,7 +39,7 @@ import {
     getExChangeRateDataById
 } from 'store/actions/masterActions/exchangeRateActions/ExchangeRateActions';
 import { currencies } from './Currency';
-
+import { getAllCurrencyListData } from 'store/actions/masterActions/ExpenseTypeAction';
 const Transition = forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
@@ -47,8 +47,8 @@ const Transition = forwardRef(function Transition(props, ref) {
 function ExchangeRateTypes({ open, handleClose, mode, code }) {
     const initialValues = {
         exchangeType: '',
-        baseCurrencyCode: '',
-        currencyISOCode: '',
+        baseCurrencyCode: null,
+        currencyISOCode: null,
         description: '',
         status: true,
         exchangeRates: [
@@ -63,8 +63,12 @@ function ExchangeRateTypes({ open, handleClose, mode, code }) {
 
     const [loadValues, setLoadValues] = useState(null);
     const [currencyListArray, setCurrecyListArray] = useState([]);
+    const [currencyListOptions, setCurrencyListOptions] = useState([]);
 
     const ref = useRef(null);
+    useEffect(() => {
+        dispatch(getAllCurrencyListData());
+    }, []);
 
     // yup.addMethod(yup.array, "uniqueTaxOrder", function (message) {
     //   return this.test("uniqueTaxOrder", message, function (list) {
@@ -128,8 +132,8 @@ function ExchangeRateTypes({ open, handleClose, mode, code }) {
 
     const validationSchema = yup.object().shape({
         exchangeType: yup.string().required('Required field'),
-        baseCurrencyCode: yup.string().required('Required field'),
-        currencyISOCode: yup.string().required('Required field'),
+        baseCurrencyCode: yup.object().required('Required field'),
+        currencyISOCode: yup.object().required('Required field'),
         description: yup.string().required('Required field'),
         // baseCurrencyCode: yup
         //   .string()
@@ -163,7 +167,14 @@ function ExchangeRateTypes({ open, handleClose, mode, code }) {
     });
 
     const exchnageRateTypeToUpdate = useSelector((state) => state.exchangeRateTypesReducer.exchnageRateTypeToUpdate);
+    const currencyListData = useSelector((state) => state.expenseTypesReducer.currencyList);
     console.log(exchnageRateTypeToUpdate);
+
+    useEffect(() => {
+        if (currencyListData != null) {
+            setCurrencyListOptions(currencyListData);
+        }
+    }, [currencyListData]);
 
     const dispatch = useDispatch();
 
@@ -282,119 +293,101 @@ function ExchangeRateTypes({ open, handleClose, mode, code }) {
                                                                             </MenuItem>
                                                                         </TextField>
                                                                     </Grid>
+                                                                    <Grid item>
+                                                                        <Autocomplete
+                                                                            value={values.baseCurrencyCode}
+                                                                            name="baseCurrencyCode"
+                                                                            onChange={(_, value) => {
+                                                                                console.log(value);
+                                                                                setFieldValue(`baseCurrencyCode`, value);
+                                                                                if (value != null) {
+                                                                                    loadExchangeRates(value);
+                                                                                }
+                                                                            }}
+                                                                            options={currencyListOptions}
+                                                                            getOptionLabel={(option) => `${option.currencyCode}`}
+                                                                            isOptionEqualToValue={(option, value) =>
+                                                                                option.currencyListId === value.currencyListId
+                                                                            }
+                                                                            fullWidth
+                                                                            renderInput={(params) => (
+                                                                                <TextField
+                                                                                    {...params}
+                                                                                    // label="tax"
+                                                                                    sx={{
+                                                                                        width: { sm: 200, md: 250 },
+                                                                                        '& .MuiInputBase-root': {
+                                                                                            height: 40
+                                                                                        }
+                                                                                    }}
+                                                                                    disabled={mode == 'VIEW_UPDATE'}
+                                                                                    InputLabelProps={{
+                                                                                        shrink: true
+                                                                                    }}
+                                                                                    fullWidth
+                                                                                    variant="outlined"
+                                                                                    name="baseCurrencyCode"
+                                                                                    label="Base Currency Code"
+                                                                                    onBlur={handleBlur}
+                                                                                    error={Boolean(
+                                                                                        touched.baseCurrencyCode && errors.baseCurrencyCode
+                                                                                    )}
+                                                                                    helperText={
+                                                                                        touched.baseCurrencyCode && errors.baseCurrencyCode
+                                                                                            ? errors.baseCurrencyCode
+                                                                                            : ''
+                                                                                    }
+                                                                                />
+                                                                            )}
+                                                                        />
+                                                                    </Grid>
 
                                                                     <Grid item>
-                                                                        <TextField
-                                                                            sx={{
-                                                                                width: { sm: 200, md: 250 },
-                                                                                '& .MuiInputBase-root': {
-                                                                                    height: 40
-                                                                                }
-                                                                            }}
-                                                                            select
-                                                                            disabled={mode == 'VIEW_UPDATE'}
-                                                                            id="demo-simple-select"
-                                                                            name="baseCurrencyCode"
-                                                                            label="Base Currency Code"
-                                                                            InputLabelProps={{
-                                                                                shrink: true
-                                                                            }}
-                                                                            defaultValue="LKR-"
-                                                                            value={values.baseCurrencyCode}
-                                                                            onChange={handleChange}
-                                                                            menuprops={{
-                                                                                paperprops: { sx: { maxHeight: 120 } }
-                                                                            }}
-                                                                            error={Boolean(
-                                                                                touched.baseCurrencyCode && errors.baseCurrencyCode
-                                                                            )}
-                                                                            helperText={
-                                                                                touched.baseCurrencyCode && errors.baseCurrencyCode
-                                                                                    ? errors.baseCurrencyCode
-                                                                                    : ''
-                                                                            }
-                                                                        >
-                                                                            {currencyListArray.length != 0
-                                                                                ? currencyListArray.map((data, key) => {
-                                                                                      return (
-                                                                                          <MenuItem key={key} value={data.value}>
-                                                                                              {`${data.name}-${data.value}`}
-                                                                                          </MenuItem>
-                                                                                      );
-                                                                                  })
-                                                                                : null}
-
-                                                                            {/* <MenuItem value={20}>Twenty</MenuItem>
-                                      <MenuItem value={30}>Thirty</MenuItem> */}
-                                                                        </TextField>
-                                                                    </Grid>
-                                                                    <Grid>
-                                                                        {/* <TextField
-                                      sx={{
-                                        width: { sm: 200, md: 250 },
-                                        "& .MuiInputBase-root": {
-                                          height: 40,
-                                        },
-                                      }}
-                                      id="outlined-required"
-                                      label="Currency ISO Code"
-                                      name="currencyISOCode"
-                                      onChange={handleChange}
-                                      onBlur={handleBlur}
-                                      value={values.currencyISOCode}
-                                      error={Boolean(
-                                        touched.currencyISOCode &&
-                                          errors.currencyISOCode
-                                      )}
-                                      helperText={
-                                        touched.currencyISOCode &&
-                                        errors.currencyISOCode
-                                          ? errors.currencyISOCode
-                                          : ""
-                                      }
-                                    /> */}
-                                                                        <TextField
-                                                                            sx={{
-                                                                                width: { sm: 200, md: 250 },
-                                                                                '& .MuiInputBase-root': {
-                                                                                    height: 40
-                                                                                }
-                                                                            }}
-                                                                            select
-                                                                            InputLabelProps={{
-                                                                                shrink: true
-                                                                            }}
-                                                                            id="demo-simple-select"
-                                                                            name="currencyISOCode"
+                                                                        <Autocomplete
                                                                             value={values.currencyISOCode}
-                                                                            onChange={handleChange}
-                                                                            label="Currency ISO Code"
-                                                                            menuprops={{
-                                                                                PaperProps: { sx: { maxHeight: 120 } }
+                                                                            name="currencyISOCode"
+                                                                            onChange={(_, value) => {
+                                                                                console.log(value);
+                                                                                setFieldValue(`currencyISOCode`, value);
                                                                             }}
-                                                                            error={Boolean(
-                                                                                touched.currencyISOCode && errors.currencyISOCode
-                                                                            )}
-                                                                            helperText={
-                                                                                touched.currencyISOCode && errors.currencyISOCode
-                                                                                    ? errors.currencyISOCode
-                                                                                    : ''
+                                                                            options={currencyListOptions}
+                                                                            getOptionLabel={(option) => `${option.currencyCode}`}
+                                                                            isOptionEqualToValue={(option, value) =>
+                                                                                option.currencyListId === value.currencyListId
                                                                             }
-                                                                        >
-                                                                            {currencyListArray.length != 0
-                                                                                ? currencyListArray.map((data, key) => {
-                                                                                      return (
-                                                                                          <MenuItem key={key} value={data.value}>
-                                                                                              {`${data.name}-${data.value}`}
-                                                                                          </MenuItem>
-                                                                                      );
-                                                                                  })
-                                                                                : null}
-
-                                                                            {/* <MenuItem value={20}>Twenty</MenuItem>
-                                      <MenuItem value={30}>Thirty</MenuItem> */}
-                                                                        </TextField>
+                                                                            fullWidth
+                                                                            renderInput={(params) => (
+                                                                                <TextField
+                                                                                    {...params}
+                                                                                    // label="tax"
+                                                                                    sx={{
+                                                                                        width: { sm: 200, md: 250 },
+                                                                                        '& .MuiInputBase-root': {
+                                                                                            height: 40
+                                                                                        }
+                                                                                    }}
+                                                                                    disabled={mode == 'VIEW_UPDATE'}
+                                                                                    InputLabelProps={{
+                                                                                        shrink: true
+                                                                                    }}
+                                                                                    fullWidth
+                                                                                    variant="outlined"
+                                                                                    name="currencyISOCode"
+                                                                                    label="Currency ISO Code"
+                                                                                    onBlur={handleBlur}
+                                                                                    error={Boolean(
+                                                                                        touched.currencyISOCode && errors.currencyISOCode
+                                                                                    )}
+                                                                                    helperText={
+                                                                                        touched.currencyISOCode && errors.currencyISOCode
+                                                                                            ? errors.currencyISOCode
+                                                                                            : ''
+                                                                                    }
+                                                                                />
+                                                                            )}
+                                                                        />
                                                                     </Grid>
+
                                                                     <Grid>
                                                                         <TextField
                                                                             sx={{

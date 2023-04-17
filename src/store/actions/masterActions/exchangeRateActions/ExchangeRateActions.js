@@ -3,7 +3,8 @@ import {
     UPDATE_EXCHNAGE_RATE_TYPE_DATA,
     GET_ALL_EXCHNAGE_RATE_TYPE_DATA,
     GET_EXCHNAGE_RATE_TYPE_BY_ID,
-    GET_LAST_MODIFIED_DATE_TIME_EXCHNAGE_RATE_TYPE
+    GET_LAST_MODIFIED_DATE_TIME_EXCHNAGE_RATE_TYPE,
+    GET_EXCHNAGE_RATE_TYPE_DATA_BY_CURRENCY_ID
 } from '../../../constant/master/ExchangeRateConstant';
 
 export const saveExChangeRateData = (data) => {
@@ -40,5 +41,12 @@ export const getExChangeRateDataById = (id) => {
 export const getLatestModifiedDetails = () => {
     return {
         type: GET_LAST_MODIFIED_DATE_TIME_EXCHNAGE_RATE_TYPE
+    };
+};
+
+export const getExchangeRatesByCurrencyId = (id) => {
+    return {
+        type: GET_EXCHNAGE_RATE_TYPE_DATA_BY_CURRENCY_ID,
+        data: { id }
     };
 };
