@@ -24,6 +24,7 @@ import { Formik, Form } from 'formik';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import axios from 'axios';
 
 const Transition = forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -46,6 +47,9 @@ function ProgramTransport({ open, handleClose, mode }) {
 
     const [formValues, setFormValues] = useState(initialValues);
     const [loadValues, setLoadValues] = useState(null);
+    const [transportType, setTransportType] = useState([]);
+    const [vehicleType, setVehicleType] = useState([]);
+    const [vehicleCategory, setVehicleCategory] = useState([]);
     const dispatch = useDispatch();
 
     const validationSchema = yup.object().shape({
@@ -60,6 +64,42 @@ function ProgramTransport({ open, handleClose, mode }) {
         location4: yup.string().typeError('Required field'),
         location5: yup.string().typeError('Required field')
     });
+
+    useEffect(() => {
+        // Fetch the data from the API
+        fetch('http://localhost:8085/api/v1/activeMainCategories/Transport%20Type')
+            .then((response) => response.json())
+            .then((data) => {
+                // Extract the "description" property from each object and store it in state
+                const extractedDescriptions = data.payload.flatMap((category) => category.map((item) => item.description));
+                setTransportType(extractedDescriptions);
+            })
+            .catch((error) => console.error('Error fetching data:', error));
+    }, []);
+
+    useEffect(() => {
+        // Fetch the data from the API
+        fetch('http://localhost:8085/api/v1/activeMainCategories/Vehicle%20Type')
+            .then((response) => response.json())
+            .then((data) => {
+                // Extract the "description" property from each object and store it in state
+                const extractedDescriptions = data.payload.flatMap((category) => category.map((item) => item.description));
+                setVehicleType(extractedDescriptions);
+            })
+            .catch((error) => console.error('Error fetching data:', error));
+    }, []);
+
+    useEffect(() => {
+        // Fetch the data from the API
+        fetch('http://localhost:8085/api/v1/activeMainCategories/Vehicle%20Category')
+            .then((response) => response.json())
+            .then((data) => {
+                // Extract the "description" property from each object and store it in state
+                const extractedDescriptions = data.payload.flatMap((category) => category.map((item) => item.description));
+                setVehicleCategory(extractedDescriptions);
+            })
+            .catch((error) => console.error('Error fetching data:', error));
+    }, []);
 
     const handleSubmitForm = (data) => {
         handleClose();
@@ -158,12 +198,11 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                             touched.transportType && errors.transportType ? errors.transportType : ''
                                                         }
                                                     >
-                                                        <MenuItem dense={true} value={'Normal'}>
-                                                            Normal
-                                                        </MenuItem>
-                                                        <MenuItem dense={true} value={'Economy'}>
-                                                            Economy
-                                                        </MenuItem>
+                                                        {transportType.map((description) => (
+                                                            <>
+                                                                <MenuItem key={description}>{description}</MenuItem>
+                                                            </>
+                                                        ))}
                                                     </TextField>
                                                 </Grid>
                                                 <Grid item>
@@ -216,12 +255,11 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                         error={Boolean(touched.vehicleType && errors.vehicleType)}
                                                         helperText={touched.vehicleType && errors.vehicleType ? errors.vehicleType : ''}
                                                     >
-                                                        <MenuItem dense={true} value={'Standard'}>
-                                                            Standard
-                                                        </MenuItem>
-                                                        <MenuItem dense={true} value={'Premium'}>
-                                                            Premium
-                                                        </MenuItem>
+                                                        {vehicleType.map((description) => (
+                                                            <>
+                                                                <MenuItem key={description}>{description}</MenuItem>
+                                                            </>
+                                                        ))}
                                                     </TextField>
                                                 </Grid>
 
@@ -248,12 +286,11 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                             touched.vehicleCategory && errors.vehicleCategory ? errors.vehicleCategory : ''
                                                         }
                                                     >
-                                                        <MenuItem dense={true} value={'Car'}>
-                                                            Car
-                                                        </MenuItem>
-                                                        <MenuItem dense={true} value={'Bike'}>
-                                                            Bike
-                                                        </MenuItem>
+                                                        {vehicleCategory.map((description) => (
+                                                            <>
+                                                                <MenuItem key={description}>{description}</MenuItem>
+                                                            </>
+                                                        ))}
                                                     </TextField>
                                                 </Grid>
                                             </Grid>
