@@ -8,7 +8,9 @@ import {
     UPDATE_SUCCESS_EXCHNAGE_RATE_TYPE_DATA,
     UPDATE_FAILED_EXCHNAGE_RATE_TYPE_DATA,
     SUCCESS_LAST_MODIFIED_DATE_EXCHNAGE_RATE_TYPE,
-    FAILED_LAST_MODIFIED_DATE_EXCHNAGE_RATE_TYPE
+    FAILED_LAST_MODIFIED_DATE_EXCHNAGE_RATE_TYPE,
+    SUCCESS_EXCHNAGE_RATE_TYPE_DATA_BY_CURRENCY_ID,
+    FAILED_EXCHNAGE_RATE_TYPE_DATA_BY_CURRENCY_ID
 } from '../../constant/master/ExchangeRateConstant';
 
 const initialState = {
@@ -17,7 +19,8 @@ const initialState = {
     exchnageRateTypeToUpdate: null,
     errorMsg: null,
     duplicateExchangeRateTypeGroup: null,
-    lastModifiedDateTime: null
+    lastModifiedDateTime: null,
+    rateListByCurrencyID: []
 };
 
 export const exchangeRateTypesReducer = (state = initialState, action) => {
@@ -84,6 +87,12 @@ export const exchangeRateTypesReducer = (state = initialState, action) => {
 
         case FAILED_LAST_MODIFIED_DATE_EXCHNAGE_RATE_TYPE:
             return { ...state, lastModifiedDateTime: data };
+
+        case SUCCESS_EXCHNAGE_RATE_TYPE_DATA_BY_CURRENCY_ID:
+            return { ...state, rateListByCurrencyID: data.payload[0] };
+
+        case FAILED_EXCHNAGE_RATE_TYPE_DATA_BY_CURRENCY_ID:
+            return { ...state, rateListByCurrencyID: data };
 
         default:
             return state;

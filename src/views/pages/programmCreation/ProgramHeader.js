@@ -10,7 +10,11 @@ import { getActiveTourTypes } from 'store/actions/masterActions/TourTypeAction';
 import { getActiveTourCategoryData } from 'store/actions/masterActions/TourCategoryActions';
 import { getAllActiveMarketData } from 'store/actions/masterActions/operatorActions/MarketAction';
 import { activeSeasonsData } from 'store/actions/masterActions/SeasonAction';
-
+import { getExchangeRatesByCurrencyId } from 'store/actions/masterActions/exchangeRateActions/ExchangeRateActions';
+import MomentUtils from '@date-io/moment';
+import moment from 'moment';
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
+import 'moment/locale/de';
 const ProgramHeader = () => {
     const initialValues = {
         programmeNo: null,
@@ -24,11 +28,12 @@ const ProgramHeader = () => {
         operator: null,
         profitType: '',
         startDate: '',
-        endDate: ''
+        endDate: '',
+        tourDuration: ''
     };
     const dispatch = useDispatch();
 
-    const [activeLocationList, setActiveLocationList] = useState([]);
+    const [activeExchangeRatesByCurrencyId, setActiveExchangeRatesByCurrencyId] = useState([]);
     const [activeSeasonList, setactiveSeasonList] = useState([]);
     const [currencyListOptions, setCurrencyListOptions] = useState([]);
     const [activeTourTypeList, setActiveTourTypeList] = useState([]);
@@ -41,6 +46,7 @@ const ProgramHeader = () => {
     const activeTourTypeListData = useSelector((state) => state.tourTypeDataReducer.activeTourTypeList);
     const activeTourCategoriesListData = useSelector((state) => state.tourCategoryReducer.activeTourCategories);
     const marketListData = useSelector((state) => state.marketReducer.marketActiveList);
+    const rateListByCurrencyID = useSelector((state) => state.exchangeRateTypesReducer.rateListByCurrencyID);
 
     const handleSubmit = async (values) => {
         console.log(values);
@@ -51,6 +57,14 @@ const ProgramHeader = () => {
             setCurrencyListOptions(currencyListData);
         }
     }, [currencyListData]);
+
+    useEffect(() => {
+        console.log('lllllllllllllllllllllllllll');
+        console.log(rateListByCurrencyID);
+        if (rateListByCurrencyID.length != 0) {
+            setActiveExchangeRatesByCurrencyId(rateListByCurrencyID);
+        }
+    }, [rateListByCurrencyID]);
 
     useEffect(() => {
         if (activeSeasonData.length != 0) {
@@ -83,19 +97,23 @@ const ProgramHeader = () => {
         dispatch(getActiveTourTypes());
         dispatch(getActiveTourCategoryData());
         dispatch(getAllActiveMarketData());
+        // dispatch(getExchangeRatesByCurrencyId());
     }, []);
 
-    function getDuration(endDate, startDate) {
-        console.log(endDate);
-        console.log(startDate);
-        const x = new Date(endDate).toISOString().split('T')[0];
-        const y = new Date(startDate).toISOString().split('T')[0];
-        console.log(x);
-        console.log(y);
-
+    function getDuration(endDate, startDate, setFieldValue) {
+        console.log(moment(endDate).diff(startDate, 'days'));
+        if (moment(endDate).diff(startDate, 'days') < 0) {
+            setFieldValue('tourDuration', '');
+        } else {
+            setFieldValue('tourDuration', moment(endDate).diff(startDate, 'days'));
+        }
         // console.log(x.getTime());
     }
 
+    const loadExchangeRates = (values) => {
+        console.log(values);
+        dispatch(getExchangeRatesByCurrencyId(values.currencyListId));
+    };
     return (
         <div>
             <Formik
@@ -110,7 +128,7 @@ const ProgramHeader = () => {
                 {({ values, handleChange, setFieldValue, errors, handleBlur, touched, resetForm }) => {
                     return (
                         <Form>
-                            <Stack spacing={2} direction="row" sx={{ marginBottom: 4 }}>
+                            <Stack spacing={2} direction="row" sx={{ marginBottom: 4 }} display="none">
                                 <TextField
                                     type="text"
                                     variant="outlined"
@@ -363,12 +381,15 @@ const ProgramHeader = () => {
                                     )}
                                 />
                                 <LocalizationProvider
-                                    dateAdapter={AdapterDayjs}
+                                    dateAdapter={AdapterMoment}
                                     // adapterLocale={locale}
                                 >
                                     <DatePicker
                                         onChange={(value) => {
                                             setFieldValue(`startDate`, value);
+                                            if (values.endDate) {
+                                                getDuration(values.endDate, value, setFieldValue);
+                                            }
                                         }}
                                         fullWidth
                                         inputFormat="DD/MM/YYYY"
@@ -396,13 +417,15 @@ const ProgramHeader = () => {
                                     />
                                 </LocalizationProvider>
                                 <LocalizationProvider
-                                    dateAdapter={AdapterDayjs}
+                                    dateAdapter={AdapterMoment}
                                     // adapterLocale={locale}
                                 >
                                     <DatePicker
                                         onChange={(value) => {
                                             setFieldValue(`endDate`, value);
-                                            getDuration(value, values.startDate);
+                                            if (values.startDate) {
+                                                getDuration(value, values.startDate, setFieldValue);
+                                            }
                                         }}
                                         inputFormat="DD/MM/YYYY"
                                         value={values.endDate}
@@ -437,6 +460,9 @@ const ProgramHeader = () => {
                                     onChange={(_, value) => {
                                         console.log(value);
                                         setFieldValue(`currency`, value);
+                                        if (value != null) {
+                                            loadExchangeRates(value);
+                                        }
                                     }}
                                     options={currencyListOptions}
                                     getOptionLabel={(option) => `${option.currencyCode}`}
@@ -488,7 +514,7 @@ const ProgramHeader = () => {
                                             InputLabelProps={{
                                                 shrink: true
                                             }}
-                                            label="Currency"
+                                            label="Exchange Rate"
                                             variant="outlined"
                                             name="currency"
                                             onBlur={handleBlur}
@@ -508,14 +534,15 @@ const ProgramHeader = () => {
                                     InputLabelProps={{
                                         shrink: true
                                     }}
+                                    disabled
                                     color="secondary"
                                     label="Tour Duration"
                                     fullWidth
-                                    value={values.locationDes}
+                                    value={values.tourDuration}
                                     onChange={handleChange}
                                     onBlur={handleBlur}
-                                    error={Boolean(touched.locationDes && errors.locationDes)}
-                                    helperText={touched.tou && errors.locationDes ? errors.locationDes : ''}
+                                    error={Boolean(touched.tourDuration && errors.tourDuration)}
+                                    helperText={touched.tourDuration && errors.locationDes ? errors.tourDuration : ''}
                                 />
                             </Stack>
                         </Form>
