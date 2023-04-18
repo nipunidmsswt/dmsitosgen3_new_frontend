@@ -11,6 +11,7 @@ import { style } from '@mui/system';
 import SuccessMsg from 'messages/SuccessMsg';
 import ErrorMsg from 'messages/ErrorMsg';
 import ProgramTransport from './ProgramTransport';
+import ProgramActivity from './ProgramActivity';
 
 const useStyles = makeStyles((theme) => ({
     content: {
@@ -152,6 +153,7 @@ function ProgramCreationDetails() {
     };
 
     const handleClickOpen = (type, category, data) => {
+        console.log(category);
         if (type === 'VIEW_UPDATE') {
             setMode(type);
         } else if (type === 'INSERT') {
@@ -164,7 +166,7 @@ function ProgramCreationDetails() {
             setOpenTransport(true);
         } else if (category === 'Accomodation') {
             setOpenAccomodation(true);
-        } else if (category === 'Activities') {
+        } else if (category === 'Activites') {
             setOpenActivites(true);
         } else if (category === 'Supplements') {
             setOpenActivites(true);
@@ -319,6 +321,7 @@ function ProgramCreationDetails() {
                             </div>
                             <br />
                             {openTransport ? <ProgramTransport open={openTransport} handleClose={handleClose} mode={mode} /> : ''}
+                            {openActivites ? <ProgramActivity open={openActivites} handleClose={handleClose} mode={mode} /> : ''}
                             {openToast ? <SuccessMsg openToast={openToast} handleToast={handleToast} mode={mode} /> : null}
                             {openErrorToast ? <ErrorMsg openToast={openErrorToast} handleToast={setOpenErrorToast} mode={mode} /> : null}
                         </Grid>
