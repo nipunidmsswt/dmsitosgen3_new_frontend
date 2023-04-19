@@ -157,9 +157,11 @@ export function* getActiveVehicleTypeDataByTypeSaga(action) {
     try {
         responseData = yield call(getById, `${process.env.REACT_APP_TRANSPORT_URL}/activeMainCategories/${action.data.type}`);
         console.log(responseData);
+        console.log('getActiveVehicleTypeDataByTypeSagaSuccess');
         yield put({ type: SUCCESS_GET_ACTIVE_VEHICLE_TYPE_DATA_BY_TYPE, data: responseData.data });
     } catch (e) {
         console.log(responseData);
+        console.log('getActiveVehicleTypeDataByTypeSagaFail');
         yield put({ type: FAILED_GET_GET_ACTIVE_VEHICLE_TYPE_DATA_BY_TYPE, data: responseData });
     }
 }

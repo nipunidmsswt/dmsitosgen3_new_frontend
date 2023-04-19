@@ -892,7 +892,7 @@ export function* wacherSaga() {
     yield takeLatest(CHECK_SEASON_DUPLICATE, checkDupicateSeasonSaga);
     yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_SEASON, checkLatestSeasonModifiedDateSaga);
     yield takeLatest(ACTIVE_RATES_BY_SEASON_ID, getAllActiveRatesBySeasonSaga);
-    yield takeLatest(ACTIVE_SEASON_LIST_DATA, getAllActiveSeasonSaga);
+    // yield takeLatest(ACTIVE_SEASON_LIST_DATA, getAllActiveSeasonSaga);
 
     // //hotel facility data
     yield takeLatest(SAVE_HOTEL_FACILITY_DATA, saveHotelFacilitySaga);

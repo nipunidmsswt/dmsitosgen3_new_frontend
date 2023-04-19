@@ -1,6 +1,6 @@
-import { Accordion, AccordionDetails, AccordionSummary, ButtonGroup, Grid, Typography } from '@mui/material';
+import { Accordion, AccordionDetails, AccordionSummary, ButtonGroup, Grid, TextField, Typography } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { gridSpacing } from 'store/constant';
 import { Formik, Field, Form } from 'formik';
 import * as Yup from 'yup';
@@ -11,6 +11,13 @@ import { style } from '@mui/system';
 import SuccessMsg from 'messages/SuccessMsg';
 import ErrorMsg from 'messages/ErrorMsg';
 import ProgramTransport from './ProgramTransport';
+import {
+    getAllActiveTransportMainCategoryDataByType,
+    getAllActiveVehicleCategoryDataByType,
+    getAllActiveVehicleTypeDataByType
+} from 'store/actions/masterActions/transportActions/MainTransportCategoriesActions';
+import { getActiveLocations } from 'store/actions/masterActions/LocationAction';
+import { useDispatch } from 'react-redux';
 
 const useStyles = makeStyles((theme) => ({
     content: {
@@ -108,6 +115,14 @@ function ProgramCreationDetails() {
     const [openErrorToast, setOpenErrorToast] = useState(false);
     const [mode, setMode] = useState('INSERT');
     const classes = useStyles();
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        dispatch(getAllActiveTransportMainCategoryDataByType('Transport Type'));
+        dispatch(getAllActiveVehicleTypeDataByType('Vehicle Type'));
+        dispatch(getAllActiveVehicleCategoryDataByType('Vehicle Category'));
+        dispatch(getActiveLocations());
+    }, []);
 
     const handleKeyDown = (event) => {
         if (event.key === 'Backspace') {
@@ -364,7 +379,7 @@ function ProgramCreationDetails() {
                                 >
                                     Set
                                 </Button>
-                                <Button
+                                {/*<Button
                                     className={`btnSave ${classes.setButton}`}
                                     variant="contained"
                                     color="primary"
@@ -391,7 +406,7 @@ function ProgramCreationDetails() {
                                     style={{ width: '19%', right: '2%', marginTop: '40px' }}
                                 >
                                     Costing
-                                </Button>
+                                </Button> */}
                             </Grid>
                             <div className={classes.buttonArray}>{buttonArray}</div>
                             <Divider style={{ color: 'black', height: '2px' }} />

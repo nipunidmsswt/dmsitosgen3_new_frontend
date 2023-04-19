@@ -77,6 +77,7 @@ export const getAllActiveVehicleCategoryDataByType = (type) => {
 
 export const getAllActiveVehicleTypeDataByType = (type) => {
     console.log(type);
+    console.log('getAllActiveVehicleTypeDataByTypeSuccessful');
     return {
         type: GET_ACTIVE_VEHICLE_TYPE_DATA_BY_TYPE,
         data: { type }

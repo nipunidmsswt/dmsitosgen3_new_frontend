@@ -116,6 +116,7 @@ export const mainTransportCategoryReducer = (state = initialState, action) => {
 
         case SUCCESS_GET_ACTIVE_VEHICLE_TYPE_DATA_BY_TYPE:
             return { ...state, vehicleTypes: data.payload[0] };
+            console.log('Reducer Success');
 
         case FAILED_GET_GET_ACTIVE_VEHICLE_TYPE_DATA_BY_TYPE:
             return {
@@ -123,6 +124,7 @@ export const mainTransportCategoryReducer = (state = initialState, action) => {
                 vehicleTypes: null,
                 errorMsg: data ? data.errorMessages : 'netwok error'
             };
+            console.log('Reducer Fail');
 
         default:
             return state;
