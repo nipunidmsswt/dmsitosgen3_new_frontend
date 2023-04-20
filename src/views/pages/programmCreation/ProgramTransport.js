@@ -27,13 +27,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import * as yup from 'yup';
 import { Formik, Form } from 'formik';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import {
-    getAllActiveTransportMainCategoryDataByType,
-    getAllActiveVehicleCategoryDataByType,
-    getAllActiveVehicleTypeDataByType
-} from 'store/actions/masterActions/transportActions/MainTransportCategoriesActions';
 
 const Transition = forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -66,6 +59,8 @@ function ProgramTransport({ open, handleClose, mode }) {
     const [activeVehicleCategoryList, setActiveVehicleCategoryList] = useState([]);
     const [activeLocationList, setActiveLocationList] = useState([]);
     const [checkedItems, setCheckedItems] = useState({});
+    const [location1, setLocation1] = useState({});
+    // const [location2Check, setLocation2Check] = useState(true);
     const dispatch = useDispatch();
 
     //data from reducers
@@ -93,6 +88,18 @@ function ProgramTransport({ open, handleClose, mode }) {
         setCheckedItems((prevCheckedItems) => ({ ...prevCheckedItems, [name]: checked }));
     };
 
+    const handleLocation1 = (value) => {
+        if (value === null) {
+            console.log('Empty location');
+        } else {
+            setLocation1(value);
+        }
+    };
+
+    useEffect(() => {
+        console.log(location1.shortDescription);
+    }, [location1]);
+
     useEffect(() => {
         if (activeTransportTypeListData.length != 0) {
             setActiveTransportTypeList(activeTransportTypeListData);
@@ -117,11 +124,12 @@ function ProgramTransport({ open, handleClose, mode }) {
         }
     }, [activeLocationListData]);
 
-    useEffect(() => {
-        dispatch(getAllActiveTransportMainCategoryDataByType('Transport Type'));
-        dispatch(getAllActiveVehicleTypeDataByType('Vehicle Type'));
-        dispatch(getAllActiveVehicleCategoryDataByType('Vehicle Category'));
-    }, []);
+    console.log('Transport Popup');
+    // useEffect(() => {
+    //     dispatch(getAllActiveTransportMainCategoryDataByType('Transport Type'));
+    //     dispatch(getAllActiveVehicleTypeDataByType('Vehicle Type'));
+    //     dispatch(getAllActiveVehicleCategoryDataByType('Vehicle Category'));
+    // }, []);
 
     return (
         <div>
@@ -346,6 +354,7 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                         name="location1"
                                                         onChange={(_, value) => {
                                                             setFieldValue(`location1`, value);
+                                                            handleLocation1(value);
                                                         }}
                                                         InputLabelProps={{
                                                             shrink: true
@@ -395,7 +404,7 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                         InputLabelProps={{
                                                             shrink: true
                                                         }}
-                                                        options={activeLocationList}
+                                                        options={!values.location1 ? [] : activeLocationList}
                                                         getOptionLabel={(option) => `${option.code}-${option.shortDescription}`}
                                                         isOptionEqualToValue={(option, value) => option.location_id === value.location_id}
                                                         renderInput={(params) => (
@@ -412,6 +421,9 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                                 InputLabelProps={{
                                                                     shrink: true
                                                                 }}
+                                                                // InputProps={{
+                                                                //     readOnly: location2Check
+                                                                // }}
                                                                 error={Boolean(touched.location2 && errors.location2)}
                                                                 helperText={touched.location2 && errors.location2 ? errors.location2 : ''}
                                                                 variant="outlined"
@@ -440,7 +452,7 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                         InputLabelProps={{
                                                             shrink: true
                                                         }}
-                                                        options={activeLocationList}
+                                                        options={!values.location2 ? [] : activeLocationList}
                                                         getOptionLabel={(option) => `${option.code}-${option.shortDescription}`}
                                                         isOptionEqualToValue={(option, value) => option.location_id === value.location_id}
                                                         renderInput={(params) => (
@@ -485,7 +497,7 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                         InputLabelProps={{
                                                             shrink: true
                                                         }}
-                                                        options={activeLocationList}
+                                                        options={!values.location3 ? [] : activeLocationList}
                                                         getOptionLabel={(option) => `${option.code} - ${option.shortDescription}`}
                                                         isOptionEqualToValue={(option, value) => option.location_id === value.location_id}
                                                         renderInput={(params) => (
@@ -530,7 +542,7 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                         InputLabelProps={{
                                                             shrink: true
                                                         }}
-                                                        options={activeLocationList}
+                                                        options={!values.location4 ? [] : activeLocationList}
                                                         getOptionLabel={(option) => `${option.code}-${option.shortDescription}`}
                                                         isOptionEqualToValue={(option, value) => option.location_id === value.location_id}
                                                         renderInput={(params) => (
@@ -577,7 +589,7 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                         InputLabelProps={{
                                                             shrink: true
                                                         }}
-                                                        options={activeLocationList}
+                                                        options={!values.location5 ? [] : activeLocationList}
                                                         getOptionLabel={(option) => `${option.code}-${option.shortDescription}`}
                                                         isOptionEqualToValue={(option, value) => option.location_id === value.location_id}
                                                         renderInput={(params) => (
@@ -622,7 +634,7 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                         InputLabelProps={{
                                                             shrink: true
                                                         }}
-                                                        options={activeLocationList}
+                                                        options={!values.location6 ? [] : activeLocationList}
                                                         getOptionLabel={(option) => `${option.code}-${option.shortDescription}`}
                                                         isOptionEqualToValue={(option, value) => option.location_id === value.location_id}
                                                         renderInput={(params) => (
@@ -667,7 +679,7 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                         InputLabelProps={{
                                                             shrink: true
                                                         }}
-                                                        options={activeLocationList}
+                                                        options={!values.location7 ? [] : activeLocationList}
                                                         getOptionLabel={(option) => `${option.code}-${option.shortDescription}`}
                                                         isOptionEqualToValue={(option, value) => option.location_id === value.location_id}
                                                         renderInput={(params) => (
@@ -712,7 +724,7 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                         InputLabelProps={{
                                                             shrink: true
                                                         }}
-                                                        options={activeLocationList}
+                                                        options={!values.location8 ? [] : activeLocationList}
                                                         getOptionLabel={(option) => `${option.code} - ${option.shortDescription}`}
                                                         isOptionEqualToValue={(option, value) => option.location_id === value.location_id}
                                                         renderInput={(params) => (
@@ -757,7 +769,7 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                         InputLabelProps={{
                                                             shrink: true
                                                         }}
-                                                        options={activeLocationList}
+                                                        options={!values.location9 ? [] : activeLocationList}
                                                         getOptionLabel={(option) => `${option.code}-${option.shortDescription}`}
                                                         isOptionEqualToValue={(option, value) => option.location_id === value.location_id}
                                                         renderInput={(params) => (
@@ -798,7 +810,7 @@ function ProgramTransport({ open, handleClose, mode }) {
                                             <Grid gap="60px" display="flex" style={{ marginTop: '50px' }}>
                                                 <Grid item>
                                                     <TextField
-                                                        label="Distance"
+                                                        label="Distance (km)"
                                                         sx={{
                                                             alignItems: 'center',
                                                             width: { sm: 75, md: 150 },
@@ -821,7 +833,7 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                 </Grid>
                                                 <Grid>
                                                     <TextField
-                                                        label="Hours"
+                                                        label="Duration (hr)"
                                                         sx={{
                                                             alignItems: 'center',
                                                             width: { sm: 75, md: 150 },

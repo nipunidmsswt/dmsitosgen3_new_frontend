@@ -3,7 +3,8 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import React from 'react';
 import { gridSpacing } from 'store/constant';
 import MainCard from 'ui-component/cards/MainCard';
-import { Button, makeStyles } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core';
+import { Button } from '@mui/material';
 import ProgramHeader from './ProgramHeader';
 import ProgramCreationDetails from './ProgramCreationDetails';
 
