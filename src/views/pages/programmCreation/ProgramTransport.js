@@ -60,6 +60,16 @@ function ProgramTransport({ open, handleClose, mode }) {
     const [activeLocationList, setActiveLocationList] = useState([]);
     const [checkedItems, setCheckedItems] = useState({});
     const [location1, setLocation1] = useState({});
+    const [location2, setLocation2] = useState({});
+    const [location3, setLocation3] = useState({});
+    const [location4, setLocation4] = useState({});
+    const [location5, setLocation5] = useState({});
+    const [location6, setLocation6] = useState({});
+    const [location7, setLocation7] = useState({});
+    const [location8, setLocation8] = useState({});
+    const [location9, setLocation9] = useState({});
+    const [location10, setLocation10] = useState({});
+
     // const [location2Check, setLocation2Check] = useState(true);
     const dispatch = useDispatch();
 
@@ -96,9 +106,90 @@ function ProgramTransport({ open, handleClose, mode }) {
         }
     };
 
+    const handleLocation2 = (value) => {
+        if (value === null) {
+            console.log('Empty location');
+        } else {
+            setLocation2(value);
+        }
+    };
+
+    const handleLocation3 = (value) => {
+        if (value === null) {
+            console.log('Empty location');
+        } else {
+            setLocation3(value);
+        }
+    };
+
+    const handleLocation4 = (value) => {
+        if (value === null) {
+            console.log('Empty location');
+        } else {
+            setLocation4(value);
+        }
+    };
+
+    const handleLocation5 = (value) => {
+        if (value === null) {
+            console.log('Empty location');
+        } else {
+            setLocation5(value);
+        }
+    };
+
+    const handleLocation6 = (value) => {
+        if (value === null) {
+            console.log('Empty location');
+        } else {
+            setLocation6(value);
+        }
+    };
+
+    const handleLocation7 = (value) => {
+        if (value === null) {
+            console.log('Empty location');
+        } else {
+            setLocation7(value);
+        }
+    };
+
+    const handleLocation8 = (value) => {
+        if (value === null) {
+            console.log('Empty location');
+        } else {
+            setLocation8(value);
+        }
+    };
+
+    const handleLocation9 = (value) => {
+        if (value === null) {
+            console.log('Empty location');
+        } else {
+            setLocation9(value);
+        }
+    };
+
+    const handleLocation10 = (value) => {
+        if (value === null) {
+            console.log('Empty location');
+        } else {
+            setLocation10(value);
+        }
+    };
+
     useEffect(() => {
         console.log(location1.shortDescription);
-    }, [location1]);
+        console.log(location2.shortDescription);
+        console.log(location3.shortDescription);
+        console.log(location4.shortDescription);
+        console.log(location5.shortDescription);
+        console.log(location6.shortDescription);
+        console.log(location7.shortDescription);
+        console.log(location8.shortDescription);
+        console.log(location9.shortDescription);
+        console.log(location10.shortDescription);
+    }, [location1, location2, location3, location4, location5, location6, location7, location8, location9, location10]);
 
     useEffect(() => {
         if (activeTransportTypeListData.length != 0) {
@@ -400,6 +491,7 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                         name="location2"
                                                         onChange={(_, value) => {
                                                             setFieldValue(`location2`, value);
+                                                            handleLocation2(value);
                                                         }}
                                                         InputLabelProps={{
                                                             shrink: true
@@ -448,6 +540,7 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                         name="location3"
                                                         onChange={(_, value) => {
                                                             setFieldValue(`location3`, value);
+                                                            handleLocation3(value);
                                                         }}
                                                         InputLabelProps={{
                                                             shrink: true
@@ -493,6 +586,7 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                         name="location4"
                                                         onChange={(_, value) => {
                                                             setFieldValue(`location4`, value);
+                                                            handleLocation4(value);
                                                         }}
                                                         InputLabelProps={{
                                                             shrink: true
@@ -538,6 +632,7 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                         name="location5"
                                                         onChange={(_, value) => {
                                                             setFieldValue(`location5`, value);
+                                                            handleLocation5(value);
                                                         }}
                                                         InputLabelProps={{
                                                             shrink: true
@@ -585,6 +680,7 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                         name="location6"
                                                         onChange={(_, value) => {
                                                             setFieldValue(`location6`, value);
+                                                            handleLocation6(value);
                                                         }}
                                                         InputLabelProps={{
                                                             shrink: true
@@ -630,6 +726,7 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                         name="location7"
                                                         onChange={(_, value) => {
                                                             setFieldValue(`location7`, value);
+                                                            handleLocation7(value);
                                                         }}
                                                         InputLabelProps={{
                                                             shrink: true
@@ -675,6 +772,7 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                         name="location8"
                                                         onChange={(_, value) => {
                                                             setFieldValue(`location8`, value);
+                                                            handleLocation8(value);
                                                         }}
                                                         InputLabelProps={{
                                                             shrink: true
@@ -720,6 +818,7 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                         name="location9"
                                                         onChange={(_, value) => {
                                                             setFieldValue(`location9`, value);
+                                                            handleLocation9(value);
                                                         }}
                                                         InputLabelProps={{
                                                             shrink: true
@@ -765,6 +864,7 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                         name="location10"
                                                         onChange={(_, value) => {
                                                             setFieldValue(`location10`, value);
+                                                            handleLocation10(value);
                                                         }}
                                                         InputLabelProps={{
                                                             shrink: true
