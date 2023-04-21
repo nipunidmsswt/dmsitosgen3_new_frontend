@@ -95,7 +95,7 @@ export const distanceReducer = (state = initialState, action) => {
             return { ...state, calculatedDistance: data.distance, calculatedDuration: data.duration };
 
         case FAILED_GET_CALCULATED_DISTANCE_AND_DURATION:
-            return { ...state, distance: null, duration: null, errorMsg: 'netwok error' };
+            return { ...state, distance: 0, duration: 0, errorMsg: 'netwok error' };
 
         default:
             return state;

@@ -78,8 +78,8 @@ function ProgramTransport({ open, handleClose, mode }) {
     const [location10, setLocation10] = useState({});
     const [locationIds, setLocationIds] = useState([]);
     const [transportType, setTransportType] = useState({});
-    const [distance, setDistance] = useState();
-    const [duration, setDuration] = useState();
+    const [distance, setDistance] = useState(0);
+    const [duration, setDuration] = useState(0);
     const dispatch = useDispatch();
 
     //data from reducers
@@ -102,6 +102,13 @@ function ProgramTransport({ open, handleClose, mode }) {
 
     const handleSubmitForm = (data) => {
         handleClose();
+    };
+
+    const handleCalculate = () => {
+        const filteredIds = locationIds.filter((id) => id !== '' && id !== undefined);
+        const transportTypeId = transportType.categoryId;
+        console.log(filteredIds);
+        dispatch(getCalculatedDistanceAndDuration(transportTypeId, filteredIds));
     };
 
     const handleCheckboxChange = (event) => {
@@ -160,12 +167,12 @@ function ProgramTransport({ open, handleClose, mode }) {
         setLocationIds(newIds);
     }, [location1, location2, location3, location4, location5, location6, location7, location8, location9, location10]);
 
-    useEffect(() => {
-        const filteredIds = locationIds.filter((id) => id !== '' && id !== undefined);
-        const transportTypeId = transportType.categoryId;
-        console.log(filteredIds);
-        dispatch(getCalculatedDistanceAndDuration(transportTypeId, filteredIds));
-    }, [locationIds, transportType]);
+    // useEffect(() => {
+    //     const filteredIds = locationIds.filter((id) => id !== '' && id !== undefined);
+    //     const transportTypeId = transportType.categoryId;
+    //     console.log(filteredIds);
+    //     dispatch(getCalculatedDistanceAndDuration(transportTypeId, filteredIds));
+    // }, [locationIds, transportType]);
 
     // useEffect(() => {
     //     console.log(location1.shortDescription);
@@ -913,6 +920,11 @@ function ProgramTransport({ open, handleClose, mode }) {
                                             </Grid>
                                             <Grid gap="60px" display="flex" style={{ marginTop: '50px' }}>
                                                 <Grid item>
+                                                    <Button className="btnSave" variant="contained" type="button" onClick={handleCalculate}>
+                                                        Calculate
+                                                    </Button>
+                                                </Grid>
+                                                <Grid item>
                                                     <TextField
                                                         label="Distance (km)"
                                                         sx={{
@@ -928,10 +940,9 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                         InputProps={{
                                                             readOnly: true
                                                         }}
-                                                        // error={Boolean(touched.location3 && errors.location3)}
-                                                        // helperText={touched.location3 && errors.location3 ? errors.location3 : ''}
                                                         variant="outlined"
                                                         name="distance"
+                                                        value={distance}
                                                         onBlur={handleBlur}
                                                     />
                                                 </Grid>
@@ -951,10 +962,9 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                         InputProps={{
                                                             readOnly: true
                                                         }}
-                                                        // error={Boolean(touched.location3 && errors.location3)}
-                                                        // helperText={touched.location3 && errors.location3 ? errors.location3 : ''}
                                                         variant="outlined"
                                                         name="hours"
+                                                        value={duration}
                                                         onBlur={handleBlur}
                                                     />
                                                 </Grid>
