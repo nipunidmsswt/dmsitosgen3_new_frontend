@@ -17,6 +17,7 @@ import {
     getAllActiveVehicleTypeDataByType
 } from 'store/actions/masterActions/transportActions/MainTransportCategoriesActions';
 import { getActiveLocations } from 'store/actions/masterActions/LocationAction';
+import { getCalculatedDistanceAndDuration } from 'store/actions/masterActions/DistanceAction';
 import { useDispatch } from 'react-redux';
 import { Button } from '@mui/material';
 
@@ -117,12 +118,15 @@ function ProgramCreationDetails() {
     const [mode, setMode] = useState('INSERT');
     const classes = useStyles();
     const dispatch = useDispatch();
+    const transportTypeId = 'T001';
+    const filteredIds = ['D1', 'D2', 'D3'];
 
     useEffect(() => {
         dispatch(getAllActiveTransportMainCategoryDataByType('Transport Type'));
         dispatch(getAllActiveVehicleTypeDataByType('Vehicle Type'));
         dispatch(getAllActiveVehicleCategoryDataByType('Vehicle Category'));
         dispatch(getActiveLocations());
+        dispatch(getCalculatedDistanceAndDuration(transportTypeId, filteredIds));
     }, []);
 
     const handleKeyDown = (event) => {

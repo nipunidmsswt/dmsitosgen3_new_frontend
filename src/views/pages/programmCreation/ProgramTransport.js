@@ -27,6 +27,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import * as yup from 'yup';
 import { Formik, Form } from 'formik';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import {
+    getAllActiveTransportMainCategoryDataByType,
+    getAllActiveVehicleCategoryDataByType,
+    getAllActiveVehicleTypeDataByType
+} from 'store/actions/masterActions/transportActions/MainTransportCategoriesActions';
+import { getActiveLocations } from 'store/actions/masterActions/LocationAction';
+import { getCalculatedDistanceAndDuration } from 'store/actions/masterActions/DistanceAction';
 
 const Transition = forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -69,8 +76,10 @@ function ProgramTransport({ open, handleClose, mode }) {
     const [location8, setLocation8] = useState({});
     const [location9, setLocation9] = useState({});
     const [location10, setLocation10] = useState({});
-
-    // const [location2Check, setLocation2Check] = useState(true);
+    const [locationIds, setLocationIds] = useState([]);
+    const [transportType, setTransportType] = useState({});
+    const [distance, setDistance] = useState();
+    const [duration, setDuration] = useState();
     const dispatch = useDispatch();
 
     //data from reducers
@@ -78,6 +87,8 @@ function ProgramTransport({ open, handleClose, mode }) {
     const activeVehicleTypeListData = useSelector((state) => state.mainTransportCategoryReducer.vehicleTypes);
     const activeVehicleCategoriesListData = useSelector((state) => state.mainTransportCategoryReducer.vehicleCategories);
     const activeLocationListData = useSelector((state) => state.locationReducer.activeLocations);
+    const calculatedDistance = useSelector((state) => state.distanceReducer.calculatedDistance);
+    const calculatedDuration = useSelector((state) => state.distanceReducer.calculatedDuration);
 
     const validationSchema = yup.object().shape({
         paxBaggage: yup.string().required('Required field'),
@@ -99,97 +110,75 @@ function ProgramTransport({ open, handleClose, mode }) {
     };
 
     const handleLocation1 = (value) => {
-        if (value === null) {
-            console.log('Empty location');
-        } else {
-            setLocation1(value);
-        }
+        setLocation1(value);
     };
 
     const handleLocation2 = (value) => {
-        if (value === null) {
-            console.log('Empty location');
-        } else {
-            setLocation2(value);
-        }
+        setLocation2(value);
     };
 
     const handleLocation3 = (value) => {
-        if (value === null) {
-            console.log('Empty location');
-        } else {
-            setLocation3(value);
-        }
+        setLocation3(value);
     };
 
     const handleLocation4 = (value) => {
-        if (value === null) {
-            console.log('Empty location');
-        } else {
-            setLocation4(value);
-        }
+        setLocation4(value);
     };
 
     const handleLocation5 = (value) => {
-        if (value === null) {
-            console.log('Empty location');
-        } else {
-            setLocation5(value);
-        }
+        setLocation5(value);
     };
 
     const handleLocation6 = (value) => {
-        if (value === null) {
-            console.log('Empty location');
-        } else {
-            setLocation6(value);
-        }
+        setLocation6(value);
     };
 
     const handleLocation7 = (value) => {
-        if (value === null) {
-            console.log('Empty location');
-        } else {
-            setLocation7(value);
-        }
+        setLocation7(value);
     };
 
     const handleLocation8 = (value) => {
-        if (value === null) {
-            console.log('Empty location');
-        } else {
-            setLocation8(value);
-        }
+        setLocation8(value);
     };
 
     const handleLocation9 = (value) => {
-        if (value === null) {
-            console.log('Empty location');
-        } else {
-            setLocation9(value);
-        }
+        setLocation9(value);
     };
 
     const handleLocation10 = (value) => {
-        if (value === null) {
-            console.log('Empty location');
-        } else {
-            setLocation10(value);
-        }
+        setLocation10(value);
+    };
+
+    const handleTranportType = (value) => {
+        setTransportType(value);
     };
 
     useEffect(() => {
-        console.log(location1.shortDescription);
-        console.log(location2.shortDescription);
-        console.log(location3.shortDescription);
-        console.log(location4.shortDescription);
-        console.log(location5.shortDescription);
-        console.log(location6.shortDescription);
-        console.log(location7.shortDescription);
-        console.log(location8.shortDescription);
-        console.log(location9.shortDescription);
-        console.log(location10.shortDescription);
+        const newIds = [location1, location2, location3, location4, location5, location6, location7, location8, location9, location10].map(
+            (location) => (location === null || location === undefined ? '' : location.shortDescription)
+        );
+        setLocationIds(newIds);
     }, [location1, location2, location3, location4, location5, location6, location7, location8, location9, location10]);
+
+    useEffect(() => {
+        const filteredIds = locationIds.filter((id) => id !== '' && id !== undefined);
+        const transportTypeId = transportType.categoryId;
+        console.log(filteredIds);
+        dispatch(getCalculatedDistanceAndDuration(transportTypeId, filteredIds));
+    }, [locationIds, transportType]);
+
+    // useEffect(() => {
+    //     console.log(location1.shortDescription);
+    //     console.log(location2.shortDescription);
+    //     console.log(location3.shortDescription);
+    //     console.log(location4.shortDescription);
+    //     console.log(location5.shortDescription);
+    //     console.log(location6.shortDescription);
+    //     console.log(location7.shortDescription);
+    //     console.log(location8.shortDescription);
+    //     console.log(location9.shortDescription);
+    //     console.log(location10.shortDescription);
+    // }, [location1, location2, location3, location4, location5, location6, location7, location8, location9, location10]);
 
     useEffect(() => {
         if (activeTransportTypeListData.length != 0) {
@@ -215,12 +204,25 @@ function ProgramTransport({ open, handleClose, mode }) {
         }
     }, [activeLocationListData]);
 
-    console.log('Transport Popup');
-    // useEffect(() => {
-    //     dispatch(getAllActiveTransportMainCategoryDataByType('Transport Type'));
-    //     dispatch(getAllActiveVehicleTypeDataByType('Vehicle Type'));
-    //     dispatch(getAllActiveVehicleCategoryDataByType('Vehicle Category'));
-    // }, []);
+    useEffect(() => {
+        if (calculatedDistance != null) {
+            setDistance(calculatedDistance);
+        }
+    }, [calculatedDistance]);
+
+    useEffect(() => {
+        if (calculatedDuration != null) {
+            setDuration(calculatedDuration);
+        }
+    }, [calculatedDuration]);
+
+    useEffect(() => {
+        console.log('Transport Popup');
+        dispatch(getAllActiveTransportMainCategoryDataByType('Transport Type'));
+        dispatch(getAllActiveVehicleTypeDataByType('Vehicle Type'));
+        dispatch(getAllActiveVehicleCategoryDataByType('Vehicle Category'));
+        dispatch(getActiveLocations());
+    }, []);
 
     return (
         <div>
@@ -298,6 +300,8 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                         name="transportType"
                                                         onChange={(_, value) => {
                                                             setFieldValue(`transportType`, value);
+                                                            handleTranportType(value);
+                                                            console.log(value);
                                                         }}
                                                         fullWidth
                                                         options={activeTransportTypeList}
@@ -962,6 +966,7 @@ function ProgramTransport({ open, handleClose, mode }) {
                                             </Button>
 
                                             <Button
+                                                className="btnClear"
                                                 variant="outlined"
                                                 type="button"
                                                 style={{

@@ -717,14 +717,16 @@ import {
     GET_ALL_DISTANCE_DATA,
     GET_DISTANCE_DATA_BY_ID,
     SAVE_DISTANCE_DATA,
-    UPDATE_DISTANCE_DATA
+    UPDATE_DISTANCE_DATA,
+    GET_CALCULATED_DISTANCE_AND_DURATION
 } from 'store/constant/master/TransportMasterConstant/DistanceConstant';
 import {
     getAllActiveDistanceDataByTransportTypeSaga,
     getDistanceByIdSaga,
     saveDistanceDataHandler,
     saveDistanceSaga,
-    updateDistanceSaga
+    updateDistanceSaga,
+    getDistanceAndDurationSaga
 } from './mastersaga/transportSaga/DistanceSaga';
 export function* wacherSaga() {
     // tax setup
@@ -1109,6 +1111,7 @@ export function* wacherSaga() {
     yield takeLatest(GET_ALL_ACTIVE_DISTANCE_DATA_TBY_TRANSPORT_TYPE, getAllActiveDistanceDataByTransportTypeSaga);
     // yield takeLatest(CHECK_ROOM_BUYING_RATE_CODE_DUPLICATE, checkDupicateRoomBuyingRateSaga);
     yield takeLatest(UPDATE_DISTANCE_DATA, updateDistanceSaga);
+    yield takeLatest(GET_CALCULATED_DISTANCE_AND_DURATION, getDistanceAndDurationSaga);
 
     //baggage
     yield takeLatest(SAVE_BAGGAGE_TRANSPORT_RATE, saveBaggageTransportRateSaga);
