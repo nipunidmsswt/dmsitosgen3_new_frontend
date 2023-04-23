@@ -13,6 +13,7 @@ import {
     Grid,
     Switch
 } from '@mui/material';
+import { makeStyles } from '@material-ui/core';
 import MenuItem from '@material-ui/core/MenuItem';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import IconButton from '@mui/material/IconButton';
@@ -34,10 +35,41 @@ import {
 } from 'store/actions/masterActions/transportActions/MainTransportCategoriesActions';
 import { getActiveLocations } from 'store/actions/masterActions/LocationAction';
 import { getCalculatedDistanceAndDuration } from 'store/actions/masterActions/DistanceAction';
+import '../../../assets/scss/style.scss';
 
 const Transition = forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
+
+const useStyles = makeStyles((theme) => ({
+    content: {
+        justifyContent: 'center'
+    },
+    saveButton: {
+        margin: '0px 10px',
+        height: '40px',
+        width: '70px',
+        display: 'inline-flex',
+        textTransform: 'capitalize',
+        color: 'white',
+        borderRadius: '10%',
+        backgroundColor: '#1877f2',
+        background: '-moz-linear-gradient(top, #3b5998, #1877f2)',
+        background: '-ms-linear-gradient(top, #3b5998, #1877f2)',
+        background: '-webkit-linear-gradient(top, #3b5998, #1877f2)'
+    },
+    clearButton: {
+        margin: '0px 10px',
+        height: '40px',
+        width: '70px',
+        display: 'inline-flex',
+        textTransform: 'capitalize',
+        color: '#1877f2',
+        borderColor: '#1877f2',
+        borderRadius: '10%',
+        backgroundColor: 'white'
+    }
+}));
 function ProgramTransport({ open, handleClose, mode }) {
     const initialValues = {
         paxBaggage: '',
@@ -81,6 +113,7 @@ function ProgramTransport({ open, handleClose, mode }) {
     const [distance, setDistance] = useState(0);
     const [duration, setDuration] = useState(0);
     const dispatch = useDispatch();
+    const classes = useStyles();
 
     //data from reducers
     const activeTransportTypeListData = useSelector((state) => state.mainTransportCategoryReducer.activeCategoryDetails);
@@ -153,7 +186,7 @@ function ProgramTransport({ open, handleClose, mode }) {
         handleClose();
     };
 
-    const handleCalculate = (values, setFieldError, errors, touched) => {
+    const handleCalculate = (values, setFieldError, setFieldTouched, errors, touched) => {
         const fields = [
             { fieldName: 'transportType', errorMessage: 'Required Field' },
             { fieldName: 'chargeMethod', errorMessage: 'Required Field' },
@@ -169,6 +202,13 @@ function ProgramTransport({ open, handleClose, mode }) {
             { fieldName: 'location10', errorMessage: 'Required Field' }
         ];
 
+        const mandatoryFields = [
+            { fieldName: 'transportType', errorMessage: 'Required Field' },
+            { fieldName: 'chargeMethod', errorMessage: 'Required Field' },
+            { fieldName: 'location1', errorMessage: 'Required Field' },
+            { fieldName: 'location2', errorMessage: 'Required Field' }
+        ];
+
         let hasError = false;
 
         fields.forEach((field) => {
@@ -178,13 +218,26 @@ function ProgramTransport({ open, handleClose, mode }) {
             }
         });
 
+        mandatoryFields.forEach((mandatoryField) => {
+            if (!values[mandatoryField.fieldName]) {
+                setFieldError(mandatoryField.fieldName, mandatoryField.errorMessage);
+                setFieldTouched(mandatoryField.fieldName, true);
+                hasError = true;
+            }
+        });
+
+        // if (!values.transportType || !values.transportType.categoryId) {
+        //     setFieldError('transportType', 'Required Field');
+        //     setFieldTouched('transportType', true);
+        //     console.log(values.transportType);
+        // }
+
         if (!hasError && touched.transportType && touched.chargeMethod && touched.location1 && touched.location2) {
             const filteredIds = locationIds.filter((id) => id !== '' && id !== undefined);
             const transportTypeId = transportType.categoryId;
             console.log(filteredIds);
             dispatch(getCalculatedDistanceAndDuration(transportTypeId, filteredIds));
             console.log(duration);
-            console.log(touched.transportType);
         }
     };
 
@@ -344,7 +397,17 @@ function ProgramTransport({ open, handleClose, mode }) {
                             }}
                             validationSchema={validationSchema}
                         >
-                            {({ values, handleChange, setFieldValue, setFieldError, errors, handleBlur, touched, resetForm }) => {
+                            {({
+                                values,
+                                handleChange,
+                                setFieldValue,
+                                setFieldError,
+                                setFieldTouched,
+                                errors,
+                                handleBlur,
+                                touched,
+                                resetForm
+                            }) => {
                                 return (
                                     <Form>
                                         <div style={{ marginTop: '6px', margin: '10px' }}>
@@ -1014,13 +1077,16 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                     />
                                                 </Grid>
                                             </Grid>
-                                            <Grid gap="60px" display="flex" style={{ marginTop: '50px' }}>
+                                            <Grid display="flex" style={{ marginTop: '50px' }}>
                                                 <Grid item>
                                                     <Button
-                                                        className="btnSave"
+                                                        className={classes.saveButton}
+                                                        style={{ width: '90px', left: '20px' }}
                                                         variant="contained"
                                                         type="button"
-                                                        onClick={() => handleCalculate(values, setFieldError, errors, touched)}
+                                                        onClick={() =>
+                                                            handleCalculate(values, setFieldError, setFieldTouched, errors, touched)
+                                                        }
                                                     >
                                                         Calculate
                                                     </Button>
@@ -1030,6 +1096,7 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                         label="Distance (km)"
                                                         sx={{
                                                             alignItems: 'center',
+                                                            left: '100px',
                                                             width: { sm: 75, md: 150 },
                                                             '& .MuiInputBase-root': {
                                                                 height: 40
@@ -1052,6 +1119,7 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                         label="Duration (hr)"
                                                         sx={{
                                                             alignItems: 'center',
+                                                            left: '160px',
                                                             width: { sm: 75, md: 150 },
                                                             '& .MuiInputBase-root': {
                                                                 height: 40
@@ -1072,12 +1140,12 @@ function ProgramTransport({ open, handleClose, mode }) {
                                             </Grid>
                                         </div>
                                         <Box display="flex" flexDirection="row-reverse" style={{ marginTop: '60px' }}>
-                                            <Button className="btnSave" variant="contained" type="submit">
+                                            <Button className={classes.saveButton} variant="contained" type="submit">
                                                 {mode === 'INSERT' ? 'SAVE' : 'UPDATE'}
                                             </Button>
 
                                             <Button
-                                                className="btnClear"
+                                                className={classes.clearButton}
                                                 variant="outlined"
                                                 type="button"
                                                 style={{

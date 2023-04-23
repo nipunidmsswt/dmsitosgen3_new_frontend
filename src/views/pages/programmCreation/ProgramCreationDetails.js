@@ -43,7 +43,7 @@ const useStyles = makeStyles((theme) => ({
     },
     roundbutton: {
         borderRadius: '50%',
-        margin: '2px 9px',
+        margin: '2px 10px',
         width: '1px',
         height: '30px',
         minWidth: '0px',
@@ -413,6 +413,7 @@ function ProgramCreationDetails() {
                                     Costing
                                 </Button> */}
                             </Grid>
+                            <div style={{ fontSize: '12px', marginLeft: '115px' }}>*Max: 60</div>
                             <div className={classes.buttonArray}>{buttonArray}</div>
                             <Divider style={{ color: 'black', height: '2px' }} />
                             <br />
