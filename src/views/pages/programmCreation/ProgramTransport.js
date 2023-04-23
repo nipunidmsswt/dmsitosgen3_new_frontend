@@ -55,8 +55,8 @@ function ProgramTransport({ open, handleClose, mode }) {
         location8: null,
         location9: null,
         location10: null,
-        kms: 0,
-        hours: 0
+        distance: null,
+        duration: null
     };
 
     const [formValues, setFormValues] = useState(initialValues);
@@ -78,8 +78,8 @@ function ProgramTransport({ open, handleClose, mode }) {
     const [location10, setLocation10] = useState({});
     const [locationIds, setLocationIds] = useState([]);
     const [transportType, setTransportType] = useState({});
-    const [distance, setDistance] = useState();
-    const [duration, setDuration] = useState();
+    const [distance, setDistance] = useState(0);
+    const [duration, setDuration] = useState(0);
     const dispatch = useDispatch();
 
     //data from reducers
@@ -91,25 +91,101 @@ function ProgramTransport({ open, handleClose, mode }) {
     const calculatedDuration = useSelector((state) => state.distanceReducer.calculatedDuration);
 
     const validationSchema = yup.object().shape({
-        paxBaggage: yup.string().required('Required field'),
+        paxBaggage: yup.string().nullable().required('Required field'),
         transportType: yup.object().nullable().required('Required field'),
-        chargeMethod: yup.string().required('Required field'),
+        chargeMethod: yup.string().nullable().required('Required field'),
         vehicleType: yup.object().nullable().required('Required field'),
         vehicleCategory: yup.object().nullable().required('Required field'),
         location1: yup.object().nullable().required('Required field'),
-        location2: yup.object().nullable().required('Required field')
+        location2: yup.object().nullable().required('Required field'),
+        location3: yup
+            .object()
+            .nullable()
+            .when('location4', {
+                is: (value) => !!value,
+                then: yup.object().nullable().required('Required field')
+            }),
+        location4: yup
+            .object()
+            .nullable()
+            .when('location5', {
+                is: (value) => !!value,
+                then: yup.object().nullable().required('Required field')
+            }),
+        location5: yup
+            .object()
+            .nullable()
+            .when('location6', {
+                is: (value) => !!value,
+                then: yup.object().nullable().required('Required field')
+            }),
+        location6: yup
+            .object()
+            .nullable()
+            .when('location7', {
+                is: (value) => !!value,
+                then: yup.object().nullable().required('Required field')
+            }),
+        location7: yup
+            .object()
+            .nullable()
+            .when('location8', {
+                is: (value) => !!value,
+                then: yup.object().nullable().required('Required field')
+            }),
+        location8: yup
+            .object()
+            .nullable()
+            .when('location9', {
+                is: (value) => !!value,
+                then: yup.object().nullable().required('Required field')
+            }),
+        location9: yup
+            .object()
+            .nullable()
+            .when('location10', {
+                is: (value) => !!value,
+                then: yup.object().nullable().required('Required field')
+            })
     });
 
     const handleSubmitForm = (data) => {
         handleClose();
     };
 
-    const handleCalculate = () => {
-        const filteredIds = locationIds.filter((id) => id !== '' && id !== undefined);
-        const transportTypeId = transportType.categoryId;
-        console.log(filteredIds);
-        dispatch(getCalculatedDistanceAndDuration(transportTypeId, filteredIds));
-        console.log(duration);
+    const handleCalculate = (values, setFieldError, errors, touched) => {
+        const fields = [
+            { fieldName: 'transportType', errorMessage: 'Required Field' },
+            { fieldName: 'chargeMethod', errorMessage: 'Required Field' },
+            { fieldName: 'location1', errorMessage: 'Required Field' },
+            { fieldName: 'location2', errorMessage: 'Required Field' },
+            { fieldName: 'location3', errorMessage: 'Required Field' },
+            { fieldName: 'location4', errorMessage: 'Required Field' },
+            { fieldName: 'location5', errorMessage: 'Required Field' },
+            { fieldName: 'location6', errorMessage: 'Required Field' },
+            { fieldName: 'location7', errorMessage: 'Required Field' },
+            { fieldName: 'location8', errorMessage: 'Required Field' },
+            { fieldName: 'location9', errorMessage: 'Required Field' },
+            { fieldName: 'location10', errorMessage: 'Required Field' }
+        ];
+
+        let hasError = false;
+
+        fields.forEach((field) => {
+            if (errors[field.fieldName]) {
+                setFieldError(field.fieldName, field.errorMessage);
+                hasError = true;
+            }
+        });
+
+        if (!hasError && touched.transportType && touched.chargeMethod && touched.location1 && touched.location2) {
+            const filteredIds = locationIds.filter((id) => id !== '' && id !== undefined);
+            const transportTypeId = transportType.categoryId;
+            console.log(filteredIds);
+            dispatch(getCalculatedDistanceAndDuration(transportTypeId, filteredIds));
+            console.log(duration);
+            console.log(touched.transportType);
+        }
     };
 
     const handleCheckboxChange = (event) => {
@@ -268,39 +344,46 @@ function ProgramTransport({ open, handleClose, mode }) {
                             }}
                             validationSchema={validationSchema}
                         >
-                            {({ values, handleChange, setFieldValue, errors, handleBlur, touched, resetForm }) => {
+                            {({ values, handleChange, setFieldValue, setFieldError, errors, handleBlur, touched, resetForm }) => {
                                 return (
                                     <Form>
                                         <div style={{ marginTop: '6px', margin: '10px' }}>
                                             <Grid gap="30px" display="flex">
                                                 <Grid item>
-                                                    <TextField
-                                                        sx={{
-                                                            width: { sm: 75, md: 180 },
-                                                            '& .MuiInputBase-root': {
-                                                                height: 40
-                                                            }
-                                                        }}
-                                                        id="paxBaggage"
-                                                        select
-                                                        InputLabelProps={{
-                                                            shrink: true
-                                                        }}
-                                                        label="Pag/Baggage"
-                                                        name="paxBaggage"
-                                                        onChange={handleChange}
-                                                        onBlur={handleBlur}
+                                                    <Autocomplete
                                                         value={values.paxBaggage}
-                                                        error={Boolean(touched.paxBaggage && errors.paxBaggage)}
-                                                        helperText={touched.paxBaggage && errors.paxBaggage ? errors.paxBaggage : ''}
-                                                    >
-                                                        <MenuItem dense={true} value={'Pax'}>
-                                                            Pax
-                                                        </MenuItem>
-                                                        <MenuItem dense={true} value={'Baggage'}>
-                                                            Baggage
-                                                        </MenuItem>
-                                                    </TextField>
+                                                        name="paxBaggage"
+                                                        onChange={(_, value) => {
+                                                            setFieldValue(`paxBaggage`, value);
+                                                            console.log(value);
+                                                        }}
+                                                        fullWidth
+                                                        options={['Pax', 'Baggage']}
+                                                        disableClearable={true}
+                                                        renderInput={(params) => (
+                                                            <TextField
+                                                                {...params}
+                                                                label="Pax/Baggage"
+                                                                InputLabelProps={{
+                                                                    shrink: true
+                                                                }}
+                                                                fullWidth
+                                                                sx={{
+                                                                    width: { sm: 75, md: 180 },
+                                                                    '& .MuiInputBase-root': {
+                                                                        height: 40
+                                                                    }
+                                                                }}
+                                                                variant="outlined"
+                                                                name="paxBaggage"
+                                                                onBlur={handleBlur}
+                                                                error={Boolean(touched.paxBaggage && errors.paxBaggage)}
+                                                                helperText={
+                                                                    touched.paxBaggage && errors.paxBaggage ? errors.paxBaggage : ''
+                                                                }
+                                                            />
+                                                        )}
+                                                    />
                                                 </Grid>
                                                 <Grid item>
                                                     <Autocomplete
@@ -315,6 +398,7 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                         options={activeTransportTypeList}
                                                         getOptionLabel={(option) => `${option.description}`}
                                                         isOptionEqualToValue={(option, value) => option.categoryId === value.categoryId}
+                                                        disableClearable={true}
                                                         renderInput={(params) => (
                                                             <TextField
                                                                 {...params}
@@ -344,33 +428,40 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                     />
                                                 </Grid>
                                                 <Grid item>
-                                                    <TextField
-                                                        sx={{
-                                                            width: { sm: 75, md: 180 },
-                                                            '& .MuiInputBase-root': {
-                                                                height: 40
-                                                            }
-                                                        }}
-                                                        id="chargeMethod"
-                                                        select
-                                                        InputLabelProps={{
-                                                            shrink: true
-                                                        }}
-                                                        label="Charge Method"
-                                                        name="chargeMethod"
-                                                        onChange={handleChange}
-                                                        onBlur={handleBlur}
+                                                    <Autocomplete
                                                         value={values.chargeMethod}
-                                                        error={Boolean(touched.chargeMethod && errors.chargeMethod)}
-                                                        helperText={touched.chargeMethod && errors.chargeMethod ? errors.chargeMethod : ''}
-                                                    >
-                                                        <MenuItem dense={true} value={'Distance'}>
-                                                            Distance
-                                                        </MenuItem>
-                                                        <MenuItem dense={true} value={'Hours'}>
-                                                            Hours
-                                                        </MenuItem>
-                                                    </TextField>
+                                                        name="chargeMethod"
+                                                        onChange={(_, value) => {
+                                                            setFieldValue(`chargeMethod`, value);
+                                                            console.log(value);
+                                                        }}
+                                                        fullWidth
+                                                        options={['Distance', 'Duration']}
+                                                        disableClearable={true}
+                                                        renderInput={(params) => (
+                                                            <TextField
+                                                                {...params}
+                                                                label="Charge Method"
+                                                                InputLabelProps={{
+                                                                    shrink: true
+                                                                }}
+                                                                fullWidth
+                                                                sx={{
+                                                                    width: { sm: 75, md: 180 },
+                                                                    '& .MuiInputBase-root': {
+                                                                        height: 40
+                                                                    }
+                                                                }}
+                                                                variant="outlined"
+                                                                name="chargeMethod"
+                                                                onBlur={handleBlur}
+                                                                error={Boolean(touched.chargeMethod && errors.chargeMethod)}
+                                                                helperText={
+                                                                    touched.chargeMethod && errors.chargeMethod ? errors.chargeMethod : ''
+                                                                }
+                                                            />
+                                                        )}
+                                                    />
                                                 </Grid>
                                                 <Grid item>
                                                     <Autocomplete
@@ -383,6 +474,7 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                         options={activeVehicleTypeList}
                                                         getOptionLabel={(option) => `${option.description}`}
                                                         isOptionEqualToValue={(option, value) => option.categoryId === value.categoryId}
+                                                        disableClearable={true}
                                                         renderInput={(params) => (
                                                             <TextField
                                                                 {...params}
@@ -421,6 +513,7 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                         options={activeVehicleCategoryList}
                                                         getOptionLabel={(option) => `${option.description}`}
                                                         isOptionEqualToValue={(option, value) => option.categoryId === value.categoryId}
+                                                        disableClearable={true}
                                                         renderInput={(params) => (
                                                             <TextField
                                                                 {...params}
@@ -465,6 +558,7 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                         options={activeLocationList}
                                                         getOptionLabel={(option) => `${option.code}-${option.shortDescription}`}
                                                         isOptionEqualToValue={(option, value) => option.location_id === value.location_id}
+                                                        disableClearable={true}
                                                         renderInput={(params) => (
                                                             <TextField
                                                                 {...params}
@@ -511,6 +605,7 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                         options={!values.location1 ? [] : activeLocationList}
                                                         getOptionLabel={(option) => `${option.code}-${option.shortDescription}`}
                                                         isOptionEqualToValue={(option, value) => option.location_id === value.location_id}
+                                                        disableClearable={true}
                                                         renderInput={(params) => (
                                                             <TextField
                                                                 {...params}
@@ -921,7 +1016,12 @@ function ProgramTransport({ open, handleClose, mode }) {
                                             </Grid>
                                             <Grid gap="60px" display="flex" style={{ marginTop: '50px' }}>
                                                 <Grid item>
-                                                    <Button className="btnSave" variant="contained" type="button" onClick={handleCalculate}>
+                                                    <Button
+                                                        className="btnSave"
+                                                        variant="contained"
+                                                        type="button"
+                                                        onClick={() => handleCalculate(values, setFieldError, errors, touched)}
+                                                    >
                                                         Calculate
                                                     </Button>
                                                 </Grid>
@@ -943,7 +1043,7 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                         }}
                                                         variant="outlined"
                                                         name="distance"
-                                                        value={distance}
+                                                        value={values.chargeMethod === 'Distance' ? distance : ''}
                                                         onBlur={handleBlur}
                                                     />
                                                 </Grid>
@@ -964,8 +1064,8 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                             readOnly: true
                                                         }}
                                                         variant="outlined"
-                                                        name="hours"
-                                                        value={duration}
+                                                        name="duration"
+                                                        value={values.chargeMethod === 'Duration' ? duration : ''}
                                                         onBlur={handleBlur}
                                                     />
                                                 </Grid>
