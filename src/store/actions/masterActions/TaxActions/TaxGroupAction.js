@@ -60,8 +60,9 @@ export const getActiveTaxGroupList = () => {
     };
 };
 
-export const getActiveTaxGroupandTaxList = () => {
+export const getActiveTaxGroupandTaxList = (data) => {
     return {
-        type: GET_TAX_GROUP_AND_TAX_LIST
+        type: GET_TAX_GROUP_AND_TAX_LIST,
+        data: data
     };
 };

@@ -14,7 +14,9 @@ import {
     SUCCESS_GET_ACTIVITY_SUPPLIMENT_DETAILS_BY_CODE,
     SUCCESS_GET_ACTIVITY_SUPPLIMENT_LAST_MODIFIED_DATE_TIME,
     UPDATE_FAILED_ACTIVITY_SUPPLIMENT_DATA,
-    UPDATE_SUCCESS_ACTIVITY_SUPPLIMENT_DATA
+    UPDATE_SUCCESS_ACTIVITY_SUPPLIMENT_DATA,
+    SUCCESS_GET_ALL_ACTIVE_ACT_SUP_MIS_DATA_BY_LOCATION_AND_TYPE,
+    FAILED_GET_ALL_ACTIVE_ACT_SUP_MIS_DATA_BY_LOCATION_AND_TYPE
 } from '../../constant/master/Activity_SupplimentConstant';
 
 export function* getAllActivity_SupplimentDataSaga() {
@@ -162,5 +164,19 @@ export function* getAllActiveActivity_SupplimentDataSaga() {
         yield put({ type: SUCCESS_GET_ALL_ACTIVE_ACTIVITY_SUPPLIMENT_DATA, data: responseData.data });
     } catch (e) {
         yield put({ type: FAILED_GET_ALL_ACTIVE_ACTIVITY_SUPPLIMENT_DATA, data: responseData.data });
+    }
+}
+
+export function* getActSupMisListByLocationAndTypSaga(action) {
+    console.log(action.data);
+    action.data.path = `${process.env.REACT_APP_TOUR_URL}/activeActivities`;
+    let responseData = [];
+    try {
+        responseData = yield call(create, action.data);
+        console.log(responseData);
+        yield put({ type: SUCCESS_GET_ALL_ACTIVE_ACT_SUP_MIS_DATA_BY_LOCATION_AND_TYPE, data: responseData.data });
+    } catch (e) {
+        console.log('heyyyyyyyyyyyyyyyyyyyyy bnbnbn');
+        yield put({ type: FAILED_GET_ALL_ACTIVE_ACT_SUP_MIS_DATA_BY_LOCATION_AND_TYPE, data: responseData });
     }
 }

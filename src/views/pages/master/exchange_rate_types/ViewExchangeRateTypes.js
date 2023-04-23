@@ -27,13 +27,13 @@ function ViewExchangeRateTypes() {
         },
         {
             title: 'Base Currency Code',
-            field: 'baseCurrencyCode',
+            field: 'baseCurrencyCode.currencyCode',
             filterPlaceholder: 'filter',
             align: 'left'
         },
         {
             title: 'Currency ISO Code',
-            field: 'currencyISOCode',
+            field: 'currencyISOCode.currencyCode',
             align: 'left',
             grouping: false,
             filterPlaceholder: 'filter'
@@ -125,13 +125,13 @@ function ViewExchangeRateTypes() {
         console.log(data);
         if (type === 'VIEW_UPDATE') {
             setMode(type);
-            setCode(data.baseCurrencyCode);
+            setCode(data.currencyId);
         } else if (type === 'INSERT') {
             setCode('');
             setMode(type);
         } else {
             setMode(type);
-            setCode(data.baseCurrencyCode);
+            setCode(data.currencyId);
         }
         setOpen(true);
     };

@@ -215,7 +215,6 @@ function PaxVehicleRate({ mode, selectedType, setMode }) {
     const guideClassActiveList = useSelector((state) => state.guideClassReducer.guideClassActiveList);
     const vehicleCategories = useSelector((state) => state.mainTransportCategoryReducer.vehicleCategories);
     const vehicleTypes = useSelector((state) => state.mainTransportCategoryReducer.vehicleTypes);
-    const taxListData = useSelector((state) => state.taxReducer.taxes);
     const activeTaxGroupandTaxesListData = useSelector((state) => state.taxGroupReducer.activeTaxGroupandTaxes);
 
     const [flag, setFlag] = useState(true);
@@ -343,12 +342,6 @@ function PaxVehicleRate({ mode, selectedType, setMode }) {
     }, [currencyListData]);
 
     useEffect(() => {
-        if (taxListData != null) {
-            setTaxListOptions(taxListData);
-        }
-    }, [taxListData]);
-
-    useEffect(() => {
         console.log(error);
         if (error != null) {
             console.log('failed Toast');
@@ -376,8 +369,7 @@ function PaxVehicleRate({ mode, selectedType, setMode }) {
         dispatch(getAllActiveGuideClassData());
         dispatch(getAllActiveVehicleCategoryDataByType('Vehicle Category'));
         dispatch(getAllActiveVehicleTypeDataByType('Vehicle Type'));
-        dispatch(getAllTaxData());
-        dispatch(getActiveTaxGroupandTaxList());
+        dispatch(getActiveTaxGroupandTaxList('buy'));
     }, []);
 
     const handleToast = () => {

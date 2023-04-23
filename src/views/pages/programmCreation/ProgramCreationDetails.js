@@ -1,17 +1,17 @@
-import { Accordion, AccordionDetails, AccordionSummary, ButtonGroup, Grid, Typography } from '@mui/material';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { Grid, Typography } from '@mui/material';
 import React, { useState } from 'react';
-import { gridSpacing } from 'store/constant';
 import { Formik, Field, Form } from 'formik';
 import * as Yup from 'yup';
 import MainCard from 'ui-component/cards/MainCard';
-import { Button, makeStyles, Card, CardContent, Divider } from '@material-ui/core';
+import { Button, makeStyles, Divider } from '@material-ui/core';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import { style } from '@mui/system';
 import SuccessMsg from 'messages/SuccessMsg';
 import ErrorMsg from 'messages/ErrorMsg';
 import ProgramTransport from './ProgramTransport';
 import ProgramActivity from './ProgramActivity';
+import ProgramMisCellaneous from './ProgramMisCellaneous';
+import ProgramSuppliment from './ProgramSuppliment';
+import MaterialTable from 'material-table';
 
 const useStyles = makeStyles((theme) => ({
     content: {
@@ -93,7 +93,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-function ProgramCreationDetails() {
+function ProgramCreationDetails(startDate) {
     const [numButtons, setNumButtons] = useState(null);
     const [activeButton, setActiveButton] = useState(null);
     const [buttonTexts, setButtonTexts] = useState([]);
@@ -107,8 +107,24 @@ function ProgramCreationDetails() {
     const [openMiscellaneous, setOpenMiscellaneous] = useState(false);
     const [openToast, setHandleToast] = useState(false);
     const [openErrorToast, setOpenErrorToast] = useState(false);
+    const [tableData, setTableData] = useState([]);
     const [mode, setMode] = useState('INSERT');
     const classes = useStyles();
+
+    const columns = [
+        {
+            title: 't1',
+            field: 'taxCode',
+            filterPlaceholder: 'Tax Code',
+            align: 'left'
+        },
+        {
+            title: 't2',
+            field: 'taxDescription',
+            filterPlaceholder: 'Tax Description',
+            align: 'left'
+        }
+    ];
 
     const handleKeyDown = (event) => {
         if (event.key === 'Backspace') {
@@ -169,8 +185,8 @@ function ProgramCreationDetails() {
         } else if (category === 'Activites') {
             setOpenActivites(true);
         } else if (category === 'Supplements') {
-            setOpenActivites(true);
-        } else {
+            setOpenSupplements(true);
+        } else if (category === 'Miscellaneous') {
             setOpenMiscellaneous(true);
         }
     };
@@ -181,6 +197,7 @@ function ProgramCreationDetails() {
         setOpenActivites(false);
         setOpenActivites(false);
         setOpenMiscellaneous(false);
+        setOpenSupplements(false);
     };
 
     const handleToast = () => {
@@ -221,7 +238,6 @@ function ProgramCreationDetails() {
                                 <Typography variant="h4" className={classes.dayText}>
                                     Day {i + 1}
                                 </Typography>
-
                                 <Button
                                     className={`btnSave ${classes.popUpButton}`}
                                     variant="contained"
@@ -235,7 +251,6 @@ function ProgramCreationDetails() {
                                         onClick={() => handleClickOpen('INSERT', 'Transport', null)}
                                     />
                                 </Button>
-
                                 <Button
                                     className={`btnSave ${classes.popUpButton}`}
                                     variant="contained"
@@ -249,7 +264,6 @@ function ProgramCreationDetails() {
                                         onClick={() => handleClickOpen('INSERT', 'Accomodation', null)}
                                     />
                                 </Button>
-
                                 <Button
                                     className={`btnSave ${classes.popUpButton}`}
                                     variant="contained"
@@ -263,7 +277,6 @@ function ProgramCreationDetails() {
                                         onClick={() => handleClickOpen('INSERT', 'Activites', null)}
                                     />
                                 </Button>
-
                                 <Button
                                     className={`btnSave ${classes.popUpButton}`}
                                     variant="contained"
@@ -277,7 +290,6 @@ function ProgramCreationDetails() {
                                         onClick={() => handleClickOpen('INSERT', 'Supplements', null)}
                                     />
                                 </Button>
-
                                 <Button
                                     className={`btnSave ${classes.popUpButton}`}
                                     variant="contained"
@@ -321,7 +333,28 @@ function ProgramCreationDetails() {
                             </div>
                             <br />
                             {openTransport ? <ProgramTransport open={openTransport} handleClose={handleClose} mode={mode} /> : ''}
-                            {openActivites ? <ProgramActivity open={openActivites} handleClose={handleClose} mode={mode} /> : ''}
+                            {openActivites ? (
+                                <ProgramActivity open={openActivites} handleClose={handleClose} mode={mode} startDate={startDate} />
+                            ) : (
+                                ''
+                            )}
+                            {openMiscellaneous ? (
+                                <ProgramMisCellaneous
+                                    open={openMiscellaneous}
+                                    handleClose={handleClose}
+                                    mode={mode}
+                                    startDate={startDate}
+                                />
+                            ) : (
+                                ''
+                            )}
+
+                            {openSupplements ? (
+                                <ProgramSuppliment open={openSupplements} handleClose={handleClose} mode={mode} startDate={startDate} />
+                            ) : (
+                                ''
+                            )}
+
                             {openToast ? <SuccessMsg openToast={openToast} handleToast={handleToast} mode={mode} /> : null}
                             {openErrorToast ? <ErrorMsg openToast={openErrorToast} handleToast={setOpenErrorToast} mode={mode} /> : null}
                         </Grid>
@@ -357,7 +390,7 @@ function ProgramCreationDetails() {
                                     max={60}
                                     required
                                 />
-                                {/* <ErrorMessage name="number" /> */}
+
                                 <Button
                                     className={`btnSave ${classes.setButton}`}
                                     variant="contained"

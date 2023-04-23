@@ -129,6 +129,8 @@ function ActivitySupplement({ open, handleClose, mode, activitySupplimentId }) {
                 (mode === 'VIEW_UPDATE' && activity_supplimentToUpdate != null) ||
                 (mode === 'VIEW' && activity_supplimentToUpdate != null)
             ) {
+                console.log(activity_supplimentToUpdate);
+
                 activity_supplimentToUpdate.activityWithTaxes.map((item) => {
                     const activityWithTaxes = {
                         enableRow: true,
@@ -137,7 +139,6 @@ function ActivitySupplement({ open, handleClose, mode, activitySupplimentId }) {
                         currencyList: item.currencyList,
                         tax: item.tax,
                         perDayRate: item.perPaxBuyRate == null ? 0.0 : item.perPaxBuyRate,
-
                         status: item.status
                     };
 
@@ -199,12 +200,13 @@ function ActivitySupplement({ open, handleClose, mode, activitySupplimentId }) {
                 setPreviewImages(images);
 
                 setLoadValues(saveValues);
-                activity_supplimentToUpdate.type == 'Supplement' ? setCategoryType('Supplement') : setCategoryType('Activity');
+                setCategoryType(activity_supplimentToUpdate.type);
+                // activity_supplimentToUpdate.type == 'Supplement' ? setCategoryType('Supplement') : setCategoryType('Activity');
                 activity_supplimentToUpdate.type == 'Supplement' ? setTypeOfActivity(false) : setTypeOfActivity(true);
                 // activity_supplimentToUpdate.typeOfActivity == 'Supplement' ? setCategoryType('Supplement') : setCategoryType('Activity');
                 if (activity_supplimentToUpdate.typeOfActivity == 'Group') {
                     setLabelName('Per Group Rate');
-                } else if (activity_supplimentToUpdate.typeOfActivity == 'Ride') {
+                } else if (activity_supplimentToUpdate.typeOfActivity == 'Slab') {
                     setLabelName('Max Pax Rate');
                     // setTypeOfActivity(false);
                 } else {
@@ -339,6 +341,7 @@ function ActivitySupplement({ open, handleClose, mode, activitySupplimentId }) {
         } else if (mode === 'VIEW_UPDATE') {
             const dataArray = [];
             const dataArrayYoutube = [];
+
             console.log('activity_supplimentToUpdate.id:' + activity_supplimentToUpdate.id);
             data.activityWithTaxes.map((item) => {
                 const activityWithTaxes = {
@@ -426,6 +429,8 @@ function ActivitySupplement({ open, handleClose, mode, activitySupplimentId }) {
         setCategoryType(selectedType);
         if (selectedType == 'Activity') {
             setTypeOfActivity(true);
+        } else if (selectedType == 'Miscellaneous') {
+            setTypeOfActivity(true);
         } else {
             setLabelName('Per Pax Rate');
             setTypeOfActivity(false);
@@ -437,7 +442,7 @@ function ActivitySupplement({ open, handleClose, mode, activitySupplimentId }) {
         const selectedType = event.currentTarget.dataset.value;
         if (selectedType == 'Group') {
             setLabelName('Per Group Rate');
-        } else if (selectedType == 'Ride') {
+        } else if (selectedType == 'Slab') {
             setLabelName('Max Pax Rate');
             // setTypeOfActivity(false);
         } else {
@@ -499,7 +504,7 @@ function ActivitySupplement({ open, handleClose, mode, activitySupplimentId }) {
                                                                         disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
                                                                         id="standard-select-currency"
                                                                         select
-                                                                        label="Activity / Supplement"
+                                                                        label="Activity / Supplement / Miscellaneous"
                                                                         name="type"
                                                                         onChange={handleChange}
                                                                         onBlur={handleBlur}
@@ -522,6 +527,13 @@ function ActivitySupplement({ open, handleClose, mode, activitySupplimentId }) {
                                                                         <MenuItem dense={true} value={'Supplement'} onClick={selectedType}>
                                                                             Supplement
                                                                         </MenuItem>
+                                                                        <MenuItem
+                                                                            dense={true}
+                                                                            value={'Miscellaneous'}
+                                                                            onClick={selectedType}
+                                                                        >
+                                                                            Miscellaneous
+                                                                        </MenuItem>
                                                                     </TextField>
                                                                 </Grid>
                                                                 {typeOfActivity ? (
@@ -536,7 +548,7 @@ function ActivitySupplement({ open, handleClose, mode, activitySupplimentId }) {
                                                                             disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
                                                                             id="standard-select-currency"
                                                                             select
-                                                                            label="Type Of Activity"
+                                                                            label={'Type of ' + categoryType}
                                                                             name="typeOfActivity"
                                                                             onChange={handleChange}
                                                                             onBlur={handleBlur}
@@ -569,10 +581,10 @@ function ActivitySupplement({ open, handleClose, mode, activitySupplimentId }) {
                                                                             </MenuItem>
                                                                             <MenuItem
                                                                                 dense={true}
-                                                                                value={'Ride'}
+                                                                                value={'Slab'}
                                                                                 onClick={selectedActivityType}
                                                                             >
-                                                                                Ride
+                                                                                Slab
                                                                             </MenuItem>
                                                                         </TextField>
                                                                     </Grid>
@@ -862,7 +874,7 @@ function ActivitySupplement({ open, handleClose, mode, activitySupplimentId }) {
                                                             </Grid>
 
                                                             <br />
-                                                            <Grid item xs={8}>
+                                                            <Grid item xs={8} display={categoryType === 'Miscellaneous' ? 'none' : 'block'}>
                                                                 <input
                                                                     type="file"
                                                                     multiple
@@ -922,121 +934,128 @@ function ActivitySupplement({ open, handleClose, mode, activitySupplimentId }) {
                                                         </div>
 
                                                         {/* youtubeLinks */}
-                                                        <FieldArray name="youtubeLinks">
-                                                            {({ insert, remove, push }) => (
-                                                                <Paper>
-                                                                    {mode != 'VIEW' ? (
-                                                                        <Box display="flex" flexDirection="row-reverse">
-                                                                            <IconButton
-                                                                                aria-label="delete"
-                                                                                onClick={() => {
-                                                                                    push({
-                                                                                        url: '',
-                                                                                        status: false
-                                                                                    });
-                                                                                }}
-                                                                            >
-                                                                                <AddBoxIcon />
-                                                                            </IconButton>
-                                                                        </Box>
-                                                                    ) : (
-                                                                        ''
-                                                                    )}
+                                                        {categoryType !== 'Miscellaneous' ? (
+                                                            <FieldArray name="youtubeLinks">
+                                                                {({ insert, remove, push }) => (
+                                                                    <Paper>
+                                                                        {mode != 'VIEW' ? (
+                                                                            <Box display="flex" flexDirection="row-reverse">
+                                                                                <IconButton
+                                                                                    aria-label="delete"
+                                                                                    onClick={() => {
+                                                                                        push({
+                                                                                            url: '',
+                                                                                            status: false
+                                                                                        });
+                                                                                    }}
+                                                                                >
+                                                                                    <AddBoxIcon />
+                                                                                </IconButton>
+                                                                            </Box>
+                                                                        ) : (
+                                                                            ''
+                                                                        )}
 
-                                                                    <TableContainer>
-                                                                        <Table stickyHeader size="small">
-                                                                            <TableHead>
-                                                                                <TableRow>
-                                                                                    <TableCell>Sequence</TableCell>
-                                                                                    <TableCell>Youtube Link</TableCell>
+                                                                        <TableContainer>
+                                                                            <Table stickyHeader size="small">
+                                                                                <TableHead>
+                                                                                    <TableRow>
+                                                                                        <TableCell>Sequence</TableCell>
+                                                                                        <TableCell>Youtube Link</TableCell>
 
-                                                                                    <TableCell>Status</TableCell>
-                                                                                    <TableCell>Actions</TableCell>
-                                                                                </TableRow>
-                                                                            </TableHead>
-                                                                            <TableBody>
-                                                                                {values.youtubeLinks.map((record, idx) => {
-                                                                                    return (
-                                                                                        <TableRow key={idx} hover>
-                                                                                            <TableCell>{idx + 1}</TableCell>
+                                                                                        <TableCell>Status</TableCell>
+                                                                                        <TableCell>Actions</TableCell>
+                                                                                    </TableRow>
+                                                                                </TableHead>
+                                                                                <TableBody>
+                                                                                    {values.youtubeLinks.map((record, idx) => {
+                                                                                        return (
+                                                                                            <TableRow key={idx} hover>
+                                                                                                <TableCell>{idx + 1}</TableCell>
 
-                                                                                            <TableCell>
-                                                                                                <TextField
-                                                                                                    sx={{
-                                                                                                        width: { sm: 500 },
-                                                                                                        '& .MuiInputBase-root': {
-                                                                                                            height: 40
-                                                                                                        }
-                                                                                                    }}
-                                                                                                    // label="Additional Price"
-                                                                                                    type="text"
-                                                                                                    variant="outlined"
-                                                                                                    // disabled={
-                                                                                                    //     mode == 'VIEW_UPDATE' ||
-                                                                                                    //     mode == 'VIEW'
-                                                                                                    // }
+                                                                                                <TableCell>
+                                                                                                    <TextField
+                                                                                                        sx={{
+                                                                                                            width: { sm: 500 },
+                                                                                                            '& .MuiInputBase-root': {
+                                                                                                                height: 40
+                                                                                                            }
+                                                                                                        }}
+                                                                                                        // label="Additional Price"
+                                                                                                        type="text"
+                                                                                                        variant="outlined"
+                                                                                                        // disabled={
+                                                                                                        //     mode == 'VIEW_UPDATE' ||
+                                                                                                        //     mode == 'VIEW'
+                                                                                                        // }
 
-                                                                                                    name={`youtubeLinks.${idx}.url`}
-                                                                                                    value={
-                                                                                                        values.youtubeLinks[idx] &&
-                                                                                                        values.youtubeLinks[idx].url
-                                                                                                    }
-                                                                                                    onChange={handleChange}
-                                                                                                    // onChange={(e) =>
-                                                                                                    //     setRateWithTax(e.target.value)
-                                                                                                    // }
-                                                                                                    onBlur={handleBlur}
-                                                                                                />
-                                                                                            </TableCell>
-
-                                                                                            <TableCell>
-                                                                                                <FormGroup>
-                                                                                                    <FormControlLabel
-                                                                                                        name={`youtubeLinks.${idx}.status`}
-                                                                                                        // onChange={handleChangeStatus}
+                                                                                                        name={`youtubeLinks.${idx}.url`}
                                                                                                         value={
                                                                                                             values.youtubeLinks[idx] &&
-                                                                                                            values.youtubeLinks[idx].status
+                                                                                                            values.youtubeLinks[idx].url
                                                                                                         }
-                                                                                                        control={<Switch color="success" />}
-                                                                                                        onChange={(_, value) => {
-                                                                                                            checkStatus();
-                                                                                                            // console.log(value.currencyListId);
-                                                                                                            // setAppearing(value);
-                                                                                                            setFieldValue(
-                                                                                                                `youtubeLinks.${idx}.status`,
-                                                                                                                value
-                                                                                                            );
-                                                                                                        }}
-                                                                                                        // label="Status"
-                                                                                                        checked={
-                                                                                                            values.youtubeLinks[idx] &&
-                                                                                                            values.youtubeLinks[idx].status
-                                                                                                        }
-                                                                                                        disabled={mode == 'VIEW'}
+                                                                                                        onChange={handleChange}
+                                                                                                        // onChange={(e) =>
+                                                                                                        //     setRateWithTax(e.target.value)
+                                                                                                        // }
+                                                                                                        onBlur={handleBlur}
                                                                                                     />
-                                                                                                </FormGroup>
-                                                                                            </TableCell>
-                                                                                            <TableCell>
-                                                                                                <IconButton
-                                                                                                    aria-label="delete"
-                                                                                                    onClick={() => {
-                                                                                                        remove(idx);
-                                                                                                    }}
-                                                                                                >
-                                                                                                    <HighlightOffIcon />
-                                                                                                </IconButton>
-                                                                                            </TableCell>
-                                                                                        </TableRow>
-                                                                                    );
-                                                                                })}
-                                                                            </TableBody>
-                                                                        </Table>
-                                                                    </TableContainer>
-                                                                </Paper>
-                                                            )}
-                                                        </FieldArray>
+                                                                                                </TableCell>
 
+                                                                                                <TableCell>
+                                                                                                    <FormGroup>
+                                                                                                        <FormControlLabel
+                                                                                                            name={`youtubeLinks.${idx}.status`}
+                                                                                                            // onChange={handleChangeStatus}
+                                                                                                            value={
+                                                                                                                values.youtubeLinks[idx] &&
+                                                                                                                values.youtubeLinks[idx]
+                                                                                                                    .status
+                                                                                                            }
+                                                                                                            control={
+                                                                                                                <Switch color="success" />
+                                                                                                            }
+                                                                                                            onChange={(_, value) => {
+                                                                                                                checkStatus();
+                                                                                                                // console.log(value.currencyListId);
+                                                                                                                // setAppearing(value);
+                                                                                                                setFieldValue(
+                                                                                                                    `youtubeLinks.${idx}.status`,
+                                                                                                                    value
+                                                                                                                );
+                                                                                                            }}
+                                                                                                            // label="Status"
+                                                                                                            checked={
+                                                                                                                values.youtubeLinks[idx] &&
+                                                                                                                values.youtubeLinks[idx]
+                                                                                                                    .status
+                                                                                                            }
+                                                                                                            disabled={mode == 'VIEW'}
+                                                                                                        />
+                                                                                                    </FormGroup>
+                                                                                                </TableCell>
+                                                                                                <TableCell>
+                                                                                                    <IconButton
+                                                                                                        aria-label="delete"
+                                                                                                        onClick={() => {
+                                                                                                            remove(idx);
+                                                                                                        }}
+                                                                                                    >
+                                                                                                        <HighlightOffIcon />
+                                                                                                    </IconButton>
+                                                                                                </TableCell>
+                                                                                            </TableRow>
+                                                                                        );
+                                                                                    })}
+                                                                                </TableBody>
+                                                                            </Table>
+                                                                        </TableContainer>
+                                                                    </Paper>
+                                                                )}
+                                                            </FieldArray>
+                                                        ) : (
+                                                            ''
+                                                        )}
                                                         <FieldArray name="activityWithTaxes">
                                                             {({ insert, remove, push }) => (
                                                                 <Paper>

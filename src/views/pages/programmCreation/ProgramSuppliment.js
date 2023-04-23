@@ -19,40 +19,36 @@ import {
 } from '@mui/material';
 import { getActiveTaxGroupandTaxList } from 'store/actions/masterActions/TaxActions/TaxGroupAction';
 import { getActiveLocations } from 'store/actions/masterActions/LocationAction';
-import * as yup from 'yup';
 import { getActivitySupMisByLcationandType } from 'store/actions/masterActions/Activity_SupplimentAction';
+import * as yup from 'yup';
 
-function ProgramMisCellaneous({ open, handleClose, mode, id, startDate }) {
+function ProgramSuppliment({ open, handleClose, mode, id, startDate }) {
     const initialValues = {
         location: null,
-        activity: null,
+        supplement: null,
         maxPax: '',
         description: '',
-        advance: true,
+        chargeable: true,
         remarks: '',
         totalBuyRate: '',
         taxGroup: null,
         markup: '',
         sellRate: '',
-        totalSellRateWithTax: '',
-        miscellaneosType: null,
-        miscellaneousCode: null
+        totalSellRateWithTax: ''
     };
     const dispatch = useDispatch();
 
-    const [miscellaneosCodeList, setMiscellaneosCodeList] = useState([]);
+    const [supplimentCodeList, setSupplimentCodeList] = useState([]);
     const [activeTaxGroupandTaxesList, setActiveTaxGroupandTaxesListData] = useState([]);
-    const [activityTypeList, setActivityTypeList] = useState([{ label: 'Individual' }, { label: 'Group' }, { label: 'Slab' }]);
     const [activeLocationList, setActiveLocationList] = useState([]);
     //data from reducers
     const activeTaxGroupandTaxesListData = useSelector((state) => state.taxGroupReducer.activeTaxGroupandTaxes);
     const activeLocations = useSelector((state) => state.locationReducer.activeLocations);
-    const miscellaneousListByLocationandType = useSelector((state) => state.activity_supplimentReducer.actSupMisListByLocationandType);
+    const suplimentListByLocationandType = useSelector((state) => state.activity_supplimentReducer.actSupMisListByLocationandType);
 
     const validationSchema = yup.object().shape({
         location: yup.object().nullable().required('Required field'),
-        miscellaneosType: yup.object().nullable().required('Required field'),
-        miscellaneousCode: yup.object().nullable().required('Required field'),
+        supplement: yup.object().nullable().required('Required field'),
         taxGroup: yup.object().nullable().required('Required field')
     });
     const handleSubmit = async (values) => {
@@ -60,49 +56,9 @@ function ProgramMisCellaneous({ open, handleClose, mode, id, startDate }) {
     };
 
     useEffect(() => {
-        console.log('HEYYYYYYYYYYYYYYYY');
-        console.log(miscellaneousListByLocationandType);
-        if (miscellaneousListByLocationandType.length != 0) {
-            setMiscellaneosCodeList(miscellaneousListByLocationandType);
-        } else {
-            setMiscellaneosCodeList([]);
-        }
-    }, [miscellaneousListByLocationandType]);
-
-    const calculateSellRateTax = (value, tax, setFieldValue) => {
-        console.log(value);
-        console.log(tax);
-        if (tax != null) {
-            if (tax.type === 'Group') {
-                let amountWithTax = value;
-                for (let i in tax.taxOrder) {
-                    amountWithTax = (+amountWithTax * tax.taxOrder[i]) / 100 + +amountWithTax;
-                }
-
-                setFieldValue(`vehicleRateWithTax`, +amountWithTax.toFixed(4));
-            } else if (tax.type === 'IND') {
-                let amountWithTax = 0;
-                amountWithTax = (+value * tax.tax) / 100 + +value;
-
-                setFieldValue(`vehicleRateWithTax`, +amountWithTax.toFixed(4));
-            }
-        }
-    };
-    const getMiscellaneousByLocationAndType = (locationId, type) => {
-        let data = {
-            locationId: locationId.location_id,
-            type: 'Miscellaneous',
-            typeOfActivity: type.label,
-            fromDate: startDate
-        };
-
-        dispatch(getActivitySupMisByLcationandType(data));
-    };
-
-    useEffect(() => {
         dispatch(getActiveLocations());
 
-        dispatch(getActiveTaxGroupandTaxList('sell'));
+        dispatch(getActiveTaxGroupandTaxList('Sell'));
     }, []);
 
     useEffect(() => {
@@ -118,13 +74,54 @@ function ProgramMisCellaneous({ open, handleClose, mode, id, startDate }) {
         }
     }, [activeTaxGroupandTaxesListData]);
 
-    const filledMiscellaneoseDetails = (data, setFieldValue) => {
+    useEffect(() => {
+        console.log('HEYYYYYYYYYYYYYYYY');
+        if (suplimentListByLocationandType.length != 0) {
+            setSupplimentCodeList(suplimentListByLocationandType);
+        } else {
+            setSupplimentCodeList([]);
+        }
+    }, [suplimentListByLocationandType]);
+
+    const getSuplimentByLocationAndType = (locationId) => {
+        console.log('im called');
+
+        let data = {
+            locationId: locationId.location_id,
+            type: 'Supplement',
+            typeOfActivity: null,
+            fromDate: startDate
+        };
+        console.log(data);
+        dispatch(getActivitySupMisByLcationandType(data));
+    };
+
+    const filledSupplimentDetails = (data, setFieldValue) => {
         setFieldValue('description', data.activityDescription);
         setFieldValue('maxPax', data.maxPax);
         setFieldValue('advance', data.advanceType);
         setFieldValue('totalBuyRate', data.activityWithTaxes[0].length === 0 ? 0 : data.activityWithTaxes[0].rateWithTax);
     };
 
+    const calculateSellRateTax = (value, tax, setFieldValue) => {
+        console.log(value);
+        console.log(tax);
+        if (tax != null) {
+            if (tax.type === 'Group') {
+                let amountWithTax = value;
+                for (let i in tax.taxOrder) {
+                    amountWithTax = (+amountWithTax * tax.taxOrder[i]) / 100 + +amountWithTax;
+                }
+
+                setFieldValue(`totalSellRateWithTax`, +amountWithTax.toFixed(4));
+            } else if (tax.type === 'IND') {
+                let amountWithTax = 0;
+                amountWithTax = (+value * tax.tax) / 100 + +value;
+
+                setFieldValue(`totalSellRateWithTax`, +amountWithTax.toFixed(4));
+            }
+        }
+    };
     return (
         <div>
             <Dialog
@@ -140,7 +137,7 @@ function ProgramMisCellaneous({ open, handleClose, mode, id, startDate }) {
                     <Box display="flex" className="dialog-title">
                         <Box flexGrow={1}>
                             {mode === 'BANK' ? 'Add' : ''} {mode === 'VIEW_UPDATE' ? 'Update' : ''} {mode === 'VIEW' ? 'View' : ''}
-                            Miscellaneous
+                            Suppliment
                         </Box>
                         <Box>
                             <IconButton onClick={handleClose}>
@@ -170,8 +167,8 @@ function ProgramMisCellaneous({ open, handleClose, mode, id, startDate }) {
                                                 name="location"
                                                 onChange={(_, value) => {
                                                     setFieldValue(`location`, value);
-                                                    if (value != null && values.miscellaneosType != null) {
-                                                        getMiscellaneousByLocationAndType(value, values.miscellaneosType);
+                                                    if (value != null) {
+                                                        getSuplimentByLocationAndType(value);
                                                     }
                                                 }}
                                                 fullWidth
@@ -200,61 +197,23 @@ function ProgramMisCellaneous({ open, handleClose, mode, id, startDate }) {
                                                     />
                                                 )}
                                             />
-                                            <Autocomplete
-                                                value={values.miscellaneosType}
-                                                name="miscellaneosType"
-                                                onChange={(_, value) => {
-                                                    setFieldValue(`miscellaneosType`, value);
-                                                    if (value != null && values.location != null) {
-                                                        getMiscellaneousByLocationAndType(values.location, value);
-                                                    }
-                                                }}
-                                                fullWidth
-                                                options={activityTypeList}
-                                                getOptionLabel={(option) => `${option.label}`}
-                                                isOptionEqualToValue={(option, value) => option.label === value.label}
-                                                renderInput={(params) => (
-                                                    <TextField
-                                                        {...params}
-                                                        label="Type Of Miscellaneous"
-                                                        InputLabelProps={{
-                                                            shrink: true
-                                                        }}
-                                                        fullWidth
-                                                        sx={{
-                                                            '& .MuiInputBase-root': {
-                                                                height: 40
-                                                            }
-                                                        }}
-                                                        // disabled={mode == 'VIEW'}
-                                                        variant="outlined"
-                                                        name="miscellaneosType"
-                                                        onBlur={handleBlur}
-                                                        error={Boolean(touched.miscellaneosType && errors.miscellaneosType)}
-                                                        helperText={
-                                                            touched.miscellaneosType && errors.miscellaneosType
-                                                                ? errors.miscellaneosType
-                                                                : ''
-                                                        }
-                                                    />
-                                                )}
-                                            />
 
                                             <Autocomplete
-                                                value={values.miscellaneousCode}
-                                                name="miscellaneousCode"
+                                                value={values.activity}
+                                                name="supplement"
                                                 onChange={(_, value) => {
-                                                    setFieldValue(`miscellaneousCode`, value);
-                                                    filledMiscellaneoseDetails(value, setFieldValue);
+                                                    console.log(value);
+                                                    setFieldValue(`supplement`, value);
+                                                    filledSupplimentDetails(value, setFieldValue);
                                                 }}
                                                 fullWidth
-                                                options={miscellaneosCodeList}
+                                                options={supplimentCodeList}
                                                 getOptionLabel={(option) => `${option.code}`}
                                                 isOptionEqualToValue={(option, value) => option.id === value.id}
                                                 renderInput={(params) => (
                                                     <TextField
                                                         {...params}
-                                                        label="Miscellaneous Code"
+                                                        label="Supplement"
                                                         InputLabelProps={{
                                                             shrink: true
                                                         }}
@@ -266,14 +225,10 @@ function ProgramMisCellaneous({ open, handleClose, mode, id, startDate }) {
                                                         }}
                                                         // disabled={mode == 'VIEW'}
                                                         variant="outlined"
-                                                        name="miscellaneousCode"
+                                                        name="supplement"
                                                         onBlur={handleBlur}
-                                                        error={Boolean(touched.miscellaneousCode && errors.miscellaneousCode)}
-                                                        helperText={
-                                                            touched.miscellaneousCode && errors.miscellaneousCode
-                                                                ? errors.miscellaneousCode
-                                                                : ''
-                                                        }
+                                                        error={Boolean(touched.supplement && errors.supplement)}
+                                                        helperText={touched.supplement && errors.supplement ? errors.supplement : ''}
                                                     />
                                                 )}
                                             />
@@ -326,12 +281,12 @@ function ProgramMisCellaneous({ open, handleClose, mode, id, startDate }) {
                                         <Stack spacing={2} direction="row" sx={{ marginBottom: 4 }}>
                                             <FormGroup>
                                                 <FormControlLabel
-                                                    name="advance"
+                                                    name="chargeable"
                                                     onChange={handleChange}
-                                                    value={values.advance}
+                                                    value={values.chargeable}
                                                     control={<Switch color="success" />}
                                                     label="Advance"
-                                                    checked={values.advance}
+                                                    checked={values.chargeable}
                                                     disabled={mode == 'VIEW'}
                                                 />
                                             </FormGroup>
@@ -523,4 +478,4 @@ function ProgramMisCellaneous({ open, handleClose, mode, id, startDate }) {
     );
 }
 
-export default ProgramMisCellaneous;
+export default ProgramSuppliment;

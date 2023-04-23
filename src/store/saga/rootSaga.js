@@ -536,7 +536,8 @@ import {
     GET_ALL_ACTIVE_ACTIVITY_SUPPLIMENT_DATA,
     GET_ALL_ACTIVITY_SUPPLIMENT_DATA,
     SAVE_ACTIVITY_SUPPLIMENT_DATA,
-    UPDATE_ACTIVITY_SUPPLIMENT_DATA
+    UPDATE_ACTIVITY_SUPPLIMENT_DATA,
+    GET_ALL_ACTIVE_ACT_SUP_MIS_DATA_BY_LOCATION_AND_TYPE
 } from 'store/constant/master/Activity_SupplimentConstant';
 import {
     checkActivity_SupplimentDupicateCodeSaga,
@@ -545,7 +546,8 @@ import {
     getAllActiveActivity_SupplimentDataSaga,
     getAllActivity_SupplimentDataSaga,
     saveActivity_SupplimentDataHandler,
-    updateActivity_SupplimentDataSaga
+    updateActivity_SupplimentDataSaga,
+    getActSupMisListByLocationAndTypSaga
 } from './mastersaga/Activity_SupplimentSage';
 import { getAllActiveRecreationData } from 'store/actions/masterActions/HotelFacilityAction';
 import {
@@ -1019,6 +1021,7 @@ export function* wacherSaga() {
     yield takeLatest(CHECK_ACTIVITY_SUPPLIMENT_CODE_DUPLICATE, checkActivity_SupplimentDupicateCodeSaga);
     yield takeLatest(UPDATE_ACTIVITY_SUPPLIMENT_DATA, updateActivity_SupplimentDataSaga);
     yield takeLatest(GET_ALL_ACTIVE_ACTIVITY_SUPPLIMENT_DATA, getAllActiveActivity_SupplimentDataSaga);
+    yield takeLatest(GET_ALL_ACTIVE_ACT_SUP_MIS_DATA_BY_LOCATION_AND_TYPE, getActSupMisListByLocationAndTypSaga);
 
     //bank
     yield takeLatest(SAVE_BANK_DATA, saveBankSaga);
