@@ -78,8 +78,8 @@ function ProgramTransport({ open, handleClose, mode }) {
     const [location10, setLocation10] = useState({});
     const [locationIds, setLocationIds] = useState([]);
     const [transportType, setTransportType] = useState({});
-    const [distance, setDistance] = useState(0);
-    const [duration, setDuration] = useState(0);
+    const [distance, setDistance] = useState();
+    const [duration, setDuration] = useState();
     const dispatch = useDispatch();
 
     //data from reducers
@@ -109,6 +109,7 @@ function ProgramTransport({ open, handleClose, mode }) {
         const transportTypeId = transportType.categoryId;
         console.log(filteredIds);
         dispatch(getCalculatedDistanceAndDuration(transportTypeId, filteredIds));
+        console.log(duration);
     };
 
     const handleCheckboxChange = (event) => {
