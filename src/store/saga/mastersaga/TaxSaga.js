@@ -228,10 +228,10 @@ export function* getAllActiveTaxGroups() {
     }
 }
 
-export function* getAllActiveTaxGroupsandTaxes() {
+export function* getAllActiveTaxGroupsandTaxes(action) {
     let responseData = [];
     try {
-        responseData = yield call(get, `${process.env.REACT_APP_FINANCE_URL}/taxTaxGroupDetails`);
+        responseData = yield call(get, `${process.env.REACT_APP_FINANCE_URL}/taxTaxGroupDetailsByType/${action.data}`);
         console.log('response data last:' + responseData);
         yield put({ type: SUCCESS_GET_TAX_GROUP_AND_TAX_LIST, data: responseData.data });
     } catch (e) {

@@ -11,7 +11,9 @@ import {
     SUCCESS_GET_ACTIVITY_SUPPLIMENT_LAST_MODIFIED_DATE_TIME,
     UPDATE_FAILED_ACTIVITY_SUPPLIMENT_DATA,
     UPDATE_SUCCESS_ACTIVITY_SUPPLIMENT_DATA,
-    ADD_FAILED_ACTIVITY_SUPPLIMENT_DATA
+    ADD_FAILED_ACTIVITY_SUPPLIMENT_DATA,
+    SUCCESS_GET_ALL_ACTIVE_ACT_SUP_MIS_DATA_BY_LOCATION_AND_TYPE,
+    FAILED_GET_ALL_ACTIVE_ACT_SUP_MIS_DATA_BY_LOCATION_AND_TYPE
 } from 'store/constant/master/Activity_SupplimentConstant';
 
 const initialState = {
@@ -23,7 +25,8 @@ const initialState = {
     duplicateCode: null,
     lastModifiedDateTime: null,
     cluterTypesDetails: [],
-    activity_supplimentActiveList: []
+    activity_supplimentActiveList: [],
+    actSupMisListByLocationandType: []
 };
 
 export const activity_supplimentReducer = (state = initialState, action) => {
@@ -83,6 +86,18 @@ export const activity_supplimentReducer = (state = initialState, action) => {
 
         case FAILED_GET_ALL_ACTIVE_ACTIVITY_SUPPLIMENT_DATA:
             return { ...state, activity_supplimentActiveList: data.payload[0] };
+
+        case SUCCESS_GET_ALL_ACTIVE_ACT_SUP_MIS_DATA_BY_LOCATION_AND_TYPE:
+            return { ...state, actSupMisListByLocationandType: data.payload[0] };
+
+        case FAILED_GET_ALL_ACTIVE_ACT_SUP_MIS_DATA_BY_LOCATION_AND_TYPE:
+            console.log('heyyyyyyyyyyyyy bn3');
+            console.log(data);
+            return {
+                ...state,
+                actSupMisListByLocationandType: [],
+                errorMsg: data ? data.errorMessages : 'netwok error'
+            };
 
         default:
             return state;

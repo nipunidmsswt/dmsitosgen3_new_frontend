@@ -5,7 +5,8 @@ import {
     GET_ALL_ACTIVITY_SUPPLIMENT_DATA,
     GET_ACTIVITY_SUPPLIMENT_DETAILS_BY_CODE,
     GET_ACTIVITY_SUPPLIMENT_LAST_MODIFIED_DATE_TIME,
-    UPDATE_ACTIVITY_SUPPLIMENT_DATA
+    UPDATE_ACTIVITY_SUPPLIMENT_DATA,
+    GET_ALL_ACTIVE_ACT_SUP_MIS_DATA_BY_LOCATION_AND_TYPE
 } from 'store/constant/master/Activity_SupplimentConstant';
 
 export const saveActivity_SupplimentData = (data) => {
@@ -52,5 +53,13 @@ export const checkDuplicateActivity_SupplimentsCode = (code, type) => {
 export const getAllActiveActivity_SupplimentData = () => {
     return {
         type: GET_ALL_ACTIVE_ACTIVITY_SUPPLIMENT_DATA
+    };
+};
+
+export const getActivitySupMisByLcationandType = (data) => {
+    console.log('saveManagerData action s called', data);
+    return {
+        type: GET_ALL_ACTIVE_ACT_SUP_MIS_DATA_BY_LOCATION_AND_TYPE,
+        data
     };
 };

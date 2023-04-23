@@ -1,6 +1,6 @@
 import { Accordion, AccordionDetails, AccordionSummary, Grid, Typography } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import React from 'react';
+import React, { useState } from 'react';
 import { gridSpacing } from 'store/constant';
 import MainCard from 'ui-component/cards/MainCard';
 import { makeStyles } from '@material-ui/core/styles';
@@ -15,6 +15,12 @@ const useStyles = makeStyles({
 
 const ViewMainScreen = () => {
     const classes = useStyles();
+    const [startDate, setStartDate] = useState([]);
+
+    const programStartDate = (date) => {
+        setStartDate(date);
+    };
+
     return (
         <div>
             <MainCard title="Programm Creation">
@@ -42,7 +48,7 @@ const ViewMainScreen = () => {
                                         </Typography>
                                     </AccordionSummary>
                                     <AccordionDetails>
-                                        <ProgramHeader></ProgramHeader>
+                                        <ProgramHeader programStartDate={programStartDate}></ProgramHeader>
                                     </AccordionDetails>
                                 </Accordion>
 
@@ -66,7 +72,7 @@ const ViewMainScreen = () => {
                                         </Typography>
                                     </AccordionSummary>
                                     <AccordionDetails>
-                                        <ProgramCreationDetails></ProgramCreationDetails>
+                                        <ProgramCreationDetails startDate={startDate}></ProgramCreationDetails>
                                     </AccordionDetails>
                                 </Accordion>
                             </Grid>

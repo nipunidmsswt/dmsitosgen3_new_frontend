@@ -42,7 +42,7 @@ export function* getExchangeRateTypeByIdSaga(action) {
 
     let responseData = [];
     try {
-        responseData = yield call(getById, `${process.env.REACT_APP_FINANCE_URL}/currency/${action.data.id}`);
+        responseData = yield call(getById, `${process.env.REACT_APP_FINANCE_URL}/currency/exchangeRate/${action.data.id}`);
         console.log(responseData.data.payload);
         yield put({ type: SUCCESS_GET_EXCHNAGE_RATE_TYPE_DATA_BY_ID, data: responseData.data });
     } catch (e) {
@@ -54,7 +54,7 @@ export function* getExchangeRateTypeByIdSaga(action) {
 export function* updateExchangeRateTypeSaga(action) {
     console.log('updateExchangeRateTypeSaga tax saga');
     console.log(action);
-    action.data.path = `${process.env.REACT_APP_FINANCE_URL}/currency/${action.data.baseCurrencyCode}`;
+    action.data.path = `${process.env.REACT_APP_FINANCE_URL}/currency/${action.data.currencyId}`;
     let responseData = [];
     try {
         responseData = yield call(update, action.data);

@@ -15,22 +15,23 @@ import MomentUtils from '@date-io/moment';
 import moment from 'moment';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import 'moment/locale/de';
-const ProgramHeader = () => {
+const ProgramHeader = ({ programStartDate }) => {
     const initialValues = {
         programmeNo: null,
         version: '',
         reference: null,
         programmeName: '',
         tourType: null,
-        TourTypeDto: '',
         tourCategory: null,
         market: null,
         operator: null,
         profitType: '',
         startDate: '',
         endDate: '',
-        tourDuration: ''
+        tourDuration: '',
+        exchangeRate: null
     };
+
     const dispatch = useDispatch();
 
     const [activeExchangeRatesByCurrencyId, setActiveExchangeRatesByCurrencyId] = useState([]);
@@ -61,8 +62,11 @@ const ProgramHeader = () => {
     useEffect(() => {
         console.log('lllllllllllllllllllllllllll');
         console.log(rateListByCurrencyID);
-        if (rateListByCurrencyID.length != 0) {
+
+        if (rateListByCurrencyID != undefined) {
             setActiveExchangeRatesByCurrencyId(rateListByCurrencyID);
+        } else {
+            setActiveExchangeRatesByCurrencyId([]);
         }
     }, [rateListByCurrencyID]);
 
@@ -387,6 +391,7 @@ const ProgramHeader = () => {
                                     <DatePicker
                                         onChange={(value) => {
                                             setFieldValue(`startDate`, value);
+                                            programStartDate(value);
                                             if (values.endDate) {
                                                 getDuration(values.endDate, value, setFieldValue);
                                             }
@@ -460,6 +465,7 @@ const ProgramHeader = () => {
                                     onChange={(_, value) => {
                                         console.log(value);
                                         setFieldValue(`currency`, value);
+                                        setFieldValue(`exchangeRate`, null);
                                         if (value != null) {
                                             loadExchangeRates(value);
                                         }
@@ -491,16 +497,16 @@ const ProgramHeader = () => {
                                     )}
                                 />
                                 <Autocomplete
-                                    value={values.currency}
-                                    name="currency"
+                                    value={values.exchangeRate}
+                                    name="exchangeRate"
                                     onChange={(_, value) => {
                                         console.log(value);
-                                        setFieldValue(`currency`, value);
+                                        setFieldValue(`exchangeRate`, value);
                                     }}
                                     fullWidth
-                                    options={currencyListOptions}
-                                    getOptionLabel={(option) => `${option.currencyCode}`}
-                                    isOptionEqualToValue={(option, value) => option.currencyListId === value.currencyListId}
+                                    options={activeExchangeRatesByCurrencyId}
+                                    getOptionLabel={(option) => `${option.rate}`}
+                                    isOptionEqualToValue={(option, value) => option.exchangeRateId === value.exchangeRateId}
                                     renderInput={(params) => (
                                         <TextField
                                             {...params}
@@ -516,10 +522,10 @@ const ProgramHeader = () => {
                                             }}
                                             label="Exchange Rate"
                                             variant="outlined"
-                                            name="currency"
+                                            name="exchangeRate"
                                             onBlur={handleBlur}
-                                            error={Boolean(touched.currency && errors.currency)}
-                                            helperText={touched.currency && errors.currency ? errors.currency : ''}
+                                            error={Boolean(touched.exchangeRate && errors.exchangeRate)}
+                                            helperText={touched.exchangeRate && errors.exchangeRate ? errors.exchangeRate : ''}
                                         />
                                     )}
                                 />

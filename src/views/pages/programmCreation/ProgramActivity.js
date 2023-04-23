@@ -20,15 +20,16 @@ import {
 import { getActiveTaxGroupandTaxList } from 'store/actions/masterActions/TaxActions/TaxGroupAction';
 import { getActiveLocations } from 'store/actions/masterActions/LocationAction';
 import * as yup from 'yup';
+import { getActivitySupMisByLcationandType } from 'store/actions/masterActions/Activity_SupplimentAction';
 
-function ProgramActivity({ open, handleClose, mode, id }) {
+function ProgramActivity({ open, handleClose, mode, id, startDate }) {
     const initialValues = {
         location: null,
         activity: null,
         activityType: null,
         maxPax: '',
         description: '',
-        advance: true,
+        advance: false,
         remarks: '',
         totalBuyRate: '',
         taxGroup: null,
@@ -38,13 +39,14 @@ function ProgramActivity({ open, handleClose, mode, id }) {
     };
     const dispatch = useDispatch();
 
-    const [activeTourTypeList, setActiveTourTypeList] = useState([]);
+    const [activityCodeList, setActivityCodeList] = useState([]);
     const [activeTaxGroupandTaxesList, setActiveTaxGroupandTaxesListData] = useState([]);
     const [activityTypeList, setActivityTypeList] = useState([{ label: 'Individual' }, { label: 'Group' }, { label: 'Slab' }]);
     const [activeLocationList, setActiveLocationList] = useState([]);
     //data from reducers
     const activeTaxGroupandTaxesListData = useSelector((state) => state.taxGroupReducer.activeTaxGroupandTaxes);
     const activeLocations = useSelector((state) => state.locationReducer.activeLocations);
+    const activityListByLocationandType = useSelector((state) => state.activity_supplimentReducer.actSupMisListByLocationandType);
 
     const validationSchema = yup.object().shape({
         location: yup.object().nullable().required('Required field'),
@@ -59,8 +61,18 @@ function ProgramActivity({ open, handleClose, mode, id }) {
     useEffect(() => {
         dispatch(getActiveLocations());
 
-        dispatch(getActiveTaxGroupandTaxList());
+        dispatch(getActiveTaxGroupandTaxList('sell'));
     }, []);
+
+    useEffect(() => {
+        console.log('HEYYYYYYYYYYYYYYYY');
+        console.log(activityListByLocationandType);
+        if (activityListByLocationandType.length != 0) {
+            setActivityCodeList(activityListByLocationandType);
+        } else {
+            setActivityCodeList([]);
+        }
+    }, [activityListByLocationandType]);
 
     useEffect(() => {
         if (activeLocations.length != 0) {
@@ -69,11 +81,48 @@ function ProgramActivity({ open, handleClose, mode, id }) {
     }, [activeLocations]);
 
     useEffect(() => {
-        console.log(activeTaxGroupandTaxesListData);
         if (activeTaxGroupandTaxesListData.length != 0) {
             setActiveTaxGroupandTaxesListData(activeTaxGroupandTaxesListData);
         }
     }, [activeTaxGroupandTaxesListData]);
+
+    const calculateSellRateTax = (value, tax, setFieldValue) => {
+        console.log(value);
+        console.log(tax);
+        if (tax != null) {
+            if (tax.type === 'Group') {
+                let amountWithTax = value;
+                for (let i in tax.taxOrder) {
+                    amountWithTax = (+amountWithTax * tax.taxOrder[i]) / 100 + +amountWithTax;
+                }
+
+                setFieldValue(`totalSellRateWithTax`, +amountWithTax.toFixed(4));
+            } else if (tax.type === 'IND') {
+                let amountWithTax = 0;
+                amountWithTax = (+value * tax.tax) / 100 + +value;
+
+                setFieldValue(`totalSellRateWithTax`, +amountWithTax.toFixed(4));
+            }
+        }
+    };
+
+    const getActivityByLocationAndType = (locationId, type) => {
+        let data = {
+            locationId: locationId.location_id,
+            type: 'activity',
+            typeOfActivity: type.label,
+            fromDate: startDate
+        };
+
+        dispatch(getActivitySupMisByLcationandType(data));
+    };
+
+    const filledActivityDetails = (data, setFieldValue) => {
+        setFieldValue('description', data.activityDescription);
+        setFieldValue('maxPax', data.maxPax);
+        setFieldValue('advance', data.advanceType);
+        setFieldValue('totalBuyRate', data.activityWithTaxes[0].length === 0 ? 0 : data.activityWithTaxes[0].rateWithTax);
+    };
 
     return (
         <div>
@@ -119,6 +168,9 @@ function ProgramActivity({ open, handleClose, mode, id }) {
                                                 name="location"
                                                 onChange={(_, value) => {
                                                     setFieldValue(`location`, value);
+                                                    if (value != null && values.activityType != null) {
+                                                        getActivityByLocationAndType(value, values.activityType);
+                                                    }
                                                 }}
                                                 fullWidth
                                                 options={activeLocationList}
@@ -151,6 +203,10 @@ function ProgramActivity({ open, handleClose, mode, id }) {
                                                 name="activityType"
                                                 onChange={(_, value) => {
                                                     setFieldValue(`activityType`, value);
+                                                    if (value != null && values.location != null) {
+                                                        console.log('call me');
+                                                        getActivityByLocationAndType(values.location, value);
+                                                    }
                                                 }}
                                                 fullWidth
                                                 options={activityTypeList}
@@ -183,12 +239,14 @@ function ProgramActivity({ open, handleClose, mode, id }) {
                                                 value={values.activity}
                                                 name="activity"
                                                 onChange={(_, value) => {
+                                                    console.log(value);
                                                     setFieldValue(`activity`, value);
+                                                    filledActivityDetails(value, setFieldValue);
                                                 }}
                                                 fullWidth
-                                                options={activeLocationList}
+                                                options={activityCodeList}
                                                 getOptionLabel={(option) => `${option.code}`}
-                                                isOptionEqualToValue={(option, value) => option.location_id === value.location_id}
+                                                isOptionEqualToValue={(option, value) => option.id === value.id}
                                                 renderInput={(params) => (
                                                     <TextField
                                                         {...params}
@@ -328,7 +386,10 @@ function ProgramActivity({ open, handleClose, mode, id }) {
                                                 label="Markup"
                                                 fullWidth
                                                 value={values.markup}
-                                                onChange={handleChange}
+                                                onChange={(e) => {
+                                                    handleChange(e);
+                                                    setFieldValue('sellRate', +values.totalBuyRate + +e.target.value);
+                                                }}
                                                 onBlur={handleBlur}
                                                 error={Boolean(touched.markup && errors.markup)}
                                                 helperText={touched.markup && errors.markup ? errors.markup : ''}
@@ -362,11 +423,7 @@ function ProgramActivity({ open, handleClose, mode, id }) {
                                                 disabled={mode == 'VIEW'}
                                                 onChange={(_, value) => {
                                                     setFieldValue(`taxGroup`, value);
-                                                    // calculateVehicleTax(
-                                                    //     values.vehicleRate,
-                                                    //     value,
-                                                    //     setFieldValue
-                                                    // );
+                                                    calculateSellRateTax(values.sellRate, value, setFieldValue);
                                                 }}
                                                 InputLabelProps={{
                                                     shrink: true
