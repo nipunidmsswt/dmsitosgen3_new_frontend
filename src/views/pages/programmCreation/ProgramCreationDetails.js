@@ -20,6 +20,11 @@ import { getActiveLocations } from 'store/actions/masterActions/LocationAction';
 import { getCalculatedDistanceAndDuration } from 'store/actions/masterActions/DistanceAction';
 import { useDispatch } from 'react-redux';
 import { Button } from '@mui/material';
+import Table from '@material-ui/core/Table';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+import TableCell from '@material-ui/core/TableCell';
+import TableBody from '@material-ui/core/TableBody';
 
 const useStyles = makeStyles((theme) => ({
     content: {
@@ -171,7 +176,7 @@ function ProgramCreationDetails() {
         return errors;
     };
 
-    const handleClickOpen = (type, category, data) => {
+    const handleClickOpen = (type, category, data, activeIndex) => {
         if (type === 'VIEW_UPDATE') {
             setMode(type);
         } else if (type === 'INSERT') {
@@ -181,15 +186,25 @@ function ProgramCreationDetails() {
         }
 
         if (category === 'Transport') {
-            setOpenTransport(true);
+            const newOpenTransport = Array(numButtons).fill(false);
+            newOpenTransport[activeIndex] = true;
+            setOpenTransport(newOpenTransport);
         } else if (category === 'Accomodation') {
-            setOpenAccomodation(true);
+            const newOpenAccomodation = Array(numButtons).fill(false);
+            newOpenAccomodation[activeIndex] = true;
+            setOpenAccomodation(newOpenAccomodation);
         } else if (category === 'Activities') {
-            setOpenActivites(true);
+            const newOpenActivities = Array(numButtons).fill(false);
+            newOpenActivities[activeIndex] = true;
+            setOpenActivites(newOpenActivities);
         } else if (category === 'Supplements') {
-            setOpenActivites(true);
+            const newOpenSupplements = Array(numButtons).fill(false);
+            newOpenSupplements[activeIndex] = true;
+            setOpenSupplements(newOpenSupplements);
         } else {
-            setOpenMiscellaneous(true);
+            const newOpenMiscellaneous = Array(numButtons).fill(false);
+            newOpenMiscellaneous[activeIndex] = true;
+            setOpenMiscellaneous(newOpenMiscellaneous);
         }
     };
 
@@ -246,11 +261,12 @@ function ProgramCreationDetails() {
                                     color="primary"
                                     type="button"
                                     style={{ left: '19%' }}
+                                    onClick={() => handleClickOpen('INSERT', 'Transport', null, i)}
                                 >
                                     Transport
                                     <AddCircleIcon
                                         className={classes.iconButton}
-                                        onClick={() => handleClickOpen('INSERT', 'Transport', null)}
+                                        onClick={() => handleClickOpen('INSERT', 'Transport', null, i)}
                                     />
                                 </Button>
 
@@ -338,10 +354,34 @@ function ProgramCreationDetails() {
                                 ) : null}
                             </div>
                             <br />
-                            {openTransport ? <ProgramTransport open={openTransport} handleClose={handleClose} mode={mode} /> : ''}
+                            {openTransport[i] ? ( // Use the unique identifier (i) to determine if the ProgramTransport component should be rendered
+                                <ProgramTransport open={true} handleClose={handleClose} mode={mode} />
+                            ) : null}
                             {openToast ? <SuccessMsg openToast={openToast} handleToast={handleToast} mode={mode} /> : null}
                             {openErrorToast ? <ErrorMsg openToast={openErrorToast} handleToast={setOpenErrorToast} mode={mode} /> : null}
                         </Grid>
+                        <Grid style={{ marginTop: '60px' }}>
+                            <Typography variant="h5" className={classes.dayText}>
+                                Order
+                            </Typography>
+                        </Grid>
+                        {/* <Grid style={{ marginTop: '120px', width: '60%' }}>
+                            <Table>
+                                <TableBody>
+                                     {userDetails.map((user) => (
+                                    <TableRow>
+                                        <TableCell>1</TableCell>
+                                        <TableCell>Transport</TableCell>
+                                        <TableCell>CPT/WLT/CPT</TableCell>
+                                        <TableCell>CPT/WLT/CPT</TableCell>
+                                        <TableCell>CPT/WLT/CPT</TableCell>
+                                        <TableCell>CPT/WLT/CPT</TableCell>
+                                        <TableCell>CPT/WLT/CPT</TableCell>
+                                    </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </Grid> */}
                     </form>
                 )}
             </Formik>
@@ -413,7 +453,7 @@ function ProgramCreationDetails() {
                                     Costing
                                 </Button> */}
                             </Grid>
-                            <div style={{ fontSize: '12px', marginLeft: '115px' }}>*Max: 60</div>
+                            {/* <div style={{ fontSize: '12px', marginLeft: '115px' }}>*Max: 60</div> */}
                             <div className={classes.buttonArray}>{buttonArray}</div>
                             <Divider style={{ color: 'black', height: '2px' }} />
                             <br />

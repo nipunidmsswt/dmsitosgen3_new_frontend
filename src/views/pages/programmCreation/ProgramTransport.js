@@ -1140,21 +1140,21 @@ function ProgramTransport({ open, handleClose, mode }) {
                                             </Grid>
                                         </div>
                                         <Box display="flex" flexDirection="row-reverse" style={{ marginTop: '60px' }}>
-                                            <Button className={classes.saveButton} variant="contained" type="submit">
-                                                {mode === 'INSERT' ? 'SAVE' : 'UPDATE'}
-                                            </Button>
-
                                             <Button
                                                 className={classes.clearButton}
                                                 variant="outlined"
                                                 type="button"
                                                 style={{
                                                     // backgroundColor: '#B22222',
-                                                    marginRight: '10px'
+                                                    marginLeft: '10px'
                                                 }}
                                                 onClick={(e) => resetForm()}
                                             >
                                                 CLEAR
+                                            </Button>
+
+                                            <Button className={classes.saveButton} variant="contained" type="submit">
+                                                {mode === 'INSERT' ? 'SAVE' : 'UPDATE'}
                                             </Button>
                                         </Box>
                                     </Form>
