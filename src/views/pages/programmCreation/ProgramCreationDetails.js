@@ -1,9 +1,26 @@
-import { Grid, Typography } from '@mui/material';
-import React, { useState } from 'react';
+import { Accordion, AccordionDetails, AccordionSummary, ButtonGroup, Grid, TextField, Typography } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import React, { useState, useEffect } from 'react';
+import { gridSpacing } from 'store/constant';
 import { Formik, Field, Form } from 'formik';
 import * as Yup from 'yup';
 import MainCard from 'ui-component/cards/MainCard';
-import { Button, makeStyles, Divider } from '@material-ui/core';
+import { makeStyles, Card, CardContent, Divider } from '@material-ui/core';
+import { style } from '@mui/system';
+import {
+    getAllActiveTransportMainCategoryDataByType,
+    getAllActiveVehicleCategoryDataByType,
+    getAllActiveVehicleTypeDataByType
+} from 'store/actions/masterActions/transportActions/MainTransportCategoriesActions';
+import { getActiveLocations } from 'store/actions/masterActions/LocationAction';
+import { getCalculatedDistanceAndDuration } from 'store/actions/masterActions/DistanceAction';
+import { useDispatch } from 'react-redux';
+import { Button } from '@mui/material';
+import Table from '@material-ui/core/Table';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+import TableCell from '@material-ui/core/TableCell';
+import TableBody from '@material-ui/core/TableBody';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import SuccessMsg from 'messages/SuccessMsg';
 import ErrorMsg from 'messages/ErrorMsg';
@@ -35,7 +52,7 @@ const useStyles = makeStyles((theme) => ({
     },
     roundbutton: {
         borderRadius: '50%',
-        margin: '2px 9px',
+        margin: '2px 10px',
         width: '1px',
         height: '30px',
         minWidth: '0px',
@@ -110,6 +127,17 @@ function ProgramCreationDetails(startDate) {
     const [tableData, setTableData] = useState([]);
     const [mode, setMode] = useState('INSERT');
     const classes = useStyles();
+    const dispatch = useDispatch();
+    const transportTypeId = 'T001';
+    const filteredIds = ['D1', 'D2', 'D3'];
+
+    useEffect(() => {
+        dispatch(getAllActiveTransportMainCategoryDataByType('Transport Type'));
+        dispatch(getAllActiveVehicleTypeDataByType('Vehicle Type'));
+        dispatch(getAllActiveVehicleCategoryDataByType('Vehicle Category'));
+        dispatch(getActiveLocations());
+        dispatch(getCalculatedDistanceAndDuration(transportTypeId, filteredIds));
+    }, []);
 
     const columns = [
         {
@@ -168,8 +196,7 @@ function ProgramCreationDetails(startDate) {
         return errors;
     };
 
-    const handleClickOpen = (type, category, data) => {
-        console.log(category);
+    const handleClickOpen = (type, category, data, activeIndex) => {
         if (type === 'VIEW_UPDATE') {
             setMode(type);
         } else if (type === 'INSERT') {
@@ -179,15 +206,25 @@ function ProgramCreationDetails(startDate) {
         }
 
         if (category === 'Transport') {
-            setOpenTransport(true);
+            const newOpenTransport = Array(numButtons).fill(false);
+            newOpenTransport[activeIndex] = true;
+            setOpenTransport(newOpenTransport);
         } else if (category === 'Accomodation') {
-            setOpenAccomodation(true);
-        } else if (category === 'Activites') {
-            setOpenActivites(true);
+            const newOpenAccomodation = Array(numButtons).fill(false);
+            newOpenAccomodation[activeIndex] = true;
+            setOpenAccomodation(newOpenAccomodation);
+        } else if (category === 'Activities') {
+            const newOpenActivities = Array(numButtons).fill(false);
+            newOpenActivities[activeIndex] = true;
+            setOpenActivites(newOpenActivities);
         } else if (category === 'Supplements') {
-            setOpenSupplements(true);
-        } else if (category === 'Miscellaneous') {
-            setOpenMiscellaneous(true);
+            const newOpenSupplements = Array(numButtons).fill(false);
+            newOpenSupplements[activeIndex] = true;
+            setOpenSupplements(newOpenSupplements);
+        } else {
+            const newOpenMiscellaneous = Array(numButtons).fill(false);
+            newOpenMiscellaneous[activeIndex] = true;
+            setOpenMiscellaneous(newOpenMiscellaneous);
         }
     };
 
@@ -244,11 +281,12 @@ function ProgramCreationDetails(startDate) {
                                     color="primary"
                                     type="button"
                                     style={{ left: '19%' }}
+                                    onClick={() => handleClickOpen('INSERT', 'Transport', null, i)}
                                 >
                                     Transport
                                     <AddCircleIcon
                                         className={classes.iconButton}
-                                        onClick={() => handleClickOpen('INSERT', 'Transport', null)}
+                                        onClick={() => handleClickOpen('INSERT', 'Transport', null, i)}
                                     />
                                 </Button>
                                 <Button
@@ -261,7 +299,7 @@ function ProgramCreationDetails(startDate) {
                                     Accomodation
                                     <AddCircleIcon
                                         className={classes.iconButton}
-                                        onClick={() => handleClickOpen('INSERT', 'Accomodation', null)}
+                                        onClick={() => handleClickOpen('INSERT', 'Accomodation', null, i)}
                                     />
                                 </Button>
                                 <Button
@@ -274,7 +312,7 @@ function ProgramCreationDetails(startDate) {
                                     Activites
                                     <AddCircleIcon
                                         className={classes.iconButton}
-                                        onClick={() => handleClickOpen('INSERT', 'Activites', null)}
+                                        onClick={() => handleClickOpen('INSERT', 'Activites', null, i)}
                                     />
                                 </Button>
                                 <Button
@@ -287,7 +325,7 @@ function ProgramCreationDetails(startDate) {
                                     Supplements
                                     <AddCircleIcon
                                         className={classes.iconButton}
-                                        onClick={() => handleClickOpen('INSERT', 'Supplements', null)}
+                                        onClick={() => handleClickOpen('INSERT', 'Supplements', null, i)}
                                     />
                                 </Button>
                                 <Button
@@ -300,7 +338,7 @@ function ProgramCreationDetails(startDate) {
                                     Miscellaneous
                                     <AddCircleIcon
                                         className={classes.iconButton}
-                                        onClick={() => handleClickOpen('INSERT', 'Miscellaneous', null)}
+                                        onClick={() => handleClickOpen('INSERT', 'Miscellaneous', null, i)}
                                     />
                                 </Button>
 
@@ -332,31 +370,27 @@ function ProgramCreationDetails(startDate) {
                                 ) : null}
                             </div>
                             <br />
-                            {openTransport ? <ProgramTransport open={openTransport} handleClose={handleClose} mode={mode} /> : ''}
-                            {openActivites ? (
-                                <ProgramActivity open={openActivites} handleClose={handleClose} mode={mode} startDate={startDate} />
-                            ) : (
-                                ''
-                            )}
-                            {openMiscellaneous ? (
-                                <ProgramMisCellaneous
-                                    open={openMiscellaneous}
-                                    handleClose={handleClose}
-                                    mode={mode}
-                                    startDate={startDate}
-                                />
-                            ) : (
-                                ''
-                            )}
+                            {openTransport[i] ? ( // Unique identifier (i) to determine if the ProgramTransport component should be rendered
+                                <ProgramTransport open={true} handleClose={handleClose} mode={mode} />
+                            ) : null}
+                            {openActivites[i] ? (
+                                <ProgramActivity open={true} handleClose={handleClose} mode={mode} startDate={startDate} />
+                            ) : null}
+                            {openMiscellaneous[i] ? (
+                                <ProgramMisCellaneous open={true} handleClose={handleClose} mode={mode} startDate={startDate} />
+                            ) : null}
 
-                            {openSupplements ? (
-                                <ProgramSuppliment open={openSupplements} handleClose={handleClose} mode={mode} startDate={startDate} />
-                            ) : (
-                                ''
-                            )}
+                            {openSupplements[i] ? (
+                                <ProgramSuppliment open={true} handleClose={handleClose} mode={mode} startDate={startDate} />
+                            ) : null}
 
                             {openToast ? <SuccessMsg openToast={openToast} handleToast={handleToast} mode={mode} /> : null}
                             {openErrorToast ? <ErrorMsg openToast={openErrorToast} handleToast={setOpenErrorToast} mode={mode} /> : null}
+                        </Grid>
+                        <Grid style={{ marginTop: '60px' }}>
+                            <Typography variant="h5" className={classes.dayText}>
+                                Order
+                            </Typography>
                         </Grid>
                     </form>
                 )}

@@ -15,7 +15,9 @@ import {
     FAILED_LAST_MODIFIED_DATE_DISTANCE,
     SUCCESS_LAST_MODIFIED_DATE_DISTANCE,
     SUCCESS_GET_ALL_ACTIVE_DISTANCE_DATA_TBY_TRANSPORT_TYPE,
-    FAILED_GET_ALL_ACTIVE_DISTANCE_DATA_TBY_TRANSPORT_TYPE
+    FAILED_GET_ALL_ACTIVE_DISTANCE_DATA_TBY_TRANSPORT_TYPE,
+    SUCCESS_GET_CALCULATED_DISTANCE_AND_DURATION,
+    FAILED_GET_CALCULATED_DISTANCE_AND_DURATION
 } from '../../../constant/master/TransportMasterConstant/DistanceConstant';
 
 const initialState = {
@@ -88,6 +90,14 @@ export const distanceReducer = (state = initialState, action) => {
                 distanceByTransportType: null,
                 errorMsg: data ? data.errorMessages : 'netwok error'
             };
+
+        case SUCCESS_GET_CALCULATED_DISTANCE_AND_DURATION:
+            console.log('Distance Reducer Success');
+            return { ...state, calculatedDistance: data.distance, calculatedDistance: data.duration };
+
+        case FAILED_GET_CALCULATED_DISTANCE_AND_DURATION:
+            console.log('Distance Reducer Failed');
+            return { ...state, calculatedDistance: 0, calculatedDistance: 0, errorMsg: 'netwok error' };
 
         default:
             return state;

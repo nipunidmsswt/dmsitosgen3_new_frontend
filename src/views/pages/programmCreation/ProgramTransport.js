@@ -13,103 +13,359 @@ import {
     Grid,
     Switch
 } from '@mui/material';
+import { makeStyles } from '@material-ui/core';
 import MenuItem from '@material-ui/core/MenuItem';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
+import Checkbox from '@material-ui/core/Checkbox';
+import { green } from '@material-ui/core/colors';
+import { common } from '@material-ui/core/colors';
+import CheckBoxIcon from '@mui/icons-material/CheckBox';
+import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import 'assets/scss/style.scss';
 import { useDispatch, useSelector } from 'react-redux';
 import * as yup from 'yup';
 import { Formik, Form } from 'formik';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import axios from 'axios';
+import {
+    getAllActiveTransportMainCategoryDataByType,
+    getAllActiveVehicleCategoryDataByType,
+    getAllActiveVehicleTypeDataByType
+} from 'store/actions/masterActions/transportActions/MainTransportCategoriesActions';
+import { getActiveLocations } from 'store/actions/masterActions/LocationAction';
+import { getCalculatedDistanceAndDuration } from 'store/actions/masterActions/DistanceAction';
+import '../../../assets/scss/style.scss';
 
 const Transition = forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
+
+const useStyles = makeStyles((theme) => ({
+    content: {
+        justifyContent: 'center'
+    },
+    saveButton: {
+        margin: '0px 10px',
+        height: '40px',
+        width: '70px',
+        display: 'inline-flex',
+        textTransform: 'capitalize',
+        color: 'white',
+        borderRadius: '10%',
+        backgroundColor: '#1877f2',
+        background: '-moz-linear-gradient(top, #3b5998, #1877f2)',
+        background: '-ms-linear-gradient(top, #3b5998, #1877f2)',
+        background: '-webkit-linear-gradient(top, #3b5998, #1877f2)'
+    },
+    clearButton: {
+        margin: '0px 10px',
+        height: '40px',
+        width: '70px',
+        display: 'inline-flex',
+        textTransform: 'capitalize',
+        color: '#1877f2',
+        borderColor: '#1877f2',
+        borderRadius: '10%',
+        backgroundColor: 'white'
+    }
+}));
 function ProgramTransport({ open, handleClose, mode }) {
     const initialValues = {
         paxBaggage: '',
-        transportType: '',
+        transportType: null,
         chargeMethod: '',
-        vehicleType: '',
-        vehicleCategory: '',
+        vehicleType: null,
+        vehicleCategory: null,
         location1: null,
         location2: null,
         location3: null,
         location4: null,
         location5: null,
-        kms: 0,
-        hours: 0
+        location6: null,
+        location7: null,
+        location8: null,
+        location9: null,
+        location10: null,
+        distance: null,
+        duration: null
     };
 
     const [formValues, setFormValues] = useState(initialValues);
     const [loadValues, setLoadValues] = useState(null);
-    const [transportType, setTransportType] = useState([]);
-    const [vehicleType, setVehicleType] = useState([]);
-    const [vehicleCategory, setVehicleCategory] = useState([]);
+    const [activeTransportTypeList, setActiveTransportTypeList] = useState([]);
+    const [activeVehicleTypeList, setActiveVehicleTypeList] = useState([]);
+    const [activeVehicleCategoryList, setActiveVehicleCategoryList] = useState([]);
+    const [activeLocationList, setActiveLocationList] = useState([]);
+    const [checkedItems, setCheckedItems] = useState({});
+    const [location1, setLocation1] = useState({});
+    const [location2, setLocation2] = useState({});
+    const [location3, setLocation3] = useState({});
+    const [location4, setLocation4] = useState({});
+    const [location5, setLocation5] = useState({});
+    const [location6, setLocation6] = useState({});
+    const [location7, setLocation7] = useState({});
+    const [location8, setLocation8] = useState({});
+    const [location9, setLocation9] = useState({});
+    const [location10, setLocation10] = useState({});
+    const [locationIds, setLocationIds] = useState([]);
+    const [transportType, setTransportType] = useState({});
+    const [distance, setDistance] = useState(0);
+    const [duration, setDuration] = useState(0);
     const dispatch = useDispatch();
+    const classes = useStyles();
+
+    //data from reducers
+    const activeTransportTypeListData = useSelector((state) => state.mainTransportCategoryReducer.activeCategoryDetails);
+    const activeVehicleTypeListData = useSelector((state) => state.mainTransportCategoryReducer.vehicleTypes);
+    const activeVehicleCategoriesListData = useSelector((state) => state.mainTransportCategoryReducer.vehicleCategories);
+    const activeLocationListData = useSelector((state) => state.locationReducer.activeLocations);
+    const calculatedDistance = useSelector((state) => state.distanceReducer.calculatedDistance);
+    const calculatedDuration = useSelector((state) => state.distanceReducer.calculatedDuration);
 
     const validationSchema = yup.object().shape({
-        paxBaggage: yup.string().required('Required field'),
-        transportType: yup.string().required('Required field'),
-        chargeMethod: yup.string().required('Required field'),
-        vehicleType: yup.string().required('Required field'),
-        vehicleCategory: yup.string().required('Required field'),
-        location1: yup.string().typeError('Required field'),
-        location2: yup.string().typeError('Required field'),
-        location3: yup.string().typeError('Required field'),
-        location4: yup.string().typeError('Required field'),
-        location5: yup.string().typeError('Required field')
+        paxBaggage: yup.string().nullable().required('Required field'),
+        transportType: yup.object().nullable().required('Required field'),
+        chargeMethod: yup.string().nullable().required('Required field'),
+        vehicleType: yup.object().nullable().required('Required field'),
+        vehicleCategory: yup.object().nullable().required('Required field'),
+        location1: yup.object().nullable().required('Required field'),
+        location2: yup.object().nullable().required('Required field'),
+        location3: yup
+            .object()
+            .nullable()
+            .when('location4', {
+                is: (value) => !!value,
+                then: yup.object().nullable().required('Required field')
+            }),
+        location4: yup
+            .object()
+            .nullable()
+            .when('location5', {
+                is: (value) => !!value,
+                then: yup.object().nullable().required('Required field')
+            }),
+        location5: yup
+            .object()
+            .nullable()
+            .when('location6', {
+                is: (value) => !!value,
+                then: yup.object().nullable().required('Required field')
+            }),
+        location6: yup
+            .object()
+            .nullable()
+            .when('location7', {
+                is: (value) => !!value,
+                then: yup.object().nullable().required('Required field')
+            }),
+        location7: yup
+            .object()
+            .nullable()
+            .when('location8', {
+                is: (value) => !!value,
+                then: yup.object().nullable().required('Required field')
+            }),
+        location8: yup
+            .object()
+            .nullable()
+            .when('location9', {
+                is: (value) => !!value,
+                then: yup.object().nullable().required('Required field')
+            }),
+        location9: yup
+            .object()
+            .nullable()
+            .when('location10', {
+                is: (value) => !!value,
+                then: yup.object().nullable().required('Required field')
+            })
     });
-
-    useEffect(() => {
-        // Fetch the data from the API
-        fetch('http://localhost:8085/api/v1/activeMainCategories/Transport%20Type')
-            .then((response) => response.json())
-            .then((data) => {
-                // Extract the "description" property from each object and store it in state
-                const extractedDescriptions = data.payload.flatMap((category) => category.map((item) => item.description));
-                setTransportType(extractedDescriptions);
-            })
-            .catch((error) => console.error('Error fetching data:', error));
-    }, []);
-
-    useEffect(() => {
-        // Fetch the data from the API
-        fetch('http://localhost:8085/api/v1/activeMainCategories/Vehicle%20Type')
-            .then((response) => response.json())
-            .then((data) => {
-                // Extract the "description" property from each object and store it in state
-                const extractedDescriptions = data.payload.flatMap((category) => category.map((item) => item.description));
-                setVehicleType(extractedDescriptions);
-            })
-            .catch((error) => console.error('Error fetching data:', error));
-    }, []);
-
-    useEffect(() => {
-        // Fetch the data from the API
-        fetch('http://localhost:8085/api/v1/activeMainCategories/Vehicle%20Category')
-            .then((response) => response.json())
-            .then((data) => {
-                // Extract the "description" property from each object and store it in state
-                const extractedDescriptions = data.payload.flatMap((category) => category.map((item) => item.description));
-                setVehicleCategory(extractedDescriptions);
-            })
-            .catch((error) => console.error('Error fetching data:', error));
-    }, []);
 
     const handleSubmitForm = (data) => {
         handleClose();
     };
 
+    const handleCalculate = (values, setFieldError, setFieldTouched, errors, touched) => {
+        const fields = [
+            { fieldName: 'transportType', errorMessage: 'Required Field' },
+            { fieldName: 'chargeMethod', errorMessage: 'Required Field' },
+            { fieldName: 'location1', errorMessage: 'Required Field' },
+            { fieldName: 'location2', errorMessage: 'Required Field' },
+            { fieldName: 'location3', errorMessage: 'Required Field' },
+            { fieldName: 'location4', errorMessage: 'Required Field' },
+            { fieldName: 'location5', errorMessage: 'Required Field' },
+            { fieldName: 'location6', errorMessage: 'Required Field' },
+            { fieldName: 'location7', errorMessage: 'Required Field' },
+            { fieldName: 'location8', errorMessage: 'Required Field' },
+            { fieldName: 'location9', errorMessage: 'Required Field' },
+            { fieldName: 'location10', errorMessage: 'Required Field' }
+        ];
+
+        const mandatoryFields = [
+            { fieldName: 'transportType', errorMessage: 'Required Field' },
+            { fieldName: 'chargeMethod', errorMessage: 'Required Field' },
+            { fieldName: 'location1', errorMessage: 'Required Field' },
+            { fieldName: 'location2', errorMessage: 'Required Field' }
+        ];
+
+        let hasError = false;
+
+        fields.forEach((field) => {
+            if (errors[field.fieldName]) {
+                setFieldError(field.fieldName, field.errorMessage);
+                hasError = true;
+            }
+        });
+
+        mandatoryFields.forEach((mandatoryField) => {
+            if (!values[mandatoryField.fieldName]) {
+                setFieldError(mandatoryField.fieldName, mandatoryField.errorMessage);
+                setFieldTouched(mandatoryField.fieldName, true);
+                hasError = true;
+            }
+        });
+
+        // if (!values.transportType || !values.transportType.categoryId) {
+        //     setFieldError('transportType', 'Required Field');
+        //     setFieldTouched('transportType', true);
+        //     console.log(values.transportType);
+        // }
+
+        if (!hasError && touched.transportType && touched.chargeMethod && touched.location1 && touched.location2) {
+            const filteredIds = locationIds.filter((id) => id !== '' && id !== undefined);
+            const transportTypeId = transportType.categoryId;
+            console.log(filteredIds);
+            dispatch(getCalculatedDistanceAndDuration(transportTypeId, filteredIds));
+            console.log(duration);
+        }
+    };
+
+    const handleCheckboxChange = (event) => {
+        const { name, checked } = event.target;
+        setCheckedItems((prevCheckedItems) => ({ ...prevCheckedItems, [name]: checked }));
+    };
+
+    const handleLocation1 = (value) => {
+        setLocation1(value);
+    };
+
+    const handleLocation2 = (value) => {
+        setLocation2(value);
+    };
+
+    const handleLocation3 = (value) => {
+        setLocation3(value);
+    };
+
+    const handleLocation4 = (value) => {
+        setLocation4(value);
+    };
+
+    const handleLocation5 = (value) => {
+        setLocation5(value);
+    };
+
+    const handleLocation6 = (value) => {
+        setLocation6(value);
+    };
+
+    const handleLocation7 = (value) => {
+        setLocation7(value);
+    };
+
+    const handleLocation8 = (value) => {
+        setLocation8(value);
+    };
+
+    const handleLocation9 = (value) => {
+        setLocation9(value);
+    };
+
+    const handleLocation10 = (value) => {
+        setLocation10(value);
+    };
+
+    const handleTranportType = (value) => {
+        setTransportType(value);
+    };
+
+    useEffect(() => {
+        const newIds = [location1, location2, location3, location4, location5, location6, location7, location8, location9, location10].map(
+            (location) => (location === null || location === undefined ? '' : location.shortDescription)
+        );
+        setLocationIds(newIds);
+    }, [location1, location2, location3, location4, location5, location6, location7, location8, location9, location10]);
+
+    // useEffect(() => {
+    //     const filteredIds = locationIds.filter((id) => id !== '' && id !== undefined);
+    //     const transportTypeId = transportType.categoryId;
+    //     console.log(filteredIds);
+    //     dispatch(getCalculatedDistanceAndDuration(transportTypeId, filteredIds));
+    // }, [locationIds, transportType]);
+
+    // useEffect(() => {
+    //     console.log(location1.shortDescription);
+    //     console.log(location2.shortDescription);
+    //     console.log(location3.shortDescription);
+    //     console.log(location4.shortDescription);
+    //     console.log(location5.shortDescription);
+    //     console.log(location6.shortDescription);
+    //     console.log(location7.shortDescription);
+    //     console.log(location8.shortDescription);
+    //     console.log(location9.shortDescription);
+    //     console.log(location10.shortDescription);
+    // }, [location1, location2, location3, location4, location5, location6, location7, location8, location9, location10]);
+
+    useEffect(() => {
+        if (activeTransportTypeListData.length != 0) {
+            setActiveTransportTypeList(activeTransportTypeListData);
+        }
+    }, [activeTransportTypeListData]);
+
+    useEffect(() => {
+        if (activeVehicleTypeListData.length != 0) {
+            setActiveVehicleTypeList(activeVehicleTypeListData);
+        }
+    }, [activeVehicleTypeListData]);
+
+    useEffect(() => {
+        if (activeVehicleCategoriesListData.length != 0) {
+            setActiveVehicleCategoryList(activeVehicleCategoriesListData);
+        }
+    }, [activeVehicleCategoriesListData]);
+
+    useEffect(() => {
+        if (activeLocationListData.length != 0) {
+            setActiveLocationList(activeLocationListData);
+        }
+    }, [activeLocationListData]);
+
+    useEffect(() => {
+        if (calculatedDistance != null) {
+            setDistance(calculatedDistance);
+        }
+    }, [calculatedDistance]);
+
+    useEffect(() => {
+        if (calculatedDuration != null) {
+            setDuration(calculatedDuration);
+        }
+    }, [calculatedDuration]);
+
+    useEffect(() => {
+        console.log('Transport Popup');
+        dispatch(getAllActiveTransportMainCategoryDataByType('Transport Type'));
+        dispatch(getAllActiveVehicleTypeDataByType('Vehicle Type'));
+        dispatch(getAllActiveVehicleCategoryDataByType('Vehicle Category'));
+        dispatch(getActiveLocations());
+    }, []);
+
     return (
         <div>
             <Dialog
                 PaperProps={{
-                    style: { borderRadius: 15, maxWidth: '120%', height: '65%' }
+                    style: { borderRadius: 15, maxWidth: '120%', height: '80%' }
                 }}
                 open={open}
                 TransitionComponent={Transition}
@@ -141,178 +397,238 @@ function ProgramTransport({ open, handleClose, mode }) {
                             }}
                             validationSchema={validationSchema}
                         >
-                            {({ values, handleChange, setFieldValue, errors, handleBlur, touched, resetForm }) => {
+                            {({
+                                values,
+                                handleChange,
+                                setFieldValue,
+                                setFieldError,
+                                setFieldTouched,
+                                errors,
+                                handleBlur,
+                                touched,
+                                resetForm
+                            }) => {
                                 return (
                                     <Form>
                                         <div style={{ marginTop: '6px', margin: '10px' }}>
-                                            <Grid gap="10px" display="flex">
+                                            <Grid gap="30px" display="flex">
                                                 <Grid item>
-                                                    <TextField
-                                                        sx={{
-                                                            width: { sm: 75, md: 150 },
-                                                            '& .MuiInputBase-root': {
-                                                                height: 40
-                                                            }
-                                                        }}
-                                                        id="paxBaggage"
-                                                        select
-                                                        InputLabelProps={{
-                                                            shrink: true
-                                                        }}
-                                                        label="Pag/Baggage"
-                                                        name="paxBaggage"
-                                                        onChange={handleChange}
-                                                        onBlur={handleBlur}
+                                                    <Autocomplete
                                                         value={values.paxBaggage}
-                                                        error={Boolean(touched.paxBaggage && errors.paxBaggage)}
-                                                        helperText={touched.paxBaggage && errors.paxBaggage ? errors.paxBaggage : ''}
-                                                    >
-                                                        <MenuItem dense={true} value={'Pax'}>
-                                                            Pax
-                                                        </MenuItem>
-                                                        <MenuItem dense={true} value={'Baggage'}>
-                                                            Baggage
-                                                        </MenuItem>
-                                                    </TextField>
+                                                        name="paxBaggage"
+                                                        onChange={(_, value) => {
+                                                            setFieldValue(`paxBaggage`, value);
+                                                            console.log(value);
+                                                        }}
+                                                        fullWidth
+                                                        options={['Pax', 'Baggage']}
+                                                        disableClearable={true}
+                                                        renderInput={(params) => (
+                                                            <TextField
+                                                                {...params}
+                                                                label="Pax/Baggage"
+                                                                InputLabelProps={{
+                                                                    shrink: true
+                                                                }}
+                                                                fullWidth
+                                                                sx={{
+                                                                    width: { sm: 75, md: 180 },
+                                                                    '& .MuiInputBase-root': {
+                                                                        height: 40
+                                                                    }
+                                                                }}
+                                                                variant="outlined"
+                                                                name="paxBaggage"
+                                                                onBlur={handleBlur}
+                                                                error={Boolean(touched.paxBaggage && errors.paxBaggage)}
+                                                                helperText={
+                                                                    touched.paxBaggage && errors.paxBaggage ? errors.paxBaggage : ''
+                                                                }
+                                                            />
+                                                        )}
+                                                    />
                                                 </Grid>
                                                 <Grid item>
-                                                    <TextField
-                                                        sx={{
-                                                            width: { sm: 75, md: 150 },
-                                                            '& .MuiInputBase-root': {
-                                                                height: 40
-                                                            }
-                                                        }}
-                                                        id="transportType"
-                                                        select
-                                                        InputLabelProps={{
-                                                            shrink: true
-                                                        }}
-                                                        label="Transport Type"
-                                                        name="transportType"
-                                                        onChange={handleChange}
-                                                        onBlur={handleBlur}
+                                                    <Autocomplete
                                                         value={values.transportType}
-                                                        error={Boolean(touched.transportType && errors.transportType)}
-                                                        helperText={
-                                                            touched.transportType && errors.transportType ? errors.transportType : ''
-                                                        }
-                                                    >
-                                                        {transportType.map((description) => (
-                                                            <>
-                                                                <MenuItem key={description}>{description}</MenuItem>
-                                                            </>
-                                                        ))}
-                                                    </TextField>
+                                                        name="transportType"
+                                                        onChange={(_, value) => {
+                                                            setFieldValue(`transportType`, value);
+                                                            handleTranportType(value);
+                                                            console.log(value);
+                                                        }}
+                                                        fullWidth
+                                                        options={activeTransportTypeList}
+                                                        getOptionLabel={(option) => `${option.description}`}
+                                                        isOptionEqualToValue={(option, value) => option.categoryId === value.categoryId}
+                                                        disableClearable={true}
+                                                        renderInput={(params) => (
+                                                            <TextField
+                                                                {...params}
+                                                                label="Transport Type"
+                                                                InputLabelProps={{
+                                                                    shrink: true
+                                                                }}
+                                                                fullWidth
+                                                                sx={{
+                                                                    width: { sm: 75, md: 180 },
+                                                                    '& .MuiInputBase-root': {
+                                                                        height: 40
+                                                                    }
+                                                                }}
+                                                                // disabled={mode == 'VIEW'}
+                                                                variant="outlined"
+                                                                name="transportType"
+                                                                onBlur={handleBlur}
+                                                                error={Boolean(touched.transportType && errors.transportType)}
+                                                                helperText={
+                                                                    touched.transportType && errors.transportType
+                                                                        ? errors.transportType
+                                                                        : ''
+                                                                }
+                                                            />
+                                                        )}
+                                                    />
                                                 </Grid>
                                                 <Grid item>
-                                                    <TextField
-                                                        sx={{
-                                                            width: { sm: 75, md: 150 },
-                                                            '& .MuiInputBase-root': {
-                                                                height: 40
-                                                            }
-                                                        }}
-                                                        id="chargeMethod"
-                                                        select
-                                                        InputLabelProps={{
-                                                            shrink: true
-                                                        }}
-                                                        label="Charge Method"
-                                                        name="chargeMethod"
-                                                        onChange={handleChange}
-                                                        onBlur={handleBlur}
+                                                    <Autocomplete
                                                         value={values.chargeMethod}
-                                                        error={Boolean(touched.chargeMethod && errors.chargeMethod)}
-                                                        helperText={touched.chargeMethod && errors.chargeMethod ? errors.chargeMethod : ''}
-                                                    >
-                                                        <MenuItem dense={true} value={'Distance'}>
-                                                            Distance
-                                                        </MenuItem>
-                                                        <MenuItem dense={true} value={'Hours'}>
-                                                            Hours
-                                                        </MenuItem>
-                                                    </TextField>
+                                                        name="chargeMethod"
+                                                        onChange={(_, value) => {
+                                                            setFieldValue(`chargeMethod`, value);
+                                                            console.log(value);
+                                                        }}
+                                                        fullWidth
+                                                        options={['Distance', 'Duration']}
+                                                        disableClearable={true}
+                                                        renderInput={(params) => (
+                                                            <TextField
+                                                                {...params}
+                                                                label="Charge Method"
+                                                                InputLabelProps={{
+                                                                    shrink: true
+                                                                }}
+                                                                fullWidth
+                                                                sx={{
+                                                                    width: { sm: 75, md: 180 },
+                                                                    '& .MuiInputBase-root': {
+                                                                        height: 40
+                                                                    }
+                                                                }}
+                                                                variant="outlined"
+                                                                name="chargeMethod"
+                                                                onBlur={handleBlur}
+                                                                error={Boolean(touched.chargeMethod && errors.chargeMethod)}
+                                                                helperText={
+                                                                    touched.chargeMethod && errors.chargeMethod ? errors.chargeMethod : ''
+                                                                }
+                                                            />
+                                                        )}
+                                                    />
                                                 </Grid>
                                                 <Grid item>
-                                                    <TextField
-                                                        sx={{
-                                                            width: { sm: 75, md: 150 },
-                                                            '& .MuiInputBase-root': {
-                                                                height: 40
-                                                            }
-                                                        }}
-                                                        id="vehicleType"
-                                                        select
-                                                        InputLabelProps={{
-                                                            shrink: true
-                                                        }}
-                                                        label="Vehicle Type"
-                                                        name="vehicleType"
-                                                        onChange={handleChange}
-                                                        onBlur={handleBlur}
+                                                    <Autocomplete
                                                         value={values.vehicleType}
-                                                        error={Boolean(touched.vehicleType && errors.vehicleType)}
-                                                        helperText={touched.vehicleType && errors.vehicleType ? errors.vehicleType : ''}
-                                                    >
-                                                        {vehicleType.map((description) => (
-                                                            <>
-                                                                <MenuItem key={description}>{description}</MenuItem>
-                                                            </>
-                                                        ))}
-                                                    </TextField>
+                                                        name="vehicleType"
+                                                        onChange={(_, value) => {
+                                                            setFieldValue(`vehicleType`, value);
+                                                        }}
+                                                        fullWidth
+                                                        options={activeVehicleTypeList}
+                                                        getOptionLabel={(option) => `${option.description}`}
+                                                        isOptionEqualToValue={(option, value) => option.categoryId === value.categoryId}
+                                                        disableClearable={true}
+                                                        renderInput={(params) => (
+                                                            <TextField
+                                                                {...params}
+                                                                label="Vehicle Type"
+                                                                InputLabelProps={{
+                                                                    shrink: true
+                                                                }}
+                                                                fullWidth
+                                                                sx={{
+                                                                    width: { sm: 75, md: 180 },
+                                                                    '& .MuiInputBase-root': {
+                                                                        height: 40
+                                                                    }
+                                                                }}
+                                                                // disabled={mode == 'VIEW'}
+                                                                variant="outlined"
+                                                                name="vehicleType"
+                                                                onBlur={handleBlur}
+                                                                error={Boolean(touched.vehicleType && errors.vehicleType)}
+                                                                helperText={
+                                                                    touched.vehicleType && errors.vehicleType ? errors.vehicleType : ''
+                                                                }
+                                                            />
+                                                        )}
+                                                    />
                                                 </Grid>
 
                                                 <Grid item>
-                                                    <TextField
-                                                        sx={{
-                                                            width: { sm: 75, md: 150 },
-                                                            '& .MuiInputBase-root': {
-                                                                height: 40
-                                                            }
-                                                        }}
-                                                        id="vehicleCategory"
-                                                        select
-                                                        InputLabelProps={{
-                                                            shrink: true
-                                                        }}
-                                                        label="Vehicle Category"
-                                                        name="vehicleCategory"
-                                                        onChange={handleChange}
-                                                        onBlur={handleBlur}
+                                                    <Autocomplete
                                                         value={values.vehicleCategory}
-                                                        error={Boolean(touched.vehicleCategory && errors.vehicleCategory)}
-                                                        helperText={
-                                                            touched.vehicleCategory && errors.vehicleCategory ? errors.vehicleCategory : ''
-                                                        }
-                                                    >
-                                                        {vehicleCategory.map((description) => (
-                                                            <>
-                                                                <MenuItem key={description}>{description}</MenuItem>
-                                                            </>
-                                                        ))}
-                                                    </TextField>
+                                                        name="vehicleCategory"
+                                                        onChange={(_, value) => {
+                                                            setFieldValue(`vehicleCategory`, value);
+                                                        }}
+                                                        fullWidth
+                                                        options={activeVehicleCategoryList}
+                                                        getOptionLabel={(option) => `${option.description}`}
+                                                        isOptionEqualToValue={(option, value) => option.categoryId === value.categoryId}
+                                                        disableClearable={true}
+                                                        renderInput={(params) => (
+                                                            <TextField
+                                                                {...params}
+                                                                label="Vehicle Category"
+                                                                InputLabelProps={{
+                                                                    shrink: true
+                                                                }}
+                                                                fullWidth
+                                                                sx={{
+                                                                    width: { sm: 75, md: 180 },
+                                                                    '& .MuiInputBase-root': {
+                                                                        height: 40
+                                                                    }
+                                                                }}
+                                                                // disabled={mode == 'VIEW'}
+                                                                variant="outlined"
+                                                                name="vehicleCategory"
+                                                                onBlur={handleBlur}
+                                                                error={Boolean(touched.vehicleCategory && errors.vehicleCategory)}
+                                                                helperText={
+                                                                    touched.vehicleCategory && errors.vehicleCategory
+                                                                        ? errors.vehicleCategory
+                                                                        : ''
+                                                                }
+                                                            />
+                                                        )}
+                                                    />
                                                 </Grid>
                                             </Grid>
-                                            <Grid gap="10px" display="flex" style={{ marginTop: '50px' }}>
+                                            <Grid gap="5px" display="flex" style={{ marginTop: '50px' }}>
                                                 <Grid item>
                                                     <Autocomplete
                                                         value={values.location1}
                                                         name="location1"
                                                         onChange={(_, value) => {
                                                             setFieldValue(`location1`, value);
+                                                            handleLocation1(value);
                                                         }}
                                                         InputLabelProps={{
                                                             shrink: true
                                                         }}
-                                                        options={['CMB-Colombo', 'KDY-Kandy', 'JAF-Jaffna']}
+                                                        options={activeLocationList}
+                                                        getOptionLabel={(option) => `${option.code}-${option.shortDescription}`}
+                                                        isOptionEqualToValue={(option, value) => option.location_id === value.location_id}
+                                                        disableClearable={true}
                                                         renderInput={(params) => (
                                                             <TextField
                                                                 {...params}
                                                                 label="Location 01"
                                                                 sx={{
                                                                     alignItems: 'center',
-                                                                    width: { sm: 75, md: 110 },
+                                                                    width: { sm: 75, md: 150 },
                                                                     '& .MuiInputBase-root': {
                                                                         height: 40
                                                                     }
@@ -322,7 +638,7 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                                 }}
                                                                 error={Boolean(touched.location1 && errors.location1)}
                                                                 helperText={touched.location1 && errors.location1 ? errors.location1 : ''}
-                                                                variant="standard"
+                                                                variant="outlined"
                                                                 name="location1"
                                                                 onBlur={handleBlur}
                                                             />
@@ -330,23 +646,36 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                     />
                                                 </Grid>
                                                 <Grid item>
+                                                    <Checkbox
+                                                        checked={checkedItems.checkbox1 || false} // set to true for a checked checkbox
+                                                        icon={<CheckBoxOutlineBlankIcon style={{ color: common.black }} />} // customize the icon with the desired color
+                                                        checkedIcon={<CheckBoxIcon style={{ color: green[500] }} />} // customize the checked icon with the desired color
+                                                        onChange={handleCheckboxChange}
+                                                        name="checkbox1"
+                                                    />
+                                                </Grid>
+                                                <Grid item style={{ marginLeft: '8px' }}>
                                                     <Autocomplete
                                                         value={values.location2}
                                                         name="location2"
                                                         onChange={(_, value) => {
                                                             setFieldValue(`location2`, value);
+                                                            handleLocation2(value);
                                                         }}
                                                         InputLabelProps={{
                                                             shrink: true
                                                         }}
-                                                        options={['CMB-Colombo', 'KDY-Kandy', 'JAF-Jaffna']}
+                                                        options={!values.location1 ? [] : activeLocationList}
+                                                        getOptionLabel={(option) => `${option.code}-${option.shortDescription}`}
+                                                        isOptionEqualToValue={(option, value) => option.location_id === value.location_id}
+                                                        disableClearable={true}
                                                         renderInput={(params) => (
                                                             <TextField
                                                                 {...params}
                                                                 label="Location 02"
                                                                 sx={{
                                                                     alignItems: 'center',
-                                                                    width: { sm: 75, md: 110 },
+                                                                    width: { sm: 75, md: 150 },
                                                                     '& .MuiInputBase-root': {
                                                                         height: 40
                                                                     }
@@ -354,9 +683,12 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                                 InputLabelProps={{
                                                                     shrink: true
                                                                 }}
+                                                                // InputProps={{
+                                                                //     readOnly: location2Check
+                                                                // }}
                                                                 error={Boolean(touched.location2 && errors.location2)}
                                                                 helperText={touched.location2 && errors.location2 ? errors.location2 : ''}
-                                                                variant="standard"
+                                                                variant="outlined"
                                                                 name="location2"
                                                                 onBlur={handleBlur}
                                                             />
@@ -364,23 +696,35 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                     />
                                                 </Grid>
                                                 <Grid item>
+                                                    <Checkbox
+                                                        checked={checkedItems.checkbox2 || false} // set to true for a checked checkbox
+                                                        icon={<CheckBoxOutlineBlankIcon style={{ color: common.black }} />} // customize the icon with the desired color
+                                                        checkedIcon={<CheckBoxIcon style={{ color: green[500] }} />} // customize the checked icon with the desired color
+                                                        onChange={handleCheckboxChange}
+                                                        name="checkbox2"
+                                                    />
+                                                </Grid>
+                                                <Grid item style={{ marginLeft: '8px' }}>
                                                     <Autocomplete
                                                         value={values.location3}
                                                         name="location3"
                                                         onChange={(_, value) => {
                                                             setFieldValue(`location3`, value);
+                                                            handleLocation3(value);
                                                         }}
                                                         InputLabelProps={{
                                                             shrink: true
                                                         }}
-                                                        options={['CMB-Colombo', 'KDY-Kandy', 'JAF-Jaffna']}
+                                                        options={!values.location2 ? [] : activeLocationList}
+                                                        getOptionLabel={(option) => `${option.code}-${option.shortDescription}`}
+                                                        isOptionEqualToValue={(option, value) => option.location_id === value.location_id}
                                                         renderInput={(params) => (
                                                             <TextField
                                                                 {...params}
                                                                 label="Location 03"
                                                                 sx={{
                                                                     alignItems: 'center',
-                                                                    width: { sm: 75, md: 110 },
+                                                                    width: { sm: 75, md: 150 },
                                                                     '& .MuiInputBase-root': {
                                                                         height: 40
                                                                     }
@@ -390,7 +734,7 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                                 }}
                                                                 error={Boolean(touched.location3 && errors.location3)}
                                                                 helperText={touched.location3 && errors.location3 ? errors.location3 : ''}
-                                                                variant="standard"
+                                                                variant="outlined"
                                                                 name="location3"
                                                                 onBlur={handleBlur}
                                                             />
@@ -398,23 +742,35 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                     />
                                                 </Grid>
                                                 <Grid item>
+                                                    <Checkbox
+                                                        checked={checkedItems.checkbox3 || false} // set to true for a checked checkbox
+                                                        icon={<CheckBoxOutlineBlankIcon style={{ color: common.black }} />} // customize the icon with the desired color
+                                                        checkedIcon={<CheckBoxIcon style={{ color: green[500] }} />} // customize the checked icon with the desired color
+                                                        onChange={handleCheckboxChange}
+                                                        name="checkbox3"
+                                                    />
+                                                </Grid>
+                                                <Grid item style={{ marginLeft: '8px' }}>
                                                     <Autocomplete
                                                         value={values.location4}
                                                         name="location4"
                                                         onChange={(_, value) => {
                                                             setFieldValue(`location4`, value);
+                                                            handleLocation4(value);
                                                         }}
                                                         InputLabelProps={{
                                                             shrink: true
                                                         }}
-                                                        options={['CMB-Colombo', 'KDY-Kandy', 'JAF-Jaffna']}
+                                                        options={!values.location3 ? [] : activeLocationList}
+                                                        getOptionLabel={(option) => `${option.code} - ${option.shortDescription}`}
+                                                        isOptionEqualToValue={(option, value) => option.location_id === value.location_id}
                                                         renderInput={(params) => (
                                                             <TextField
                                                                 {...params}
                                                                 label="Location 04"
                                                                 sx={{
                                                                     alignItems: 'center',
-                                                                    width: { sm: 75, md: 110 },
+                                                                    width: { sm: 75, md: 150 },
                                                                     '& .MuiInputBase-root': {
                                                                         height: 40
                                                                     }
@@ -424,7 +780,7 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                                 }}
                                                                 error={Boolean(touched.location4 && errors.location4)}
                                                                 helperText={touched.location4 && errors.location4 ? errors.location4 : ''}
-                                                                variant="standard"
+                                                                variant="outlined"
                                                                 name="location4"
                                                                 onBlur={handleBlur}
                                                             />
@@ -432,23 +788,35 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                     />
                                                 </Grid>
                                                 <Grid item>
+                                                    <Checkbox
+                                                        checked={checkedItems.checkbox4 || false} // set to true for a checked checkbox
+                                                        icon={<CheckBoxOutlineBlankIcon style={{ color: common.black }} />} // customize the icon with the desired color
+                                                        checkedIcon={<CheckBoxIcon style={{ color: green[500] }} />} // customize the checked icon with the desired color
+                                                        onChange={handleCheckboxChange}
+                                                        name="checkbox4"
+                                                    />
+                                                </Grid>
+                                                <Grid item style={{ marginLeft: '8px' }}>
                                                     <Autocomplete
                                                         value={values.location5}
                                                         name="location5"
                                                         onChange={(_, value) => {
                                                             setFieldValue(`location5`, value);
+                                                            handleLocation5(value);
                                                         }}
                                                         InputLabelProps={{
                                                             shrink: true
                                                         }}
-                                                        options={['CMB-Colombo', 'KDY-Kandy', 'JAF-Jaffna']}
+                                                        options={!values.location4 ? [] : activeLocationList}
+                                                        getOptionLabel={(option) => `${option.code}-${option.shortDescription}`}
+                                                        isOptionEqualToValue={(option, value) => option.location_id === value.location_id}
                                                         renderInput={(params) => (
                                                             <TextField
                                                                 {...params}
                                                                 label="Location 05"
                                                                 sx={{
                                                                     alignItems: 'center',
-                                                                    width: { sm: 75, md: 110 },
+                                                                    width: { sm: 75, md: 150 },
                                                                     '& .MuiInputBase-root': {
                                                                         height: 40
                                                                     }
@@ -458,19 +826,278 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                                 }}
                                                                 error={Boolean(touched.location5 && errors.location5)}
                                                                 helperText={touched.location5 && errors.location5 ? errors.location5 : ''}
-                                                                variant="standard"
+                                                                variant="outlined"
                                                                 name="location5"
                                                                 onBlur={handleBlur}
                                                             />
                                                         )}
                                                     />
                                                 </Grid>
-                                                <Grid item style={{ marginLeft: '40px', marginTop: '15px' }}>
+                                                <Grid item>
+                                                    <Checkbox
+                                                        checked={checkedItems.checkbox5 || false} // set to true for a checked checkbox
+                                                        icon={<CheckBoxOutlineBlankIcon style={{ color: common.black }} />} // customize the icon with the desired color
+                                                        checkedIcon={<CheckBoxIcon style={{ color: green[500] }} />} // customize the checked icon with the desired color
+                                                        onChange={handleCheckboxChange}
+                                                        name="checkbox5"
+                                                    />
+                                                </Grid>
+                                            </Grid>
+                                            <Grid gap="5px" display="flex" style={{ marginTop: '50px' }}>
+                                                <Grid item>
+                                                    <Autocomplete
+                                                        value={values.location6}
+                                                        name="location6"
+                                                        onChange={(_, value) => {
+                                                            setFieldValue(`location6`, value);
+                                                            handleLocation6(value);
+                                                        }}
+                                                        InputLabelProps={{
+                                                            shrink: true
+                                                        }}
+                                                        options={!values.location5 ? [] : activeLocationList}
+                                                        getOptionLabel={(option) => `${option.code}-${option.shortDescription}`}
+                                                        isOptionEqualToValue={(option, value) => option.location_id === value.location_id}
+                                                        renderInput={(params) => (
+                                                            <TextField
+                                                                {...params}
+                                                                label="Location 06"
+                                                                sx={{
+                                                                    alignItems: 'center',
+                                                                    width: { sm: 75, md: 150 },
+                                                                    '& .MuiInputBase-root': {
+                                                                        height: 40
+                                                                    }
+                                                                }}
+                                                                InputLabelProps={{
+                                                                    shrink: true
+                                                                }}
+                                                                error={Boolean(touched.location6 && errors.location6)}
+                                                                helperText={touched.location6 && errors.location6 ? errors.location6 : ''}
+                                                                variant="outlined"
+                                                                name="location6"
+                                                                onBlur={handleBlur}
+                                                            />
+                                                        )}
+                                                    />
+                                                </Grid>
+                                                <Grid item>
+                                                    <Checkbox
+                                                        checked={checkedItems.checkbox6 || false} // set to true for a checked checkbox
+                                                        icon={<CheckBoxOutlineBlankIcon style={{ color: common.black }} />} // customize the icon with the desired color
+                                                        checkedIcon={<CheckBoxIcon style={{ color: green[500] }} />} // customize the checked icon with the desired color
+                                                        onChange={handleCheckboxChange}
+                                                        name="checkbox6"
+                                                    />
+                                                </Grid>
+                                                <Grid item style={{ marginLeft: '8px' }}>
+                                                    <Autocomplete
+                                                        value={values.location7}
+                                                        name="location7"
+                                                        onChange={(_, value) => {
+                                                            setFieldValue(`location7`, value);
+                                                            handleLocation7(value);
+                                                        }}
+                                                        InputLabelProps={{
+                                                            shrink: true
+                                                        }}
+                                                        options={!values.location6 ? [] : activeLocationList}
+                                                        getOptionLabel={(option) => `${option.code}-${option.shortDescription}`}
+                                                        isOptionEqualToValue={(option, value) => option.location_id === value.location_id}
+                                                        renderInput={(params) => (
+                                                            <TextField
+                                                                {...params}
+                                                                label="Location 07"
+                                                                sx={{
+                                                                    alignItems: 'center',
+                                                                    width: { sm: 75, md: 150 },
+                                                                    '& .MuiInputBase-root': {
+                                                                        height: 40
+                                                                    }
+                                                                }}
+                                                                InputLabelProps={{
+                                                                    shrink: true
+                                                                }}
+                                                                error={Boolean(touched.location7 && errors.location7)}
+                                                                helperText={touched.location7 && errors.location7 ? errors.location7 : ''}
+                                                                variant="outlined"
+                                                                name="location7"
+                                                                onBlur={handleBlur}
+                                                            />
+                                                        )}
+                                                    />
+                                                </Grid>
+                                                <Grid item>
+                                                    <Checkbox
+                                                        checked={checkedItems.checkbox7 || false} // set to true for a checked checkbox
+                                                        icon={<CheckBoxOutlineBlankIcon style={{ color: common.black }} />} // customize the icon with the desired color
+                                                        checkedIcon={<CheckBoxIcon style={{ color: green[500] }} />} // customize the checked icon with the desired color
+                                                        onChange={handleCheckboxChange}
+                                                        name="checkbox7"
+                                                    />
+                                                </Grid>
+                                                <Grid item style={{ marginLeft: '8px' }}>
+                                                    <Autocomplete
+                                                        value={values.location8}
+                                                        name="location8"
+                                                        onChange={(_, value) => {
+                                                            setFieldValue(`location8`, value);
+                                                            handleLocation8(value);
+                                                        }}
+                                                        InputLabelProps={{
+                                                            shrink: true
+                                                        }}
+                                                        options={!values.location7 ? [] : activeLocationList}
+                                                        getOptionLabel={(option) => `${option.code}-${option.shortDescription}`}
+                                                        isOptionEqualToValue={(option, value) => option.location_id === value.location_id}
+                                                        renderInput={(params) => (
+                                                            <TextField
+                                                                {...params}
+                                                                label="Location 08"
+                                                                sx={{
+                                                                    alignItems: 'center',
+                                                                    width: { sm: 75, md: 150 },
+                                                                    '& .MuiInputBase-root': {
+                                                                        height: 40
+                                                                    }
+                                                                }}
+                                                                InputLabelProps={{
+                                                                    shrink: true
+                                                                }}
+                                                                error={Boolean(touched.location8 && errors.location8)}
+                                                                helperText={touched.location8 && errors.location8 ? errors.location8 : ''}
+                                                                variant="outlined"
+                                                                name="location8"
+                                                                onBlur={handleBlur}
+                                                            />
+                                                        )}
+                                                    />
+                                                </Grid>
+                                                <Grid item>
+                                                    <Checkbox
+                                                        checked={checkedItems.checkbox8 || false} // set to true for a checked checkbox
+                                                        icon={<CheckBoxOutlineBlankIcon style={{ color: common.black }} />} // customize the icon with the desired color
+                                                        checkedIcon={<CheckBoxIcon style={{ color: green[500] }} />} // customize the checked icon with the desired color
+                                                        onChange={handleCheckboxChange}
+                                                        name="checkbox8"
+                                                    />
+                                                </Grid>
+                                                <Grid item style={{ marginLeft: '8px' }}>
+                                                    <Autocomplete
+                                                        value={values.location9}
+                                                        name="location9"
+                                                        onChange={(_, value) => {
+                                                            setFieldValue(`location9`, value);
+                                                            handleLocation9(value);
+                                                        }}
+                                                        InputLabelProps={{
+                                                            shrink: true
+                                                        }}
+                                                        options={!values.location8 ? [] : activeLocationList}
+                                                        getOptionLabel={(option) => `${option.code} - ${option.shortDescription}`}
+                                                        isOptionEqualToValue={(option, value) => option.location_id === value.location_id}
+                                                        renderInput={(params) => (
+                                                            <TextField
+                                                                {...params}
+                                                                label="Location 09"
+                                                                sx={{
+                                                                    alignItems: 'center',
+                                                                    width: { sm: 75, md: 150 },
+                                                                    '& .MuiInputBase-root': {
+                                                                        height: 40
+                                                                    }
+                                                                }}
+                                                                InputLabelProps={{
+                                                                    shrink: true
+                                                                }}
+                                                                error={Boolean(touched.location9 && errors.location9)}
+                                                                helperText={touched.location9 && errors.location9 ? errors.location9 : ''}
+                                                                variant="outlined"
+                                                                name="location9"
+                                                                onBlur={handleBlur}
+                                                            />
+                                                        )}
+                                                    />
+                                                </Grid>
+                                                <Grid item>
+                                                    <Checkbox
+                                                        checked={checkedItems.checkbox9 || false} // set to true for a checked checkbox
+                                                        icon={<CheckBoxOutlineBlankIcon style={{ color: common.black }} />} // customize the icon with the desired color
+                                                        checkedIcon={<CheckBoxIcon style={{ color: green[500] }} />} // customize the checked icon with the desired color
+                                                        onChange={handleCheckboxChange}
+                                                        name="checkbox9"
+                                                    />
+                                                </Grid>
+                                                <Grid item style={{ marginLeft: '8px' }}>
+                                                    <Autocomplete
+                                                        value={values.location10}
+                                                        name="location10"
+                                                        onChange={(_, value) => {
+                                                            setFieldValue(`location10`, value);
+                                                            handleLocation10(value);
+                                                        }}
+                                                        InputLabelProps={{
+                                                            shrink: true
+                                                        }}
+                                                        options={!values.location9 ? [] : activeLocationList}
+                                                        getOptionLabel={(option) => `${option.code}-${option.shortDescription}`}
+                                                        isOptionEqualToValue={(option, value) => option.location_id === value.location_id}
+                                                        renderInput={(params) => (
+                                                            <TextField
+                                                                {...params}
+                                                                label="Location 10"
+                                                                sx={{
+                                                                    alignItems: 'center',
+                                                                    width: { sm: 75, md: 150 },
+                                                                    '& .MuiInputBase-root': {
+                                                                        height: 40
+                                                                    }
+                                                                }}
+                                                                InputLabelProps={{
+                                                                    shrink: true
+                                                                }}
+                                                                error={Boolean(touched.location10 && errors.location10)}
+                                                                helperText={
+                                                                    touched.location10 && errors.location10 ? errors.location10 : ''
+                                                                }
+                                                                variant="outlined"
+                                                                name="location10"
+                                                                onBlur={handleBlur}
+                                                            />
+                                                        )}
+                                                    />
+                                                </Grid>
+                                                <Grid item>
+                                                    <Checkbox
+                                                        checked={checkedItems.checkbox10 || false} // set to true for a checked checkbox
+                                                        icon={<CheckBoxOutlineBlankIcon style={{ color: common.black }} />} // customize the icon with the desired color
+                                                        checkedIcon={<CheckBoxIcon style={{ color: green[500] }} />} // customize the checked icon with the desired color
+                                                        onChange={handleCheckboxChange}
+                                                        name="checkbox10"
+                                                    />
+                                                </Grid>
+                                            </Grid>
+                                            <Grid display="flex" style={{ marginTop: '50px' }}>
+                                                <Grid item>
+                                                    <Button
+                                                        className={classes.saveButton}
+                                                        style={{ width: '90px', left: '20px' }}
+                                                        variant="contained"
+                                                        type="button"
+                                                        onClick={() =>
+                                                            handleCalculate(values, setFieldError, setFieldTouched, errors, touched)
+                                                        }
+                                                    >
+                                                        Calculate
+                                                    </Button>
+                                                </Grid>
+                                                <Grid item>
                                                     <TextField
-                                                        label="Distance"
+                                                        label="Distance (km)"
                                                         sx={{
                                                             alignItems: 'center',
-                                                            width: { sm: 75, md: 70 },
+                                                            left: '100px',
+                                                            width: { sm: 75, md: 150 },
                                                             '& .MuiInputBase-root': {
                                                                 height: 40
                                                             }
@@ -481,19 +1108,19 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                         InputProps={{
                                                             readOnly: true
                                                         }}
-                                                        // error={Boolean(touched.location3 && errors.location3)}
-                                                        // helperText={touched.location3 && errors.location3 ? errors.location3 : ''}
-                                                        variant="filled"
+                                                        variant="outlined"
                                                         name="distance"
+                                                        value={values.chargeMethod === 'Distance' ? distance : ''}
                                                         onBlur={handleBlur}
                                                     />
                                                 </Grid>
-                                                <Grid item style={{ marginTop: '15px' }}>
+                                                <Grid>
                                                     <TextField
-                                                        label="Hours"
+                                                        label="Duration (hr)"
                                                         sx={{
                                                             alignItems: 'center',
-                                                            width: { sm: 75, md: 70 },
+                                                            left: '160px',
+                                                            width: { sm: 75, md: 150 },
                                                             '& .MuiInputBase-root': {
                                                                 height: 40
                                                             }
@@ -504,30 +1131,30 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                         InputProps={{
                                                             readOnly: true
                                                         }}
-                                                        // error={Boolean(touched.location3 && errors.location3)}
-                                                        // helperText={touched.location3 && errors.location3 ? errors.location3 : ''}
-                                                        variant="filled"
-                                                        name="hours"
+                                                        variant="outlined"
+                                                        name="duration"
+                                                        value={values.chargeMethod === 'Duration' ? duration : ''}
                                                         onBlur={handleBlur}
                                                     />
                                                 </Grid>
                                             </Grid>
                                         </div>
                                         <Box display="flex" flexDirection="row-reverse" style={{ marginTop: '60px' }}>
-                                            <Button className="btnSave" variant="contained" type="submit">
-                                                {mode === 'INSERT' ? 'SAVE' : 'UPDATE'}
-                                            </Button>
-
                                             <Button
+                                                className={classes.clearButton}
                                                 variant="outlined"
                                                 type="button"
                                                 style={{
                                                     // backgroundColor: '#B22222',
-                                                    marginRight: '10px'
+                                                    marginLeft: '10px'
                                                 }}
                                                 onClick={(e) => resetForm()}
                                             >
                                                 CLEAR
+                                            </Button>
+
+                                            <Button className={classes.saveButton} variant="contained" type="submit">
+                                                {mode === 'INSERT' ? 'SAVE' : 'UPDATE'}
                                             </Button>
                                         </Box>
                                     </Form>
