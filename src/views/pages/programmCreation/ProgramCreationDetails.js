@@ -280,7 +280,7 @@ function ProgramCreationDetails() {
                                     Accomodation
                                     <AddCircleIcon
                                         className={classes.iconButton}
-                                        onClick={() => handleClickOpen('INSERT', 'Accomodation', null)}
+                                        onClick={() => handleClickOpen('INSERT', 'Accomodation', null, i)}
                                     />
                                 </Button>
 
@@ -294,7 +294,7 @@ function ProgramCreationDetails() {
                                     Activites
                                     <AddCircleIcon
                                         className={classes.iconButton}
-                                        onClick={() => handleClickOpen('INSERT', 'Activites', null)}
+                                        onClick={() => handleClickOpen('INSERT', 'Activites', null, i)}
                                     />
                                 </Button>
 
@@ -308,7 +308,7 @@ function ProgramCreationDetails() {
                                     Supplements
                                     <AddCircleIcon
                                         className={classes.iconButton}
-                                        onClick={() => handleClickOpen('INSERT', 'Supplements', null)}
+                                        onClick={() => handleClickOpen('INSERT', 'Supplements', null, i)}
                                     />
                                 </Button>
 
@@ -322,7 +322,7 @@ function ProgramCreationDetails() {
                                     Miscellaneous
                                     <AddCircleIcon
                                         className={classes.iconButton}
-                                        onClick={() => handleClickOpen('INSERT', 'Miscellaneous', null)}
+                                        onClick={() => handleClickOpen('INSERT', 'Miscellaneous', null, i)}
                                     />
                                 </Button>
 
@@ -335,7 +335,7 @@ function ProgramCreationDetails() {
                                     //    handleButtonTextChange(i, event)
                                     //  }
                                 /> */}
-                                {errors[`input-${activeButton}`] && touched[`input-${activeButton}`] ? (
+                                {/* {errors[`input-${activeButton}`] && touched[`input-${activeButton}`] ? (
                                     <div>
                                         {errors[`input-${activeButton}`]}
                                         {setActiveButtonColor('red')}
@@ -351,7 +351,7 @@ function ProgramCreationDetails() {
                                         {setActiveButtonColor('#1877f2')}
                                         {setPreButtonColor('#1877f2')}
                                     </div>
-                                ) : null}
+                                ) : null} */}
                             </div>
                             <br />
                             {openTransport[i] ? ( // Use the unique identifier (i) to determine if the ProgramTransport component should be rendered
