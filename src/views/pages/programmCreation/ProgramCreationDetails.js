@@ -12,6 +12,7 @@ import ProgramActivity from './ProgramActivity';
 import ProgramMisCellaneous from './ProgramMisCellaneous';
 import ProgramSuppliment from './ProgramSuppliment';
 import MaterialTable from 'material-table';
+import ProgramAccommodation from './ProgramAccommodation';
 
 const useStyles = makeStyles((theme) => ({
     content: {
@@ -355,6 +356,11 @@ function ProgramCreationDetails(startDate) {
                                 ''
                             )}
 
+                            {openAccomodation ? (
+                                <ProgramAccommodation open={openAccomodation} handleClose={handleClose} mode={mode} startDate={startDate} />
+                            ) : (
+                                ''
+                            )}
                             {openToast ? <SuccessMsg openToast={openToast} handleToast={handleToast} mode={mode} /> : null}
                             {openErrorToast ? <ErrorMsg openToast={openErrorToast} handleToast={setOpenErrorToast} mode={mode} /> : null}
                         </Grid>
