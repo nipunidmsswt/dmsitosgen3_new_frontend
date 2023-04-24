@@ -13,7 +13,8 @@ import {
     UPDATE_FAILED_EXPENSE_TYPES,
     UPDATE_SUCCESS_EXPENSE_TYPES,
     SUCCESS_ACTIVE_EXPENSE_TYPES_LIST_DATA,
-    FAILED_ACTIVE_EXPENSE_TYPES_LIST_DATA
+    FAILED_ACTIVE_EXPENSE_TYPES_LIST_DATA,
+    EXPENSE_TYPES_DESCRIPTION_DUPLICATE
 } from 'store/constant/master/ExpenseTypesConstant';
 
 const initialState = {
@@ -23,6 +24,7 @@ const initialState = {
     expenseTypeToUpdate: null,
     errorMsg: null,
     duplicateExpenseType: null,
+    duplicateExpenseDescription: null,
     lastModifiedDateTime: null,
     activeExpenseTypes: []
 };
@@ -97,6 +99,9 @@ export const expenseTypesReducer = (state = initialState, action) => {
 
         case FAILED_ACTIVE_EXPENSE_TYPES_LIST_DATA:
             return { ...state, activeExpenseTypes: data };
+
+        case EXPENSE_TYPES_DESCRIPTION_DUPLICATE:
+            return { ...state, duplicateExpenseDescription: data };
 
         default:
             return state;

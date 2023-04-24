@@ -54,7 +54,8 @@
         "slick-carousel": "^1.8.1",
         "srilankan-provinces-districts": "^1.0.8",
         "sweetalert2": "^11.7.3",
-        "yup": "^0.32.11"
+        "yup": "^0.32.11",
+        "zustand": "^4.3.7"
     },
     "scripts": {
         "start": "react-scripts --openssl-legacy-provider start",

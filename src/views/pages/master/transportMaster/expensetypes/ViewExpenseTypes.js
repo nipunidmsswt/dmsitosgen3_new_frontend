@@ -98,7 +98,7 @@ function ViewExpenseTypes() {
 
     useEffect(() => {
         setLastModifiedTimeDate(
-            lastModifiedDate === null
+            lastModifiedDate === null || lastModifiedDate === ''
                 ? ''
                 : new Date(lastModifiedDate).toLocaleString('en-GB', {
                       year: 'numeric',
@@ -121,6 +121,7 @@ function ViewExpenseTypes() {
             setMode(type);
         } else {
             setMode(type);
+            
             setCode(data.expenseCode);
         }
         setOpen(true);
@@ -139,7 +140,7 @@ function ViewExpenseTypes() {
     return (
         <div>
             <MainCard title="Expense Types">
-                <div style={{ textAlign: 'right' }}> Last Modified Date : {lastModifiedTimeDate}</div>
+                {/* <div style={{ textAlign: 'right' }}> Last Modified Date : {lastModifiedTimeDate}</div> */}
                 <br />
                 <Grid container spacing={gridSpacing}>
                     <Grid item xs={12}>
