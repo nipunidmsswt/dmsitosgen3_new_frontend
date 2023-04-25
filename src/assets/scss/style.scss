@@ -7,6 +7,12 @@
 @import ' ~slick-carousel/slick/slick-theme.css';
 @import 'react-responsive-carousel/lib/styles/carousel.min.css';
 
+//theme
+@import "primereact/resources/themes/lara-light-indigo/theme.css";     
+    
+//core
+@import "primereact/resources/primereact.min.css";                                       
+        
 // ==============================|| LIGHT BOX ||============================== //
 .fullscreen .react-images__blanket {
     z-index: 1200;

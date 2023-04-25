@@ -11,9 +11,11 @@ import { FormControlLabel, FormGroup, Grid, Switch } from '@mui/material';
 import { gridSpacing } from 'store/constant';
 import ExpenseTypes from './ExpenseTypes';
 import { getAllExpenseTypesData, getLatestModifiedDetailsExpenseRates } from 'store/actions/masterActions/ExpenseTypeAction';
+import AlertModelClose from 'messages/AlertModelClose';
 
 function ViewExpenseTypes() {
     const [open, setOpen] = useState(false);
+    const [openConfirmationModel, setOpenConfirmationModel] = useState(false);
     const [Code, setCode] = useState('');
     const [mode, setMode] = useState('INSERT');
     const [openToast, setHandleToast] = useState(false);
@@ -69,7 +71,6 @@ function ViewExpenseTypes() {
     const expenseTypesList = useSelector((state) => state.expenseTypesReducer.expenseTypes);
 
     useEffect(() => {
-        console.log(expenseTypesList);
         if (expenseTypesList?.length > 0) {
             setTableData(expenseTypesList);
         }
@@ -82,9 +83,7 @@ function ViewExpenseTypes() {
     }, [error]);
 
     useEffect(() => {
-        console.log(expenseType);
         if (expenseType) {
-            console.log('sucessToast');
             setHandleToast(true);
             dispatch(getAllExpenseTypesData());
             dispatch(getLatestModifiedDetailsExpenseRates());
@@ -121,14 +120,27 @@ function ViewExpenseTypes() {
             setMode(type);
         } else {
             setMode(type);
-            
             setCode(data.expenseCode);
         }
         setOpen(true);
     };
 
     const handleClose = () => {
+        setOpenConfirmationModel(true);
+    };
+
+    const handleCloseSubmit = () => {
         setOpen(false);
+    };
+
+    const handleCloseModel = (status) => {
+        //close
+        if (status == true) {
+            setOpen(false);
+            setOpenConfirmationModel(false);
+        } else {
+            setOpenConfirmationModel(false);
+        }
     };
 
     const handleToast = () => {
@@ -208,8 +220,22 @@ function ViewExpenseTypes() {
                                         }
                                     }}
                                 />
-
-                                {open ? <ExpenseTypes open={open} handleClose={handleClose} code={Code} mode={mode} /> : ''}
+                                {openConfirmationModel ? (
+                                    <AlertModelClose title="dev" open={openConfirmationModel} handleCloseModel={handleCloseModel} />
+                                ) : (
+                                    ''
+                                )}
+                                {open ? (
+                                    <ExpenseTypes
+                                        open={open}
+                                        handleClose={handleClose}
+                                        handleCloseSubmit={handleCloseSubmit}
+                                        code={Code}
+                                        mode={mode}
+                                    />
+                                ) : (
+                                    ''
+                                )}
                                 {openToast ? <SuccessMsg openToast={openToast} handleToast={handleToast} mode={mode} /> : null}
                                 {openErrorToast ? (
                                     <ErrorMsg openToast={openErrorToast} handleToast={setOpenErrorToast} mode={mode} />

@@ -12,6 +12,7 @@ import {
 } from '../../../constant/master/TransportMasterConstant/MainTransportCategoryConstant';
 
 export const saveMainTransportDetailsData = (data) => {
+    console.log('data :' + data);
     return {
         type: SAVE_MAIN_TRANSPORT_DETAILS_DATA,
         data

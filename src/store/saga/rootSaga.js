@@ -15,7 +15,8 @@ import {
     checkLatestTaxGrupModifiedDateSaga,
     getTaxByUniqueIdSaga,
     getAllActiveTaxGroups,
-    getAllActiveTaxGroupsandTaxes
+    getAllActiveTaxGroupsandTaxes,
+    getAllActiveTaxGroupsandTaxesTypeBase
 } from './mastersaga/TaxSaga';
 import {
     SAVE_TAX_DATA,
@@ -32,7 +33,8 @@ import {
     GET_LAST_MODIFIED_DATE_TIME_TAX_GROUP,
     GET_TAX_DATA_BY_UNIQUE_ID,
     GET_ACTIVE_TAX_GROUP_LIST,
-    GET_TAX_GROUP_AND_TAX_LIST
+    GET_TAX_GROUP_AND_TAX_LIST,
+    GET_TAX_GROUP_AND_TAX_LIST_TYPE
 } from 'store/constant/master/TaxMasterConstant';
 
 import {
@@ -747,7 +749,7 @@ export function* wacherSaga() {
     yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_TAX_GROUP, checkLatestTaxGrupModifiedDateSaga);
     yield takeLatest(GET_ACTIVE_TAX_GROUP_LIST, getAllActiveTaxGroups);
     yield takeLatest(GET_TAX_GROUP_AND_TAX_LIST, getAllActiveTaxGroupsandTaxes);
-
+    yield takeLatest(GET_TAX_GROUP_AND_TAX_LIST_TYPE, getAllActiveTaxGroupsandTaxesTypeBase);
     // //tour category setup
     yield takeLatest(SAVE_TOUR_CATEGORY_DATA, saveTourCategoryHandler);
     yield takeLatest(GET_ALL_TOUR_CATEGORY_DATA, getAllTourCategorySaga);

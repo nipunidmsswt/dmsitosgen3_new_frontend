@@ -1,5 +1,7 @@
 import { create, get, getById, update } from 'apis/Apis';
 import { put, takeEvery, call } from 'redux-saga/effects';
+import { SUCCESS_GET_TAX_GROUP_AND_TAX_LIST_TYPE } from 'store/constant/master/TaxMasterConstant';
+import { FAILED_GET_TAX_GROUP_AND_TAX_LIST_TYPE } from 'store/constant/master/TaxMasterConstant';
 import {
     ADD_FAILED_TAX_DATA,
     ADD_FAILED_TAX_GROUP_DATA,
@@ -225,6 +227,18 @@ export function* getAllActiveTaxGroups() {
     } catch (e) {
         console.log('Error:' + e);
         yield put({ type: FAILED_GET_ACTIVE_TAX_GROUP_LIST, data: '' });
+    }
+}
+
+export function* getAllActiveTaxGroupsandTaxesTypeBase(action) {
+    let responseData = [];
+    try {
+        responseData = yield call(get, `${process.env.REACT_APP_FINANCE_URL}/taxTaxGroupDetailsByType/${action.data}`);
+        console.log('response data last:' + responseData);
+        yield put({ type: SUCCESS_GET_TAX_GROUP_AND_TAX_LIST_TYPE, data: responseData.data });
+    } catch (e) {
+        console.log('Error:' + e);
+        yield put({ type: FAILED_GET_TAX_GROUP_AND_TAX_LIST_TYPE, data: '' });
     }
 }
 

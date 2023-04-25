@@ -9,7 +9,7 @@ export default function AlertItemDelete({ title, open, handleClose }) {
             open={true}
             onClose={() => handleClose(false)}
             keepMounted
-            maxWidth="xs"
+            maxWidth="md"
             aria-labelledby="item-delete-title"
             aria-describedby="item-delete-description"
         >

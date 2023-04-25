@@ -13,7 +13,9 @@ import {
     SUCCESS_GET_ACTIVE_TAX_GROUP_LIST,
     FAILED_GET_ACTIVE_TAX_GROUP_LIST,
     SUCCESS_GET_TAX_GROUP_AND_TAX_LIST,
-    FAILED_GET_TAX_GROUP_AND_TAX_LIST
+    FAILED_GET_TAX_GROUP_AND_TAX_LIST,
+    SUCCESS_GET_TAX_GROUP_AND_TAX_LIST_TYPE,
+    FAILED_GET_TAX_GROUP_AND_TAX_LIST_TYPE
 } from '../../constant/master/TaxMasterConstant';
 
 const initialState = {
@@ -24,7 +26,8 @@ const initialState = {
     duplicateTaxGroup: null,
     lastModifiedDateTime: null,
     activeTaxGrups: [],
-    activeTaxGroupandTaxes: []
+    activeTaxGroupandTaxes: [],
+    activeTaxGroupandTaxesByType: []
 };
 
 export const taxGroupReducer = (state = initialState, action) => {
@@ -107,6 +110,13 @@ export const taxGroupReducer = (state = initialState, action) => {
 
         case FAILED_GET_TAX_GROUP_AND_TAX_LIST:
             return { ...state, activeTaxGroupandTaxes: data.payload[0] };
+
+        case SUCCESS_GET_TAX_GROUP_AND_TAX_LIST_TYPE:
+            console.log(data.payload[0]);
+            return { ...state, activeTaxGroupandTaxesByType: data.payload[0] };
+
+        case FAILED_GET_TAX_GROUP_AND_TAX_LIST_TYPE:
+            return { ...state, activeTaxGroupandTaxesByType: data.payload[0] };
 
         default:
             return state;

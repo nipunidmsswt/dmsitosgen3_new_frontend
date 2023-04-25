@@ -41,13 +41,39 @@ import {
     updateExpenseTypesData
 } from 'store/actions/masterActions/ExpenseTypeAction';
 import CreatedUpdatedUserDetailsWithTableFormat from '../../userTimeDetails/CreatedUpdatedUserDetailsWithTableFormat';
+import { getActiveTaxGroupandTaxList, getActiveTaxGroupandTaxListTypeBase } from 'store/actions/masterActions/TaxActions/TaxGroupAction';
 
 const Transition = forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
 
-function ExpenseTypes({ open, handleClose, mode, code }) {
+function ExpenseTypes({ open, handleClose, mode, code, handleCloseSubmit }) {
+    const currencyListData = useSelector((state) => state.expenseTypesReducer.currencyList);
+    const [currencyListOptions, setCurrencyListOptions] = useState([]);
+    const activeTaxGroupandTaxesByType = useSelector((state) => state.taxGroupReducer.activeTaxGroupandTaxesByType);
+
+    const [activeTaxGroupandTaxesList, setActiveTaxGroupandTaxesListData] = useState([]);
+    useEffect(() => {
+        if (currencyListData != null) {
+            setCurrencyListOptions(currencyListData);
+        }
+    }, [currencyListData]);
+
+    const currencyLists = [];
+    const dafaultTaxLists = [];
+
     const initialValues = {
+        currencyListNew: currencyListOptions.forEach((element) => {
+            if (element.currencyCode === 'LKR') {
+                currencyLists.push(element);
+            }
+        }),
+
+        taxListNew: activeTaxGroupandTaxesList.forEach((element) => {
+            if (element.code === 'None') {
+                dafaultTaxLists.push(element);
+            }
+        }),
         expenseCode: '',
         description: '',
         status: true,
@@ -55,8 +81,17 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
             {
                 fromDate: '',
                 toDate: '',
-                currencyList: null,
-                tax: null,
+                currencyList: {
+                    currencyCode: currencyLists[0]?.currencyCode,
+                    currencyDescription: currencyLists[0]?.currencyDescription,
+                    currencyListId: currencyLists[0]?.currencyListId
+                },
+                tax: {
+                    code: dafaultTaxLists[0]?.code,
+                    description: dafaultTaxLists[0]?.description,
+                    id: dafaultTaxLists[0]?.id
+                },
+
                 expenseRate: '',
                 rateWithoutTax: '',
                 rateWithTax: '',
@@ -226,34 +261,28 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                 dispatch(updateExpenseTypesData(saveValues));
             }
         }
-        handleClose();
+        handleCloseSubmit();
     };
 
     useEffect(() => {}, [ref]);
 
     const taxListData = useSelector((state) => state.taxReducer.taxes);
-    const currencyListData = useSelector((state) => state.expenseTypesReducer.currencyList);
+
     const duplicateCode = useSelector((state) => state.expenseTypesReducer.duplicateExpenseType);
     const duplicateExpenseDescription = useSelector((state) => state.expenseTypesReducer.duplicateExpenseDescription);
     const [taxListOptions, setTaxListOptions] = useState([]);
-    const [currencyListOptions, setCurrencyListOptions] = useState([]);
 
     useEffect(() => {
-        dispatch(getAllTaxData());
+        dispatch(getActiveTaxGroupandTaxListTypeBase('Buy'));
         dispatch(getAllCurrencyListData());
     }, []);
 
     useEffect(() => {
-        if (currencyListData != null) {
-            setCurrencyListOptions(currencyListData);
+        console.log(activeTaxGroupandTaxesByType);
+        if (activeTaxGroupandTaxesByType != null) {
+            setActiveTaxGroupandTaxesListData(activeTaxGroupandTaxesByType);
         }
-    }, [currencyListData]);
-
-    useEffect(() => {
-        if (taxListData != null) {
-            setTaxListOptions(taxListData);
-        }
-    }, [taxListData]);
+    }, [activeTaxGroupandTaxesByType]);
 
     return (
         <div>
@@ -376,7 +405,12 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                                                                                         expenseTypesDetailsId: '',
                                                                                         fromDate: '',
                                                                                         toDate: '',
-                                                                                        currencyList: null,
+                                                                                        currencyList: {
+                                                                                            currencyCode: currencyLists[0]?.currencyCode,
+                                                                                            currencyDescription:
+                                                                                                currencyLists[0]?.currencyDescription,
+                                                                                            currencyListId: currencyLists[0]?.currencyListId
+                                                                                        },
                                                                                         tax: null,
                                                                                         expenseRate: '',
                                                                                         rateWithoutTax: '',
@@ -528,7 +562,10 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                                                                                                             values.expenseTypeDetails[idx]
                                                                                                                 .fromDate === null ||
                                                                                                             values.expenseTypeDetails[idx]
-                                                                                                                .fromDate === ''
+                                                                                                                .fromDate === '' ||
+                                                                                                            values.expenseTypeDetails[idx]
+                                                                                                                .enableRow ||
+                                                                                                            mode == 'VIEW'
                                                                                                         }
                                                                                                         inputFormat="DD/MM/YYYY"
                                                                                                         value={
@@ -606,6 +643,7 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
 
                                                                                             <TableCell>
                                                                                                 <Autocomplete
+                                                                                                    id="combo-box-demo"
                                                                                                     value={
                                                                                                         values.expenseTypeDetails[idx]
                                                                                                             ? values.expenseTypeDetails[idx]
@@ -624,6 +662,8 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                                                                                                         values.expenseTypeDetails[idx]
                                                                                                             .enableRow || mode == 'VIEW'
                                                                                                     }
+                                                                                                    // disablePortal
+                                                                                                    autoSelect={true}
                                                                                                     options={currencyListOptions}
                                                                                                     getOptionLabel={(option) =>
                                                                                                         `${option.currencyCode}`
@@ -655,9 +695,10 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                                                                                                             variant="outlined"
                                                                                                             name={`expenseTypeDetails.${idx}.currencyList`}
                                                                                                             onBlur={handleBlur}
-                                                                                                            // defaultValue={
-                                                                                                            //     currencyListOptions[0]
-                                                                                                            // }
+                                                                                                            autoSelect={true}
+                                                                                                            // defaultValue={{
+                                                                                                            //     currencyCode: 'LKR'
+                                                                                                            // }}
                                                                                                             helperText={
                                                                                                                 touched.expenseTypeDetails &&
                                                                                                                 touched.expenseTypeDetails[
@@ -715,6 +756,7 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                                                                                                         values.expenseTypeDetails[idx]
                                                                                                             .enableRow || mode == 'VIEW'
                                                                                                     }
+                                                                                                    autoSelect={true}
                                                                                                     name={`expenseTypeDetails.${idx}.tax`}
                                                                                                     onChange={(_, value) => {
                                                                                                         console.log(value);
@@ -723,17 +765,18 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                                                                                                             value
                                                                                                         );
                                                                                                     }}
-                                                                                                    options={taxListOptions}
+                                                                                                    // options={taxListOptions}
+                                                                                                    options={activeTaxGroupandTaxesList}
                                                                                                     getOptionLabel={(option) =>
-                                                                                                        `${option.taxCode}`
+                                                                                                        `${option.code}`
                                                                                                     }
                                                                                                     isOptionEqualToValue={(option, value) =>
-                                                                                                        option.taxId === value.taxId
+                                                                                                        option.id === value.id
                                                                                                     }
                                                                                                     renderOption={(props, option) => (
                                                                                                         <li {...props}>
-                                                                                                            {option.taxCode}&nbsp;-
-                                                                                                            {option.taxDescription}
+                                                                                                            {option.code}&nbsp;-
+                                                                                                            {option.description}
                                                                                                         </li>
                                                                                                     )}
                                                                                                     renderInput={(params) => (

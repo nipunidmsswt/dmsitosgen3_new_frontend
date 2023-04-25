@@ -6,7 +6,8 @@ import {
     CHECK_TAX_GROUP_DUPLICATE,
     GET_LAST_MODIFIED_DATE_TIME_TAX_GROUP,
     GET_ACTIVE_TAX_GROUP_LIST,
-    GET_TAX_GROUP_AND_TAX_LIST
+    GET_TAX_GROUP_AND_TAX_LIST,
+    GET_TAX_GROUP_AND_TAX_LIST_TYPE
 } from '../../../constant/master/TaxMasterConstant';
 
 export const saveTaxGroupData = (data) => {
@@ -63,5 +64,12 @@ export const getActiveTaxGroupList = () => {
 export const getActiveTaxGroupandTaxList = () => {
     return {
         type: GET_TAX_GROUP_AND_TAX_LIST
+    };
+};
+
+export const getActiveTaxGroupandTaxListTypeBase = (data) => {
+    return {
+        type: GET_TAX_GROUP_AND_TAX_LIST_TYPE,
+        data: data
     };
 };
