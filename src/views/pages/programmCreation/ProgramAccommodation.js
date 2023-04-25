@@ -36,6 +36,7 @@ import { getAllDepartmentData, getAllDesignationData } from 'store/actions/maste
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import { getActiveLocations } from 'store/actions/masterActions/LocationAction';
 import { makeStyles } from '@material-ui/core/styles';
+import CompareRates from './CompareRates';
 
 function ProgramAccommodation({ open, handleClose, mode, userCode, component }) {
     const initialValues = {
@@ -1078,13 +1079,6 @@ function ProgramAccommodation({ open, handleClose, mode, userCode, component }) 
                                                                 </Grid>
                                                             </div>
 
-                                                            <Box>
-                                                                <Grid item>
-                                                                    {mode === 'VIEW' ? (
-                                                                        <CreatedUpdatedUserDetailsWithTableFormat formValues={values} />
-                                                                    ) : null}
-                                                                </Grid>
-                                                            </Box>
                                                             <Box display="flex" flexDirection="row-reverse" style={{ marginTop: '20px' }}>
                                                                 {mode != 'VIEW' ? (
                                                                     <Button
@@ -1109,6 +1103,16 @@ function ProgramAccommodation({ open, handleClose, mode, userCode, component }) 
                                                                     ''
                                                                 )}
                                                             </Box>
+                                                            {openCompareRate ? (
+                                                                <CompareRates
+                                                                    open={openCompareRate}
+                                                                    handleClose={handleClose}
+                                                                    taxGroupCode={null}
+                                                                    mode={mode}
+                                                                />
+                                                            ) : (
+                                                                ''
+                                                            )}
                                                         </Form>
                                                     );
                                                 }}

@@ -29,7 +29,7 @@ import {
     getTaxGroupDataById,
     updateTaxGroupData,
     checkDuplicateTaxGroupCode
-} from '../../../../store/actions/masterActions/TaxActions/TaxGroupAction';
+} from '../../../store/actions/masterActions/TaxActions/TaxGroupAction';
 
 import { Formik, Form, FieldArray } from 'formik';
 import Grid from '@mui/material/Grid';
@@ -37,11 +37,9 @@ import TableContainer from '@mui/material/TableContainer';
 import Autocomplete from '@mui/material/Autocomplete';
 import Paper from '@mui/material/Paper';
 import * as yup from 'yup';
-import { getAllTaxData } from '../../../../store/actions/masterActions/TaxActions/TaxAction';
-import CreatedUpdatedUserDetailsWithTableFormat from '../userTimeDetails/CreatedUpdatedUserDetailsWithTableFormat';
-import { array } from 'prop-types';
+import { getAllTaxData } from '../../../store/actions/masterActions/TaxActions/TaxAction';
 
-function TaxGroup({ open, handleClose, mode, taxGroupCode }) {
+function CompareRates({ open, handleClose, mode, taxGroupCode }) {
     const initialValues = {
         taxGroupType: '',
         taxGroupCode: '',
@@ -541,56 +539,6 @@ function TaxGroup({ open, handleClose, mode, taxGroupCode }) {
                                                                                                         : 0}
                                                                                                 </TableCell>
 
-                                                                                                {/* <TableCell>
-                                                                                                    <TextField
-                                                                                                        sx={{
-                                                                                                            width: { sm: 200 },
-                                                                                                            '& .MuiInputBase-root': {
-                                                                                                                height: 40
-                                                                                                            }
-                                                                                                        }}
-                                                                                                        // label="Additional Price"
-                                                                                                        type="number"
-                                                                                                        variant="outlined"
-                                                                                                        placeholder="0"
-                                                                                                        name={`taxGroupDetails.${idx}.onOriginal`}
-                                                                                                        value={
-                                                                                                            values.taxGroupDetails[idx] &&
-                                                                                                            values.taxGroupDetails[idx]
-                                                                                                                .onOriginal
-                                                                                                        }
-                                                                                                        onChange={handleChange}
-                                                                                                        onBlur={handleBlur}
-                                                                                                        error={Boolean(
-                                                                                                            touched.taxGroupDetails &&
-                                                                                                                touched.taxGroupDetails[
-                                                                                                                    idx
-                                                                                                                ] &&
-                                                                                                                touched.taxGroupDetails[idx]
-                                                                                                                    .onOriginal &&
-                                                                                                                errors.taxGroupDetails &&
-                                                                                                                errors.taxGroupDetails[
-                                                                                                                    idx
-                                                                                                                ] &&
-                                                                                                                errors.taxGroupDetails[idx]
-                                                                                                                    .onOriginal
-                                                                                                        )}
-                                                                                                        helperText={
-                                                                                                            touched.taxGroupDetails &&
-                                                                                                            touched.taxGroupDetails[idx] &&
-                                                                                                            touched.taxGroupDetails[idx]
-                                                                                                                .onOriginal &&
-                                                                                                            errors.taxGroupDetails &&
-                                                                                                            errors.taxGroupDetails[idx] &&
-                                                                                                            errors.taxGroupDetails[idx]
-                                                                                                                .onOriginal
-                                                                                                                ? errors.taxGroupDetails[
-                                                                                                                      idx
-                                                                                                                  ].onOriginal
-                                                                                                                : ''
-                                                                                                        }
-                                                                                                    />
-                                                                                                </TableCell> */}
                                                                                                 <TableCell>
                                                                                                     <FormGroup>
                                                                                                         <FormControlLabel
@@ -695,13 +643,6 @@ function TaxGroup({ open, handleClose, mode, taxGroupCode }) {
                                                                     ''
                                                                 )}
                                                             </Box>
-                                                            <Box>
-                                                                <Grid item>
-                                                                    {mode === 'VIEW' ? (
-                                                                        <CreatedUpdatedUserDetailsWithTableFormat formValues={values} />
-                                                                    ) : null}
-                                                                </Grid>
-                                                            </Box>
                                                         </Form>
                                                     );
                                                 }}
@@ -718,4 +659,4 @@ function TaxGroup({ open, handleClose, mode, taxGroupCode }) {
     );
 }
 
-export default TaxGroup;
+export default CompareRates;
