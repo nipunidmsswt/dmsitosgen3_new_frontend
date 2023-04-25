@@ -70,7 +70,7 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: 'white'
     }
 }));
-function ProgramTransport({ open, handleClose, mode }) {
+function ProgramTransport({ open, handleClose, mode, onSave, formIndex }) {
     const initialValues = {
         paxBaggage: '',
         transportType: null,
@@ -98,6 +98,7 @@ function ProgramTransport({ open, handleClose, mode }) {
     const [activeVehicleCategoryList, setActiveVehicleCategoryList] = useState([]);
     const [activeLocationList, setActiveLocationList] = useState([]);
     const [checkedItems, setCheckedItems] = useState({});
+    const [transportType, setTransportType] = useState({});
     const [location1, setLocation1] = useState({});
     const [location2, setLocation2] = useState({});
     const [location3, setLocation3] = useState({});
@@ -109,7 +110,6 @@ function ProgramTransport({ open, handleClose, mode }) {
     const [location9, setLocation9] = useState({});
     const [location10, setLocation10] = useState({});
     const [locationIds, setLocationIds] = useState([]);
-    const [transportType, setTransportType] = useState({});
     const [distance, setDistance] = useState(0);
     const [duration, setDuration] = useState(0);
     const dispatch = useDispatch();
@@ -122,6 +122,8 @@ function ProgramTransport({ open, handleClose, mode }) {
     const activeLocationListData = useSelector((state) => state.locationReducer.activeLocations);
     const calculatedDistance = useSelector((state) => state.distanceReducer.calculatedDistance);
     const calculatedDuration = useSelector((state) => state.distanceReducer.calculatedDuration);
+
+    //passing values to ProgramCreationDetails
 
     const validationSchema = yup.object().shape({
         paxBaggage: yup.string().nullable().required('Required field'),
@@ -183,6 +185,7 @@ function ProgramTransport({ open, handleClose, mode }) {
     });
 
     const handleSubmitForm = (data) => {
+        onSave(data);
         handleClose();
     };
 
@@ -241,6 +244,10 @@ function ProgramTransport({ open, handleClose, mode }) {
         }
     };
 
+    const handleTranportType = (value) => {
+        setTransportType(value);
+    };
+
     const handleCheckboxChange = (event) => {
         const { name, checked } = event.target;
         setCheckedItems((prevCheckedItems) => ({ ...prevCheckedItems, [name]: checked }));
@@ -286,13 +293,9 @@ function ProgramTransport({ open, handleClose, mode }) {
         setLocation10(value);
     };
 
-    const handleTranportType = (value) => {
-        setTransportType(value);
-    };
-
     useEffect(() => {
         const newIds = [location1, location2, location3, location4, location5, location6, location7, location8, location9, location10].map(
-            (location) => (location === null || location === undefined ? '' : location.shortDescription)
+            (location) => (location === null || location === undefined ? '' : location.code)
         );
         setLocationIds(newIds);
     }, [location1, location2, location3, location4, location5, location6, location7, location8, location9, location10]);
@@ -392,7 +395,11 @@ function ProgramTransport({ open, handleClose, mode }) {
                             enableReinitialize={true}
                             initialValues={loadValues || initialValues}
                             onSubmit={(values) => {
-                                console.log(values);
+                                const filteredArrList = locationIds.filter((item) => item !== '' && item !== undefined && item !== null);
+                                const combinedLocations = filteredArrList.join('/');
+                                values.locations = combinedLocations;
+                                values.popUpType = 'Transport';
+                                values.formIndex = formIndex;
                                 handleSubmitForm(values);
                             }}
                             validationSchema={validationSchema}
@@ -418,6 +425,7 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                         name="paxBaggage"
                                                         onChange={(_, value) => {
                                                             setFieldValue(`paxBaggage`, value);
+                                                            handlePaxBaggage(value);
                                                             console.log(value);
                                                         }}
                                                         fullWidth
@@ -496,6 +504,7 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                         name="chargeMethod"
                                                         onChange={(_, value) => {
                                                             setFieldValue(`chargeMethod`, value);
+                                                            handleChargeMethod(value);
                                                             console.log(value);
                                                         }}
                                                         fullWidth
@@ -532,6 +541,7 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                         name="vehicleType"
                                                         onChange={(_, value) => {
                                                             setFieldValue(`vehicleType`, value);
+                                                            handleVehicleType(value);
                                                         }}
                                                         fullWidth
                                                         options={activeVehicleTypeList}
@@ -571,6 +581,7 @@ function ProgramTransport({ open, handleClose, mode }) {
                                                         name="vehicleCategory"
                                                         onChange={(_, value) => {
                                                             setFieldValue(`vehicleCategory`, value);
+                                                            handleVehicleCategory(value);
                                                         }}
                                                         fullWidth
                                                         options={activeVehicleCategoryList}
