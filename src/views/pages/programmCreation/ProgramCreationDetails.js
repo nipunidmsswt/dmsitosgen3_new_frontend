@@ -28,6 +28,8 @@ import MaterialTable from 'material-table';
 import CancelRoundedIcon from '@mui/icons-material/CancelRounded';
 import EditIcon from '@mui/icons-material/Edit';
 import ReplyIcon from '@mui/icons-material/Reply';
+import KeyboardArrowUpRoundedIcon from '@mui/icons-material/KeyboardArrowUpRounded';
+import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
 import { DndContext, closestCenter } from '@dnd-kit/core';
 import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 
@@ -130,7 +132,7 @@ function ProgramCreationDetails(startDate) {
     const [dialogData, setDialogData] = useState([]);
     const classes = useStyles();
     const dispatch = useDispatch();
-    const widthValues = ['50px', '120px', '300px', '90px'];
+    const widthValues = ['50px', '120px', '350px', '150px'];
     const paddingValues = ['8px 20px', '8px 8px', '8px 8px', '8px 8px'];
     const transportTypeId = 'T001';
     const filteredIds = ['D1', 'D2', 'D3'];
@@ -179,7 +181,8 @@ function ProgramCreationDetails(startDate) {
 
     const TableColumn = styled('td')(({ column }) => ({
         width: widthValues[column],
-        padding: paddingValues[column]
+        padding: paddingValues[column],
+        fontSize: column === 2 ? '13px' : 'inherit'
     }));
 
     const handleKeyDown = (event) => {
@@ -256,16 +259,43 @@ function ProgramCreationDetails(startDate) {
         }
     };
 
-    const handleSaveData = (data) => {
-        setDialogData((prevData) => [...prevData, data]);
+    const handleSaveData = (data, formIndex) => {
+        const updatedDialogData = [...dialogData];
+
+        if (updatedDialogData[formIndex]) {
+            updatedDialogData[formIndex].push(data);
+        } else {
+            updatedDialogData[formIndex] = [data];
+        }
+
+        setDialogData(updatedDialogData);
+        console.log(updatedDialogData);
     };
 
-    const handleDeleteData = (index) => {
-        setDialogData((prevData) => {
-            const newData = [...prevData];
-            newData.splice(index, 1);
-            return newData;
-        });
+    const handleDeleteData = (activeButton, j) => {
+        const updatedDialogData = [...dialogData];
+        updatedDialogData[activeButton].splice(j, 1);
+        setDialogData(updatedDialogData);
+    };
+
+    const handleMoveUp = (activeButton, j) => {
+        if (j > 0) {
+            const updatedDialogData = [...dialogData];
+            const temp = updatedDialogData[activeButton][j];
+            updatedDialogData[activeButton][j] = updatedDialogData[activeButton][j - 1];
+            updatedDialogData[activeButton][j - 1] = temp;
+            setDialogData(updatedDialogData);
+        }
+    };
+
+    const handleMoveDown = (activeButton, j) => {
+        if (j < dialogData[activeButton].length - 1) {
+            const updatedDialogData = [...dialogData];
+            const temp = updatedDialogData[activeButton][j];
+            updatedDialogData[activeButton][j] = updatedDialogData[activeButton][j + 1];
+            updatedDialogData[activeButton][j + 1] = temp;
+            setDialogData(updatedDialogData);
+        }
     };
 
     const handleClose = () => {
@@ -436,24 +466,44 @@ function ProgramCreationDetails(startDate) {
                             <TableStyles>
                                 <tbody>
                                     <th>Order</th>
-                                    {dialogData
-                                        .filter((data) => data.formIndex === i)
-                                        .map((data, index) => (
-                                            <tr key={`dialog-${index}`}>
-                                                <TableColumn column={0}>{index + 1}</TableColumn>
+                                    {dialogData[activeButton] &&
+                                        dialogData[activeButton].map((data, j) => (
+                                            <tr key={j}>
+                                                <TableColumn column={0}>{j + 1}</TableColumn>
                                                 <TableColumn column={1}>{data.popUpType}</TableColumn>
                                                 <TableColumn column={2}>{data.locations}</TableColumn>
                                                 <TableColumn column={3}>
-                                                    <EditIcon onClick={console.log(data, index, activeButton, dialogData)} />
+                                                    <KeyboardArrowUpRoundedIcon
+                                                        onClick={() => handleMoveUp(activeButton, j)}
+                                                        style={{ color: '#1877f2' }}
+                                                    />
+                                                    <KeyboardArrowDownRoundedIcon
+                                                        onClick={() => handleMoveDown(activeButton, j)}
+                                                        style={{ color: '#1877f2' }}
+                                                    />
+                                                    <EditIcon onClick={console.log(data, i, activeButton, dialogData)} />
                                                     <ReplyIcon style={{ transform: 'scaleX(-1)' }} />
                                                     <CancelRoundedIcon
-                                                        onClick={() => handleDeleteData(index)}
+                                                        onClick={() => handleDeleteData(activeButton, j)}
                                                         style={{ cursor: 'pointer' }}
                                                     />
                                                 </TableColumn>
                                             </tr>
                                         ))}
                                 </tbody>
+                                {/* <tbody>
+                                    {mainArray[currentI] &&
+                                        mainArray[currentI].map((data, j) => (
+                                            <tr key={j}>
+                                                <td>Dialog Box {currentI}</td>
+                                                <td>{data.input1}</td>
+                                                <td>{data.input2}</td>
+                                                <td>
+                                                    <DeleteIcon onClick={() => handleDeleteRow(currentI, j)} />
+                                                </td>
+                                            </tr>
+                                        ))}
+                                </tbody> */}
                             </TableStyles>
                         </Grid>
                     </form>

@@ -185,7 +185,7 @@ function ProgramTransport({ open, handleClose, mode, onSave, formIndex }) {
     });
 
     const handleSubmitForm = (data) => {
-        onSave(data);
+        onSave(data, formIndex);
         handleClose();
     };
 
@@ -396,7 +396,7 @@ function ProgramTransport({ open, handleClose, mode, onSave, formIndex }) {
                             initialValues={loadValues || initialValues}
                             onSubmit={(values) => {
                                 const filteredArrList = locationIds.filter((item) => item !== '' && item !== undefined && item !== null);
-                                const combinedLocations = filteredArrList.join('/');
+                                const combinedLocations = filteredArrList.join('/ ');
                                 values.locations = combinedLocations;
                                 values.popUpType = 'Transport';
                                 values.formIndex = formIndex;
