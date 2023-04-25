@@ -256,16 +256,31 @@ function ProgramCreationDetails(startDate) {
         }
     };
 
-    const handleSaveData = (data) => {
-        setDialogData((prevData) => [...prevData, data]);
+    const handleSaveData = (data, formIndex) => {
+        const updatedDialogData = [...dialogData];
+
+        if (updatedDialogData[formIndex]) {
+            updatedDialogData[formIndex].push(data);
+        } else {
+            updatedDialogData[formIndex] = [data];
+        }
+
+        setDialogData(updatedDialogData);
+        console.log(updatedDialogData);
+
+        // setDialogData((prevData) => [...prevData, data]);
     };
 
-    const handleDeleteData = (index) => {
-        setDialogData((prevData) => {
-            const newData = [...prevData];
-            newData.splice(index, 1);
-            return newData;
-        });
+    const handleDeleteData = (activeButton, j) => {
+        const updatedDialogData = [...dialogData];
+        updatedDialogData[activeButton].splice(j, 1);
+        setDialogData(updatedDialogData);
+
+        // setDialogData((prevData) => {
+        //     const newData = [...prevData];
+        //     newData.splice(index, 1);
+        //     return newData;
+        // });
     };
 
     const handleClose = () => {
@@ -436,24 +451,36 @@ function ProgramCreationDetails(startDate) {
                             <TableStyles>
                                 <tbody>
                                     <th>Order</th>
-                                    {dialogData
-                                        .filter((data) => data.formIndex === i)
-                                        .map((data, index) => (
-                                            <tr key={`dialog-${index}`}>
-                                                <TableColumn column={0}>{index + 1}</TableColumn>
+                                    {dialogData[activeButton] &&
+                                        dialogData[activeButton].map((data, j) => (
+                                            <tr key={j}>
+                                                <TableColumn column={0}>{j + 1}</TableColumn>
                                                 <TableColumn column={1}>{data.popUpType}</TableColumn>
                                                 <TableColumn column={2}>{data.locations}</TableColumn>
                                                 <TableColumn column={3}>
-                                                    <EditIcon onClick={console.log(data, index, activeButton, dialogData)} />
+                                                    <EditIcon onClick={console.log(data, i, activeButton, dialogData)} />
                                                     <ReplyIcon style={{ transform: 'scaleX(-1)' }} />
                                                     <CancelRoundedIcon
-                                                        onClick={() => handleDeleteData(index)}
+                                                        onClick={() => handleDeleteData(activeButton, j)}
                                                         style={{ cursor: 'pointer' }}
                                                     />
                                                 </TableColumn>
                                             </tr>
                                         ))}
                                 </tbody>
+                                {/* <tbody>
+                                    {mainArray[currentI] &&
+                                        mainArray[currentI].map((data, j) => (
+                                            <tr key={j}>
+                                                <td>Dialog Box {currentI}</td>
+                                                <td>{data.input1}</td>
+                                                <td>{data.input2}</td>
+                                                <td>
+                                                    <DeleteIcon onClick={() => handleDeleteRow(currentI, j)} />
+                                                </td>
+                                            </tr>
+                                        ))}
+                                </tbody> */}
                             </TableStyles>
                         </Grid>
                     </form>

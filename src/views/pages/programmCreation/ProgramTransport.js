@@ -185,7 +185,7 @@ function ProgramTransport({ open, handleClose, mode, onSave, formIndex }) {
     });
 
     const handleSubmitForm = (data) => {
-        onSave(data);
+        onSave(data, formIndex);
         handleClose();
     };
 
