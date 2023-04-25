@@ -16,11 +16,7 @@ import { getActiveLocations } from 'store/actions/masterActions/LocationAction';
 import { getCalculatedDistanceAndDuration } from 'store/actions/masterActions/DistanceAction';
 import { useDispatch } from 'react-redux';
 import { Button } from '@mui/material';
-import Table from '@material-ui/core/Table';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import TableCell from '@material-ui/core/TableCell';
-import TableBody from '@material-ui/core/TableBody';
+import { styled } from '@mui/material/styles';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import SuccessMsg from 'messages/SuccessMsg';
 import ErrorMsg from 'messages/ErrorMsg';
@@ -29,6 +25,9 @@ import ProgramActivity from './ProgramActivity';
 import ProgramMisCellaneous from './ProgramMisCellaneous';
 import ProgramSuppliment from './ProgramSuppliment';
 import MaterialTable from 'material-table';
+import CancelRoundedIcon from '@mui/icons-material/CancelRounded';
+import EditIcon from '@mui/icons-material/Edit';
+import ReplyIcon from '@mui/icons-material/Reply';
 
 const useStyles = makeStyles((theme) => ({
     content: {
@@ -126,8 +125,11 @@ function ProgramCreationDetails(startDate) {
     const [openErrorToast, setOpenErrorToast] = useState(false);
     const [tableData, setTableData] = useState([]);
     const [mode, setMode] = useState('INSERT');
+    const [dialogData, setDialogData] = useState([]);
     const classes = useStyles();
     const dispatch = useDispatch();
+    const widthValues = ['50px', '120px', '300px', '90px'];
+    const paddingValues = ['8px 20px', '8px 8px', '8px 8px', '8px 8px'];
     const transportTypeId = 'T001';
     const filteredIds = ['D1', 'D2', 'D3'];
 
@@ -153,6 +155,30 @@ function ProgramCreationDetails(startDate) {
             align: 'left'
         }
     ];
+
+    const TableStyles = styled('table')({
+        color: 'black',
+        borderCollapse: 'collapse',
+        '& td': {
+            borderBottom: '1px solid #ccc'
+        },
+        '& th': {
+            padding: '8px',
+            backgroundColor: '#ffffff',
+            fontWeight: 'bold'
+        },
+        '& tbody tr:nth-child(even)': {
+            backgroundColor: '#ffffff'
+        },
+        '& tbody tr:hover': {
+            backgroundColor: '#ebebeb'
+        }
+    });
+
+    const TableColumn = styled('td')(({ column }) => ({
+        width: widthValues[column],
+        padding: paddingValues[column]
+    }));
 
     const handleKeyDown = (event) => {
         if (event.key === 'Backspace') {
@@ -226,6 +252,18 @@ function ProgramCreationDetails(startDate) {
             newOpenMiscellaneous[activeIndex] = true;
             setOpenMiscellaneous(newOpenMiscellaneous);
         }
+    };
+
+    const handleSaveData = (data) => {
+        setDialogData((prevData) => [...prevData, data]);
+    };
+
+    const handleDeleteData = (index) => {
+        setDialogData((prevData) => {
+            const newData = [...prevData];
+            newData.splice(index, 1);
+            return newData;
+        });
     };
 
     const handleClose = () => {
@@ -371,7 +409,7 @@ function ProgramCreationDetails(startDate) {
                             </div>
                             <br />
                             {openTransport[i] ? ( // Unique identifier (i) to determine if the ProgramTransport component should be rendered
-                                <ProgramTransport open={true} handleClose={handleClose} mode={mode} />
+                                <ProgramTransport open={true} handleClose={handleClose} mode={mode} onSave={handleSaveData} />
                             ) : null}
                             {openActivites[i] ? (
                                 <ProgramActivity open={true} handleClose={handleClose} mode={mode} startDate={startDate} />
@@ -387,10 +425,29 @@ function ProgramCreationDetails(startDate) {
                             {openToast ? <SuccessMsg openToast={openToast} handleToast={handleToast} mode={mode} /> : null}
                             {openErrorToast ? <ErrorMsg openToast={openErrorToast} handleToast={setOpenErrorToast} mode={mode} /> : null}
                         </Grid>
-                        <Grid style={{ marginTop: '60px' }}>
+                        {/* <Grid style={{ marginTop: '60px' }}>
                             <Typography variant="h5" className={classes.dayText}>
                                 Order
                             </Typography>
+                        </Grid> */}
+                        <Grid style={{ marginTop: '60px' }}>
+                            <TableStyles>
+                                <tbody>
+                                    <th>Order</th>
+                                    {dialogData.map((data, index) => (
+                                        <tr key={`dialog-${index}`}>
+                                            <TableColumn column={0}>{index + 1}</TableColumn>
+                                            <TableColumn column={1}>{data.popUpType}</TableColumn>
+                                            <TableColumn column={2}>{data.locations}</TableColumn>
+                                            <TableColumn column={3}>
+                                                <EditIcon />
+                                                <ReplyIcon style={{ transform: 'scaleX(-1)' }} />
+                                                <CancelRoundedIcon onClick={() => handleDeleteData(index)} style={{ cursor: 'pointer' }} />
+                                            </TableColumn>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </TableStyles>
                         </Grid>
                     </form>
                 )}
