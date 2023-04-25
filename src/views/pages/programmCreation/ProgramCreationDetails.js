@@ -28,6 +28,8 @@ import MaterialTable from 'material-table';
 import CancelRoundedIcon from '@mui/icons-material/CancelRounded';
 import EditIcon from '@mui/icons-material/Edit';
 import ReplyIcon from '@mui/icons-material/Reply';
+import KeyboardArrowUpRoundedIcon from '@mui/icons-material/KeyboardArrowUpRounded';
+import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
 import { DndContext, closestCenter } from '@dnd-kit/core';
 import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 
@@ -130,7 +132,7 @@ function ProgramCreationDetails(startDate) {
     const [dialogData, setDialogData] = useState([]);
     const classes = useStyles();
     const dispatch = useDispatch();
-    const widthValues = ['50px', '120px', '300px', '90px'];
+    const widthValues = ['50px', '120px', '350px', '150px'];
     const paddingValues = ['8px 20px', '8px 8px', '8px 8px', '8px 8px'];
     const transportTypeId = 'T001';
     const filteredIds = ['D1', 'D2', 'D3'];
@@ -179,7 +181,8 @@ function ProgramCreationDetails(startDate) {
 
     const TableColumn = styled('td')(({ column }) => ({
         width: widthValues[column],
-        padding: paddingValues[column]
+        padding: paddingValues[column],
+        fontSize: column === 2 ? '13px' : 'inherit'
     }));
 
     const handleKeyDown = (event) => {
@@ -267,20 +270,32 @@ function ProgramCreationDetails(startDate) {
 
         setDialogData(updatedDialogData);
         console.log(updatedDialogData);
-
-        // setDialogData((prevData) => [...prevData, data]);
     };
 
     const handleDeleteData = (activeButton, j) => {
         const updatedDialogData = [...dialogData];
         updatedDialogData[activeButton].splice(j, 1);
         setDialogData(updatedDialogData);
+    };
 
-        // setDialogData((prevData) => {
-        //     const newData = [...prevData];
-        //     newData.splice(index, 1);
-        //     return newData;
-        // });
+    const handleMoveUp = (activeButton, j) => {
+        if (j > 0) {
+            const updatedDialogData = [...dialogData];
+            const temp = updatedDialogData[activeButton][j];
+            updatedDialogData[activeButton][j] = updatedDialogData[activeButton][j - 1];
+            updatedDialogData[activeButton][j - 1] = temp;
+            setDialogData(updatedDialogData);
+        }
+    };
+
+    const handleMoveDown = (activeButton, j) => {
+        if (j < dialogData[activeButton].length - 1) {
+            const updatedDialogData = [...dialogData];
+            const temp = updatedDialogData[activeButton][j];
+            updatedDialogData[activeButton][j] = updatedDialogData[activeButton][j + 1];
+            updatedDialogData[activeButton][j + 1] = temp;
+            setDialogData(updatedDialogData);
+        }
     };
 
     const handleClose = () => {
@@ -458,6 +473,14 @@ function ProgramCreationDetails(startDate) {
                                                 <TableColumn column={1}>{data.popUpType}</TableColumn>
                                                 <TableColumn column={2}>{data.locations}</TableColumn>
                                                 <TableColumn column={3}>
+                                                    <KeyboardArrowUpRoundedIcon
+                                                        onClick={() => handleMoveUp(activeButton, j)}
+                                                        style={{ color: '#1877f2' }}
+                                                    />
+                                                    <KeyboardArrowDownRoundedIcon
+                                                        onClick={() => handleMoveDown(activeButton, j)}
+                                                        style={{ color: '#1877f2' }}
+                                                    />
                                                     <EditIcon onClick={console.log(data, i, activeButton, dialogData)} />
                                                     <ReplyIcon style={{ transform: 'scaleX(-1)' }} />
                                                     <CancelRoundedIcon
