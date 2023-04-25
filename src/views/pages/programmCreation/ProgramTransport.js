@@ -70,7 +70,7 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: 'white'
     }
 }));
-function ProgramTransport({ open, handleClose, mode, onSave }) {
+function ProgramTransport({ open, handleClose, mode, onSave, formIndex }) {
     const initialValues = {
         paxBaggage: '',
         transportType: null,
@@ -399,6 +399,7 @@ function ProgramTransport({ open, handleClose, mode, onSave }) {
                                 const combinedLocations = filteredArrList.join('/');
                                 values.locations = combinedLocations;
                                 values.popUpType = 'Transport';
+                                values.formIndex = formIndex;
                                 handleSubmitForm(values);
                             }}
                             validationSchema={validationSchema}

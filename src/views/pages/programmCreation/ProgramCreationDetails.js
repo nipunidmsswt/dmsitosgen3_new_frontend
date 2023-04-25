@@ -28,6 +28,8 @@ import MaterialTable from 'material-table';
 import CancelRoundedIcon from '@mui/icons-material/CancelRounded';
 import EditIcon from '@mui/icons-material/Edit';
 import ReplyIcon from '@mui/icons-material/Reply';
+import { DndContext, closestCenter } from '@dnd-kit/core';
+import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 
 const useStyles = makeStyles((theme) => ({
     content: {
@@ -409,7 +411,7 @@ function ProgramCreationDetails(startDate) {
                             </div>
                             <br />
                             {openTransport[i] ? ( // Unique identifier (i) to determine if the ProgramTransport component should be rendered
-                                <ProgramTransport open={true} handleClose={handleClose} mode={mode} onSave={handleSaveData} />
+                                <ProgramTransport open={true} handleClose={handleClose} mode={mode} onSave={handleSaveData} formIndex={i} />
                             ) : null}
                             {openActivites[i] ? (
                                 <ProgramActivity open={true} handleClose={handleClose} mode={mode} startDate={startDate} />
@@ -434,18 +436,23 @@ function ProgramCreationDetails(startDate) {
                             <TableStyles>
                                 <tbody>
                                     <th>Order</th>
-                                    {dialogData.map((data, index) => (
-                                        <tr key={`dialog-${index}`}>
-                                            <TableColumn column={0}>{index + 1}</TableColumn>
-                                            <TableColumn column={1}>{data.popUpType}</TableColumn>
-                                            <TableColumn column={2}>{data.locations}</TableColumn>
-                                            <TableColumn column={3}>
-                                                <EditIcon />
-                                                <ReplyIcon style={{ transform: 'scaleX(-1)' }} />
-                                                <CancelRoundedIcon onClick={() => handleDeleteData(index)} style={{ cursor: 'pointer' }} />
-                                            </TableColumn>
-                                        </tr>
-                                    ))}
+                                    {dialogData
+                                        .filter((data) => data.formIndex === i)
+                                        .map((data, index) => (
+                                            <tr key={`dialog-${index}`}>
+                                                <TableColumn column={0}>{index + 1}</TableColumn>
+                                                <TableColumn column={1}>{data.popUpType}</TableColumn>
+                                                <TableColumn column={2}>{data.locations}</TableColumn>
+                                                <TableColumn column={3}>
+                                                    <EditIcon onClick={console.log(data, index, activeButton, dialogData)} />
+                                                    <ReplyIcon style={{ transform: 'scaleX(-1)' }} />
+                                                    <CancelRoundedIcon
+                                                        onClick={() => handleDeleteData(index)}
+                                                        style={{ cursor: 'pointer' }}
+                                                    />
+                                                </TableColumn>
+                                            </tr>
+                                        ))}
                                 </tbody>
                             </TableStyles>
                         </Grid>
