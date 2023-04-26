@@ -68,7 +68,7 @@ function ProgramAccommodation({ open, handleClose, mode, userCode, component }) 
         minRate: '',
         maxRate: '',
         allRates: true,
-        hotel: null,
+        hotelCode: null,
         hotelDefaultCurrency: null,
         rate: '',
         rateConverson: true,
@@ -84,6 +84,7 @@ function ProgramAccommodation({ open, handleClose, mode, userCode, component }) 
     const [activeLocationList, setActiveLocationList] = useState([]);
     const [currencyListOptions, setCurrencyListOptions] = useState([]);
     const [openCompareRate, setOpenCompareRate] = useState(false);
+    const [hotelData, setHotelData] = useState([]);
 
     const formikRef = useRef();
 
@@ -316,6 +317,9 @@ function ProgramAccommodation({ open, handleClose, mode, userCode, component }) 
         }
     }, [currencyListData]);
 
+    const closeCompareRate = () => {
+        setOpenCompareRate(false);
+    };
     return (
         <div>
             <Dialog maxWidth="500px" open={open} keepMounted onClose={handleClose} aria-describedby="alert-dialog-slide-description">
@@ -349,7 +353,12 @@ function ProgramAccommodation({ open, handleClose, mode, userCode, component }) 
                                                     return (
                                                         <Form>
                                                             <div style={{ marginTop: '6px', margin: '10px' }}>
-                                                                <Grid gap="10px" display="flex" style={{ marginTop: '10px' }}>
+                                                                <Grid
+                                                                    gap="10px"
+                                                                    display="flex"
+                                                                    style={{ marginTop: '10px' }}
+                                                                    alignItems="center"
+                                                                >
                                                                     <Grid item>
                                                                         <Autocomplete
                                                                             value={values.locationCode}
@@ -518,37 +527,58 @@ function ProgramAccommodation({ open, handleClose, mode, userCode, component }) 
                                                                             </Grid>
                                                                         </Grid>
                                                                     </fieldset>
+                                                                    <Grid item>
+                                                                        <Button
+                                                                            type="button"
+                                                                            variant="contained"
+                                                                            style={{ backgroundColor: '#B31B1B' }}
+                                                                            sx={{ borderRadius: 60 }}
+                                                                            onClick={() => setOpenCompareRate(true)}
+                                                                        >
+                                                                            Generate
+                                                                        </Button>
+                                                                    </Grid>
                                                                 </Grid>
 
                                                                 <Grid gap="10px" display="flex" style={{ marginTop: '10px' }}>
                                                                     <Grid item>
-                                                                        <TextField
-                                                                            sx={{
-                                                                                width: { sm: 200, md: 200 },
-                                                                                '& .MuiInputBase-root': {
-                                                                                    height: 40
-                                                                                }
+                                                                        <Autocomplete
+                                                                            value={values.hotelCode}
+                                                                            name="hotelCode"
+                                                                            disabled
+                                                                            onChange={(_, value) => {
+                                                                                setFieldValue(`hotelCode`, value);
                                                                             }}
-                                                                            id="outlined-required"
-                                                                            label="First Name"
-                                                                            name="firstName"
-                                                                            onChange={handleChange}
                                                                             InputLabelProps={{
                                                                                 shrink: true
                                                                             }}
-                                                                            disabled={
-                                                                                component === 'user_creation' && mode === 'INSERT'
-                                                                                    ? false
-                                                                                    : true
-                                                                            }
-                                                                            onBlur={handleBlur}
-                                                                            value={values.firstName}
-                                                                            error={Boolean(touched.firstName && errors.firstName)}
-                                                                            helperText={
-                                                                                touched.firstName && errors.firstName
-                                                                                    ? errors.firstName
-                                                                                    : ''
-                                                                            }
+                                                                            options={hotelData}
+                                                                            getOptionLabel={(option) => `${option.hotelCode}`}
+                                                                            isOptionEqualToValue={(option, value) => option.id === value.id}
+                                                                            renderInput={(params) => (
+                                                                                <TextField
+                                                                                    {...params}
+                                                                                    label="Hotel"
+                                                                                    sx={{
+                                                                                        width: { xs: 300 },
+                                                                                        '& .MuiInputBase-root': {
+                                                                                            height: 41
+                                                                                        }
+                                                                                    }}
+                                                                                    InputLabelProps={{
+                                                                                        shrink: true
+                                                                                    }}
+                                                                                    error={Boolean(touched.hotelCode && errors.hotelCode)}
+                                                                                    helperText={
+                                                                                        touched.hotelCode && errors.hotelCode
+                                                                                            ? errors.hotelCode
+                                                                                            : ''
+                                                                                    }
+                                                                                    variant="outlined"
+                                                                                    name="hotelCode"
+                                                                                    onBlur={handleBlur}
+                                                                                />
+                                                                            )}
                                                                         />
                                                                     </Grid>
                                                                     <Grid item>
@@ -562,22 +592,20 @@ function ProgramAccommodation({ open, handleClose, mode, userCode, component }) 
                                                                             }}
                                                                             id="standard-select-currency"
                                                                             label="Middle Name"
-                                                                            name="middleName"
+                                                                            name="hotelDefaultCurrency"
                                                                             onChange={handleChange}
                                                                             InputLabelProps={{
                                                                                 shrink: true
                                                                             }}
-                                                                            disabled={
-                                                                                component === 'user_creation' && mode === 'INSERT'
-                                                                                    ? false
-                                                                                    : true
-                                                                            }
+                                                                            disabled={true}
                                                                             onBlur={handleBlur}
-                                                                            value={values.middleName}
-                                                                            error={Boolean(touched.middleName && errors.middleName)}
+                                                                            value={values.hotelDefaultCurrency}
+                                                                            error={Boolean(
+                                                                                touched.hotelDefaultCurrency && errors.hotelDefaultCurrency
+                                                                            )}
                                                                             helperText={
-                                                                                touched.middleName && errors.middleName
-                                                                                    ? errors.middleName
+                                                                                touched.hotelDefaultCurrency && errors.hotelDefaultCurrency
+                                                                                    ? errors.hotelDefaultCurrency
                                                                                     : ''
                                                                             }
                                                                         ></TextField>
@@ -618,7 +646,7 @@ function ProgramAccommodation({ open, handleClose, mode, userCode, component }) 
                                                                                 onChange={handleChange}
                                                                                 value={values.status}
                                                                                 control={<Switch color="success" />}
-                                                                                label="Apply Rate Conversion 4"
+                                                                                label="Apply Rate Conversion"
                                                                                 checked={values.status}
                                                                                 // disabled={mode == 'VIEW'}
                                                                             />
@@ -655,10 +683,11 @@ function ProgramAccommodation({ open, handleClose, mode, userCode, component }) 
                                                                     </Grid>
                                                                     <Grid item>
                                                                         <Button
+                                                                            type="button"
                                                                             variant="contained"
                                                                             style={{ backgroundColor: '#556B2F' }}
                                                                             sx={{ borderRadius: 60 }}
-                                                                            onClick={setOpenCompareRate(true)}
+                                                                            onClick={() => setOpenCompareRate(true)}
                                                                         >
                                                                             Compare Rates
                                                                         </Button>
@@ -756,6 +785,17 @@ function ProgramAccommodation({ open, handleClose, mode, userCode, component }) 
                                                                                 touched.mobile && errors.mobile ? errors.mobile : ''
                                                                             }
                                                                         ></TextField>
+                                                                    </Grid>
+                                                                    <Grid item>
+                                                                        <Button
+                                                                            type="button"
+                                                                            variant="contained"
+                                                                            style={{ backgroundColor: '#B31B1B' }}
+                                                                            sx={{ borderRadius: 60 }}
+                                                                            onClick={() => setOpenCompareRate(true)}
+                                                                        >
+                                                                            Generate
+                                                                        </Button>
                                                                     </Grid>
                                                                 </Grid>
 
@@ -1103,21 +1143,22 @@ function ProgramAccommodation({ open, handleClose, mode, userCode, component }) 
                                                                     ''
                                                                 )}
                                                             </Box>
-                                                            {openCompareRate ? (
-                                                                <CompareRates
-                                                                    open={openCompareRate}
-                                                                    handleClose={handleClose}
-                                                                    taxGroupCode={null}
-                                                                    mode={mode}
-                                                                />
-                                                            ) : (
-                                                                ''
-                                                            )}
                                                         </Form>
                                                     );
                                                 }}
                                             </Formik>
                                         </>
+
+                                        {openCompareRate ? (
+                                            <CompareRates
+                                                open={openCompareRate}
+                                                handleClose={closeCompareRate}
+                                                taxGroupCode={null}
+                                                mode={mode}
+                                            />
+                                        ) : (
+                                            ''
+                                        )}
                                     </Grid>
                                 </Grid>
                             </div>

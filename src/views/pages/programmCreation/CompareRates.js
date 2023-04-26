@@ -208,10 +208,7 @@ function CompareRates({ open, handleClose, mode, taxGroupCode }) {
             <Dialog maxWidth="220px" open={open} keepMounted onClose={handleClose} aria-describedby="alert-dialog-slide-description">
                 <DialogTitle>
                     <Box display="flex" className="dialog-title">
-                        <Box flexGrow={1}>
-                            {mode === 'INSERT' ? 'Add' : ''} {mode === 'VIEW_UPDATE' ? 'Update' : ''} {mode === 'VIEW' ? 'View' : ''}Tax
-                            Group
-                        </Box>
+                        <Box flexGrow={1}>Compare Rates</Box>
                         <Box>
                             <IconButton onClick={handleClose}>
                                 <CloseIcon />
