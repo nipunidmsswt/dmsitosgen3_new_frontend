@@ -16,6 +16,7 @@ import {
     getActivity_SupplementLatestModifiedDetails,
     getAllActivity_SupplimentData
 } from 'store/actions/masterActions/Activity_SupplimentAction';
+import { useLocation } from 'react-router-dom';
 
 function ViewActivitySupplement() {
     const [open, setOpen] = useState(false);
@@ -95,6 +96,15 @@ function ViewActivitySupplement() {
     const activity_suppliment = useSelector((state) => state.activity_supplimentReducer.activity_suppliment);
     const activity_supplimentList = useSelector((state) => state.activity_supplimentReducer.activity_supplimentList);
     const lastModifiedDate = useSelector((state) => state.activity_supplimentReducer.lastModifiedDateTime);
+
+    let location = useLocation();
+
+    useEffect(() => {
+        if (location?.state?.miscellaneous === 'miscellaneous') {
+            setMode('INSERT');
+            setOpen(true);
+        }
+    }, [location]);
 
     useEffect(() => {
         setLastModifiedTimeDate(lastModifiedDate);
