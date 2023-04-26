@@ -25,6 +25,7 @@ import ProgramActivity from './ProgramActivity';
 import ProgramMisCellaneous from './ProgramMisCellaneous';
 import ProgramSuppliment from './ProgramSuppliment';
 import MaterialTable from 'material-table';
+import ProgramAccommodation from './ProgramAccommodation';
 import CancelRoundedIcon from '@mui/icons-material/CancelRounded';
 import EditIcon from '@mui/icons-material/Edit';
 import ReplyIcon from '@mui/icons-material/Reply';
@@ -454,6 +455,11 @@ function ProgramCreationDetails(startDate) {
                                 <ProgramSuppliment open={true} handleClose={handleClose} mode={mode} startDate={startDate} />
                             ) : null}
 
+                            {openAccomodation ? (
+                                <ProgramAccommodation open={openAccomodation} handleClose={handleClose} mode={mode} startDate={startDate} />
+                            ) : (
+                                ''
+                            )}
                             {openToast ? <SuccessMsg openToast={openToast} handleToast={handleToast} mode={mode} /> : null}
                             {openErrorToast ? <ErrorMsg openToast={openErrorToast} handleToast={setOpenErrorToast} mode={mode} /> : null}
                         </Grid>

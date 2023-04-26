@@ -21,6 +21,7 @@ import { getActiveTaxGroupandTaxList } from 'store/actions/masterActions/TaxActi
 import { getActiveLocations } from 'store/actions/masterActions/LocationAction';
 import * as yup from 'yup';
 import { getActivitySupMisByLcationandType } from 'store/actions/masterActions/Activity_SupplimentAction';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 function ProgramMisCellaneous({ open, handleClose, mode, id, startDate }) {
     const initialValues = {
@@ -48,6 +49,7 @@ function ProgramMisCellaneous({ open, handleClose, mode, id, startDate }) {
     const activeTaxGroupandTaxesListData = useSelector((state) => state.taxGroupReducer.activeTaxGroupandTaxes);
     const activeLocations = useSelector((state) => state.locationReducer.activeLocations);
     const miscellaneousListByLocationandType = useSelector((state) => state.activity_supplimentReducer.actSupMisListByLocationandType);
+    const navigate = useNavigate();
 
     const validationSchema = yup.object().shape({
         location: yup.object().nullable().required('Required field'),
@@ -164,6 +166,32 @@ function ProgramMisCellaneous({ open, handleClose, mode, id, startDate }) {
                             {({ values, handleChange, setFieldValue, errors, handleBlur, touched, resetForm }) => {
                                 return (
                                     <Form>
+                                        <Stack
+                                            spacing={2}
+                                            direction="row"
+                                            sx={{ marginBottom: 4, marginTop: 2 }}
+                                            display="flex"
+                                            flexDirection="row-reverse"
+                                        >
+                                            <Button
+                                                variant="outlined"
+                                                type="button"
+                                                // onClick={handleClose}
+                                                style={{
+                                                    // backgroundColor: '#B22222',
+                                                    marginLeft: '10px'
+                                                }}
+                                                onClick={(e) =>
+                                                    navigate('/master/activitysupplementview', {
+                                                        state: {
+                                                            miscellaneous: 'miscellaneous'
+                                                        }
+                                                    })
+                                                }
+                                            >
+                                                Add New Miscellaneous
+                                            </Button>
+                                        </Stack>
                                         <Stack spacing={2} direction="row" sx={{ marginBottom: 4, marginTop: 2 }}>
                                             <Autocomplete
                                                 value={values.location}
