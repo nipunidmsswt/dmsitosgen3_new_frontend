@@ -384,7 +384,8 @@ import {
     GET_EXPENSE_TYPES_LAST_MODIFIED_DATE_TIME,
     SAVE_EXPENSE_TYPES,
     UPDATE_EXPENSE_TYPES,
-    GET_ALL_ACTIVE_EXPENSE_TYPES
+    GET_ALL_ACTIVE_EXPENSE_TYPES,
+    CHECK_EXPENSE_TYPES_DESCRIPTION_DUPLICATE
 } from 'store/constant/master/ExpenseTypesConstant';
 import {
     checkExpenseTypesDupicateCodeSaga,
@@ -394,7 +395,8 @@ import {
     getExpenseTypesLatestModifiedDateSaga,
     saveExpenseTypesDataHandler,
     updateExpenseTypesDataSaga,
-    getAllActiveExpenseTypesDataSaga
+    getAllActiveExpenseTypesDataSaga,
+    checkExpenseTypesDupicateDescriptionSaga
 } from './mastersaga/ExpenseTypesSaga';
 
 import { getAllChargeMethods, getAllModeOfTransort } from './mastersaga/TransportRateSaga';
@@ -941,6 +943,7 @@ export function* wacherSaga() {
 
     //charge method
     yield takeLatest(GET_ALL_CHARGE_METHOD_DATA, getAllChargeMethods);
+    yield takeLatest(CHECK_EXPENSE_TYPES_DESCRIPTION_DUPLICATE, checkExpenseTypesDupicateDescriptionSaga);
 
     //mode of transport
     yield takeLatest(GET_ALL_MODE_OF_TRANSPORT_DATA, getAllModeOfTransort);
