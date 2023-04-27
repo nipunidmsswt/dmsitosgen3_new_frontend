@@ -34,31 +34,69 @@ import { gridSpacing } from 'store/constant';
 import { getAllTaxData, getTaxDataById, getTaxDataByUniqueId } from 'store/actions/masterActions/TaxActions/TaxAction';
 import {
     checkDuplicateExpenseRateCode,
+    checkDuplicateExpenseRateDescription,
     getAllCurrencyListData,
     getExpenseTypesById,
     saveExpenseTypesData,
     updateExpenseTypesData
 } from 'store/actions/masterActions/ExpenseTypeAction';
 import CreatedUpdatedUserDetailsWithTableFormat from '../../userTimeDetails/CreatedUpdatedUserDetailsWithTableFormat';
+import { getActiveTaxGroupandTaxList, getActiveTaxGroupandTaxListTypeBase } from 'store/actions/masterActions/TaxActions/TaxGroupAction';
 
 const Transition = forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
 
-function ExpenseTypes({ open, handleClose, mode, code }) {
+function ExpenseTypes({ open, handleClose, mode, code, handleCloseSubmit }) {
+    const currencyListData = useSelector((state) => state.expenseTypesReducer.currencyList);
+    const [currencyListOptions, setCurrencyListOptions] = useState([]);
+    const activeTaxGroupandTaxesByType = useSelector((state) => state.taxGroupReducer.activeTaxGroupandTaxes);
+
+    const [activeTaxGroupandTaxesList, setActiveTaxGroupandTaxesListData] = useState([]);
+    useEffect(() => {
+        if (currencyListData != null) {
+            setCurrencyListOptions(currencyListData);
+        }
+    }, [currencyListData]);
+
+    const currencyLists = [];
+    const dafaultTaxLists = [];
+
     const initialValues = {
+        currencyListNew: currencyListOptions.forEach((element) => {
+            if (element.currencyCode === 'LKR') {
+                currencyLists.push(element);
+            }
+        }),
+
+        taxListNew: activeTaxGroupandTaxesList.forEach((element) => {
+            if (element.code === 'None') {
+                dafaultTaxLists.push(element);
+            }
+        }),
+
         expenseCode: '',
         description: '',
         status: true,
         expenseTypeDetails: [
             {
+                expenseTypesDetailsId: '',
                 fromDate: '',
                 toDate: '',
-                currencyList: null,
-                tax: null,
-                expenseRate: '',
-                rateWithoutTax: '',
-                rateWithTax: '',
+                currencyList: {
+                    currencyCode: currencyLists[0]?.currencyCode,
+                    currencyDescription: currencyLists[0]?.currencyDescription,
+                    currencyListId: currencyLists[0]?.currencyListId
+                },
+                tax: {
+                    code: dafaultTaxLists[0]?.code,
+                    description: dafaultTaxLists[0]?.description,
+                    id: dafaultTaxLists[0]?.id
+                },
+
+                expenseRate: 0.0,
+                rateWithoutTax: 0.0,
+                rateWithTax: 0.0,
                 status: true,
                 enableRow: false
             }
@@ -69,9 +107,8 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
 
     const ref = useRef(null);
     yup.addMethod(yup.string, 'checkDuplicateExpenseCode', function (message) {
-        return this.test('checkDuplicateExpenseCode', 'Duplicate Expense Code', async function validateValue(value) {
+        return this.test('checkDuplicateExpenseCode', 'Expense Code already exists', async function validateValue(value) {
             try {
-                console.log(value);
                 if (mode == 'INSERT') {
                     dispatch(checkDuplicateExpenseRateCode(value));
                     console.log(duplicateCode);
@@ -86,17 +123,51 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
         });
     });
 
+    yup.addMethod(yup.string, 'checkDuplicateExpenseDescription', function (message) {
+        return this.test('checkDuplicateExpenseDescription', 'Expense Description already exists', async function validateValue(value) {
+            try {
+                if (mode == 'INSERT') {
+                    dispatch(checkDuplicateExpenseRateDescription(value));
+                    console.log(duplicateExpenseDescription);
+                    if (duplicateExpenseDescription != null && duplicateExpenseDescription.errorMessages.length != 0) {
+                        return false;
+                    } else {
+                        return true;
+                    }
+                }
+            } catch (error) {}
+            return true;
+        });
+    });
+
     const validationSchema = yup.object().shape({
-        expenseCode: yup.string().required('Required field').checkDuplicateExpenseCode('ggg'),
-        description: yup.string().required('Required field'),
+        expenseCode: yup
+            .string()
+            .matches(/^[a-zA-Z0-9]+$/, 'Expense code must be alphanumeric')
+            .required('Required field')
+            .checkDuplicateExpenseCode('ggg'),
+        description: yup.string().required('Required field').checkDuplicateExpenseDescription('ggg'),
 
         expenseTypeDetails: yup.array().of(
             yup.object().shape({
                 tax: yup.object().typeError('Required field'),
-                fromDate: yup.date().required('Required field'),
-                toDate: yup.date().min(yup.ref('fromDate'), "End date can't be before start date"),
+                fromDate: yup
+                    .date()
+                    .required('Required field')
+                    .nullable()
+                    .transform((v) => (v instanceof Date && !isNaN(v) ? v : null)),
+                toDate: yup
+                    .date()
+                    .min(yup.ref('fromDate'), "End date can't be before start date")
+                    .required('Required field')
+                    .nullable()
+                    .transform((v) => (v instanceof Date && !isNaN(v) ? v : null)),
                 currencyList: yup.object().typeError('Required field'),
-                expenseRate: yup.string().required('Required field')
+                expenseRate: yup
+                    .number()
+                    .typeError('Expense rate must be a number')
+                    .min(0, 'Expense rate must be greater than or equal to 0')
+                // expenseRate: yup.number().integer().min(0).required('Required field')
             })
         )
     });
@@ -116,6 +187,24 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
     const [taxData, setData] = useState(null);
     const [closeButton, setCloseButton] = useState(true);
 
+    const calculateExpenseRateTax = (value, tax, idx, setFieldValue) => {
+        if (tax != null) {
+            if (tax.type === 'Group') {
+                let amountWithTax = value;
+                for (let i in tax.taxOrder) {
+                    amountWithTax = (+amountWithTax * tax.taxOrder[i]) / 100 + +amountWithTax;
+                }
+
+                setFieldValue(`expenseTypeDetails.${idx}.rateWithTax`, +amountWithTax.toFixed(4));
+            } else if (tax.type === 'individual') {
+                let amountWithTax = 0;
+                amountWithTax = (+value * tax.tax) / 100 + +value;
+
+                setFieldValue(`expenseTypeDetails.${idx}.rateWithTax`, +amountWithTax.toFixed(4));
+            }
+        }
+    };
+
     useEffect(() => {
         if (expenseTypeToUpdate != null) {
             const dataArray = [];
@@ -129,8 +218,8 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
 
                         tax: item.tax,
                         expenseRate: item.expenseRate,
-                        rateWithoutTax: '',
-                        rateWithTax: '',
+                        rateWithoutTax: item.expenseRate,
+                        rateWithTax: item.rateWithTax,
                         status: item.status
                     };
                     dataArray.push(expenseTypeDetails);
@@ -157,10 +246,10 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                         fromDate: item.fromDate,
                         toDate: item.toDate,
                         currencyList: item.currencyList.currencyListId,
-                        tax: item.tax.taxId,
+                        tax: item.tax.id,
                         expenseRate: item.expenseRate,
-                        rateWithoutTax: '',
-                        rateWithTax: '',
+                        rateWithoutTax: item.expenseRate,
+                        rateWithTax: item.rateWithTax,
                         status: item.status
                     };
                     dataArray.push(expenseTypeDetails);
@@ -182,10 +271,10 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                         fromDate: item.fromDate,
                         toDate: item.toDate,
                         currencyList: item.currencyList.currencyListId,
-                        tax: item.tax.taxId,
+                        tax: item.tax.id,
                         expenseRate: item.expenseRate,
                         rateWithoutTax: item.expenseRate,
-                        rateWithTax: item.expenseRate,
+                        rateWithTax: item.rateWithTax,
                         status: item.status
                     };
                     dataArray.push(expenseTypeDetails);
@@ -200,33 +289,28 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                 dispatch(updateExpenseTypesData(saveValues));
             }
         }
-        handleClose();
+        handleCloseSubmit();
     };
 
     useEffect(() => {}, [ref]);
 
     const taxListData = useSelector((state) => state.taxReducer.taxes);
-    const currencyListData = useSelector((state) => state.expenseTypesReducer.currencyList);
+
     const duplicateCode = useSelector((state) => state.expenseTypesReducer.duplicateExpenseType);
+    const duplicateExpenseDescription = useSelector((state) => state.expenseTypesReducer.duplicateExpenseDescription);
     const [taxListOptions, setTaxListOptions] = useState([]);
-    const [currencyListOptions, setCurrencyListOptions] = useState([]);
 
     useEffect(() => {
-        dispatch(getAllTaxData());
+        dispatch(getActiveTaxGroupandTaxList('Buy'));
         dispatch(getAllCurrencyListData());
     }, []);
 
     useEffect(() => {
-        if (currencyListData != null) {
-            setCurrencyListOptions(currencyListData);
+        console.log(activeTaxGroupandTaxesByType);
+        if (activeTaxGroupandTaxesByType != null) {
+            setActiveTaxGroupandTaxesListData(activeTaxGroupandTaxesByType);
         }
-    }, [currencyListData]);
-
-    useEffect(() => {
-        if (taxListData != null) {
-            setTaxListOptions(taxListData);
-        }
-    }, [taxListData]);
+    }, [activeTaxGroupandTaxesByType]);
 
     return (
         <div>
@@ -266,7 +350,7 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                                             }}
                                             validationSchema={validationSchema}
                                         >
-                                            {({ values, handleChange, setFieldValue, errors, handleBlur, touched }) => {
+                                            {({ values, handleChange, setFieldValue, errors, handleBlur, touched, resetForm }) => {
                                                 return (
                                                     <Form>
                                                         <div style={{ marginTop: '6px', margin: '10px' }}>
@@ -349,11 +433,20 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                                                                                         expenseTypesDetailsId: '',
                                                                                         fromDate: '',
                                                                                         toDate: '',
-                                                                                        currencyList: '',
-                                                                                        tax: null,
-                                                                                        expenseRate: '',
-                                                                                        rateWithoutTax: '',
-                                                                                        rateWithTax: '',
+                                                                                        currencyList: {
+                                                                                            currencyCode: currencyLists[0]?.currencyCode,
+                                                                                            currencyDescription:
+                                                                                                currencyLists[0]?.currencyDescription,
+                                                                                            currencyListId: currencyLists[0]?.currencyListId
+                                                                                        },
+                                                                                        tax: {
+                                                                                            code: dafaultTaxLists[0]?.code,
+                                                                                            description: dafaultTaxLists[0]?.description,
+                                                                                            id: dafaultTaxLists[0]?.id
+                                                                                        },
+                                                                                        expenseRate: 0.0,
+                                                                                        rateWithoutTax: 0.0,
+                                                                                        rateWithTax: 0.0,
                                                                                         status: true,
                                                                                         enableRow:
                                                                                             mode === 'VIEW_UPDATE' || mode === 'INSERT'
@@ -493,9 +586,22 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                                                                                                                 value
                                                                                                             );
                                                                                                         }}
+                                                                                                        minDate={
+                                                                                                            values.expenseTypeDetails[idx]
+                                                                                                                .fromDate
+                                                                                                        }
+                                                                                                        // disabled={
+                                                                                                        //     values.expenseTypeDetails[idx]
+                                                                                                        //         .enableRow || mode == 'VIEW'
+                                                                                                        // }
                                                                                                         disabled={
                                                                                                             values.expenseTypeDetails[idx]
-                                                                                                                .enableRow || mode == 'VIEW'
+                                                                                                                .fromDate === null ||
+                                                                                                            values.expenseTypeDetails[idx]
+                                                                                                                .fromDate === '' ||
+                                                                                                            values.expenseTypeDetails[idx]
+                                                                                                                .enableRow ||
+                                                                                                            mode == 'VIEW'
                                                                                                         }
                                                                                                         inputFormat="DD/MM/YYYY"
                                                                                                         value={
@@ -573,6 +679,7 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
 
                                                                                             <TableCell>
                                                                                                 <Autocomplete
+                                                                                                    id="combo-box-demo"
                                                                                                     value={
                                                                                                         values.expenseTypeDetails[idx]
                                                                                                             ? values.expenseTypeDetails[idx]
@@ -586,23 +693,30 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                                                                                                             `expenseTypeDetails.${idx}.currencyList`,
                                                                                                             value
                                                                                                         );
-                                                                                                        setFieldValue(
-                                                                                                            `expenseTypeDetails.${idx}.currencyList`,
-                                                                                                            value
-                                                                                                        );
                                                                                                     }}
                                                                                                     disabled={
                                                                                                         values.expenseTypeDetails[idx]
                                                                                                             .enableRow || mode == 'VIEW'
                                                                                                     }
+                                                                                                    // disablePortal
+                                                                                                    autoSelect={true}
                                                                                                     options={currencyListOptions}
                                                                                                     getOptionLabel={(option) =>
-                                                                                                        `${option.currencyCode} - ${option.currencyDescription}`
+                                                                                                        `${option.currencyCode}`
                                                                                                     }
                                                                                                     isOptionEqualToValue={(option, value) =>
                                                                                                         option.currencyListId ===
                                                                                                         value.currencyListId
                                                                                                     }
+                                                                                                    renderOption={(props, option) => (
+                                                                                                        <li {...props}>
+                                                                                                            {option.currencyCode}&nbsp;-
+                                                                                                            {option.currencyDescription}
+                                                                                                        </li>
+                                                                                                    )}
+                                                                                                    // renderOption={(option) => (
+                                                                                                    //     <>{`${option.currencyCode} + ${option.currencyCodee}`}</>
+                                                                                                    // )}
                                                                                                     renderInput={(params) => (
                                                                                                         <TextField
                                                                                                             {...params}
@@ -613,10 +727,14 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                                                                                                                     height: 40
                                                                                                                 }
                                                                                                             }}
-                                                                                                            placeholder="--Select a Currency Code --"
+                                                                                                            placeholder="--Select a Value --"
                                                                                                             variant="outlined"
                                                                                                             name={`expenseTypeDetails.${idx}.currencyList`}
                                                                                                             onBlur={handleBlur}
+                                                                                                            autoSelect={true}
+                                                                                                            // defaultValue={{
+                                                                                                            //     currencyCode: 'LKR'
+                                                                                                            // }}
                                                                                                             helperText={
                                                                                                                 touched.expenseTypeDetails &&
                                                                                                                 touched.expenseTypeDetails[
@@ -674,6 +792,7 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                                                                                                         values.expenseTypeDetails[idx]
                                                                                                             .enableRow || mode == 'VIEW'
                                                                                                     }
+                                                                                                    autoSelect={true}
                                                                                                     name={`expenseTypeDetails.${idx}.tax`}
                                                                                                     onChange={(_, value) => {
                                                                                                         console.log(value);
@@ -681,14 +800,35 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                                                                                                             `expenseTypeDetails.${idx}.tax`,
                                                                                                             value
                                                                                                         );
+
+                                                                                                        calculateExpenseRateTax(
+                                                                                                            values.expenseTypeDetails[idx]
+                                                                                                                .expenseRate,
+                                                                                                            value,
+                                                                                                            idx,
+                                                                                                            setFieldValue
+                                                                                                        );
                                                                                                     }}
-                                                                                                    options={taxListOptions}
+                                                                                                    // options={taxListOptions}
+                                                                                                    options={activeTaxGroupandTaxesList}
+                                                                                                    // getOptionLabel={(option) =>
+                                                                                                    //     `${option.code}`
+                                                                                                    // }
+                                                                                                    // isOptionEqualToValue={(option, value) =>
+                                                                                                    //     option.id === value.id
+                                                                                                    // }
                                                                                                     getOptionLabel={(option) =>
-                                                                                                        `${option.taxCode} - (${option.taxDescription})`
+                                                                                                        `${option.code}`
                                                                                                     }
                                                                                                     isOptionEqualToValue={(option, value) =>
-                                                                                                        option.taxId === value.taxId
+                                                                                                        option.id === value.id
                                                                                                     }
+                                                                                                    renderOption={(props, option) => (
+                                                                                                        <li {...props}>
+                                                                                                            {option.type}&nbsp;-
+                                                                                                            {option.code}
+                                                                                                        </li>
+                                                                                                    )}
                                                                                                     renderInput={(params) => (
                                                                                                         <TextField
                                                                                                             {...params}
@@ -699,7 +839,7 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                                                                                                                     height: 40
                                                                                                                 }
                                                                                                             }}
-                                                                                                            placeholder="--Select a Tax Code --"
+                                                                                                            placeholder="--Select a Value --"
                                                                                                             variant="outlined"
                                                                                                             name={`expenseTypeDetails.${idx}.tax`}
                                                                                                             onBlur={handleBlur}
@@ -751,8 +891,7 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                                                                                             <TableCell>
                                                                                                 {values.expenseTypeDetails[idx] &&
                                                                                                 values.expenseTypeDetails[idx].tax
-                                                                                                    ? values.expenseTypeDetails[idx].tax
-                                                                                                          .percentage
+                                                                                                    ? values.expenseTypeDetails[idx].tax.tax
                                                                                                     : 0}
                                                                                             </TableCell>
                                                                                             <TableCell>
@@ -763,11 +902,6 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                                                                                                             height: 40
                                                                                                         }
                                                                                                     }}
-                                                                                                    min="0.00"
-                                                                                                    step="0.001"
-                                                                                                    max="1.00"
-                                                                                                    presicion={2}
-                                                                                                    // label="Additional Price"
                                                                                                     type="number"
                                                                                                     variant="outlined"
                                                                                                     disabled={
@@ -781,10 +915,30 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                                                                                                         values.expenseTypeDetails[idx]
                                                                                                             .expenseRate
                                                                                                     }
-                                                                                                    onChange={handleChange}
+                                                                                                    // onChange={handleChange}
                                                                                                     // onChange={(e) =>
                                                                                                     //     setRateWithTax(e.target.value)
                                                                                                     // }
+
+                                                                                                    onChange={(e) => {
+                                                                                                        console.log(e.target.value);
+                                                                                                        console.log(
+                                                                                                            values.expenseTypeDetails[idx]
+                                                                                                                .tax
+                                                                                                        );
+                                                                                                        setFieldValue(
+                                                                                                            `expenseTypeDetails.${idx}.expenseRate`,
+                                                                                                            e.target.value
+                                                                                                        );
+
+                                                                                                        calculateExpenseRateTax(
+                                                                                                            e.target.value,
+                                                                                                            values.expenseTypeDetails[idx]
+                                                                                                                .tax,
+                                                                                                            idx,
+                                                                                                            setFieldValue
+                                                                                                        );
+                                                                                                    }}
                                                                                                     onBlur={handleBlur}
                                                                                                     error={Boolean(
                                                                                                         touched.expenseTypeDetails &&
@@ -822,8 +976,64 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                                                                                                           .expenseRate
                                                                                                     : 0}
                                                                                             </TableCell>
+
                                                                                             <TableCell>
-                                                                                                {values.expenseTypeDetails[idx] &&
+                                                                                                <TextField
+                                                                                                    sx={{
+                                                                                                        width: { sm: 100 },
+                                                                                                        '& .MuiInputBase-root': {
+                                                                                                            height: 40
+                                                                                                        }
+                                                                                                    }}
+                                                                                                    min="0.00"
+                                                                                                    step="0.001"
+                                                                                                    max="1.00"
+                                                                                                    presicion={2}
+                                                                                                    // label="Additional Price"
+                                                                                                    type="number"
+                                                                                                    variant="outlined"
+                                                                                                    disabled
+                                                                                                    placeholder="0.0"
+                                                                                                    name={`expenseTypeDetails.${idx}.rateWithTax`}
+                                                                                                    value={
+                                                                                                        values.expenseTypeDetails[idx] &&
+                                                                                                        values.expenseTypeDetails[idx]
+                                                                                                            .rateWithTax
+                                                                                                    }
+                                                                                                    onChange={handleChange}
+                                                                                                    // onChange={(e) =>
+                                                                                                    //     setRateWithTax(e.target.value)
+                                                                                                    // }
+                                                                                                    onBlur={handleBlur}
+                                                                                                    error={Boolean(
+                                                                                                        touched.expenseTypeDetails &&
+                                                                                                            touched.expenseTypeDetails[
+                                                                                                                idx
+                                                                                                            ] &&
+                                                                                                            touched.expenseTypeDetails[idx]
+                                                                                                                .rateWithTax &&
+                                                                                                            errors.expenseTypeDetails &&
+                                                                                                            errors.expenseTypeDetails[
+                                                                                                                idx
+                                                                                                            ] &&
+                                                                                                            errors.expenseTypeDetails[idx]
+                                                                                                                .rateWithTax
+                                                                                                    )}
+                                                                                                    helperText={
+                                                                                                        touched.expenseTypeDetails &&
+                                                                                                        touched.expenseTypeDetails[idx] &&
+                                                                                                        touched.expenseTypeDetails[idx]
+                                                                                                            .rateWithTax &&
+                                                                                                        errors.expenseTypeDetails &&
+                                                                                                        errors.expenseTypeDetails[idx] &&
+                                                                                                        errors.expenseTypeDetails[idx]
+                                                                                                            .rateWithTax
+                                                                                                            ? errors.expenseTypeDetails[idx]
+                                                                                                                  .rateWithTax
+                                                                                                            : ''
+                                                                                                    }
+                                                                                                />
+                                                                                                {/* {values.expenseTypeDetails[idx] &&
                                                                                                 values.expenseTypeDetails[idx].expenseRate
                                                                                                     ? values.expenseTypeDetails[idx]
                                                                                                           .expenseRate *
@@ -832,7 +1042,7 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                                                                                                               100) +
                                                                                                       values.expenseTypeDetails[idx]
                                                                                                           .expenseRate
-                                                                                                    : 0}
+                                                                                                    : 0} */}
                                                                                             </TableCell>
 
                                                                                             <TableCell>
@@ -841,7 +1051,7 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                                                                                                         name={`expenseTypeDetails.${idx}.status`}
                                                                                                         onChange={handleChange}
                                                                                                         // value={formValues.status}
-                                                                                                        control={<Switch />}
+                                                                                                        control={<Switch color="success" />}
                                                                                                         // label="Status"
                                                                                                         checked={
                                                                                                             values.expenseTypeDetails[
@@ -895,9 +1105,9 @@ function ExpenseTypes({ open, handleClose, mode, code }) {
                                                                     style={{
                                                                         marginLeft: '10px'
                                                                     }}
-                                                                    // onClick={handleCancel}
+                                                                    onClick={(e) => resetForm()}
                                                                 >
-                                                                    Cancel
+                                                                    Clear
                                                                 </Button>
                                                             ) : (
                                                                 ''

@@ -13,7 +13,8 @@ import {
     UPDATE_FAILED_EXPENSE_TYPES,
     UPDATE_SUCCESS_EXPENSE_TYPES,
     SUCCESS_ACTIVE_EXPENSE_TYPES_LIST_DATA,
-    FAILED_ACTIVE_EXPENSE_TYPES_LIST_DATA
+    FAILED_ACTIVE_EXPENSE_TYPES_LIST_DATA,
+    EXPENSE_TYPES_DESCRIPTION_DUPLICATE
 } from 'store/constant/master/ExpenseTypesConstant';
 import { put, takeEvery, call } from 'redux-saga/effects';
 import { create, getById, update, get } from '../../../apis/Apis';
@@ -126,5 +127,24 @@ export function* getAllActiveExpenseTypesDataSaga() {
     } catch (e) {
         console.log(e);
         yield put({ type: FAILED_ACTIVE_EXPENSE_TYPES_LIST_DATA, data: responseData.data });
+    }
+}
+
+export function* checkExpenseTypesDupicateDescriptionSaga(action) {
+    console.log('checkExpenseTypesDupicateDescriptionSaga:' + action.data.code);
+    let responseData = [];
+    try {
+        responseData = yield call(getById, `${process.env.REACT_APP_TRANSPORT_URL}/expenseTypes/descriptionDuplicate/${action.data.code}`);
+        console.log('response data:' + responseData);
+        yield put({
+            type: EXPENSE_TYPES_DESCRIPTION_DUPLICATE,
+            data: responseData.data
+        });
+    } catch (e) {
+        console.log(responseData);
+        yield put({
+            type: EXPENSE_TYPES_DESCRIPTION_DUPLICATE,
+            data: responseData
+        });
     }
 }
