@@ -5,7 +5,8 @@ import {
     GET_HOTEL_MAIN_DATA_BY_ID,
     GET_LAST_MODIFIED_DATE_TIME_HOTEL_MAIN,
     SAVE_HOTEL_MAIN_DATA,
-    UPDATE_HOTEL_MAIN_DATA
+    UPDATE_HOTEL_MAIN_DATA,
+    GET_HOTELS_BY_LOCATION_CURRENCY_MIN_MAX
 } from 'store/constant/master/HotelMasterConstant';
 
 export const saveHotelMainData = (data) => {
@@ -51,6 +52,13 @@ export const checkDuplicateHotelMainCode = (code) => {
 
 export const getAllActiveHotelMainData = () => {
     return {
-        type: GET_ALL_ACTIVE_HOTEL_MAIN_DATA
+        type: GET_HOTELS_BY_LOCATION_CURRENCY_MIN_MAX
+    };
+};
+
+export const getHotelsByLocationCurrencyMinMax = (data) => {
+    return {
+        type: GET_HOTELS_BY_LOCATION_CURRENCY_MIN_MAX,
+        data: data
     };
 };

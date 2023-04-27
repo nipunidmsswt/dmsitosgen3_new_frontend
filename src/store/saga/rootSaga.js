@@ -64,7 +64,8 @@ import {
     GET_ALL_EXCHNAGE_RATE_TYPE_DATA,
     GET_EXCHNAGE_RATE_TYPE_BY_ID,
     GET_LAST_MODIFIED_DATE_TIME_EXCHNAGE_RATE_TYPE,
-    GET_EXCHNAGE_RATE_TYPE_DATA_BY_CURRENCY_ID
+    GET_EXCHNAGE_RATE_TYPE_DATA_BY_CURRENCY_ID,
+    CONVERT_CURRENCY_TO_BASE_CURRENCY
 } from 'store/constant/master/ExchangeRateConstant';
 
 import {
@@ -73,7 +74,8 @@ import {
     getAllExchnageRateTypeDataSaga,
     getExchangeRateTypeByIdSaga,
     checkLatestCurrencyModifiedDateSaga,
-    getExChangeRateDataByCurrencyId
+    getExChangeRateDataByCurrencyId,
+    convertCurrencyToBaseCurrencySaga
 } from './mastersaga/ExchangeRateTypeSaga';
 
 import {
@@ -559,7 +561,8 @@ import {
     getAllHotelMainSaga,
     getHotelMainByIdSaga,
     saveHotelMainSaga,
-    updateHotelMainSaga
+    updateHotelMainSaga,
+    getHotelsByLocationCurrencyMinMaxRates
 } from './mastersaga/HotelMainSaga';
 import {
     CHECK_HOTEL_MAIN_DUPLICATE,
@@ -568,7 +571,8 @@ import {
     GET_HOTEL_MAIN_DATA_BY_ID,
     GET_LAST_MODIFIED_DATE_TIME_HOTEL_MAIN,
     SAVE_HOTEL_MAIN_DATA,
-    UPDATE_HOTEL_MAIN_DATA
+    UPDATE_HOTEL_MAIN_DATA,
+    GET_HOTELS_BY_LOCATION_CURRENCY_MIN_MAX
 } from 'store/constant/master/HotelMasterConstant';
 
 import {
@@ -771,6 +775,7 @@ export function* wacherSaga() {
     yield takeLatest(UPDATE_EXCHNAGE_RATE_TYPE_DATA, updateExchangeRateTypeSaga);
     yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_EXCHNAGE_RATE_TYPE, checkLatestCurrencyModifiedDateSaga);
     yield takeLatest(GET_EXCHNAGE_RATE_TYPE_DATA_BY_CURRENCY_ID, getExChangeRateDataByCurrencyId);
+    yield takeLatest(CONVERT_CURRENCY_TO_BASE_CURRENCY, convertCurrencyToBaseCurrencySaga);
 
     // //product  setup
 
@@ -1057,6 +1062,7 @@ export function* wacherSaga() {
     yield takeLatest(CHECK_HOTEL_MAIN_DUPLICATE, checkDupicateHotelMainCodeSaga);
     yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_HOTEL_MAIN, checkLatestHotelMainModifiedDateSaga);
     yield takeLatest(GET_ALL_ACTIVE_HOTEL_MAIN_DATA, getAllActiveHotelMainSaga);
+    yield takeLatest(GET_HOTELS_BY_LOCATION_CURRENCY_MIN_MAX, getHotelsByLocationCurrencyMinMaxRates);
 
     //bank Details
     yield takeLatest(SAVE_BANK_DETAILS_DATA, saveBankDetailsSaga);
