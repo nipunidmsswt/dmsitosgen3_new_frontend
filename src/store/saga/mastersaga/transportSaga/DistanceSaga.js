@@ -133,7 +133,7 @@ export function* getDistanceAndDurationSaga(action) {
     let responseData = [];
     try {
         const requestBody = JSON.stringify({ locationIds });
-        responseData = yield call(getById, `${process.env.REACT_APP_TRANSPORT_URL}/calculateDistances/${transportTypeId}`, requestBody);
+        responseData = yield call(create, `${process.env.REACT_APP_TRANSPORT_URL}/calculateDistances/${transportTypeId}`, requestBody);
         console.log(responseData);
         console.log('response data check');
         yield put({
