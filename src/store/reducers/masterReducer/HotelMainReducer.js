@@ -11,7 +11,9 @@ import {
     SUCCESS_LAST_MODIFIED_DATE_HOTEL_MAIN,
     FAILED_LAST_MODIFIED_DATE_HOTEL_MAIN,
     SUCCESS_ACTIVE_HOTEL_MAIN_LIST_DATA,
-    FAILED_ACTIVE_HOTEL_MAIN_LIST_DATA
+    FAILED_ACTIVE_HOTEL_MAIN_LIST_DATA,
+    SUCCESS_GET_HOTELS_BY_LOCATION_CURRENCY_MIN_MAX,
+    FAILED_GET_HOTELS_BY_LOCATION_CURRENCY_MIN_MAX
 } from 'store/constant/master/HotelMasterConstant';
 
 const initialState = {
@@ -21,7 +23,8 @@ const initialState = {
     errorMsg: null,
     duplicatehotelMain: null,
     lastModifiedDateTime: null,
-    activeHotelCategories: []
+    activeHotelCategories: [],
+    hotelsByLocationCrrencyMinMax: []
 };
 
 export const hotelMainReducer = (state = initialState, action) => {
@@ -96,6 +99,15 @@ export const hotelMainReducer = (state = initialState, action) => {
             return { ...state, activeHotelCategories: data.payload[0] };
         case FAILED_ACTIVE_HOTEL_MAIN_LIST_DATA:
             return { ...state, activeHotelCategories: data.payload[0] };
+        case SUCCESS_GET_HOTELS_BY_LOCATION_CURRENCY_MIN_MAX:
+            return { ...state, hotelsByLocationCrrencyMinMax: data.payload[0] };
+
+        case FAILED_GET_HOTELS_BY_LOCATION_CURRENCY_MIN_MAX:
+            return {
+                ...state,
+                hotelsByLocationCrrencyMinMax: [],
+                errorMsg: data ? data.errorMessages : 'netwok error'
+            };
         default:
             return state;
     }

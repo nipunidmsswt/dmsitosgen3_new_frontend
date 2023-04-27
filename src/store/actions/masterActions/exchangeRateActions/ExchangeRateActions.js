@@ -4,7 +4,8 @@ import {
     GET_ALL_EXCHNAGE_RATE_TYPE_DATA,
     GET_EXCHNAGE_RATE_TYPE_BY_ID,
     GET_LAST_MODIFIED_DATE_TIME_EXCHNAGE_RATE_TYPE,
-    GET_EXCHNAGE_RATE_TYPE_DATA_BY_CURRENCY_ID
+    GET_EXCHNAGE_RATE_TYPE_DATA_BY_CURRENCY_ID,
+    CONVERT_CURRENCY_TO_BASE_CURRENCY
 } from '../../../constant/master/ExchangeRateConstant';
 
 export const saveExChangeRateData = (data) => {
@@ -48,5 +49,12 @@ export const getExchangeRatesByCurrencyId = (id) => {
     return {
         type: GET_EXCHNAGE_RATE_TYPE_DATA_BY_CURRENCY_ID,
         data: { id }
+    };
+};
+
+export const convertCurrencyToBaseCurrency = (data) => {
+    return {
+        type: CONVERT_CURRENCY_TO_BASE_CURRENCY,
+        data
     };
 };

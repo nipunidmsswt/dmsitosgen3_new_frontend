@@ -28,17 +28,16 @@ import {
     getProfileData,
     updateMyProfile
 } from 'store/actions/authenticationActions/UserAction';
-import CreatedUpdatedUserDetailsWithTableFormat from 'views/pages/master/userTimeDetails/CreatedUpdatedUserDetailsWithTableFormat';
+
 import { getAllActiveMarketData } from 'store/actions/masterActions/operatorActions/MarketAction';
 import { getAllClusterData } from 'store/actions/masterActions/CodeAndNameAction';
 import { getAllCompanyProfileData, getAvailableLicenseCount } from 'store/actions/masterActions/CompanyProfileAction';
 import { getAllDepartmentData, getAllDesignationData } from 'store/actions/masterActions/DepartmentDesignationAction';
-import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import { getActiveLocations } from 'store/actions/masterActions/LocationAction';
-import { makeStyles } from '@material-ui/core/styles';
+import { getHotelsByLocationCurrencyMinMax } from 'store/actions/masterActions/HotelMasterAction';
 import CompareRates from './CompareRates';
 
-function ProgramAccommodation({ open, handleClose, mode, userCode, component }) {
+function ProgramAccommodation({ open, handleClose, mode, component }) {
     const initialValues = {
         disablePassowrdField: true,
         company: null,
@@ -62,7 +61,7 @@ function ProgramAccommodation({ open, handleClose, mode, userCode, component }) 
         files: '',
         docPath: '',
 
-        location: null,
+        locationCode: null,
         allLocation: false,
         currency: null,
         minRate: '',
@@ -90,32 +89,7 @@ function ProgramAccommodation({ open, handleClose, mode, userCode, component }) 
 
     const phoneRegExp = /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
 
-    const validationSchema = yup.object().shape({
-        disablePassowrdField: yup.boolean(),
-        company: yup.object().typeError('Required field'),
-        // title: yup.string().required('Required field'),
-        firstName: yup.string().required('Required field'),
-        lastName: yup.string().required('Required field'),
-        nic: yup.string().required('Required field'),
-        email: yup.string().email().required('Required field'),
-        mobile: yup
-            .string()
-            .required('Required field')
-            .matches(phoneRegExp, 'Not valid')
-            .min(10, 'Must be exactly 10 digits')
-            .max(10, 'Must be 10 digits'),
-        designation: yup.object().typeError('Required field'),
-        department: yup.object().typeError('Required field'),
-        cluster: yup.object().typeError('Required field'),
-        userName: yup.string().required('Requied field'),
-        roleId: yup.object().typeError('Required field')
-        // market: yup.object().typeError('Required field')
-
-        // password: yup.string().when('disablePassowrdField', {
-        //     is: true && mode === 'INSERT' && component === 'user_creation',
-        //     then: yup.string().required('Field is required')
-        // })
-    });
+    const validationSchema = yup.object().shape({});
 
     //get data from reducers
     const duplicateUser = useSelector((state) => state.userReducer.duplicateUser);
@@ -141,6 +115,7 @@ function ProgramAccommodation({ open, handleClose, mode, userCode, component }) 
 
     const activeLocations = useSelector((state) => state.locationReducer.activeLocations);
     const currencyListData = useSelector((state) => state.expenseTypesReducer.currencyList);
+    const hotelsByLocationCrrencyMinMax = useSelector((state) => state.hotelMainReducer.hotelsByLocationCrrencyMinMax);
 
     const dispatch = useDispatch();
     const titleItems = [
@@ -177,6 +152,12 @@ function ProgramAccommodation({ open, handleClose, mode, userCode, component }) 
             setDepartmentListOptions(departmentActiveList);
         }
     }, [departmentActiveList]);
+
+    useEffect(() => {
+        if (hotelsByLocationCrrencyMinMax != null) {
+            setHotelData(hotelsByLocationCrrencyMinMax);
+        }
+    }, [hotelsByLocationCrrencyMinMax]);
 
     useEffect(() => {
         if ((mode === 'VIEW_UPDATE' && userToUpdate != null) || (mode === 'VIEW' && userToUpdate != null)) {
@@ -250,16 +231,6 @@ function ProgramAccommodation({ open, handleClose, mode, userCode, component }) 
     }, [designationActiveList]);
 
     useEffect(() => {
-        if ((mode === 'VIEW_UPDATE' && component === 'user_creation') || (mode === 'VIEW' && component === 'user_creation')) {
-            dispatch(getUserDataById(userCode));
-
-            // setTitleListOptions(ti)
-        } else if ((mode === 'VIEW_UPDATE' && component === 'user_profile') || (mode === 'VIEW' && component === 'user_profile')) {
-            dispatch(getProfileData(userCode));
-        }
-    }, [mode]);
-
-    useEffect(() => {
         setMarketListOptions(marketListData);
     }, [marketListData]);
 
@@ -271,22 +242,7 @@ function ProgramAccommodation({ open, handleClose, mode, userCode, component }) 
         }
     }, [companyProfile]);
 
-    const handleSubmitForm = (data) => {
-        console.log(data);
-        if (component === 'user_creation') {
-            if (mode === 'INSERT') {
-                console.log(data);
-                dispatch(saveUserData(data));
-            } else if (mode === 'VIEW_UPDATE') {
-                dispatch(updateUserData(data));
-            }
-        } else if (component === 'user_profile') {
-            console.log('user_profile');
-            dispatch(updateMyProfile(data));
-        }
-
-        handleClose();
-    };
+    const handleSubmitForm = (data) => {};
 
     const loadAvalibleLicenseCount = (data, setFieldValue) => {
         setFieldValue('availableLicenceCount', data.availableLicenceCount);
@@ -319,6 +275,19 @@ function ProgramAccommodation({ open, handleClose, mode, userCode, component }) 
 
     const closeCompareRate = () => {
         setOpenCompareRate(false);
+    };
+
+    const filledHotelData = (values) => {
+        console.log(values);
+        let data = {
+            allLocations: values.allLocation,
+            locationId: values.locationCode?.location_id,
+            currencyId: values.currency.currencyListId,
+            allRates: values.allRates,
+            minRate: values.minRate,
+            maxRate: values.maxRate
+        };
+        dispatch(getHotelsByLocationCurrencyMinMax(data));
     };
     return (
         <div>
@@ -359,59 +328,69 @@ function ProgramAccommodation({ open, handleClose, mode, userCode, component }) 
                                                                     style={{ marginTop: '10px' }}
                                                                     alignItems="center"
                                                                 >
-                                                                    <Grid item>
-                                                                        <Autocomplete
-                                                                            value={values.locationCode}
-                                                                            name="locationCode"
-                                                                            onChange={(_, value) => {
-                                                                                setFieldValue(`locationCode`, value);
-                                                                            }}
-                                                                            disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
-                                                                            options={activeLocationList}
-                                                                            getOptionLabel={(option) => `${option.code}`}
-                                                                            isOptionEqualToValue={(option, value) =>
-                                                                                option.location_id === value.location_id
-                                                                            }
-                                                                            renderInput={(params) => (
-                                                                                <TextField
-                                                                                    {...params}
-                                                                                    label="Location Code"
-                                                                                    InputLabelProps={{
-                                                                                        shrink: true
-                                                                                    }}
-                                                                                    sx={{
-                                                                                        width: {
-                                                                                            sm: 200
-                                                                                        },
-                                                                                        '& .MuiInputBase-root': {
-                                                                                            height: 40
+                                                                    <fieldset style={{ border: '3px solid #A0A0A0' }}>
+                                                                        <legend>Filtaration for Half Double Sell</legend>
+                                                                        <Grid gap="10px" display="flex" style={{ marginTop: '10px' }}>
+                                                                            <Grid item>
+                                                                                <Autocomplete
+                                                                                    value={values.locationCode}
+                                                                                    name="locationCode"
+                                                                                    onChange={(_, value) => {
+                                                                                        setFieldValue(`locationCode`, value);
+                                                                                        if (value == null) {
+                                                                                            setFieldValue('allLocation', true);
+                                                                                        } else {
+                                                                                            setFieldValue('allLocation', false);
                                                                                         }
                                                                                     }}
                                                                                     disabled={mode == 'VIEW_UPDATE' || mode == 'VIEW'}
-                                                                                    variant="outlined"
-                                                                                    name="locationCode"
-                                                                                    onBlur={handleBlur}
+                                                                                    options={activeLocationList}
+                                                                                    getOptionLabel={(option) => `${option.code}`}
+                                                                                    isOptionEqualToValue={(option, value) =>
+                                                                                        option.location_id === value.location_id
+                                                                                    }
+                                                                                    renderInput={(params) => (
+                                                                                        <TextField
+                                                                                            {...params}
+                                                                                            label="Location Code"
+                                                                                            InputLabelProps={{
+                                                                                                shrink: true
+                                                                                            }}
+                                                                                            sx={{
+                                                                                                width: {
+                                                                                                    sm: 200
+                                                                                                },
+                                                                                                '& .MuiInputBase-root': {
+                                                                                                    height: 40
+                                                                                                }
+                                                                                            }}
+                                                                                            disabled={
+                                                                                                mode == 'VIEW_UPDATE' || mode == 'VIEW'
+                                                                                            }
+                                                                                            variant="outlined"
+                                                                                            name="locationCode"
+                                                                                            onBlur={handleBlur}
+                                                                                        />
+                                                                                    )}
                                                                                 />
-                                                                            )}
-                                                                        />
-                                                                    </Grid>
-                                                                    <Grid item>
-                                                                        <FormGroup>
-                                                                            <FormControlLabel
-                                                                                name="allLocation"
-                                                                                disabled={mode == 'VIEW'}
-                                                                                onChange={handleChange}
-                                                                                value={values.allLocation}
-                                                                                control={<Switch color="success" />}
-                                                                                label="All Locations"
-                                                                                checked={values.allLocation}
-                                                                                // disabled={mode == 'VIEW'}
-                                                                            />
-                                                                        </FormGroup>
-                                                                    </Grid>
-                                                                    <fieldset style={{ border: '4px solid' }}>
-                                                                        <legend>Filtaration for Half Double Sell</legend>
-                                                                        <Grid gap="10px" display="flex" style={{ marginTop: '10px' }}>
+                                                                            </Grid>
+                                                                            <Grid item>
+                                                                                <FormGroup>
+                                                                                    <FormControlLabel
+                                                                                        name="allLocation"
+                                                                                        disabled={mode == 'VIEW'}
+                                                                                        onChange={(e) => {
+                                                                                            handleChange(e);
+                                                                                            setFieldValue('locationCode', null);
+                                                                                        }}
+                                                                                        value={values.allLocation}
+                                                                                        control={<Switch color="success" />}
+                                                                                        label="All Locations"
+                                                                                        checked={values.allLocation}
+                                                                                        // disabled={mode == 'VIEW'}
+                                                                                    />
+                                                                                </FormGroup>
+                                                                            </Grid>
                                                                             <Grid item>
                                                                                 <Autocomplete
                                                                                     value={values.currency}
@@ -472,10 +451,16 @@ function ProgramAccommodation({ open, handleClose, mode, userCode, component }) 
                                                                                     id="standard-select-currency"
                                                                                     label="Min"
                                                                                     name="minRate"
-                                                                                    onChange={handleChange}
+                                                                                    onChange={(e) => {
+                                                                                        handleChange(e);
+                                                                                        if (e.target.value) {
+                                                                                            setFieldValue('allRates', false);
+                                                                                        }
+                                                                                    }}
                                                                                     InputLabelProps={{
                                                                                         shrink: true
                                                                                     }}
+                                                                                    type="number"
                                                                                     onBlur={handleBlur}
                                                                                     value={values.minRate}
                                                                                     error={Boolean(touched.minRate && errors.minRate)}
@@ -497,7 +482,13 @@ function ProgramAccommodation({ open, handleClose, mode, userCode, component }) 
                                                                                     }}
                                                                                     label="Max"
                                                                                     name="maxRate"
-                                                                                    onChange={handleChange}
+                                                                                    type="number"
+                                                                                    onChange={(e) => {
+                                                                                        handleChange(e);
+                                                                                        if (e.target.value) {
+                                                                                            setFieldValue('allRates', false);
+                                                                                        }
+                                                                                    }}
                                                                                     onBlur={handleBlur}
                                                                                     InputLabelProps={{
                                                                                         shrink: true
@@ -516,7 +507,14 @@ function ProgramAccommodation({ open, handleClose, mode, userCode, component }) 
                                                                                     <FormControlLabel
                                                                                         name="allRates"
                                                                                         disabled={mode == 'VIEW'}
-                                                                                        onChange={handleChange}
+                                                                                        onChange={(e) => {
+                                                                                            console.log(e);
+                                                                                            handleChange(e);
+                                                                                            if (e.target.checked === true) {
+                                                                                                setFieldValue('maxRate', '');
+                                                                                                setFieldValue('minRate', '');
+                                                                                            }
+                                                                                        }}
                                                                                         value={values.allRates}
                                                                                         control={<Switch color="success" />}
                                                                                         label="All Rates"
@@ -525,282 +523,286 @@ function ProgramAccommodation({ open, handleClose, mode, userCode, component }) 
                                                                                     />
                                                                                 </FormGroup>
                                                                             </Grid>
+                                                                            <Grid item>
+                                                                                <Button
+                                                                                    type="button"
+                                                                                    variant="contained"
+                                                                                    style={{ backgroundColor: '#B31B1B' }}
+                                                                                    sx={{ borderRadius: 60 }}
+                                                                                    onClick={() => filledHotelData(values)}
+                                                                                >
+                                                                                    Filter
+                                                                                </Button>
+                                                                            </Grid>
                                                                         </Grid>
                                                                     </fieldset>
-                                                                    <Grid item>
-                                                                        <Button
-                                                                            type="button"
-                                                                            variant="contained"
-                                                                            style={{ backgroundColor: '#B31B1B' }}
-                                                                            sx={{ borderRadius: 60 }}
-                                                                            onClick={() => setOpenCompareRate(true)}
-                                                                        >
-                                                                            Generate
-                                                                        </Button>
-                                                                    </Grid>
                                                                 </Grid>
+                                                                <fieldset style={{ border: '3px solid #A0A0A0', marginTop: '10px' }}>
+                                                                    <Grid gap="10px" display="flex" style={{ marginTop: '10px' }}>
+                                                                        <Grid item>
+                                                                            <Autocomplete
+                                                                                value={values.hotelCode}
+                                                                                name="hotelCode"
+                                                                                onChange={(_, value) => {
+                                                                                    setFieldValue(`hotelCode`, value);
+                                                                                    console.log(value);
 
-                                                                <Grid gap="10px" display="flex" style={{ marginTop: '10px' }}>
-                                                                    <Grid item>
-                                                                        <Autocomplete
-                                                                            value={values.hotelCode}
-                                                                            name="hotelCode"
-                                                                            disabled
-                                                                            onChange={(_, value) => {
-                                                                                setFieldValue(`hotelCode`, value);
-                                                                            }}
-                                                                            InputLabelProps={{
-                                                                                shrink: true
-                                                                            }}
-                                                                            options={hotelData}
-                                                                            getOptionLabel={(option) => `${option.hotelCode}`}
-                                                                            isOptionEqualToValue={(option, value) => option.id === value.id}
-                                                                            renderInput={(params) => (
-                                                                                <TextField
-                                                                                    {...params}
-                                                                                    label="Hotel"
-                                                                                    sx={{
-                                                                                        width: { xs: 300 },
-                                                                                        '& .MuiInputBase-root': {
-                                                                                            height: 41
-                                                                                        }
-                                                                                    }}
-                                                                                    InputLabelProps={{
-                                                                                        shrink: true
-                                                                                    }}
-                                                                                    error={Boolean(touched.hotelCode && errors.hotelCode)}
-                                                                                    helperText={
-                                                                                        touched.hotelCode && errors.hotelCode
-                                                                                            ? errors.hotelCode
-                                                                                            : ''
+                                                                                    if (value) {
+                                                                                        // convertCurrencyToBaseCurrency();
+                                                                                        setFieldValue(
+                                                                                            `hotelDefaultCurrency`,
+                                                                                            values.currency?.currencyCode
+                                                                                        );
+                                                                                    } else {
+                                                                                        setFieldValue(`hotelDefaultCurrency`, '');
                                                                                     }
-                                                                                    variant="outlined"
-                                                                                    name="hotelCode"
-                                                                                    onBlur={handleBlur}
-                                                                                />
-                                                                            )}
-                                                                        />
-                                                                    </Grid>
-                                                                    <Grid item>
-                                                                        {' '}
-                                                                        <TextField
-                                                                            sx={{
-                                                                                width: { sm: 200, md: 200 },
-                                                                                '& .MuiInputBase-root': {
-                                                                                    height: 40
+                                                                                }}
+                                                                                InputLabelProps={{
+                                                                                    shrink: true
+                                                                                }}
+                                                                                options={hotelData}
+                                                                                getOptionLabel={(option) => `${option.hotelCode}`}
+                                                                                isOptionEqualToValue={(option, value) =>
+                                                                                    option.id === value.id
                                                                                 }
-                                                                            }}
-                                                                            id="standard-select-currency"
-                                                                            label="Middle Name"
-                                                                            name="hotelDefaultCurrency"
-                                                                            onChange={handleChange}
-                                                                            InputLabelProps={{
-                                                                                shrink: true
-                                                                            }}
-                                                                            disabled={true}
-                                                                            onBlur={handleBlur}
-                                                                            value={values.hotelDefaultCurrency}
-                                                                            error={Boolean(
-                                                                                touched.hotelDefaultCurrency && errors.hotelDefaultCurrency
-                                                                            )}
-                                                                            helperText={
-                                                                                touched.hotelDefaultCurrency && errors.hotelDefaultCurrency
-                                                                                    ? errors.hotelDefaultCurrency
-                                                                                    : ''
-                                                                            }
-                                                                        ></TextField>
-                                                                    </Grid>
-                                                                    <Grid item>
-                                                                        <TextField
-                                                                            /// disabled={disableDistrict}
-                                                                            sx={{
-                                                                                width: { sm: 200, md: 200 },
-                                                                                '& .MuiInputBase-root': {
-                                                                                    height: 40
-                                                                                }
-                                                                            }}
-                                                                            label="Last Name"
-                                                                            name="lastName"
-                                                                            onChange={handleChange}
-                                                                            onBlur={handleBlur}
-                                                                            InputLabelProps={{
-                                                                                shrink: true
-                                                                            }}
-                                                                            disabled={
-                                                                                component === 'user_creation' && mode === 'INSERT'
-                                                                                    ? false
-                                                                                    : true
-                                                                            }
-                                                                            value={values.lastName}
-                                                                            error={Boolean(touched.lastName && errors.lastName)}
-                                                                            helperText={
-                                                                                touched.lastName && errors.lastName ? errors.lastName : ''
-                                                                            }
-                                                                        ></TextField>
-                                                                    </Grid>
-                                                                    <Grid item>
-                                                                        <FormGroup>
-                                                                            <FormControlLabel
-                                                                                name="status"
-                                                                                disabled={mode == 'VIEW'}
-                                                                                onChange={handleChange}
-                                                                                value={values.status}
-                                                                                control={<Switch color="success" />}
-                                                                                label="Apply Rate Conversion"
-                                                                                checked={values.status}
-                                                                                // disabled={mode == 'VIEW'}
+                                                                                renderInput={(params) => (
+                                                                                    <TextField
+                                                                                        {...params}
+                                                                                        label="Hotel"
+                                                                                        sx={{
+                                                                                            width: { xs: 300 },
+                                                                                            '& .MuiInputBase-root': {
+                                                                                                height: 41
+                                                                                            }
+                                                                                        }}
+                                                                                        InputLabelProps={{
+                                                                                            shrink: true
+                                                                                        }}
+                                                                                        error={Boolean(
+                                                                                            touched.hotelCode && errors.hotelCode
+                                                                                        )}
+                                                                                        helperText={
+                                                                                            touched.hotelCode && errors.hotelCode
+                                                                                                ? errors.hotelCode
+                                                                                                : ''
+                                                                                        }
+                                                                                        variant="outlined"
+                                                                                        name="hotelCode"
+                                                                                        onBlur={handleBlur}
+                                                                                    />
+                                                                                )}
                                                                             />
-                                                                        </FormGroup>
-                                                                    </Grid>
+                                                                        </Grid>
+                                                                        <Grid item>
+                                                                            {' '}
+                                                                            <TextField
+                                                                                sx={{
+                                                                                    width: { sm: 200, md: 200 },
+                                                                                    '& .MuiInputBase-root': {
+                                                                                        height: 40
+                                                                                    }
+                                                                                }}
+                                                                                id="standard-select-currency"
+                                                                                label="Hotel Default Currency"
+                                                                                name="hotelDefaultCurrency"
+                                                                                onChange={handleChange}
+                                                                                InputLabelProps={{
+                                                                                    shrink: true
+                                                                                }}
+                                                                                disabled={true}
+                                                                                onBlur={handleBlur}
+                                                                                value={values.hotelDefaultCurrency}
+                                                                                error={Boolean(
+                                                                                    touched.hotelDefaultCurrency &&
+                                                                                        errors.hotelDefaultCurrency
+                                                                                )}
+                                                                                helperText={
+                                                                                    touched.hotelDefaultCurrency &&
+                                                                                    errors.hotelDefaultCurrency
+                                                                                        ? errors.hotelDefaultCurrency
+                                                                                        : ''
+                                                                                }
+                                                                            ></TextField>
+                                                                        </Grid>
+                                                                        <Grid item>
+                                                                            <TextField
+                                                                                /// disabled={disableDistrict}
+                                                                                sx={{
+                                                                                    width: { sm: 200, md: 200 },
+                                                                                    '& .MuiInputBase-root': {
+                                                                                        height: 40
+                                                                                    }
+                                                                                }}
+                                                                                label="Hotel Default Currency to Base Currency Rate"
+                                                                                name="rate"
+                                                                                onChange={handleChange}
+                                                                                onBlur={handleBlur}
+                                                                                InputLabelProps={{
+                                                                                    shrink: true
+                                                                                }}
+                                                                                value={values.rate}
+                                                                                error={Boolean(touched.rate && errors.rate)}
+                                                                                helperText={touched.rate && errors.rate ? errors.rate : ''}
+                                                                            ></TextField>
+                                                                        </Grid>
+                                                                        <Grid item>
+                                                                            <FormGroup>
+                                                                                <FormControlLabel
+                                                                                    name="rateConverson"
+                                                                                    onChange={handleChange}
+                                                                                    value={values.rateConverson}
+                                                                                    control={<Switch color="success" />}
+                                                                                    label="Apply Rate Conversion"
+                                                                                    checked={values.rateConverson}
+                                                                                />
+                                                                            </FormGroup>
+                                                                        </Grid>
 
-                                                                    <Grid item>
-                                                                        <TextField
-                                                                            /// disabled={disableDistrict}
-                                                                            sx={{
-                                                                                width: { sm: 200, md: 200 },
-                                                                                '& .MuiInputBase-root': {
-                                                                                    height: 40
+                                                                        <Grid item>
+                                                                            <TextField
+                                                                                /// disabled={disableDistrict}
+                                                                                sx={{
+                                                                                    width: { sm: 200, md: 200 },
+                                                                                    '& .MuiInputBase-root': {
+                                                                                        height: 40
+                                                                                    }
+                                                                                }}
+                                                                                label="Rate Period"
+                                                                                name="lastName"
+                                                                                onChange={handleChange}
+                                                                                onBlur={handleBlur}
+                                                                                InputLabelProps={{
+                                                                                    shrink: true
+                                                                                }}
+                                                                                value={values.ratePeriod}
+                                                                                error={Boolean(touched.lastName && errors.lastName)}
+                                                                                helperText={
+                                                                                    touched.lastName && errors.lastName
+                                                                                        ? errors.lastName
+                                                                                        : ''
                                                                                 }
-                                                                            }}
-                                                                            label="Last Name"
-                                                                            name="lastName"
-                                                                            onChange={handleChange}
-                                                                            onBlur={handleBlur}
-                                                                            InputLabelProps={{
-                                                                                shrink: true
-                                                                            }}
-                                                                            disabled={
-                                                                                component === 'user_creation' && mode === 'INSERT'
-                                                                                    ? false
-                                                                                    : true
-                                                                            }
-                                                                            value={values.lastName}
-                                                                            error={Boolean(touched.lastName && errors.lastName)}
-                                                                            helperText={
-                                                                                touched.lastName && errors.lastName ? errors.lastName : ''
-                                                                            }
-                                                                        ></TextField>
+                                                                            ></TextField>
+                                                                        </Grid>
+                                                                        <Grid item>
+                                                                            <Button
+                                                                                type="button"
+                                                                                variant="contained"
+                                                                                style={{ backgroundColor: '#556B2F' }}
+                                                                                sx={{ borderRadius: 60 }}
+                                                                                onClick={() => setOpenCompareRate(true)}
+                                                                            >
+                                                                                Compare Rates
+                                                                            </Button>
+                                                                        </Grid>
                                                                     </Grid>
-                                                                    <Grid item>
-                                                                        <Button
-                                                                            type="button"
-                                                                            variant="contained"
-                                                                            style={{ backgroundColor: '#556B2F' }}
-                                                                            sx={{ borderRadius: 60 }}
-                                                                            onClick={() => setOpenCompareRate(true)}
-                                                                        >
-                                                                            Compare Rates
-                                                                        </Button>
-                                                                    </Grid>
-                                                                </Grid>
-                                                                <Grid gap="10px" display="flex" style={{ marginTop: '10px' }}>
-                                                                    <Grid item>
-                                                                        {' '}
-                                                                        <TextField
-                                                                            sx={{
-                                                                                width: { sm: 200, md: 200 },
-                                                                                '& .MuiInputBase-root': {
-                                                                                    height: 40
+                                                                    <Grid gap="10px" display="flex" style={{ marginTop: '10px' }}>
+                                                                        <Grid item>
+                                                                            {' '}
+                                                                            <TextField
+                                                                                sx={{
+                                                                                    width: { sm: 200, md: 200 },
+                                                                                    '& .MuiInputBase-root': {
+                                                                                        height: 40
+                                                                                    }
+                                                                                }}
+                                                                                label="Mobile No"
+                                                                                InputLabelProps={{
+                                                                                    shrink: true
+                                                                                }}
+                                                                                name="mobile"
+                                                                                onChange={handleChange}
+                                                                                onBlur={handleBlur}
+                                                                                value={values.mobile}
+                                                                                error={Boolean(touched.mobile && errors.mobile)}
+                                                                                helperText={
+                                                                                    touched.mobile && errors.mobile ? errors.mobile : ''
                                                                                 }
-                                                                            }}
-                                                                            label="Mobile No"
-                                                                            InputLabelProps={{
-                                                                                shrink: true
-                                                                            }}
-                                                                            name="mobile"
-                                                                            onChange={handleChange}
-                                                                            onBlur={handleBlur}
-                                                                            value={values.mobile}
-                                                                            error={Boolean(touched.mobile && errors.mobile)}
-                                                                            helperText={
-                                                                                touched.mobile && errors.mobile ? errors.mobile : ''
-                                                                            }
-                                                                        ></TextField>
-                                                                    </Grid>
-                                                                    <Grid item>
-                                                                        {' '}
-                                                                        <TextField
-                                                                            sx={{
-                                                                                width: { sm: 200, md: 200 },
-                                                                                '& .MuiInputBase-root': {
-                                                                                    height: 40
+                                                                            ></TextField>
+                                                                        </Grid>
+                                                                        <Grid item>
+                                                                            {' '}
+                                                                            <TextField
+                                                                                sx={{
+                                                                                    width: { sm: 200, md: 200 },
+                                                                                    '& .MuiInputBase-root': {
+                                                                                        height: 40
+                                                                                    }
+                                                                                }}
+                                                                                label="Mobile No"
+                                                                                InputLabelProps={{
+                                                                                    shrink: true
+                                                                                }}
+                                                                                name="mobile"
+                                                                                onChange={handleChange}
+                                                                                onBlur={handleBlur}
+                                                                                value={values.mobile}
+                                                                                error={Boolean(touched.mobile && errors.mobile)}
+                                                                                helperText={
+                                                                                    touched.mobile && errors.mobile ? errors.mobile : ''
                                                                                 }
-                                                                            }}
-                                                                            label="Mobile No"
-                                                                            InputLabelProps={{
-                                                                                shrink: true
-                                                                            }}
-                                                                            name="mobile"
-                                                                            onChange={handleChange}
-                                                                            onBlur={handleBlur}
-                                                                            value={values.mobile}
-                                                                            error={Boolean(touched.mobile && errors.mobile)}
-                                                                            helperText={
-                                                                                touched.mobile && errors.mobile ? errors.mobile : ''
-                                                                            }
-                                                                        ></TextField>
-                                                                    </Grid>
-                                                                    <Grid item>
-                                                                        {' '}
-                                                                        <TextField
-                                                                            sx={{
-                                                                                width: { sm: 200, md: 200 },
-                                                                                '& .MuiInputBase-root': {
-                                                                                    height: 40
+                                                                            ></TextField>
+                                                                        </Grid>
+                                                                        <Grid item>
+                                                                            {' '}
+                                                                            <TextField
+                                                                                sx={{
+                                                                                    width: { sm: 200, md: 200 },
+                                                                                    '& .MuiInputBase-root': {
+                                                                                        height: 40
+                                                                                    }
+                                                                                }}
+                                                                                label="Mobile No"
+                                                                                InputLabelProps={{
+                                                                                    shrink: true
+                                                                                }}
+                                                                                name="mobile"
+                                                                                onChange={handleChange}
+                                                                                onBlur={handleBlur}
+                                                                                value={values.mobile}
+                                                                                error={Boolean(touched.mobile && errors.mobile)}
+                                                                                helperText={
+                                                                                    touched.mobile && errors.mobile ? errors.mobile : ''
                                                                                 }
-                                                                            }}
-                                                                            label="Mobile No"
-                                                                            InputLabelProps={{
-                                                                                shrink: true
-                                                                            }}
-                                                                            name="mobile"
-                                                                            onChange={handleChange}
-                                                                            onBlur={handleBlur}
-                                                                            value={values.mobile}
-                                                                            error={Boolean(touched.mobile && errors.mobile)}
-                                                                            helperText={
-                                                                                touched.mobile && errors.mobile ? errors.mobile : ''
-                                                                            }
-                                                                        ></TextField>
-                                                                    </Grid>
-                                                                    <Grid item>
-                                                                        {' '}
-                                                                        <TextField
-                                                                            sx={{
-                                                                                width: { sm: 200, md: 200 },
-                                                                                '& .MuiInputBase-root': {
-                                                                                    height: 40
+                                                                            ></TextField>
+                                                                        </Grid>
+                                                                        <Grid item>
+                                                                            {' '}
+                                                                            <TextField
+                                                                                sx={{
+                                                                                    width: { sm: 200, md: 200 },
+                                                                                    '& .MuiInputBase-root': {
+                                                                                        height: 40
+                                                                                    }
+                                                                                }}
+                                                                                label="Mobile No"
+                                                                                InputLabelProps={{
+                                                                                    shrink: true
+                                                                                }}
+                                                                                name="mobile"
+                                                                                onChange={handleChange}
+                                                                                onBlur={handleBlur}
+                                                                                value={values.mobile}
+                                                                                error={Boolean(touched.mobile && errors.mobile)}
+                                                                                helperText={
+                                                                                    touched.mobile && errors.mobile ? errors.mobile : ''
                                                                                 }
-                                                                            }}
-                                                                            label="Mobile No"
-                                                                            InputLabelProps={{
-                                                                                shrink: true
-                                                                            }}
-                                                                            name="mobile"
-                                                                            onChange={handleChange}
-                                                                            onBlur={handleBlur}
-                                                                            value={values.mobile}
-                                                                            error={Boolean(touched.mobile && errors.mobile)}
-                                                                            helperText={
-                                                                                touched.mobile && errors.mobile ? errors.mobile : ''
-                                                                            }
-                                                                        ></TextField>
+                                                                            ></TextField>
+                                                                        </Grid>
+                                                                        <Grid item>
+                                                                            <Button
+                                                                                type="button"
+                                                                                variant="contained"
+                                                                                style={{ backgroundColor: '#556B2F' }}
+                                                                                sx={{ borderRadius: 60 }}
+                                                                                onClick={() => setOpenCompareRate(true)}
+                                                                            >
+                                                                                Generate
+                                                                            </Button>
+                                                                        </Grid>
                                                                     </Grid>
-                                                                    <Grid item>
-                                                                        <Button
-                                                                            type="button"
-                                                                            variant="contained"
-                                                                            style={{ backgroundColor: '#B31B1B' }}
-                                                                            sx={{ borderRadius: 60 }}
-                                                                            onClick={() => setOpenCompareRate(true)}
-                                                                        >
-                                                                            Generate
-                                                                        </Button>
-                                                                    </Grid>
-                                                                </Grid>
-
+                                                                </fieldset>
                                                                 <Grid style={{ marginTop: '20px' }}>
-                                                                    <fieldset style={{ border: '4px solid' }}>
+                                                                    <fieldset style={{ border: '3px solid #A0A0A0' }}>
                                                                         <legend>Buy Rates</legend>
                                                                         <Grid gap="10px" display="flex" style={{ marginTop: '10px' }}>
                                                                             <Grid item>
@@ -818,11 +820,6 @@ function ProgramAccommodation({ open, handleClose, mode, userCode, component }) 
                                                                                     InputLabelProps={{
                                                                                         shrink: true
                                                                                     }}
-                                                                                    disabled={
-                                                                                        component === 'user_creation' && mode === 'INSERT'
-                                                                                            ? false
-                                                                                            : true
-                                                                                    }
                                                                                     onBlur={handleBlur}
                                                                                     value={values.firstName}
                                                                                     error={Boolean(touched.firstName && errors.firstName)}
@@ -849,11 +846,6 @@ function ProgramAccommodation({ open, handleClose, mode, userCode, component }) 
                                                                                     InputLabelProps={{
                                                                                         shrink: true
                                                                                     }}
-                                                                                    disabled={
-                                                                                        component === 'user_creation' && mode === 'INSERT'
-                                                                                            ? false
-                                                                                            : true
-                                                                                    }
                                                                                     onBlur={handleBlur}
                                                                                     value={values.middleName}
                                                                                     error={Boolean(touched.middleName && errors.middleName)}
@@ -880,11 +872,6 @@ function ProgramAccommodation({ open, handleClose, mode, userCode, component }) 
                                                                                     InputLabelProps={{
                                                                                         shrink: true
                                                                                     }}
-                                                                                    disabled={
-                                                                                        component === 'user_creation' && mode === 'INSERT'
-                                                                                            ? false
-                                                                                            : true
-                                                                                    }
                                                                                     value={values.lastName}
                                                                                     error={Boolean(touched.lastName && errors.lastName)}
                                                                                     helperText={
@@ -910,11 +897,6 @@ function ProgramAccommodation({ open, handleClose, mode, userCode, component }) 
                                                                                     InputLabelProps={{
                                                                                         shrink: true
                                                                                     }}
-                                                                                    disabled={
-                                                                                        component === 'user_creation' && mode === 'INSERT'
-                                                                                            ? false
-                                                                                            : true
-                                                                                    }
                                                                                     onBlur={handleBlur}
                                                                                     value={values.middleName}
                                                                                     error={Boolean(touched.middleName && errors.middleName)}
@@ -941,11 +923,6 @@ function ProgramAccommodation({ open, handleClose, mode, userCode, component }) 
                                                                                     InputLabelProps={{
                                                                                         shrink: true
                                                                                     }}
-                                                                                    disabled={
-                                                                                        component === 'user_creation' && mode === 'INSERT'
-                                                                                            ? false
-                                                                                            : true
-                                                                                    }
                                                                                     value={values.lastName}
                                                                                     error={Boolean(touched.lastName && errors.lastName)}
                                                                                     helperText={
@@ -959,7 +936,7 @@ function ProgramAccommodation({ open, handleClose, mode, userCode, component }) 
                                                                     </fieldset>
                                                                 </Grid>
                                                                 <Grid style={{ marginTop: '20px' }}>
-                                                                    <fieldset style={{ border: '4px solid' }}>
+                                                                    <fieldset style={{ border: '3px solid #A0A0A0' }}>
                                                                         <legend>Buy Rates</legend>
                                                                         <Grid gap="10px" display="flex" style={{ marginTop: '10px' }}>
                                                                             <Grid item>
@@ -977,11 +954,6 @@ function ProgramAccommodation({ open, handleClose, mode, userCode, component }) 
                                                                                     InputLabelProps={{
                                                                                         shrink: true
                                                                                     }}
-                                                                                    disabled={
-                                                                                        component === 'user_creation' && mode === 'INSERT'
-                                                                                            ? false
-                                                                                            : true
-                                                                                    }
                                                                                     onBlur={handleBlur}
                                                                                     value={values.firstName}
                                                                                     error={Boolean(touched.firstName && errors.firstName)}
@@ -1008,11 +980,6 @@ function ProgramAccommodation({ open, handleClose, mode, userCode, component }) 
                                                                                     InputLabelProps={{
                                                                                         shrink: true
                                                                                     }}
-                                                                                    disabled={
-                                                                                        component === 'user_creation' && mode === 'INSERT'
-                                                                                            ? false
-                                                                                            : true
-                                                                                    }
                                                                                     onBlur={handleBlur}
                                                                                     value={values.middleName}
                                                                                     error={Boolean(touched.middleName && errors.middleName)}
@@ -1039,11 +1006,6 @@ function ProgramAccommodation({ open, handleClose, mode, userCode, component }) 
                                                                                     InputLabelProps={{
                                                                                         shrink: true
                                                                                     }}
-                                                                                    disabled={
-                                                                                        component === 'user_creation' && mode === 'INSERT'
-                                                                                            ? false
-                                                                                            : true
-                                                                                    }
                                                                                     value={values.lastName}
                                                                                     error={Boolean(touched.lastName && errors.lastName)}
                                                                                     helperText={
@@ -1069,11 +1031,6 @@ function ProgramAccommodation({ open, handleClose, mode, userCode, component }) 
                                                                                     InputLabelProps={{
                                                                                         shrink: true
                                                                                     }}
-                                                                                    disabled={
-                                                                                        component === 'user_creation' && mode === 'INSERT'
-                                                                                            ? false
-                                                                                            : true
-                                                                                    }
                                                                                     onBlur={handleBlur}
                                                                                     value={values.middleName}
                                                                                     error={Boolean(touched.middleName && errors.middleName)}
@@ -1100,11 +1057,6 @@ function ProgramAccommodation({ open, handleClose, mode, userCode, component }) 
                                                                                     InputLabelProps={{
                                                                                         shrink: true
                                                                                     }}
-                                                                                    disabled={
-                                                                                        component === 'user_creation' && mode === 'INSERT'
-                                                                                            ? false
-                                                                                            : true
-                                                                                    }
                                                                                     value={values.lastName}
                                                                                     error={Boolean(touched.lastName && errors.lastName)}
                                                                                     helperText={

@@ -12,7 +12,9 @@ import {
     SUCCESS_LAST_MODIFIED_DATE_EXCHNAGE_RATE_TYPE,
     FAILED_LAST_MODIFIED_DATE_EXCHNAGE_RATE_TYPE,
     SUCCESS_EXCHNAGE_RATE_TYPE_DATA_BY_CURRENCY_ID,
-    FAILED_EXCHNAGE_RATE_TYPE_DATA_BY_CURRENCY_ID
+    FAILED_EXCHNAGE_RATE_TYPE_DATA_BY_CURRENCY_ID,
+    SUCCESS_CONVERT_CURRENCY_TO_BASE_CURRENCY,
+    FAILED_CONVERT_CURRENCY_TO_BASE_CURRENCY
 } from '../../constant/master/ExchangeRateConstant';
 
 //exchange rate type saga
@@ -121,5 +123,24 @@ export function* getExChangeRateDataByCurrencyId(action) {
     } catch (e) {
         console.log(e);
         yield put({ type: FAILED_EXCHNAGE_RATE_TYPE_DATA_BY_CURRENCY_ID, data: responseData.data });
+    }
+}
+
+export function* convertCurrencyToBaseCurrencySaga(action) {
+    action.data.path = `${process.env.REACT_APP_FINANCE_URL}/exchangeRate`;
+    let responseData = [];
+    try {
+        responseData = yield call(create, action.data);
+        console.log(responseData.data.payload);
+
+        yield put({
+            type: SUCCESS_CONVERT_CURRENCY_TO_BASE_CURRENCY,
+            data: responseData.data
+        });
+    } catch (e) {
+        yield put({
+            type: FAILED_CONVERT_CURRENCY_TO_BASE_CURRENCY,
+            data: responseData.data
+        });
     }
 }
