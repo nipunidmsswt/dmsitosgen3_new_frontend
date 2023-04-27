@@ -129,21 +129,22 @@ function ProgramCreationDetails(startDate) {
     const [openErrorToast, setOpenErrorToast] = useState(false);
     const [tableData, setTableData] = useState([]);
     const [mode, setMode] = useState('INSERT');
+    const [editData, setEditData] = useState({});
     const [dialogData, setDialogData] = useState([]);
     const classes = useStyles();
     const dispatch = useDispatch();
     const widthValues = ['50px', '120px', '350px', '150px'];
     const paddingValues = ['8px 20px', '8px 8px', '8px 8px', '8px 8px'];
-    const transportTypeId = 'T001';
-    const filteredIds = ['D1', 'D2', 'D3'];
+    // const transportTypeId = 'T001';
+    // const filteredIds = ['D1', 'D2', 'D3'];
 
-    useEffect(() => {
-        dispatch(getAllActiveTransportMainCategoryDataByType('Transport Type'));
-        dispatch(getAllActiveVehicleTypeDataByType('Vehicle Type'));
-        dispatch(getAllActiveVehicleCategoryDataByType('Vehicle Category'));
-        dispatch(getActiveLocations());
-        dispatch(getCalculatedDistanceAndDuration(transportTypeId, filteredIds));
-    }, []);
+    // useEffect(() => {
+    //     dispatch(getAllActiveTransportMainCategoryDataByType('Transport Type'));
+    //     dispatch(getAllActiveVehicleTypeDataByType('Vehicle Type'));
+    //     dispatch(getAllActiveVehicleCategoryDataByType('Vehicle Category'));
+    //     dispatch(getActiveLocations());
+    //     dispatch(getCalculatedDistanceAndDuration(transportTypeId, filteredIds));
+    // }, []);
 
     const columns = [
         {
@@ -228,10 +229,13 @@ function ProgramCreationDetails(startDate) {
     };
 
     const handleClickOpen = (type, category, data, activeIndex) => {
-        if (type === 'VIEW_UPDATE') {
+        if (type === 'UPDATE') {
             setMode(type);
+            setEditData(data);
+            console.log(type, category, editData);
         } else if (type === 'INSERT') {
             setMode(type);
+            setEditData(null);
         } else {
             setMode(type);
         }
@@ -421,7 +425,7 @@ function ProgramCreationDetails(startDate) {
                                     //    handleButtonTextChange(i, event)
                                     //  }
                                 /> */}
-                                {errors[`input-${activeButton}`] && touched[`input-${activeButton}`] ? (
+                                {/* {errors[`input-${activeButton}`] && touched[`input-${activeButton}`] ? (
                                     <div>
                                         {errors[`input-${activeButton}`]}
                                         {setActiveButtonColor('red')}
@@ -437,11 +441,18 @@ function ProgramCreationDetails(startDate) {
                                         {setActiveButtonColor('#1877f2')}
                                         {setPreButtonColor('#1877f2')}
                                     </div>
-                                ) : null}
+                                ) : null} */}
                             </div>
                             <br />
                             {openTransport[i] ? ( // Unique identifier (i) to determine if the ProgramTransport component should be rendered
-                                <ProgramTransport open={true} handleClose={handleClose} mode={mode} onSave={handleSaveData} formIndex={i} />
+                                <ProgramTransport
+                                    open={true}
+                                    handleClose={handleClose}
+                                    mode={mode}
+                                    onSave={handleSaveData}
+                                    formIndex={i}
+                                    editData={editData}
+                                />
                             ) : null}
                             {openActivites[i] ? (
                                 <ProgramActivity open={true} handleClose={handleClose} mode={mode} startDate={startDate} />
@@ -481,7 +492,11 @@ function ProgramCreationDetails(startDate) {
                                                         onClick={() => handleMoveDown(activeButton, j)}
                                                         style={{ color: '#1877f2' }}
                                                     />
-                                                    <EditIcon onClick={console.log(data, i, activeButton, dialogData)} />
+                                                    <EditIcon
+                                                        onClick={() =>
+                                                            handleClickOpen('UPDATE', data.popUpType, dialogData[activeButton][j], i)
+                                                        }
+                                                    />
                                                     <ReplyIcon style={{ transform: 'scaleX(-1)' }} />
                                                     <CancelRoundedIcon
                                                         onClick={() => handleDeleteData(activeButton, j)}

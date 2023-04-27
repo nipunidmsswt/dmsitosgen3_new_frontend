@@ -70,7 +70,7 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: 'white'
     }
 }));
-function ProgramTransport({ open, handleClose, mode, onSave, formIndex }) {
+function ProgramTransport({ open, handleClose, mode, onSave, formIndex, editData }) {
     const initialValues = {
         paxBaggage: '',
         transportType: null,
@@ -90,9 +90,27 @@ function ProgramTransport({ open, handleClose, mode, onSave, formIndex }) {
         distance: null,
         duration: null
     };
+    const loadValues = {
+        paxBaggage: editData.paxBaggage,
+        transportType: editData.transportType,
+        chargeMethod: editData.chargeMethod,
+        vehicleType: editData.vehicleType,
+        vehicleCategory: editData.vehicleCategory,
+        location1: editData.location1,
+        location2: editData.location2,
+        location3: editData.location3,
+        location4: editData.location4,
+        location5: editData.location5,
+        location6: editData.location6,
+        location7: editData.location7,
+        location8: editData.location8,
+        location9: editData.location9,
+        location10: editData.location10,
+        distance: null,
+        duration: null
+    };
 
     const [formValues, setFormValues] = useState(initialValues);
-    const [loadValues, setLoadValues] = useState(null);
     const [activeTransportTypeList, setActiveTransportTypeList] = useState([]);
     const [activeVehicleTypeList, setActiveVehicleTypeList] = useState([]);
     const [activeVehicleCategoryList, setActiveVehicleCategoryList] = useState([]);
@@ -110,8 +128,10 @@ function ProgramTransport({ open, handleClose, mode, onSave, formIndex }) {
     const [location9, setLocation9] = useState({});
     const [location10, setLocation10] = useState({});
     const [locationIds, setLocationIds] = useState([]);
-    const [distance, setDistance] = useState(0);
-    const [duration, setDuration] = useState(0);
+    const [locationCodes, setLocationCodes] = useState([]);
+    const [calculateStatus, setCalculateStatus] = useState(false);
+    const [distance, setDistance] = useState();
+    const [duration, setDuration] = useState();
     const dispatch = useDispatch();
     const classes = useStyles();
 
@@ -239,8 +259,8 @@ function ProgramTransport({ open, handleClose, mode, onSave, formIndex }) {
             const filteredIds = locationIds.filter((id) => id !== '' && id !== undefined);
             const transportTypeId = transportType.categoryId;
             console.log(filteredIds);
+            setCalculateStatus(true);
             dispatch(getCalculatedDistanceAndDuration(transportTypeId, filteredIds));
-            console.log(duration);
         }
     };
 
@@ -295,9 +315,23 @@ function ProgramTransport({ open, handleClose, mode, onSave, formIndex }) {
 
     useEffect(() => {
         const newIds = [location1, location2, location3, location4, location5, location6, location7, location8, location9, location10].map(
-            (location) => (location === null || location === undefined ? '' : location.code)
+            (location) => (location === null || location === undefined ? '' : location.location_id)
         );
+        const newCodes = [
+            location1,
+            location2,
+            location3,
+            location4,
+            location5,
+            location6,
+            location7,
+            location8,
+            location9,
+            location10
+        ].map((location) => (location === null || location === undefined ? '' : location.code));
         setLocationIds(newIds);
+        setLocationCodes(newCodes);
+        setCalculateStatus(false);
     }, [location1, location2, location3, location4, location5, location6, location7, location8, location9, location10]);
 
     // useEffect(() => {
@@ -357,7 +391,7 @@ function ProgramTransport({ open, handleClose, mode, onSave, formIndex }) {
     }, [calculatedDuration]);
 
     useEffect(() => {
-        console.log('Transport Popup');
+        console.log(editData);
         dispatch(getAllActiveTransportMainCategoryDataByType('Transport Type'));
         dispatch(getAllActiveVehicleTypeDataByType('Vehicle Type'));
         dispatch(getAllActiveVehicleCategoryDataByType('Vehicle Category'));
@@ -379,7 +413,7 @@ function ProgramTransport({ open, handleClose, mode, onSave, formIndex }) {
                 <DialogTitle>
                     <Box display="flex" className="dialog-title">
                         <Box flexGrow={1}>
-                            {mode === 'INSERT' ? 'Add' : ''} {mode === 'VIEW_UPDATE' ? 'Update' : ''} Transport
+                            {mode === 'INSERT' ? 'Add' : ''} {mode === 'UPDATE' ? 'Update' : ''} Transport
                         </Box>
                         <Box>
                             <IconButton onClick={handleClose}>
@@ -393,9 +427,9 @@ function ProgramTransport({ open, handleClose, mode, onSave, formIndex }) {
                     <div>
                         <Formik
                             enableReinitialize={true}
-                            initialValues={loadValues || initialValues}
+                            initialValues={mode === 'UPDATE' ? loadValues : initialValues}
                             onSubmit={(values) => {
-                                const filteredArrList = locationIds.filter((item) => item !== '' && item !== undefined && item !== null);
+                                const filteredArrList = locationCodes.filter((item) => item !== '' && item !== undefined && item !== null);
                                 const combinedLocations = filteredArrList.join('/ ');
                                 values.locations = combinedLocations;
                                 values.popUpType = 'Transport';
@@ -504,7 +538,6 @@ function ProgramTransport({ open, handleClose, mode, onSave, formIndex }) {
                                                         name="chargeMethod"
                                                         onChange={(_, value) => {
                                                             setFieldValue(`chargeMethod`, value);
-                                                            handleChargeMethod(value);
                                                             console.log(value);
                                                         }}
                                                         fullWidth
@@ -1089,7 +1122,7 @@ function ProgramTransport({ open, handleClose, mode, onSave, formIndex }) {
                                                 </Grid>
                                             </Grid>
                                             <Grid display="flex" style={{ marginTop: '50px' }}>
-                                                <Grid item>
+                                                {/* <Grid item>
                                                     <Button
                                                         className={classes.saveButton}
                                                         style={{ width: '90px', left: '20px' }}
@@ -1101,6 +1134,31 @@ function ProgramTransport({ open, handleClose, mode, onSave, formIndex }) {
                                                     >
                                                         Calculate
                                                     </Button>
+                                                </Grid> */}
+                                                <Grid item>
+                                                    <FormGroup>
+                                                        <FormControlLabel
+                                                            name="calculateStatus"
+                                                            value={calculateStatus}
+                                                            control={<Switch color="success" />}
+                                                            label="Calculate"
+                                                            labelPlacement="start"
+                                                            checked={calculateStatus}
+                                                            onChange={(event) => {
+                                                                if (event.target.checked) {
+                                                                    handleCalculate(
+                                                                        values,
+                                                                        setFieldError,
+                                                                        setFieldTouched,
+                                                                        errors,
+                                                                        touched
+                                                                    );
+                                                                }
+                                                                handleChange(event);
+                                                            }}
+                                                            // disabled={mode == 'VIEW'}
+                                                        />
+                                                    </FormGroup>
                                                 </Grid>
                                                 <Grid item>
                                                     <TextField
