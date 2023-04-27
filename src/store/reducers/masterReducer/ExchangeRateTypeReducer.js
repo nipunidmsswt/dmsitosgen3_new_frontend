@@ -10,7 +10,9 @@ import {
     SUCCESS_LAST_MODIFIED_DATE_EXCHNAGE_RATE_TYPE,
     FAILED_LAST_MODIFIED_DATE_EXCHNAGE_RATE_TYPE,
     SUCCESS_EXCHNAGE_RATE_TYPE_DATA_BY_CURRENCY_ID,
-    FAILED_EXCHNAGE_RATE_TYPE_DATA_BY_CURRENCY_ID
+    FAILED_EXCHNAGE_RATE_TYPE_DATA_BY_CURRENCY_ID,
+    SUCCESS_CONVERT_CURRENCY_TO_BASE_CURRENCY,
+    FAILED_CONVERT_CURRENCY_TO_BASE_CURRENCY
 } from '../../constant/master/ExchangeRateConstant';
 
 const initialState = {
@@ -20,7 +22,8 @@ const initialState = {
     errorMsg: null,
     duplicateExchangeRateTypeGroup: null,
     lastModifiedDateTime: null,
-    rateListByCurrencyID: []
+    rateListByCurrencyID: [],
+    convertCurrencytoBaseCurrency: ''
 };
 
 export const exchangeRateTypesReducer = (state = initialState, action) => {
@@ -94,6 +97,15 @@ export const exchangeRateTypesReducer = (state = initialState, action) => {
         case FAILED_EXCHNAGE_RATE_TYPE_DATA_BY_CURRENCY_ID:
             return { ...state, rateListByCurrencyID: data };
 
+        case SUCCESS_CONVERT_CURRENCY_TO_BASE_CURRENCY:
+            return { ...state, convertCurrencytoBaseCurrency: data.payload[0] };
+
+        case FAILED_CONVERT_CURRENCY_TO_BASE_CURRENCY:
+            return {
+                ...state,
+                convertCurrencytoBaseCurrency: '',
+                errorMsg: data ? data.errorMessages : 'netwok error'
+            };
         default:
             return state;
     }

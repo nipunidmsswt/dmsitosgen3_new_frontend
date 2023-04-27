@@ -13,7 +13,9 @@ import {
     SUCCESS_LAST_MODIFIED_DATE_HOTEL_MAIN,
     FAILED_LAST_MODIFIED_DATE_HOTEL_MAIN,
     SUCCESS_ACTIVE_HOTEL_MAIN_LIST_DATA,
-    FAILED_ACTIVE_HOTEL_MAIN_LIST_DATA
+    FAILED_ACTIVE_HOTEL_MAIN_LIST_DATA,
+    SUCCESS_GET_HOTELS_BY_LOCATION_CURRENCY_MIN_MAX,
+    FAILED_GET_HOTELS_BY_LOCATION_CURRENCY_MIN_MAX
 } from 'store/constant/master/HotelMasterConstant';
 
 export function* saveHotelMainSaga(action) {
@@ -103,5 +105,18 @@ export function* getAllActiveHotelMainSaga() {
         yield put({ type: SUCCESS_ACTIVE_HOTEL_MAIN_LIST_DATA, data: responseData.data });
     } catch (e) {
         yield put({ type: FAILED_ACTIVE_HOTEL_MAIN_LIST_DATA, data: responseData.data });
+    }
+}
+
+export function* getHotelsByLocationCurrencyMinMaxRates(action) {
+    action.data.path = `${process.env.REACT_APP_ACCOMODATION_URL}/filterHotels`;
+    let responseData = [];
+    try {
+        responseData = yield call(create, action.data);
+        console.log(responseData.data.payload);
+
+        yield put({ type: SUCCESS_GET_HOTELS_BY_LOCATION_CURRENCY_MIN_MAX, data: responseData.data });
+    } catch (e) {
+        yield put({ type: FAILED_GET_HOTELS_BY_LOCATION_CURRENCY_MIN_MAX, data: responseData.data });
     }
 }

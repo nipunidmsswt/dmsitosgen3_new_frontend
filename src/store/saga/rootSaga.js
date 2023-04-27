@@ -64,7 +64,8 @@ import {
     GET_ALL_EXCHNAGE_RATE_TYPE_DATA,
     GET_EXCHNAGE_RATE_TYPE_BY_ID,
     GET_LAST_MODIFIED_DATE_TIME_EXCHNAGE_RATE_TYPE,
-    GET_EXCHNAGE_RATE_TYPE_DATA_BY_CURRENCY_ID
+    GET_EXCHNAGE_RATE_TYPE_DATA_BY_CURRENCY_ID,
+    CONVERT_CURRENCY_TO_BASE_CURRENCY
 } from 'store/constant/master/ExchangeRateConstant';
 
 import {
@@ -73,7 +74,8 @@ import {
     getAllExchnageRateTypeDataSaga,
     getExchangeRateTypeByIdSaga,
     checkLatestCurrencyModifiedDateSaga,
-    getExChangeRateDataByCurrencyId
+    getExChangeRateDataByCurrencyId,
+    convertCurrencyToBaseCurrencySaga
 } from './mastersaga/ExchangeRateTypeSaga';
 
 import {
@@ -384,7 +386,8 @@ import {
     GET_EXPENSE_TYPES_LAST_MODIFIED_DATE_TIME,
     SAVE_EXPENSE_TYPES,
     UPDATE_EXPENSE_TYPES,
-    GET_ALL_ACTIVE_EXPENSE_TYPES
+    GET_ALL_ACTIVE_EXPENSE_TYPES,
+    CHECK_EXPENSE_TYPES_DESCRIPTION_DUPLICATE
 } from 'store/constant/master/ExpenseTypesConstant';
 import {
     checkExpenseTypesDupicateCodeSaga,
@@ -394,7 +397,8 @@ import {
     getExpenseTypesLatestModifiedDateSaga,
     saveExpenseTypesDataHandler,
     updateExpenseTypesDataSaga,
-    getAllActiveExpenseTypesDataSaga
+    getAllActiveExpenseTypesDataSaga,
+    checkExpenseTypesDupicateDescriptionSaga
 } from './mastersaga/ExpenseTypesSaga';
 
 import { getAllChargeMethods, getAllModeOfTransort } from './mastersaga/TransportRateSaga';
@@ -557,7 +561,8 @@ import {
     getAllHotelMainSaga,
     getHotelMainByIdSaga,
     saveHotelMainSaga,
-    updateHotelMainSaga
+    updateHotelMainSaga,
+    getHotelsByLocationCurrencyMinMaxRates
 } from './mastersaga/HotelMainSaga';
 import {
     CHECK_HOTEL_MAIN_DUPLICATE,
@@ -566,7 +571,8 @@ import {
     GET_HOTEL_MAIN_DATA_BY_ID,
     GET_LAST_MODIFIED_DATE_TIME_HOTEL_MAIN,
     SAVE_HOTEL_MAIN_DATA,
-    UPDATE_HOTEL_MAIN_DATA
+    UPDATE_HOTEL_MAIN_DATA,
+    GET_HOTELS_BY_LOCATION_CURRENCY_MIN_MAX
 } from 'store/constant/master/HotelMasterConstant';
 
 import {
@@ -719,14 +725,16 @@ import {
     GET_ALL_DISTANCE_DATA,
     GET_DISTANCE_DATA_BY_ID,
     SAVE_DISTANCE_DATA,
-    UPDATE_DISTANCE_DATA
+    UPDATE_DISTANCE_DATA,
+    GET_CALCULATED_DISTANCE_AND_DURATION
 } from 'store/constant/master/TransportMasterConstant/DistanceConstant';
 import {
     getAllActiveDistanceDataByTransportTypeSaga,
     getDistanceByIdSaga,
     saveDistanceDataHandler,
     saveDistanceSaga,
-    updateDistanceSaga
+    updateDistanceSaga,
+    getDistanceAndDurationSaga
 } from './mastersaga/transportSaga/DistanceSaga';
 export function* wacherSaga() {
     // tax setup
@@ -767,6 +775,7 @@ export function* wacherSaga() {
     yield takeLatest(UPDATE_EXCHNAGE_RATE_TYPE_DATA, updateExchangeRateTypeSaga);
     yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_EXCHNAGE_RATE_TYPE, checkLatestCurrencyModifiedDateSaga);
     yield takeLatest(GET_EXCHNAGE_RATE_TYPE_DATA_BY_CURRENCY_ID, getExChangeRateDataByCurrencyId);
+    yield takeLatest(CONVERT_CURRENCY_TO_BASE_CURRENCY, convertCurrencyToBaseCurrencySaga);
 
     // //product  setup
 
@@ -894,7 +903,7 @@ export function* wacherSaga() {
     yield takeLatest(CHECK_SEASON_DUPLICATE, checkDupicateSeasonSaga);
     yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_SEASON, checkLatestSeasonModifiedDateSaga);
     yield takeLatest(ACTIVE_RATES_BY_SEASON_ID, getAllActiveRatesBySeasonSaga);
-    yield takeLatest(ACTIVE_SEASON_LIST_DATA, getAllActiveSeasonSaga);
+    // yield takeLatest(ACTIVE_SEASON_LIST_DATA, getAllActiveSeasonSaga);
 
     // //hotel facility data
     yield takeLatest(SAVE_HOTEL_FACILITY_DATA, saveHotelFacilitySaga);
@@ -939,6 +948,7 @@ export function* wacherSaga() {
 
     //charge method
     yield takeLatest(GET_ALL_CHARGE_METHOD_DATA, getAllChargeMethods);
+    yield takeLatest(CHECK_EXPENSE_TYPES_DESCRIPTION_DUPLICATE, checkExpenseTypesDupicateDescriptionSaga);
 
     //mode of transport
     yield takeLatest(GET_ALL_MODE_OF_TRANSPORT_DATA, getAllModeOfTransort);
@@ -1052,6 +1062,7 @@ export function* wacherSaga() {
     yield takeLatest(CHECK_HOTEL_MAIN_DUPLICATE, checkDupicateHotelMainCodeSaga);
     yield takeLatest(GET_LAST_MODIFIED_DATE_TIME_HOTEL_MAIN, checkLatestHotelMainModifiedDateSaga);
     yield takeLatest(GET_ALL_ACTIVE_HOTEL_MAIN_DATA, getAllActiveHotelMainSaga);
+    yield takeLatest(GET_HOTELS_BY_LOCATION_CURRENCY_MIN_MAX, getHotelsByLocationCurrencyMinMaxRates);
 
     //bank Details
     yield takeLatest(SAVE_BANK_DETAILS_DATA, saveBankDetailsSaga);
@@ -1112,6 +1123,7 @@ export function* wacherSaga() {
     yield takeLatest(GET_ALL_ACTIVE_DISTANCE_DATA_TBY_TRANSPORT_TYPE, getAllActiveDistanceDataByTransportTypeSaga);
     // yield takeLatest(CHECK_ROOM_BUYING_RATE_CODE_DUPLICATE, checkDupicateRoomBuyingRateSaga);
     yield takeLatest(UPDATE_DISTANCE_DATA, updateDistanceSaga);
+    yield takeLatest(GET_CALCULATED_DISTANCE_AND_DURATION, getDistanceAndDurationSaga);
 
     //baggage
     yield takeLatest(SAVE_BAGGAGE_TRANSPORT_RATE, saveBaggageTransportRateSaga);
